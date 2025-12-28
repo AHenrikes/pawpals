@@ -1,0 +1,19 @@
+{
+  "name": "@repo/supabase",
+  "version": "1.0.0",
+  "main": "client.ts",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "private": true,
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "generate:component": "turbo gen react-component",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "latest"
+  }
+}
