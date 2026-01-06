@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useRef, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useSupabaseClient } from "./useSupabaseClient";
+import { useEffect, useRef, useState } from "react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import { createClient } from "@repo/supabase/client";
 
 export type useSessionType = {
   isLoggedIn: boolean;
@@ -15,8 +14,7 @@ export function useSession(): useSessionType {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const supabase = useMemo(() => createClient(), []);
-  const router = useRouter();
+  const supabase = useSupabaseClient();
   const mountedRef = useRef(true);
 
   function toError(err: unknown): Error {
@@ -36,8 +34,8 @@ export function useSession(): useSessionType {
         console.error("Logout error:", error);
         return;
       }
+      globalThis.location.assign(AUTH_ROUTES.HOME);
       
-      router.push(AUTH_ROUTES.SIGNIN);
     } catch (err) {
       console.error("Logout failed:", err);
     }

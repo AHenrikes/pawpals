@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { SmoothScroll } from "@/providers/SmoothScroll";
 import { ThemeProvider } from "next-themes";
-import Header from "@/components/Header";
+import { SmoothScroll } from "@/providers/SmoothScroll";
+import HeaderSwitcher from "@/lib/headerSwitch";
 import Footer from "@/components/Footer";
+import { Suspense } from "react";
 import "./pawpall.css";
 
 const defaultUrl = process.env.VERCEL_URL? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
@@ -24,21 +25,23 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <div id="smooth-wrapper">
-          <div id="smooth-content">
-            <SmoothScroll />
+          <div id="smooth-wrapper">
+            <div id="smooth-content">
+              <SmoothScroll />
               <ThemeProvider
                 attribute="class"
                 defaultTheme="system"
                 enableSystem
                 disableTransitionOnChange
               >
-                <Header />
+                <Suspense>
+                  <HeaderSwitcher />
+                </Suspense>
                 {children}
                 <Footer />
               </ThemeProvider>
+            </div>
           </div>
-        </div>
       </body>
     </html>
   );

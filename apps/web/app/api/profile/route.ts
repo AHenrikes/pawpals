@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
+import { createServer } from "@repo/supabase/server";
 import type { NextRequest } from "next/server";
 import {
-  getProfileForCurrentUser,
-  updateProfileForCurrentUser,
-  deleteProfileForCurrentUser,
+  getProfile,
+  updateProfile,
+  deleteProfile,
 } from "@repo/supabase/user-actions";
 
 export async function GET() {
-  const { profile, error } = await getProfileForCurrentUser();
+  const supabase = await createServer();
+  const { profile, error } = await getProfile(supabase);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ profile });
@@ -15,8 +17,9 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const supabase = await createServer();
     const body = await request.json();
-    const { profile, error } = await updateProfileForCurrentUser(body ?? {});
+    const { profile, error } = await updateProfile(supabase, body ?? {});
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ profile });
@@ -27,7 +30,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE() {
-  const { ok, error } = await deleteProfileForCurrentUser();
+  const supabase = await createServer();
+  const { ok, error } = await deleteProfile(supabase);
   
   if (!ok) return NextResponse.json({ error: error?.message ?? "failed" }, { status: 500 });
   return NextResponse.json({ ok: true });

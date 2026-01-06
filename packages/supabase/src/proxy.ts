@@ -38,7 +38,7 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const protectedPaths = ["/dashboard", "/new-password"];
+  const protectedPaths = ["/api","/pawspot", "/settings", "/store"];
   const pathname = request.nextUrl.pathname;
 
   if (protectedPaths.some((path) => pathname.startsWith(path)) && !user) {

@@ -22,7 +22,7 @@ export default function UpdatePassword() {
   const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm({ password: "" }, async (values) => {
     const { error } = await supabase.auth.updateUser({ password: values.password });
     if (error) throw error;
-    router.push(AUTH_ROUTES.DASHBOARD);
+    router.push(AUTH_ROUTES.HOME);
   });
 
   return (

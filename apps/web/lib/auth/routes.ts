@@ -7,9 +7,13 @@ export const AUTH_ROUTES = {
   SIGNUP_SUCCESS: "/sign-up-success",
   FORGOT_PASSWORD: "/forgot-password",
   UPDATE_PASSWORD: "/new-password",
-  ERROR: "/error",
+  COMMUNITY: "/community",
+  SETTINGS: "/settings",
+  PAWSPOT: "/pawspot",
   CONFIRM: "/confirm",
-  DASHBOARD: "/dashboard",
+  ABOUT: "/about",
+  STORE: "/store",
+  ERROR: "/error",
   HOME: "/",
 } as const;
 

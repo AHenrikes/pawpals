@@ -1,23 +1,19 @@
-import { createClient } from "./server";
-
+import { SupabaseClient } from "@supabase/supabase-js";
 /**
  * Server-side auth helpers for common user actions.
  * Place reusable, server-only auth logic here so all apps can import it.
 */
-export async function getServerSession() {
-  const supabase = await createClient();
+export async function getSession(supabase: SupabaseClient) {
   const { data, error } = await supabase.auth.getSession();
   return { session: data?.session ?? null, error: error ?? null };
 }
 
-export async function getServerUser() {
-  const supabase = await createClient();
+export async function getUser(supabase: SupabaseClient) {
   const { data, error } = await supabase.auth.getUser();
   return { user: data?.user ?? null, error: error ?? null };
 }
 
-export async function getProfileForCurrentUser() {
-  const supabase = await createClient();
+export async function getProfile(supabase: SupabaseClient) {
   const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr) return { profile: null, error: userErr };
   const userId = userData?.user?.id;
@@ -27,15 +23,13 @@ export async function getProfileForCurrentUser() {
   return { profile: data ?? null, error: error ?? null };
 }
 
-export async function getProfileById(userId: string) {
-  const supabase = await createClient();
+export async function getProfileById(supabase: SupabaseClient, userId: string) {
   if (!userId) return { profile: null, error: new Error("userId required") };
   const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
   return { profile: data ?? null, error: error ?? null };
 }
 
-export async function updateProfileForCurrentUser(updates: Record<string, unknown>) {
-  const supabase = await createClient();
+export async function updateProfile(supabase: SupabaseClient, updates: Record<string, unknown>) {
   const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr) return { profile: null, error: userErr };
   const userId = userData?.user?.id;
@@ -45,8 +39,7 @@ export async function updateProfileForCurrentUser(updates: Record<string, unknow
   return { profile: data ?? null, error: error ?? null };
 }
 
-export async function deleteProfileForCurrentUser() {
-  const supabase = await createClient();
+export async function deleteProfile(supabase: SupabaseClient) {
   const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr) return { ok: false, error: userErr };
   const userId = userData?.user?.id;
@@ -85,10 +78,10 @@ export async function adminDeleteUser(userId: string) {
 }
 
 export default {
-  getServerUser,
-  getServerSession,
-  getProfileForCurrentUser,
-  updateProfileForCurrentUser,
-  deleteProfileForCurrentUser,
+  getUser,
+  getSession,
+  getProfile,
+  updateProfile,
+  deleteProfile,
   adminDeleteUser,
 };
