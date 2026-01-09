@@ -30,7 +30,7 @@ export default function SignUpForm() {
         email: values.email,
         password: values.password,
         options: {
-          emailRedirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.DASHBOARD}`,
+          emailRedirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.HOME}`,
         },
       });
       if (error) throw error;

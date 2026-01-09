@@ -17,7 +17,12 @@ export default function SignIn() {
   const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm({ email: "", password: "" }, async (values) => {
     const { error } = await supabase.auth.signInWithPassword({ email: values.email, password: values.password });
     if (error) throw error;
-    router.push(AUTH_ROUTES.DASHBOARD);
+    
+    if (typeof globalThis === "undefined") {
+      router.push(AUTH_ROUTES.HOME);
+    } else {
+      globalThis.location.assign(AUTH_ROUTES.HOME);
+    }
   });
 
   return (
@@ -84,6 +89,5 @@ export default function SignIn() {
         </Card>
       </div>
     </main>
-    
   );
 }

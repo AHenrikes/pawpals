@@ -1,4 +1,5 @@
 'use client'
+import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useSession } from "@/hooks/useSession"
 import { usePathname } from "next/navigation";
 import { Button } from "@repo/ui/button";
@@ -11,11 +12,10 @@ export default function Aside() {
   const { signOut  } = useSession();
 
   const navLinks: NavLinkProp[] = [
-    {href: "/dashboard", label: "Home"},
-    {href: "/inbox", label: "Inbox"},
-    {href: "/store", label: "Store"},
-    {href: "Map", label: "Map"},
-    {href: "Settings", label: "Settings"}
+    {href: AUTH_ROUTES.HOME, label: "Home"},
+    {href: AUTH_ROUTES.STORE, label: "Store"},
+    {href: AUTH_ROUTES.PAWSPOT, label: "Pawspot"},
+    {href: AUTH_ROUTES.SETTINGS, label: "Settings"}
   ]
 
   return (
@@ -29,7 +29,7 @@ export default function Aside() {
           ))}
         </ul>
 
-        <Button onClick={signOut} size="sm" variant="outline">
+        <Button onClick={ signOut } size="sm" variant="outline">
           Logout
         </Button>
       </nav>
