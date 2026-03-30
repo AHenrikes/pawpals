@@ -14,6 +14,8 @@ export function useAuthForm<T extends Record<string, unknown>>(initialValues: T,
   const [values, setValues] = useState<T>(initialValues);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const onSuccess = options?.onSuccess;
+  const onError = options?.onError;
 
   const handleChange = useCallback((field: keyof T, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
@@ -21,26 +23,24 @@ export function useAuthForm<T extends Record<string, unknown>>(initialValues: T,
   },[]);
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.SubmitEvent) => {
       e.preventDefault();
       setIsLoading(true);
       setError(null);
 
       try {
         await onSubmit(values);
-        options?.onSuccess?.();
+        onSuccess?.();
 
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : "An error occurred";
         setError(errorMessage);
-        options?.onError?.(err instanceof Error ? err : new Error(errorMessage));
+        onError?.(err instanceof Error ? err : new Error(errorMessage));
 
-      } finally {
-        setIsLoading(false);
-      }
+      } finally { setIsLoading(false)}
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [values, onSubmit]
+
+    [values, onSubmit, onSuccess, onError]
   );
 
   return {

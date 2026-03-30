@@ -3,14 +3,14 @@ import { useSupabaseClient } from "./useSupabaseClient";
 import { useEffect, useRef, useState } from "react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 
-export type useSessionType = {
+export type UseSessionResult = {
   isLoggedIn: boolean;
   signOut: () => Promise<void>;
   loading: boolean;
   error: Error | null;
 };
 
-export function useSession(): useSessionType {
+export function useSession(): UseSessionResult {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);

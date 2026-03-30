@@ -1,9 +1,9 @@
 import { createServer } from "@repo/supabase/server";
-import LandingPage from "./LandingPage";
-import Dashboard from "./(dashboard)/page";
 import DashboardLayout from "./(dashboard)/layout";
+import Dashboard from "./(dashboard)/page";
+import { Suspense } from "react";
 
-export default async function Home() {
+export async function LandingPage() {
   const supabase = await createServer();
   const { data } = await supabase.auth.getSession();
   const session = data?.session ?? null;
@@ -16,5 +16,16 @@ export default async function Home() {
     );
   }
 
-  return <LandingPage />;
+  return (
+    <main className="h-screen">
+    </main>
+  );
+}
+
+export default function Home() {
+  return(
+    <Suspense fallback={(<h1>Loading...</h1>)}>
+      <LandingPage />
+    </Suspense>
+  )
 }

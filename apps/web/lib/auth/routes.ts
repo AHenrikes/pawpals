@@ -2,8 +2,8 @@
  * Centralized auth route constants to avoid hardcoded strings
 **/
 export const AUTH_ROUTES = {
-  SIGNIN: "/sign-in",
-  SIGNUP: "/sign-up",
+  SIGN_IN: "/sign-in",
+  SIGN_UP: "/sign-up",
   SIGNUP_SUCCESS: "/sign-up-success",
   FORGOT_PASSWORD: "/forgot-password",
   UPDATE_PASSWORD: "/new-password",

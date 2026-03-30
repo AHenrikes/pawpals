@@ -5,14 +5,14 @@ import { SmoothScroll } from "@/providers/SmoothScroll";
 import HeaderSwitcher from "@/lib/headerSwitch";
 import Footer from "@/components/Footer";
 import { Suspense } from "react";
-import "./pawpall.css";
+import "./pawpal.css";
 
 const defaultUrl = process.env.VERCEL_URL? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Pawpal",
+  description: "A social app built for furry communities",
 };
 
 const geistSans = Geist({
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 enableSystem
                 disableTransitionOnChange
               >
-                <Suspense>
+                <Suspense fallback={null}>
                   <HeaderSwitcher />
                 </Suspense>
                 {children}

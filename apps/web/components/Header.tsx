@@ -9,10 +9,10 @@ import { Button } from "@repo/ui/button";
 type NavLinkProp = { href: string; label: string };
 
 export function Header() {
-  const currentPath = usePathname()
-  const btn: NavLinkProp = currentPath === AUTH_ROUTES.SIGNIN ? 
-
-  { href: AUTH_ROUTES.SIGNUP, label: "Sign up" } : { href: AUTH_ROUTES.SIGNIN, label: "Sign in" };
+  const currentPath = usePathname();
+  const authCta: NavLinkProp = currentPath === AUTH_ROUTES.SIGN_IN
+    ? { href: AUTH_ROUTES.SIGN_UP, label: "Sign up" }
+    : { href: AUTH_ROUTES.SIGN_IN, label: "Sign in" };
 
   const navLinks: NavLinkProp[] = [
     { href: AUTH_ROUTES.HOME, label: "Home" },
@@ -34,11 +34,11 @@ export function Header() {
         </nav>
 
         <Link id="headerLogo" href={AUTH_ROUTES.HOME}>
-          <h1>PAWPALS</h1>
+          <h1>PAWPAL</h1>
         </Link>
         
         <Button asChild size="sm" variant="outline">
-          <Link href={btn.href}>{btn.label}</Link>
+          <Link href={authCta.href}>{authCta.label}</Link>
         </Button>
       </div>
     </header>
@@ -63,7 +63,7 @@ export function AuthHeader() {
       <div id="userHeader" className="flex items-center gap-1">
         <h1>
           <Link id="headerLogo" href={AUTH_ROUTES.HOME}>
-            PAWPALS
+            PAWPAL
           </Link>
         </h1>
 

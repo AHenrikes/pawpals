@@ -15,23 +15,11 @@ export async function GET(request: NextRequest) {
     if (error) {
       const url = new URL(`/error?error=${encodeURIComponent(error.message)}`, request.url);
       return NextResponse.redirect(url);
-
-    } else {
-      // Only allow same-origin absolute paths to prevent open-redirects
-      const safeNext = next && next.startsWith("/") ? next : "/";
-      const url = new URL(safeNext, request.url);
-      const res = NextResponse.redirect(url);
-
-      // short-lived, server-only flag for the signup-success flow
-      res.cookies.set("signup_success", "1", {
-        maxAge: 60,
-        path: "/",
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-      return res;
     }
+
+    // Only allow same-origin absolute paths to prevent open-redirects
+    const safeNext = next?.startsWith("/") ? next : "/";
+    return NextResponse.redirect(new URL(safeNext, request.url));
   }
 
   return NextResponse.redirect(new URL(`/error?error=No token hash or type`, request.url));

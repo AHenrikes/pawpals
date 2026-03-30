@@ -2,8 +2,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSupabaseClient } from "./useSupabaseClient";
 
+type UserProfile = Record<string, unknown>;
+
 export interface UseAuthProfileResult {
-  profile: object | null;
+  profile: UserProfile | null;
   loading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
@@ -16,7 +18,7 @@ export interface UseAuthProfileResult {
  * @returns Object with profile, loading, error, and refetch function
  */
 export function useAuthProfile(): UseAuthProfileResult {
-  const [profile, setProfile] = useState<object | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const mountedRef = useRef(true);

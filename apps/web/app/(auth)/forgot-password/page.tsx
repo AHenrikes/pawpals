@@ -71,7 +71,7 @@ export default function ForgotPasswordForm() {
                 <div className="mt-4 text-center text-sm">
                   Already have an account?{" "}
                   <Link
-                    href={AUTH_ROUTES.SIGNIN}
+                    href={AUTH_ROUTES.SIGN_IN}
                     className="underline underline-offset-4"
                   >
                     Sign in

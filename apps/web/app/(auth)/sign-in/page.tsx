@@ -17,12 +17,8 @@ export default function SignIn() {
   const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm({ email: "", password: "" }, async (values) => {
     const { error } = await supabase.auth.signInWithPassword({ email: values.email, password: values.password });
     if (error) throw error;
-    
-    if (typeof globalThis === "undefined") {
-      router.push(AUTH_ROUTES.HOME);
-    } else {
-      globalThis.location.assign(AUTH_ROUTES.HOME);
-    }
+
+    router.replace(AUTH_ROUTES.HOME);
   });
 
   return (
@@ -78,7 +74,7 @@ export default function SignIn() {
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{" "}
                 <Link
-                  href={AUTH_ROUTES.SIGNUP}
+                  href={AUTH_ROUTES.SIGN_UP}
                   className="underline underline-offset-4"
                 >
                   Sign up

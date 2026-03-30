@@ -1,5 +1,5 @@
 {
-  "name": "@pawpall/web",
+  "name": "@pawpal/web",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
