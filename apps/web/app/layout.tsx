@@ -34,11 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 enableSystem
                 disableTransitionOnChange
               >
-                <Suspense fallback={null}>
-                  <HeaderSwitcher />
-                </Suspense>
                 {children}
-                <Footer />
               </ThemeProvider>
             </div>
           </div>

@@ -1,6 +1,6 @@
 'use client'
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import { useSession } from "@/hooks/useSession"
+import { useUser } from "@/hooks/useUser"
 import { usePathname } from "next/navigation";
 import { Button } from "@repo/ui/button";
 import Link from "next/link";
@@ -9,7 +9,7 @@ type NavLinkProp = { href: string; label: string };
 
 export default function Aside() {
   const currentPath = usePathname();
-  const { signOut  } = useSession();
+  const { signOut } = useUser();
 
   const navLinks: NavLinkProp[] = [
     {href: AUTH_ROUTES.HOME, label: "Home"},

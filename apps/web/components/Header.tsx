@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useSupabaseClient } from "@/hooks/useSupabaseClient";
+import { useUser } from "@/hooks/useUser";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@repo/ui/button";
 
@@ -10,6 +9,7 @@ type NavLinkProp = { href: string; label: string };
 
 export function Header() {
   const currentPath = usePathname();
+  
   const authCta: NavLinkProp = currentPath === AUTH_ROUTES.SIGN_IN
     ? { href: AUTH_ROUTES.SIGN_UP, label: "Sign up" }
     : { href: AUTH_ROUTES.SIGN_IN, label: "Sign in" };
@@ -46,17 +46,8 @@ export function Header() {
 }
 
 export function AuthHeader() {
-  const [userEmail, setUserEmail] = useState<string>("User");
-  const supabase = useSupabaseClient();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUserEmail(data?.user?.email ?? "User");
-    };
-
-    fetchUser();
-  }, [supabase]);
+  const { user } = useUser();
+  const userEmail = user?.email ?? "User";
 
   return (
     <header>
