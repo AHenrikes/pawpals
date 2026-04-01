@@ -81,7 +81,7 @@ export default function SignUpForm() {
                 onChange={(e) => handleChange("lastname", e.target.value)}
                 required
               />
-            </div>"!"#!
+            </div>
           </div>
 
           <div className="flex flex-col w-full gap-3">
