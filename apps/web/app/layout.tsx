@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Be_Vietnam_Pro, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { SmoothScroll } from "@/providers/SmoothScroll";
-import HeaderSwitcher from "@/lib/headerSwitch";
-import Footer from "@/components/Footer";
-import { Suspense } from "react";
 import "./pawpal.css";
 
 const defaultUrl = process.env.VERCEL_URL? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
@@ -15,16 +12,24 @@ export const metadata: Metadata = {
   description: "A social app built for furry communities",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const displayFont = Manrope({
+  variable: "--font-display",
   display: "swap",
   subsets: ["latin"],
+  weight: ["500", "700", "800"],
+});
+
+const bodyFont = Be_Vietnam_Pro({
+  variable: "--font-body",
+  display: "swap",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${displayFont.variable} ${bodyFont.variable} antialiased`}>
           <div id="smooth-wrapper">
             <div id="smooth-content">
               <SmoothScroll />

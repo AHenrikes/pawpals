@@ -1,26 +1,27 @@
+import { AUTH_ROUTES } from "@/lib/auth/routes"
 import Link from "next/link"
 
 export default function SignFooter() {
   const links = [
-    {href: "#", label: "PRIVACY POLICY"},
-    {href: "#", label: "TERMS OF SERVICE"},
-    {href: "#", label: "SYSTEM STATUS"}
+    {href: AUTH_ROUTES.PRIVACY_POLICY, label: "PRIVACY POLICY", style: "hover:text-headline"},
+    {href: AUTH_ROUTES.TERMS_OF_SERVICE, label: "TERMS OF SERVICE", style: "hover:text-headline"},
+    {href: AUTH_ROUTES.SYSTEM_STATUS, label: "SYSTEM STATUS", style: "hover:text-green-400"}
   ]
 
   return (
-    <footer className="absolute bottom-0 left-0 flex justify-between items-center w-full h-16 px-4">
-      <p className="text-secondary text-sm">
-        2026 PAWPALL. ALL RIGHTS RESERVED.
+    <footer className="absolute bottom-0 left-0 hidden items-center justify-between w-full px-4 py-4 text-[0.62rem] tracking-[0.28em] lg:flex lg:px-8">
+      <p className="text-sm uppercase text-primary">
+        © 2026 PawPall. All rights reserved.
       </p>
 
-      <div className="flex gap-4">
-        { links.map((li,idx) => (
+      <div className="flex items-center text-text-muted gap-8 text-xs">
+        {links.map((li, idx) => (
           <Link
             key={idx}
-            className="text-gray-600 text-sm duration-200 hover:delay-150 hover:text-gray-400"
             href={li.href}
+            className={li.style}
           >
-            {li.label}
+            { li.label }
           </Link>
         ))}
       </div>

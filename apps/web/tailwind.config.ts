@@ -12,9 +12,29 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)"],
+        body: ["var(--font-body)"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          low: "hsl(var(--surface-container-low))",
+          highest: "hsl(var(--surface-container-highest))",
+          variant: "hsl(var(--surface-variant))",
+        },
+
+        headline:  "hsl(var(--headline))",
+        text: {
+          DEFAULT: "hsl(var(--text))",
+          primary: "hsl(var(--text-primary))",
+          secondary: "hsl(var(--text-secondary))",
+          destructive: "hsl(var(--text-destructive))",
+          muted: "hsl(var(--text-muted))",
+        },
+
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -26,6 +46,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          dim: "hsl(var(--primary-dim))"
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -58,6 +79,21 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "2rem",
+        "2xl": "3rem",
+        full: "9999px",
+      },
+      backgroundImage: {
+        "pawpal-primary": "var(--gradient-primary)",
+      },
+      boxShadow: {
+        ambient: "var(--ambient-shadow)",
+      },
+      letterSpacing: {
+        display: "-0.02em",
+      },
+      backdropBlur: {
+        glass: "24px",
       },
     },
   },

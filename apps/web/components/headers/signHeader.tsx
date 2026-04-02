@@ -4,22 +4,20 @@ import Link from "next/link";
 
 export default function SignHeader() {
   return (
-    <header className="absolute top-0 left-0 flex justify-between items-center w-full h-20 px-4">
+    <header className="absolute top-0 left-0 w-full h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
       <Link
         href={AUTH_ROUTES.HOME}
-        className="text-primary text-3xl duration-200 hover:delay-150 hover:text-"
+        className="text-2xl font-bold text-primary md:text-3xl"
       >
-        PAWPAL
+        PAWPALL
       </Link>
 
-      <div className="flex gap-4 items-center">
-        <Link
-          href="#"
-          className="text-gray-400 duration-200 hover:delay-150 hover:text-gray-200"
-        >
-          HELP
-        </Link>
-      </div> 
+      <Link
+        href="#"
+        className="text-md font-medium uppercase tracking-[0.36em]"
+      >
+        HELP
+      </Link>
     </header>
   )
 }

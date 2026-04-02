@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
+import { Card, CardHeader } from "@repo/ui/card";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { FormError } from "@repo/ui/form-error";
 import { useAuthForm } from "@/hooks/useAuthForm";
@@ -22,66 +22,74 @@ export default function SignIn() {
   });
 
   return (
-    <div className="w-full max-w-sm">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign In</CardTitle>
+    <section className="flex items-center justify-center px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
+      <Card className="w-full max-w-[640px]">
+        <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
+          <Link
+            href={AUTH_ROUTES.SIGN_UP}
+            className="text-muted transition hover:text-text"
+          >
+            Create Account
+          </Link>
 
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <Link
+            href={AUTH_ROUTES.SIGN_IN}
+            className="border-b-4 border-primary pb-2 text-headline"
+          >
+            Sign in
+          </Link>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={values.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                />
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-6">
+            <div className="space-y-2.5">
+              <Label htmlFor="email" variant={"auth"}>Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="example@pawpal.com"
+                value={values.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                variant={"auth"}
+                required
+              />
+            </div>
+              
+            <div className="space-y-2.5">
+              <div className="flex items-center">
+                <Label htmlFor="password" variant={"auth"}>Password</Label>
+
+                <Link
+                  href={AUTH_ROUTES.FORGOT_PASSWORD}
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                >
+                  Forgot your password?
+                </Link>
               </div>
 
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href={AUTH_ROUTES.FORGOT_PASSWORD}
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={values.password}
-                  onChange={(e) => handleChange("password", e.target.value)}
-                />
-              </div>
-              <FormError message={error} />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={values.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                variant={"auth"}
+                required
+              />
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href={AUTH_ROUTES.SIGN_UP}
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
-            </div>
-          </form>
-        </CardContent>
+
+            <FormError message={error} className="pb-4" />
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="h-14 w-full rounded-full bg-gradient-to-r from-primary to-secondary text-base font-semibold text-text-secondary shadow-[0_18px_45px_rgba(190,127,255,0.35)] transition hover:brightness-105"
+            >
+              <span>Sign in</span>
+            </Button>
+          </div>
+        </form>
       </Card>
-    </div>
+    </section>
   );
 }
