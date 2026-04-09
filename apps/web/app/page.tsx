@@ -1,8 +1,8 @@
+import UnAuthHeader from "@/components/headers/unAuthHeader";
 import { createServer } from "@repo/supabase/server";
 import DashboardLayout from "./(dashboard)/layout";
 import Dashboard from "./(dashboard)/page";
 import { Suspense } from "react";
-import UnAuthHeader from "@/components/headers/unAuthHeader";
 
 export async function LandingPage() {
   const supabase = await createServer();

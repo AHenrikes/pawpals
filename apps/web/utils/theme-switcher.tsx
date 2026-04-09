@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -24,45 +24,47 @@ const ThemeSwitcher = () => {
   }
 
   const ICON_SIZE = 16;
+  const currentTheme = theme === "system" ? resolvedTheme : theme;
+
   const setCurrentTheme = () => {
-    if(theme === 'light') {
+    if (currentTheme === "light") {
       return (
         <Sun
           key="light"
           size={ICON_SIZE}
-          className={"text-muted-foreground"}
+          className="text-muted-foreground"
         />
-      )
-    } else if (theme === 'dark') {
+      );
+    } else if (currentTheme === "dark") {
       return (
         <Moon
           key="dark"
           size={ICON_SIZE}
-          className={"text-muted-foreground"}
+          className="text-muted-foreground"
         />
-      )
+      );
     } else {
       return (
         <Laptop
           key="system"
           size={ICON_SIZE}
-          className={"text-muted-foreground"}
+          className="text-muted-foreground"
         />
-      )
+      );
     }
-  }
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={"sm"}>
+        <Button variant="ghost" size="icon" aria-label="Change theme">
           {setCurrentTheme()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-content" align="start" sideOffset={5}>
+      <DropdownMenuContent className="w-40" align="start" sideOffset={5}>
         <DropdownMenuRadioGroup
-          value={theme}
-          onValueChange={(e: string) => setTheme(e)}
+          value={theme ?? "system"}
+          onValueChange={setTheme}
         >
           <DropdownMenuRadioItem className="flex gap-2" value="light">
             <Sun size={ICON_SIZE} className="text-muted-foreground" />{" "}

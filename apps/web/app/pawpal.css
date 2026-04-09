@@ -106,15 +106,7 @@
     position: relative;
     isolation: isolate;
     font-family: var(--font-body);
-    background-color: hsl(var(--background));
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
+    
     background-image:
       radial-gradient(circle at 10% 0%, rgba(204, 151, 255, 0.12), transparent 34%),
       radial-gradient(circle at 88% 90%, rgba(255, 71, 134, 0.1), transparent 30%);
