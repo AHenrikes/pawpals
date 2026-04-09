@@ -7,16 +7,16 @@ export default function SignHeader() {
     <header className="absolute top-0 left-0 w-full h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
       <Link
         href={AUTH_ROUTES.HOME}
-        className="text-2xl font-bold text-primary md:text-3xl"
+        className="text-headline-md text-primary uppercase"
       >
-        PAWPALL
+        Pawpal
       </Link>
 
       <Link
         href="#"
-        className="text-md font-medium uppercase tracking-[0.36em]"
+        className="text-body-lg uppercase"
       >
-        HELP
+        Help
       </Link>
     </header>
   )

@@ -1,7 +1,13 @@
+import UnAuthHeader from "@/components/headers/unAuthHeader";
+
 export default function Community() {
   return (
-    <main className="grid place-content-center h-dvh w-full">
-      <h1>Community</h1>
-    </main>
+    <>
+      <UnAuthHeader />
+
+      <main className="grid place-content-center h-svh">
+        <h1>Community</h1>
+      </main>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { createServer } from "@repo/supabase/server";
 import DashboardLayout from "./(dashboard)/layout";
 import Dashboard from "./(dashboard)/page";
 import { Suspense } from "react";
+import UnAuthHeader from "@/components/headers/unAuthHeader";
 
 export async function LandingPage() {
   const supabase = await createServer();
@@ -17,8 +18,13 @@ export async function LandingPage() {
   }
 
   return (
-    <main className="h-screen">
-    </main>
+    <>
+      <UnAuthHeader />
+
+      <main className="grid place-content-center h-[200svh]">
+        <h1>Home</h1>
+      </main>
+    </>
   );
 }
 

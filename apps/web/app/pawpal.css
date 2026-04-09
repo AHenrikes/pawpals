@@ -103,7 +103,18 @@
 
   body {
     @apply bg-background text-foreground;
+    position: relative;
+    isolation: isolate;
     font-family: var(--font-body);
+    background-color: hsl(var(--background));
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background-image:
       radial-gradient(circle at 10% 0%, rgba(204, 151, 255, 0.12), transparent 34%),
       radial-gradient(circle at 88% 90%, rgba(255, 71, 134, 0.1), transparent 30%);
@@ -121,6 +132,8 @@
 }
 
 @layer components {
+  html { scrollbar-width: none }
+
   .pawpal-shell {
     @apply relative min-h-svh overflow-hidden bg-background text-foreground;
   }
@@ -172,12 +185,10 @@
     background-image: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
     box-shadow: 0 18px 45px rgba(190, 127, 255, 0.35);
-    transition: transform 180ms ease, filter 180ms ease;
   }
 
   .pawpal-cta:hover {
-    transform: scale(1.02);
-    filter: brightness(1.03);
+    background: hsl(var(--accent-foreground));
   }
 }
 

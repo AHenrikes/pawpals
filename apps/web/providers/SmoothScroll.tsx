@@ -18,8 +18,7 @@ export function SmoothScroll({
   smoothAmount = 1,
   enableEffects = true,
 }: SmoothScrollProps = {}): null {
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+  useEffect(() => {gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
     const smoother = ScrollSmoother.create({
       content: `#${contentSelector}`,
