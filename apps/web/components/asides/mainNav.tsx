@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Home, PawPrint, Settings, Store, Users, BellRing, Inbox, ArrowBigRight } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import {
   Item,
   ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
+  ItemMedia,
   ItemTitle,
 } from "@repo/ui/item";
 import {
@@ -53,6 +56,22 @@ const profileItems = [
 
 export default function MainNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = useSupabaseClient();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push(AUTH_ROUTES.SIGN_IN);
+    router.refresh();
+  };
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("");
 
   return (
     <Sidebar collapsible="icon" className="group/sidebar">
@@ -95,13 +114,15 @@ export default function MainNav() {
                     {profileItems.map((profile) => (
 
                       <Item key={profile.name} className="rounded-sm pl-4 cursor-pointer hover:bg-primary-foreground" variant={"outline"}>
-                        {/* TODO: profile images */}
-                        {/* <ItemMedia>
+                        <ItemMedia variant="avatar">
                           <Avatar>
-                            <AvatarImage src={} />
-                            <AvatarFallback></AvatarFallback>
+                            <AvatarImage
+                              src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(profile.name)}`}
+                              alt={profile.name}
+                            />
+                            <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
                           </Avatar>
-                        </ItemMedia> */}
+                        </ItemMedia>
 
                         <ItemContent>
                           <ItemTitle>{profile.name}</ItemTitle>
@@ -135,8 +156,8 @@ export default function MainNav() {
         </Button>
 
         <div className="group-data-[collapsible=icon]/sidebar:hidden">
-          <Button asChild variant="outline" className="mt-3 h-10 w-full rounded-full">
-            <Link href={AUTH_ROUTES.SIGN_IN}>Sign in</Link>
+          <Button onClick={handleSignOut} variant="outline" className="mt-3 h-10 w-full rounded-full">
+            Sign out
           </Button>
         </div>
       </SidebarFooter>
