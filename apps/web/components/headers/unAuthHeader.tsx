@@ -112,10 +112,7 @@ export default function UnAuthHeader() {
 
         <div className="flex items-center gap-2">
           <Button
-            asChild
-            variant="none"
-            size="sm"
-            className="pawpal-cta hidden md:flex text-sm"
+            className="hidden md:flex text-sm"
           >
             <Link href={AUTH_ROUTES.SIGN_IN}>Sign in</Link>
           </Button>

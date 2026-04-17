@@ -3,24 +3,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Circle, MessagesSquare } from "lucide-react";
+import { ArrowLeft, ArrowRight, Circle, MessagesSquare } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import CreateFursona from "@/components/CreateFursona";
+import { type fursonaType } from "@/components/CreateFursona";
 import { Button } from "@repo/ui/button";
 import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Card, CardHeader } from "@repo/ui/card";
-
-type FursonaDraft = {
-  name: string;
-  username: string;
-  species: string;
-  pronouns: string;
-  bio: string;
-};
 
 type SignUpValues = {
   firstname: string;
@@ -31,7 +24,7 @@ type SignUpValues = {
   dobYear: string;
   password: string;
   confirmPassword: string;
-  defaultFursona: FursonaDraft;
+  defaultFursona: fursonaType;
 };
 
 export default function SignUpForm() {
@@ -40,9 +33,7 @@ export default function SignUpForm() {
   const prefersReducedMotion = useReducedMotion();
   const [step, setStep] = useState<"account" | "fursona">("account");
   const formRef = useRef<HTMLFormElement | null>(null);
-  const stepTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
+  const stepTransition = prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
 
   const { values, setValues, error, isLoading, setError, handleChange, handleSubmit } = useAuthForm<SignUpValues>(
     {
@@ -71,9 +62,9 @@ export default function SignUpForm() {
       const normalizedDefaultFursona = {
         name: formValues.defaultFursona.name.trim(),
         username: formValues.defaultFursona.username.trim(),
-        species: formValues.defaultFursona.species.trim(),
-        pronouns: formValues.defaultFursona.pronouns.trim(),
-        bio: formValues.defaultFursona.bio.trim(),
+        species: formValues.defaultFursona.species?.trim(),
+        pronouns: formValues.defaultFursona.pronouns?.trim(),
+        bio: formValues.defaultFursona.bio,
       };
 
       if (normalizedDefaultFursona.name.length === 0) {
@@ -144,14 +135,8 @@ export default function SignUpForm() {
     setStep("fursona");
   };
 
-  const updateMainFursona = (field: keyof FursonaDraft, value: string) => {
-    setValues((prev) => ({
-      ...prev,
-      defaultFursona: {
-        ...prev.defaultFursona,
-        [field]: value,
-      },
-    }));
+  const updateMainFursona = (field: keyof fursonaType, value: string) => {
+    setValues((prev) => ({...prev, defaultFursona: {...prev.defaultFursona, [field]: value,}}));
     setError(null);
   };
 
@@ -322,7 +307,6 @@ export default function SignUpForm() {
                   <CreateFursona
                     fursona={values.defaultFursona}
                     onFursonaChange={updateMainFursona}
-                    onBack={() => setStep("account")}
                     isActive={step === "fursona"}
                   />
                 </motion.div>
@@ -334,22 +318,32 @@ export default function SignUpForm() {
 
           {step === "account" ? (
             <Button
-              type="button"
               onClick={goToFursonaStep}
-              className="h-14 w-full rounded-full bg-gradient-to-r from-primary to-secondary text-base font-semibold text-text-secondary shadow-[0_18px_45px_rgba(190,127,255,0.35)] transition hover:brightness-105"
+              disabled={values.email === undefined}
+              className="h-14 w-full rounded-full"
             >
-              <span>Create profile</span>
+              <span>Create Fursona</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="h-14 w-full rounded-full bg-gradient-to-r from-primary to-secondary text-base font-semibold text-text-secondary shadow-[0_18px_45px_rgba(190,127,255,0.35)] transition hover:brightness-105"
-            >
-              <span>{isLoading ? "Creating account..." : "Finish sign up"}</span>
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                onClick={() => setStep("account")}
+                className="h-14 w-full bg-primary rounded-l-full"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back</span>
+              </Button>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="h-14 w-full rounded-r-full"
+              >
+                <span>{isLoading ? "Creating account..." : "Sign up"}</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
           )}
 
           {step === "account" && (
@@ -364,7 +358,7 @@ export default function SignUpForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-12 rounded-full border-0 bg-popover text-headline shadow-none hover:bg-input"
+                  className="h-12 rounded-full bg-popover text-headline hover:bg-input"
                 >
                   <MessagesSquare className="h-4 w-4 text-[#5f7cff]" />
                   Discord
@@ -373,7 +367,7 @@ export default function SignUpForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-12 rounded-full border-0 bg-surface-highest text-headline shadow-none hover:bg-input"
+                  className="h-12 rounded-full bg-popover text-headline hover:bg-input"
                 >
                   <Circle className="h-4 w-4 text-primary" />
                   Google
