@@ -24,7 +24,7 @@ type SignUpValues = {
   dobYear: string;
   password: string;
   confirmPassword: string;
-  defaultFursona: fursonaType;
+  initFursona: fursonaType;
 };
 
 export default function SignUpForm() {
@@ -45,7 +45,7 @@ export default function SignUpForm() {
       dobYear: "",
       password: "",
       confirmPassword: "",
-      defaultFursona: {
+      initFursona: {
         name: "",
         username: "",
         species: "",
@@ -59,15 +59,15 @@ export default function SignUpForm() {
         throw new Error("Passwords do not match");
       }
 
-      const normalizedDefaultFursona = {
-        name: formValues.defaultFursona.name.trim(),
-        username: formValues.defaultFursona.username.trim(),
-        species: formValues.defaultFursona.species?.trim(),
-        pronouns: formValues.defaultFursona.pronouns?.trim(),
-        bio: formValues.defaultFursona.bio,
+      const normalizedinitFursona = {
+        name: formValues.initFursona.name.trim(),
+        username: formValues.initFursona.username.trim(),
+        species: formValues.initFursona.species?.trim(),
+        pronouns: formValues.initFursona.pronouns?.trim(),
+        bio: formValues.initFursona.bio,
       };
 
-      if (normalizedDefaultFursona.name.length === 0) {
+      if (normalizedinitFursona.name.length === 0) {
         throw new TypeError("Add your main fursona name before finishing sign up");
       }
 
@@ -99,11 +99,12 @@ export default function SignUpForm() {
         email: formValues.email,
         password: formValues.password,
         options: {
+          emailRedirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.CONFIRM}`,
           data: {
             firstname: formValues.firstname,
             lastname: formValues.lastname,
             dob: dobDate.toISOString(),
-            onboarding_main_fursona: normalizedDefaultFursona,
+            onboarding_init_fursona: normalizedinitFursona,
           },
         },
       });
@@ -136,7 +137,7 @@ export default function SignUpForm() {
   };
 
   const updateMainFursona = (field: keyof fursonaType, value: string) => {
-    setValues((prev) => ({...prev, defaultFursona: {...prev.defaultFursona, [field]: value,}}));
+    setValues((prev) => ({...prev, initFursona: {...prev.initFursona, [field]: value,}}));
     setError(null);
   };
 
@@ -305,7 +306,7 @@ export default function SignUpForm() {
                   className="space-y-5"
                 >
                   <CreateFursona
-                    fursona={values.defaultFursona}
+                    fursona={values.initFursona}
                     onFursonaChange={updateMainFursona}
                     isActive={step === "fursona"}
                   />
