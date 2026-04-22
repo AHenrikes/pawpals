@@ -13,12 +13,13 @@ async function createAccountSession(supabase: Awaited<ReturnType<typeof createSe
   .from("accounts")
   .upsert(
     {
-      id: user.id,
+      user_id: user.id,
       firstname: metadata.firstname,
       lastname: metadata.lastname,
       email: user.email,
+      dob: metadata.dob
     },
-    { onConflict: "id" },
+    { onConflict: "user_id" },
   );
 
   if(accountError) errorRedirect(accountError.message);
@@ -30,7 +31,7 @@ async function createAccountSession(supabase: Awaited<ReturnType<typeof createSe
     .schema("core")
     .from("fursonas")
     .insert( {
-      account_id: user.id,
+      user_id: user.id,
       name: initFursona.name,
       username: initFursona.username,
       species: initFursona.species,
@@ -74,7 +75,9 @@ export async function GET(request: NextRequest) {
       await createAccountSession(supabase, user, errorRedirect)
     }
 
-    errorRedirect("No token hash or type");
+    // Only allow same-origin absolute paths to prevent open-redirects
+    const safeNext = next?.startsWith("/") ? next : "/";
+    return NextResponse.redirect(new URL(safeNext, request.url));
   }
 
   return NextResponse.redirect(new URL(`/error?error=No token hash or type`, request.url));

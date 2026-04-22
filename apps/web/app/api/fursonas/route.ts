@@ -75,35 +75,23 @@ export async function GET() {
   if (response) {
     return response;
   }
+
   if (isUnauthorized(user)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [{ data: fursonas, error: fursonaError }, { data: entitlement, error: entitlementError }] = await Promise.all([
-    supabase
-      .from("fursonas")
-      .select("id,user_id,name,species,pronouns,bio,is_main,created_at,updated_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("user_entitlements")
-      .select("fursona_limit")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-  ]);
+  const { data: fursonas, error } = await supabase
+    .schema("core")
+    .from("fursonas")
+    .select("id,user_id,name,species,pronouns,bio,is_default,created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
 
-  if (fursonaError) {
-    return NextResponse.json({ error: fursonaError.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  if (entitlementError) {
-    return NextResponse.json({ error: entitlementError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    fursonas: fursonas ?? [],
-    fursonaLimit: entitlement?.fursona_limit ?? 4,
-  });
+  return NextResponse.json({ fursonas: fursonas ?? [] });
 }
 
 export async function POST(request: NextRequest) {
@@ -123,6 +111,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { data: inserted, error: insertError } = await supabase
+    .schema("core")
     .from("fursonas")
     .insert({
       user_id: user.id,
@@ -130,22 +119,13 @@ export async function POST(request: NextRequest) {
       species: normalizeOptionalText(body.species),
       pronouns: normalizeOptionalText(body.pronouns),
       bio: normalizeOptionalText(body.bio),
-      is_main: false,
+      is_default: false,
     })
-    .select("id, user_id, name, species, pronouns, bio, is_main")
+    .select("id, user_id, name, species, pronouns, bio, is_default")
     .single();
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 400 });
-  }
-
-  const shouldBeMain = body.isMain === true;
-  if (shouldBeMain) {
-    const { error: setMainError } = await supabase.rpc("set_main_fursona", { p_fursona_id: inserted.id });
-    
-    if (setMainError) {
-      return NextResponse.json({ error: setMainError.message }, { status: 400 });
-    }
   }
 
   return NextResponse.json({ fursona: inserted }, { status: 201 });
@@ -175,6 +155,7 @@ export async function PATCH(request: NextRequest) {
 
   if (Object.keys(updates).length > 0) {
     const { error: updateError } = await supabase
+      .schema("core")
       .from("fursonas")
       .update(updates)
       .eq("id", fursonaId)
@@ -193,6 +174,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const { data: fursona, error: fetchError } = await supabase
+    .schema("core")
     .from("fursonas")
     .select("id, user_id, name, species, pronouns, bio, is_main, updated_at")
     .eq("id", fursonaId)
@@ -225,6 +207,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   const { count, error: countError } = await supabase
+    .schema("core")
     .from("fursonas")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id);
@@ -238,6 +221,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   const { error: deleteError } = await supabase
+    .schema("core")
     .from("fursonas")
     .delete()
     .eq("id", fursonaId)

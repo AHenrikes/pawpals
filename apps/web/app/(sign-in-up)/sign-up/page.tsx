@@ -85,7 +85,7 @@ export default function SignUpForm() {
       }
 
       const dobIsoDate = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      const dobDate = new Date(`${dobIsoDate}T00:00:00.000Z`);
+      const dobDate = new Date(dobIsoDate);
       const isSameDate =
         dobDate.getUTCFullYear() === year
         && dobDate.getUTCMonth() + 1 === month
@@ -103,7 +103,7 @@ export default function SignUpForm() {
           data: {
             firstname: formValues.firstname,
             lastname: formValues.lastname,
-            dob: dobDate.toISOString(),
+            dob: dobIsoDate,
             onboarding_init_fursona: normalizedinitFursona,
           },
         },

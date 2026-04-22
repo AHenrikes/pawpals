@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
@@ -47,17 +48,62 @@ const mainNavItems: MainNavItem[] = [
   { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: Settings },
 ];
 
-const profileItems = [
-  { name: "Profile 1", subtitle: "Main" },
-  { name: "Profile 2", subtitle: "Personal" },
-  { name: "Profile 3", subtitle: "Family" },
-  { name: "Profile 4", subtitle: "Work" },
-];
+type Fursona = {
+  id: number;
+  name: string;
+  species: string | null;
+  is_default?: boolean;
+};
+
+type FursonaApiResponse = {
+  fursonas?: Fursona[];
+  error?: string;
+};
 
 export default function MainNav() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = useSupabaseClient();
+  const [fursonas, setFursonas] = useState<Fursona[]>([]);
+  const [fursonaError, setFursonaError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadFursonas = async () => {
+      try {
+        setFursonaError(null);
+
+        const response = await fetch("/api/fursonas", {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        const payload = (await response.json().catch(() => ({}))) as FursonaApiResponse;
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "Failed to fetch fursonas");
+        }
+
+        if (!cancelled) {
+          setFursonas(payload.fursonas ?? []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setFursonas([]);
+          setFursonaError(error instanceof Error ? error.message : "Failed to fetch fursonas");
+        }
+      }
+    };
+
+    loadFursonas();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -111,22 +157,22 @@ export default function MainNav() {
               <SidebarMenuItem>
                 <div className="group-data-[collapsible=icon]/sidebar:hidden">
                   <ItemGroup className="flex flex-col border-0 rounded-none bg-transparent gap-4">
-                    {profileItems.map((profile) => (
+                    {fursonas.map((fursona) => (
 
-                      <Item key={profile.name} className="rounded-sm pl-4 cursor-pointer hover:bg-primary-foreground" variant={"outline"}>
+                      <Item key={fursona.id} className="rounded-sm pl-4 cursor-pointer hover:bg-primary-foreground" variant={"outline"}>
                         <ItemMedia variant="avatar">
                           <Avatar>
                             <AvatarImage
-                              src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(profile.name)}`}
-                              alt={profile.name}
+                              src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(fursona.name)}`}
+                              alt={fursona.name}
                             />
-                            <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
+                            <AvatarFallback>{getInitials(fursona.name)}</AvatarFallback>
                           </Avatar>
                         </ItemMedia>
 
                         <ItemContent>
-                          <ItemTitle>{profile.name}</ItemTitle>
-                          <ItemDescription>{profile.subtitle}</ItemDescription>
+                          <ItemTitle>{fursona.name}</ItemTitle>
+                          <ItemDescription>{fursona.is_default ? "Main" : (fursona.species ?? "Fursona")}</ItemDescription>
                         </ItemContent>
 
                         <ItemActions>
@@ -136,6 +182,14 @@ export default function MainNav() {
                         </ItemActions>
                       </Item>
                     ))}
+
+                    {fursonaError ? (
+                      <p className="px-4 text-sm text-red-500">{fursonaError}</p>
+                    ) : null}
+
+                    {!fursonaError && fursonas.length === 0 ? (
+                      <p className="px-4 text-sm text-muted">No fursonas yet.</p>
+                    ) : null}
                   </ItemGroup>
                 </div>
               </SidebarMenuItem>
