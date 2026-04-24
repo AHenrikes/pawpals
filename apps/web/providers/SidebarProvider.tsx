@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PawPrint } from "lucide-react";
+import { useState, useCallback, useContext, useMemo, createContext } from "react";
 
 type SidebarContextValue = {
   state: "expanded" | "collapsed";
@@ -14,14 +15,14 @@ type SidebarContextValue = {
   toggleSidebar: () => void;
 };
 
-const SidebarContext = React.createContext<SidebarContextValue | null>(null);
+const SidebarContext = createContext<SidebarContextValue | null>(null);
 
 const SIDEBAR_WIDTH = "20rem";
 const SIDEBAR_WIDTH_ICON = "6rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 
 export function useSidebar() {
-  const context = React.useContext(SidebarContext);
+  const context = useContext(SidebarContext);
 
   if (!context) {
     throw new Error("useSidebar must be used within SidebarProvider");
@@ -37,7 +38,7 @@ type SidebarProviderProps = React.ComponentProps<"div"> & {
 };
 
 export function SidebarProvider({
-  defaultOpen = true,
+  defaultOpen = false,
   open: openProp,
   onOpenChange,
   className,
@@ -45,9 +46,9 @@ export function SidebarProvider({
   children,
   ...props
 }: SidebarProviderProps) {
-  const [openState, setOpenState] = React.useState(defaultOpen);
-  const [openMobile, setOpenMobile] = React.useState(false);
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [openState, setOpenState] = useState(defaultOpen);
+  const [openMobile, setOpenMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   React.useEffect(() => {
     const mediaQuery = globalThis.matchMedia("(max-width: 767px)");
@@ -66,7 +67,7 @@ export function SidebarProvider({
 
   const open = openProp ?? openState;
 
-  const setOpen = React.useCallback(
+  const setOpen = useCallback(
     (nextOpen: boolean) => {
       if (onOpenChange) {
         onOpenChange(nextOpen);
@@ -78,7 +79,7 @@ export function SidebarProvider({
     [onOpenChange],
   );
 
-  const toggleSidebar = React.useCallback(() => {
+  const toggleSidebar = useCallback(() => {
     if (isMobile) {
       setOpenMobile((prev) => !prev);
       return;
@@ -87,7 +88,7 @@ export function SidebarProvider({
     setOpen(!open);
   }, [isMobile, open, setOpen]);
 
-  const contextValue = React.useMemo<SidebarContextValue>(
+  const contextValue = useMemo<SidebarContextValue>(
     () => ({
       state: open ? "expanded" : "collapsed",
       open,
@@ -291,7 +292,8 @@ export function SidebarTrigger({ className, ...props }: React.ComponentProps<"bu
       onClick={toggleSidebar}
       {...props}
     >
-      <PanelLeft className="h-5 w-5" />
+      {/* <PanelLeft className="h-5 w-5" /> */}
+      <PawPrint className="h-6 w-6" />
       <span className="sr-only">Toggle Sidebar</span>
     </button>
   );

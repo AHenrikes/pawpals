@@ -8,7 +8,7 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import CreateFursona from "@/components/CreateFursona";
-import { type fursonaType } from "@/components/CreateFursona";
+import type { FursonaDraft } from "@/types/fursona"
 import { Button } from "@repo/ui/button";
 import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
@@ -24,7 +24,7 @@ type SignUpValues = {
   dobYear: string;
   password: string;
   confirmPassword: string;
-  initFursona: fursonaType;
+  initFursona: FursonaDraft;
 };
 
 export default function SignUpForm() {
@@ -51,6 +51,7 @@ export default function SignUpForm() {
         species: "",
         pronouns: "",
         bio: "",
+        is_default: true
       },
     },
 
@@ -65,6 +66,7 @@ export default function SignUpForm() {
         species: formValues.initFursona.species?.trim(),
         pronouns: formValues.initFursona.pronouns?.trim(),
         bio: formValues.initFursona.bio,
+        is_default: formValues.initFursona.is_default,
       };
 
       if (normalizedinitFursona.name.length === 0) {
@@ -136,7 +138,7 @@ export default function SignUpForm() {
     setStep("fursona");
   };
 
-  const updateMainFursona = (field: keyof fursonaType, value: string) => {
+  const updateMainFursona = (field: keyof FursonaDraft, value: string) => {
     setValues((prev) => ({...prev, initFursona: {...prev.initFursona, [field]: value,}}));
     setError(null);
   };

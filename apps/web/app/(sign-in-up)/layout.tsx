@@ -1,5 +1,5 @@
 import SignFooter from "@/components/footers/signFooter";
-import SignHeader from "@/components/headers/signHeader";
+import SignHeader from "@/components/headers/SignHeader";
 import { Card, CardContent, CardDescription } from "@repo/ui/card";
 import type { Metadata } from "next";
 

@@ -1,7 +1,7 @@
-export default function PawSpot() {
+export default function Notifications() {
   return (
     <main className="grid place-content-center">
-      <h1>PawSpot</h1>
+      <h1>Notification</h1>
     </main>
   )
 }

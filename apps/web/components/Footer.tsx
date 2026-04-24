@@ -1,4 +1,4 @@
-import { ThemeSwitcher } from "@/utils/theme-switcher"
+import { ThemeSwitcher } from "@/lib/Theme-switcher"
 
 export default function Footer() {
   return (

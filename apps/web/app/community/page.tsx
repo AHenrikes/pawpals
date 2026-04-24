@@ -1,4 +1,4 @@
-import UnAuthHeader from "@/components/headers/unAuthHeader";
+import UnAuthHeader from "@/components/headers/UnAuthHeader";
 
 export default function Community() {
   return (

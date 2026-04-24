@@ -1,15 +1,27 @@
-import { createServer } from "@repo/supabase/server";
 import { NextResponse } from "next/server";
-import type { User } from "@supabase/supabase-js";
+import requireUser from "@/lib/auth/requireUser";
 
 export async function GET() {
-  const supabase = await createServer();
+  const { supabase, user, response } = await requireUser();
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if(userError || !user) { return NextResponse.json({ error: "No user found"}, { status: 500 }) };
-  
-}
+  if (response) {
+    return response;
+  }
 
-export async function POST() {
+  const { data: account, error } = await supabase
+  .schema("core")
+  .from("accounts")
+  .select("user_id, firstname, lastname, email, dob, created_at")
+  .eq("user_id", user.id)
+  .maybeSingle();
 
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  if (!account) {
+    return NextResponse.json({ error: "Account not found." }, { status: 404 });
+  }
+
+  return NextResponse.json({ account })
 }

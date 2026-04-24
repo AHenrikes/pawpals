@@ -3,12 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSupabaseClient } from "./useSupabaseClient";
 import type { User } from "@supabase/supabase-js";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
-type UserProfile = Record<string, unknown>;
+import type { FursonaRecord } from "@/types/fursona";
+
+type FursonaApiResponse = {
+  fursonas?: FursonaRecord[];
+  error?: string;
+};
 
 export type UserHookType = {
   user: User | null;
-  profile: UserProfile | null;
+  fursonas: FursonaRecord[];
+  currentFursona: FursonaRecord | null;
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
@@ -31,7 +36,8 @@ export function useUser(): UserHookType {
   const mountedRef = useRef(true);
 
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [fursonas, setFursonas] = useState<FursonaRecord[]>([]);
+  const [currentFursona, setCurrentFursona] = useState<FursonaRecord | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -56,16 +62,33 @@ export function useUser(): UserHookType {
 
       if (!currentUser) {
         if (mountedRef.current) {
-          setProfile(null);
+          setFursonas([]);
+          setCurrentFursona(null);
         }
         return;
+      }
+
+      const fursonaResponse = await fetch("/api/fursonas", { headers: { Accept: "application/json" } });
+      const fursonaPayload = (await fursonaResponse.json().catch(() => ({}))) as FursonaApiResponse;
+
+      if (!fursonaResponse.ok) {
+        throw new Error(fursonaPayload.error ?? "Failed to fetch fursonas");
+      }
+
+      const nextFursonas = fursonaPayload.fursonas ?? [];
+      const nextCurrentFursona = nextFursonas.find((fursona) => fursona.is_default) ?? nextFursonas[0] ?? null;
+
+      if (mountedRef.current) {
+        setFursonas(nextFursonas);
+        setCurrentFursona(nextCurrentFursona);
       }
 
     } catch (err) {
       if (!mountedRef.current) return;
       setError(toError(err));
       setUser(null);
-      setProfile(null);
+      setFursonas([]);
+      setCurrentFursona(null);
 
     } finally {
       if (mountedRef.current) { setLoading(false) }
@@ -82,7 +105,8 @@ export function useUser(): UserHookType {
 
       if (event === "SIGNED_OUT") {
         setUser(null);
-        setProfile(null);
+        setFursonas([]);
+        setCurrentFursona(null);
         setError(null);
         setLoading(false);
         return;
@@ -106,8 +130,6 @@ export function useUser(): UserHookType {
       const { error } = await supabase.auth.signOut();
 
       if (error) { throw error }
-
-      globalThis.location.assign(AUTH_ROUTES.HOME);
       
     } catch (err) {
       if (!mountedRef.current) return;
@@ -115,7 +137,7 @@ export function useUser(): UserHookType {
     }
   }, [supabase]);
 
-  return { user, profile, loading, error, refresh, signOut };
+  return { user, fursonas, currentFursona, loading, error, refresh, signOut };
 }
 
 export default useUser;
