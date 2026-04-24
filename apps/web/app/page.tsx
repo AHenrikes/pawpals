@@ -1,4 +1,4 @@
-import UnAuthHeader from "@/components/headers/unAuthHeader";
+import UnAuthHeader from "@/components/headers/UnAuthHeader";
 import { createServer } from "@repo/supabase/server";
 import DashboardLayout from "./(dashboard)/layout";
 import Dashboard from "./(dashboard)/page";

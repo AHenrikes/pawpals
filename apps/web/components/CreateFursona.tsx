@@ -1,18 +1,11 @@
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
+import type { FursonaDraft } from "@/types/fursona";
 import { AtSign } from "lucide-react";
 
-export type fursonaType = {
-  name: string,
-  username: string,
-  species?: string,
-  pronouns?: string,
-  bio?: string
-}
-
 type CreateFursonaProps = {
-  fursona: fursonaType;
+  fursona: FursonaDraft;
   onFursonaChange: (field: "name" | "username" | "species" | "pronouns" | "bio", value: string) => void;
   isActive: boolean;
 };

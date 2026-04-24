@@ -37,7 +37,7 @@ async function createAccountSession(supabase: Awaited<ReturnType<typeof createSe
       species: initFursona.species,
       pronouns: initFursona.pronouns,
       bio: initFursona.bio,
-      is_default: true,
+      is_default: initFursona.is_default,
     });
 
     if(fursonaError) errorRedirect(fursonaError.message);
