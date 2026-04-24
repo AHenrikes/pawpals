@@ -1,9 +1,7 @@
-"use client"
 export default function Profile() {
-  console.count("profile")
-
   return (
-    <main>
+    <main className="grid place-content-center">
+      <h1>Profile</h1>
     </main>
   )
 }
