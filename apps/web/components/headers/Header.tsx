@@ -1,9 +1,11 @@
 "use client";
 
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { TypographyH3, TypographyLead, TypographyP, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
+import { Button } from "@repo/ui/button";
+import Link from "next/link";
 import {
   ArrowRight,
   House,
@@ -13,7 +15,6 @@ import {
   MessageCircleQuestion,
   X,
 } from "lucide-react";
-import { Button } from "@repo/ui/button";
 
 const navLinks = [
   {
@@ -68,26 +69,20 @@ export default function UnAuthHeader() {
   const activeLinkClass = "text-text-foreground shadow-[0_14px_34px_rgba(18,8,26,0.12)]";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-4 lg:px-8">
+    <header className="fixed inset-x-0 top-0 z-50 px-4 mt-3 sm:px-4 lg:px-8">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between rounded-full border border-white/10 bg-[hsl(var(--surface-variant)/0.72)] px-3 shadow-[0_22px_50px_rgba(18,8,26,0.16)] backdrop-blur-xl">
         <Link
           href={AUTH_ROUTES.HOME}
-          className="flex items-center gap-3 rounded-full px-2 py-1 transition-transform hover:scale-[1.01]"
+          className="flex items-center gap-3"
           aria-label="PawPall home"
         >
-          <span className=" flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--surface-container-highest)/0.9)] text-[hsl(var(--primary-dim))] shadow-inner shadow-white/20">
+          <span className="grid place-content-center h-10 w-10 rounded-full text-[hsl(var(--primary))] shadow-inner shadow-white/20">
             <PawPrint size={18} />
           </span>
 
-          <span className="text-title-md uppercase">
+          <TypographyH3 className="text-primary uppercase mb-1">
             Pawpal
-
-            {pathname === "/" ? (
-              <p className="text-text-muted text-xs">/HOME</p>
-            ) : (
-              <p className="text-text-muted text-xs">{pathname}</p>
-            )}
-          </span>
+          </TypographyH3>
         </Link>
 
         <nav className="hidden items-center gap-2 md:flex">
@@ -99,22 +94,26 @@ export default function UnAuthHeader() {
                 key={link.id}
                 href={link.href}
                 className={
-                  `text-body-lg flex items-center gap-2 rounded-full px-4 py-2 transition-all 
+                  `flex items-center gap-2 rounded-full px-4 py-2 transition-all
                   ${isActive ? activeLinkClass : "text-muted-foreground border border-transparent hover:border hover:border-primary"}`
                 }
               >
                 <link.icon size={16} />
-                <span>{link.label}</span>
+                <TypographyP>{link.label}</TypographyP>
               </Link>
             );
           })}
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button
-            className="hidden md:flex text-sm"
+          <Button className="hidden px-0 py-0 md:flex text-sm"
           >
-            <Link href={AUTH_ROUTES.SIGN_IN}>Sign in</Link>
+            <Link
+              href={AUTH_ROUTES.SIGN_IN}
+              className="px-4 py-2"
+            >
+              Sign in
+            </Link>
           </Button>
 
           <Button
@@ -135,7 +134,6 @@ export default function UnAuthHeader() {
       {mobileNav && (
         <div className="fixed inset-0 z-[60] md:hidden" id="primary-mobile-nav">
           <button
-            type="button"
             aria-label="Close navigation menu"
             className="absolute inset-0 bg-[hsl(var(--background)/0.66)] backdrop-blur-sm"
             onClick={() => setMobileNav(false)}
@@ -144,17 +142,18 @@ export default function UnAuthHeader() {
           <div className="absolute inset-x-4 top-20 rounded-[2rem] border border-white/10 bg-[hsl(var(--surface-container-low)/0.96)] p-4 shadow-[0_28px_80px_rgba(18,8,26,0.28)] backdrop-blur-xl">
             <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--surface-container-highest)/0.9)] text-[hsl(var(--primary-dim))]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--surface-container-highest)/0.9)] text-[hsl(var(--primary))]">
                   <PawPrint size={18} />
                 </span>
 
                 <div>
-                  <p className="font-display text-lg font-extrabold tracking-[0.2em] text-headline uppercase">
+                  <TypographyLead className="text-primary font-extrabold tracking-[0.2em] uppercase">
                     Pawpal
-                  </p>
-                  <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+                  </TypographyLead>
+
+                  <TypographySmall className="uppercase text-muted-foreground">
                     navigate
-                  </p>
+                  </TypographySmall>
                 </div>
               </div>
 
@@ -189,12 +188,13 @@ export default function UnAuthHeader() {
                       </span>
 
                       <span className="flex flex-col">
-                        <span className="text-base font-semibold">
+                        <TypographyP className="font-semibold">
                           {link.label}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
+                        </TypographyP>
+
+                        <TypographyXSmall className="text-muted-foreground">
                           {link.description}
-                        </span>
+                        </TypographyXSmall>
                       </span>
                     </span>
 
@@ -205,13 +205,14 @@ export default function UnAuthHeader() {
             </div>
 
             <div className="mt-4 flex items-center gap-3 rounded-[1.5rem] bg-[hsl(var(--surface-container-highest)/0.65)] p-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-foreground">
+              <div className="flex flex-col flex-1">
+                <TypographySmall className="text-foreground">
                   Already have an account?
-                </p>
-                <p className="text-sm text-muted-foreground">
+                </TypographySmall>
+
+                <TypographyXSmall className="text-muted-foreground">
                   Jump back in from here.
-                </p>
+                </TypographyXSmall>
               </div>
 
               <Button asChild className="rounded-full px-5">

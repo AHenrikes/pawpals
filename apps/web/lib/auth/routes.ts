@@ -20,7 +20,8 @@ export const AUTH_ROUTES = {
   ABOUT: "/about",
   STORE: "/store",
   ERROR: "/error",
-  HOME: "/",
+  HELP: "/help",
+  HOME: "/"
 } as const;
 
 export type AuthRoute = (typeof AUTH_ROUTES)[keyof typeof AUTH_ROUTES];

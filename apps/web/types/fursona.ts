@@ -1,12 +1,17 @@
-export type FursonaDraft = {
-  name: string,
+export type FursonaTypes = {
+  display_name: string,
   username: string,
+  banner_url?: string,
+  avatar_url?: string,
   species?: string,
   pronouns?: string,
   bio?: string,
-  is_default: boolean
+  reputation?: number,
+  is_current?: boolean,
+  is_default?: boolean
 }
 
-export type FursonaRecord = FursonaDraft & {
-  id: string | number
+export type FursonaTypesWithID = FursonaTypes & {
+  id: number,
+  account_id: number
 }

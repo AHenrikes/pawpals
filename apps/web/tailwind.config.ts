@@ -81,6 +81,22 @@ export default {
       },
       backgroundImage: {
         "pawpal-primary": "var(--gradient-primary)",
+        "fur-gradient": `
+          linear-gradient(
+            0deg,
+            transparent,
+            hsl(0 0% 0%) 26%,
+            hsl(0 0% 0%) 33%,
+            hsl(0 0% 0%) 39%,
+            hsl(0 0% 0%) 44%,
+            hsl(0 0% 0%) 50%,
+            hsl(0 0% 0%) 56%,
+            hsl(0 0% 0%) 61%,
+            hsl(0 0% 0%) 67%,
+            hsl(0 0% 0%) 74%,
+            transparent
+          )`
+        ,
       },
       boxShadow: {
         ambient: "var(--ambient-shadow)",

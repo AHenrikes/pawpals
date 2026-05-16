@@ -1,13 +1,11 @@
-import UnAuthHeader from "@/components/headers/UnAuthHeader";
+import PublicShell from "@/components/layouts/PublicShell";
 
 export default function Community() {
   return (
-    <>
-      <UnAuthHeader />
-
+    <PublicShell>
       <main className="grid place-content-center h-svh">
         <h1>Community</h1>
       </main>
-    </>
+    </PublicShell>
   );
 }

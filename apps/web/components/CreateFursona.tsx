@@ -1,23 +1,23 @@
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
-import type { FursonaDraft } from "@/types/fursona";
+import type { FursonaTypes } from "@/types/fursona";
 import { AtSign } from "lucide-react";
 
 type CreateFursonaProps = {
-  fursona: FursonaDraft;
-  onFursonaChange: (field: "name" | "username" | "species" | "pronouns" | "bio", value: string) => void;
+  fursona: FursonaTypes;
+  onFursonaChange: (field: "display_name" | "username" | "species" | "pronouns" | "bio", value: string) => void;
   isActive: boolean;
 };
 
 export default function CreateFursona({ fursona, onFursonaChange, isActive }: Readonly<CreateFursonaProps>) {
-  const firstName = fursona.name.trim();
+  const display_name = fursona.display_name.trim();
   const species = (fursona.species ?? "").trim();
-  const placeholder1 = `${firstName}_${Math.random().toString(36).substring(2, 5)}`;
-  const placeholder3 = `${firstName}_${species}`;
+  const placeholder1 = `${display_name}_${Math.random().toString(36).substring(2, 5)}`;
+  const placeholder2 = `${display_name}_${species}`;
   const hasSpecies = species.length > 0;
 
-  const usernameSuggestion = hasSpecies ? placeholder3 : placeholder1;
+  const usernameSuggestion = hasSpecies ? placeholder2 : placeholder1;
 
   const seedUsernameSuggestion = () => {
     if (!fursona.username.trim()) {
@@ -35,8 +35,8 @@ export default function CreateFursona({ fursona, onFursonaChange, isActive }: Re
           id="fursona-name"
           type="text"
           placeholder="Crypto"
-          value={fursona.name}
-          onChange={(e) => onFursonaChange("name", e.target.value)}
+          value={fursona.display_name}
+          onChange={(e) => onFursonaChange("display_name", e.target.value)}
           onClick={() => onFursonaChange("username", "")}
           variant={"auth"}
           autoFocus={isActive}

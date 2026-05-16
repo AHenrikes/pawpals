@@ -11,33 +11,42 @@ async function createAccountSession(supabase: Awaited<ReturnType<typeof createSe
   const { error: accountError } = await supabase
   .schema("core")
   .from("accounts")
-  .upsert(
-    {
+  .upsert({
       user_id: user.id,
       firstname: metadata.firstname,
       lastname: metadata.lastname,
       email: user.email,
       dob: metadata.dob
-    },
-    { onConflict: "user_id" },
+    }, { onConflict: "user_id" }
   );
 
   if(accountError) errorRedirect(accountError.message);
 
+  // Get the account id
+  const { data: accountData, error: fetchError } = await supabase
+  .schema("core")
+  .from("accounts")
+  .select("id")
+  .eq("user_id", user.id)
+  .single();
+
+  if(fetchError || !accountData) errorRedirect(fetchError?.message || "Failed to retrieve account");
+
   // create default fursona
   const initFursona = metadata.onboarding_init_fursona;
-  if (initFursona?.name) {
+  if (initFursona.display_name) {
     const { error: fursonaError } = await supabase
     .schema("core")
     .from("fursonas")
-    .insert( {
-      user_id: user.id,
-      name: initFursona.name,
+    .insert({
+      account_id: accountData.id,
+      display_name: initFursona.display_name,
       username: initFursona.username,
       species: initFursona.species,
       pronouns: initFursona.pronouns,
       bio: initFursona.bio,
-      is_default: initFursona.is_default,
+      is_current: true,
+      is_default: true
     });
 
     if(fursonaError) errorRedirect(fursonaError.message);
