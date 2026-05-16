@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, Fragment } from "react";
 import { Button } from "@repo/ui/button";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/providers/UserProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@repo/ui/collapsible";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
-import { Settings, User, ArrowDownUp } from "lucide-react";
+import { Settings, User, ArrowDownUp, PlusIcon, LogOutIcon } from "lucide-react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +17,11 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
+import { TypographyH4, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
 
 function getInitials(name: string) {
   return name
@@ -29,19 +33,19 @@ function getInitials(name: string) {
 }
 
 export default function AuthHeader() {
-  const { fursonas, currentFursona, user } = useUser();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
+  const { fursonas, currentFursona, user, signOut } = useUser();
+  const [ isFursonaListOpen, setIsFursonaListOpen ] = useState(false);
+  const [ isMenuOpen, setIsMenuOpen ] = useState(false);
+  const router = useRouter();
 
   const displayName = useMemo(() => {
-    if (currentFursona?.name) {
-      return currentFursona.name;
+    if (currentFursona?.display_name) {
+      return currentFursona.display_name;
     }
 
     return "Account";
-  }, [currentFursona?.name]);
+  }, [currentFursona?.display_name]);
 
-  const avatarSeed = currentFursona?.name ?? user?.email ?? "account";
   const profileSubtitle = currentFursona?.username ?? user?.email ?? "No username";
 
   function handleMenuOpenChange(nextOpen: boolean) {
@@ -57,13 +61,19 @@ export default function AuthHeader() {
     { href: AUTH_ROUTES.SETTINGS, label: "Settings", icon: Settings },
   ];
 
+  const handleSignOut = async () => {
+    await signOut();
+    router.push(AUTH_ROUTES.SIGN_IN);
+    router.refresh();
+  };
+
   return (
     <header className="fixed inset-x-0 top-0 z-40 h-16 border-b border-popover bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-full w-full items-center justify-between px-6">
+      <div className="mx-auto flex h-full w-full items-center justify-between px-2 md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
           <Link href={AUTH_ROUTES.HOME}>
-            <h1>PAWPALS</h1>
+            <TypographyH4 className="text-primary">PAWPALS</TypographyH4>
           </Link>
         </div>
 
@@ -76,7 +86,7 @@ export default function AuthHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant={"none"} className="p-0 focus-visible:ring-0">
                   <Avatar size="sm">
-                    <AvatarImage src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(avatarSeed)}`} alt={displayName} />
+                    <AvatarImage src={`${currentFursona?.avatar_url}`} alt={displayName} />
                     <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -84,16 +94,16 @@ export default function AuthHeader() {
 
               <DropdownMenuContent align="end" className="w-56 select-none">
                 <DropdownMenuGroup className="flex items-center gap-1">
-                  <DropdownMenuItem asChild className="w-full pr-4 rounded-none">
+                  <DropdownMenuItem asChild className="flex w-full pr-4 rounded-none">
                     <Link href={AUTH_ROUTES.PROFILE}>
                       <Avatar size="sm">
-                        <AvatarImage src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(avatarSeed)}`} alt={displayName} />
+                        <AvatarImage src={`${currentFursona?.avatar_url}`} alt={displayName} />
                         <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
                       </Avatar>
 
-                      <span>
-                        <p className="text-sm">{displayName}</p>
-                        <p className="text-xs">{profileSubtitle}</p>
+                      <span className="flex flex-col">
+                        <TypographySmall>{displayName}</TypographySmall>
+                        <TypographyXSmall>{profileSubtitle}</TypographyXSmall>
                       </span>
                     </Link>
                   </DropdownMenuItem>
@@ -102,7 +112,7 @@ export default function AuthHeader() {
                     <Button
                       size={"icon"}
                       variant={"none"}
-                      className="rounded-none hover:bg-surface-highest px-4 py-6"
+                      className="hover:bg-popover rounded-none"
                     >
                       <ArrowDownUp className="h-5 w-5" />
                       <span className="sr-only">Switch Fursona</span>
@@ -112,7 +122,7 @@ export default function AuthHeader() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuGroup>
+                <DropdownMenuGroup className="pb-1">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   
                   {accountMenuGroup.map((li) => {
@@ -135,13 +145,44 @@ export default function AuthHeader() {
                   <DropdownMenuGroup>
                     <DropdownMenuLabel>My Fursonas</DropdownMenuLabel>
 
-                    {fursonas.map((elem) => (
-                      <DropdownMenuItem key={elem.id}>
-                        <p>{elem.username}</p>
-                      </DropdownMenuItem>
-                    ))}
+                    {fursonas.map((elem) => {
+                      const count = fursonas.length;
+
+                      return (
+                        <Fragment key={elem.id}>
+                          <DropdownMenuItem>
+                            {elem.username}
+                          </DropdownMenuItem>
+
+                          {count < 3 && (
+                            <DropdownMenuItem>
+                              <PlusIcon className="h-4 w-4" />
+                              <Button variant={"none"} className="p-0 h-fit">
+                                Create Fursona
+                              </Button>
+                            </DropdownMenuItem>
+                          )}
+                        </Fragment>
+                      )
+                    })}
                   </DropdownMenuGroup>
                 </CollapsibleContent>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuSub>
+                {/* <DropdownMenuSubTrigger>Signout</DropdownMenuSubTrigger> */}
+                  <Button 
+                    variant="outline"
+                    onClick={handleSignOut}
+                    className="h-8 w-full my-2 rounded-full"
+                  >
+                    <div>
+                      <span>Sign out</span>
+                    </div>
+                  </Button>
+                </DropdownMenuSub>
+
               </DropdownMenuContent>
             </Collapsible>
           </DropdownMenu>

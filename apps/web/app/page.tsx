@@ -1,8 +1,9 @@
-import UnAuthHeader from "@/components/headers/UnAuthHeader";
+import PublicShell from "@/components/layouts/PublicShell";
 import { createServer } from "@repo/supabase/server";
 import DashboardLayout from "./(dashboard)/layout";
 import Dashboard from "./(dashboard)/page";
 import { Suspense } from "react";
+import Loading from "./loading";
 
 export async function LandingPage() {
   const supabase = await createServer();
@@ -18,19 +19,17 @@ export async function LandingPage() {
   }
 
   return (
-    <>
-      <UnAuthHeader />
-
+    <PublicShell>
       <main className="grid place-content-center h-[200svh]">
         <h1>Home</h1>
       </main>
-    </>
+    </PublicShell>
   );
 }
 
 export default function Home() {
   return(
-    <Suspense fallback={(<h1>Loading...</h1>)}>
+    <Suspense fallback={(<Loading />)}>
       <LandingPage />
     </Suspense>
   )

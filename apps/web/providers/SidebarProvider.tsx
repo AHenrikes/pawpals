@@ -293,7 +293,7 @@ export function SidebarTrigger({ className, ...props }: React.ComponentProps<"bu
       {...props}
     >
       {/* <PanelLeft className="h-5 w-5" /> */}
-      <PawPrint className="h-6 w-6" />
+      <PawPrint className="h-6 w-6 text-primary" />
       <span className="sr-only">Toggle Sidebar</span>
     </button>
   );

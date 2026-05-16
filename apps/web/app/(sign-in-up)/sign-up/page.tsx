@@ -8,12 +8,13 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import CreateFursona from "@/components/CreateFursona";
-import type { FursonaDraft } from "@/types/fursona"
+import type { FursonaTypes } from "@/types/fursona"
 import { Button } from "@repo/ui/button";
 import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Card, CardHeader } from "@repo/ui/card";
+import { TypographyP } from "@repo/ui/typography";
 
 type SignUpValues = {
   firstname: string;
@@ -24,7 +25,7 @@ type SignUpValues = {
   dobYear: string;
   password: string;
   confirmPassword: string;
-  initFursona: FursonaDraft;
+  initFursona: FursonaTypes;
 };
 
 export default function SignUpForm() {
@@ -46,12 +47,11 @@ export default function SignUpForm() {
       password: "",
       confirmPassword: "",
       initFursona: {
-        name: "",
+        display_name: "",
         username: "",
         species: "",
         pronouns: "",
         bio: "",
-        is_default: true
       },
     },
 
@@ -61,16 +61,15 @@ export default function SignUpForm() {
       }
 
       const normalizedinitFursona = {
-        name: formValues.initFursona.name.trim(),
+        display_name: formValues.initFursona.display_name.trim(),
         username: formValues.initFursona.username.trim(),
         species: formValues.initFursona.species?.trim(),
         pronouns: formValues.initFursona.pronouns?.trim(),
-        bio: formValues.initFursona.bio,
-        is_default: formValues.initFursona.is_default,
+        bio: formValues.initFursona.bio?.trim()
       };
 
-      if (normalizedinitFursona.name.length === 0) {
-        throw new TypeError("Add your main fursona name before finishing sign up");
+      if (normalizedinitFursona.display_name.length === 0) {
+        throw new TypeError("Add your fursona name before finishing sign up");
       }
 
       const day = Number.parseInt(formValues.dobDay, 10);
@@ -138,13 +137,13 @@ export default function SignUpForm() {
     setStep("fursona");
   };
 
-  const updateMainFursona = (field: keyof FursonaDraft, value: string) => {
+  const updateMainFursona = (field: keyof FursonaTypes, value: string) => {
     setValues((prev) => ({...prev, initFursona: {...prev.initFursona, [field]: value,}}));
     setError(null);
   };
 
   return (
-    <section className="flex items-center justify-center px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
+    <section className="flex items-center justify-center px-5 pt-32 sm:px-8 lg:px-10 lg:py-16">
       <Card className="w-full max-w-[640px]">
         <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
           <Link
@@ -377,7 +376,7 @@ export default function SignUpForm() {
                 </Button>
               </div>
 
-              <p className="mx-auto max-w-md pt-3 text-center text-[0.62rem] uppercase leading-5 tracking-[0.28em] text-text-muted">
+              <TypographyP className="mx-auto max-w-md pt-3 text-center text-[0.62rem] uppercase leading-5 tracking-[0.28em] text-text-muted">
                 By continuing, you agree to our
                 {" "}
                 <Link
@@ -393,7 +392,7 @@ export default function SignUpForm() {
                 >
                   Privacy Policy
                 </Link>
-              </p>
+              </TypographyP>
             </>
           )}
         </form>

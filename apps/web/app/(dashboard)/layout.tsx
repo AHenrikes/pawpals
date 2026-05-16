@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import MainNav from "@/components/asides/mainNav";
+import MainNav from "@/components/asides/MainNav";
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
+import { UserProvider } from "@/providers/UserProvider";
 import AuthHeader from "@/components/headers/AuthHeader";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -8,17 +9,19 @@ export const metadata: Metadata = { title: "Dashboard" };
 export default async function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div id="DashboardLayout">
-      <SidebarProvider className="flex-col">
-        <AuthHeader />
+      <UserProvider>
+        <SidebarProvider>
+          <AuthHeader />
 
-        <div className="flex w-full pt-16 h-[calc(100svh-64px)]">
-          <MainNav />
+          <div className="flex w-svw h-svh pt-16">
+            <MainNav />
 
-          <SidebarInset className="mx-auto w-full max-w-7xl">
-            {children}
-          </SidebarInset>
-        </div>
-      </SidebarProvider>
+            <SidebarInset className="overflow-y-auto">
+              {children}
+            </SidebarInset>
+          </div>
+        </SidebarProvider>
+      </UserProvider>
     </div>
   )
 }

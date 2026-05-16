@@ -5,29 +5,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
+import { TypographyH2, TypographyP } from "@repo/ui/typography";
 
 export default async function SignUpSuccess() {
   return (
-    <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">
-                Thank you for signing up!
-              </CardTitle>
-              <CardDescription>Check your email to confirm</CardDescription>
-            </CardHeader>
-            
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                You&apos;ve successfully signed up. Please check your email to
-                confirm your account before signing in.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+    <main className="grid place-content-center h-svh">
+      <Card className="text-center space-y-10">
+        <CardHeader>
+          <CardTitle>
+            <TypographyH2>
+              Thank you for signing up!
+            </TypographyH2>
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="border rounded-sm p-4">
+          <CardDescription>Check your email to confirm</CardDescription>
+
+          <TypographyP>
+            You&apos;ve successfully signed up. Please check your email to
+            confirm your account before signing in.
+          </TypographyP>
+        </CardContent>
+      </Card>
     </main>
   );
 }
