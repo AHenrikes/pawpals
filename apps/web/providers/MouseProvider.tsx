@@ -21,7 +21,9 @@ export function useMouse(): MousePos {
   return useContext(MouseContext);
 }
 
-export function MouseProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+export function MouseProvider({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [pos, setPos] = useState<MousePos>(DEFAULT_POS);
   const raf = useRef<number | null>(null);
   const latest = useRef<MousePos>(DEFAULT_POS);
@@ -54,5 +56,7 @@ export function MouseProvider({ children }: Readonly<{ children: React.ReactNode
   // Memoize context value to prevent unnecessary child re-renders
   const value = useMemo(() => pos, [pos]);
 
-  return <MouseContext.Provider value={value}>{children}</MouseContext.Provider>;
+  return (
+    <MouseContext.Provider value={value}>{children}</MouseContext.Provider>
+  );
 }

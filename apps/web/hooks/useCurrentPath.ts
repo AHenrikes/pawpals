@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import { usePathname } from "next/navigation";
 
 export function useCurrentPath(path: string): boolean {
   const currentPath = usePathname();
 
-  return currentPath === (path.startsWith("/") ? path: "/" + path);
+  return currentPath === (path.startsWith("/") ? path : "/" + path);
 }

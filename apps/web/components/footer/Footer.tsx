@@ -1,4 +1,4 @@
-import { ThemeSwitcher } from "@/lib/Theme-switcher"
+import { ThemeSwitcher } from "@/components/ui/Theme-switcher";
 
 export default function Footer() {
   return (
@@ -16,5 +16,5 @@ export default function Footer() {
       </p>
       <ThemeSwitcher />
     </footer>
-  )
+  );
 }

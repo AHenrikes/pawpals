@@ -3,5 +3,5 @@ export default function Settings() {
     <main className="grid place-content-center">
       <h1>Settings</h1>
     </main>
-  )
+  );
 }

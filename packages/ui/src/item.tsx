@@ -25,7 +25,9 @@ const itemVariants = cva(
   },
 );
 
-const itemGroupVariants = cva("overflow-hidden rounded-xl border border-border bg-background");
+const itemGroupVariants = cva(
+  "overflow-hidden rounded-xl border border-border bg-background",
+);
 
 const itemMediaVariants = cva(
   "inline-flex shrink-0 items-center justify-center text-muted-foreground [&_img]:h-full [&_img]:w-full [&_img]:object-cover",
@@ -82,29 +84,35 @@ const ItemSeparator = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("h-px w-full bg-border", className)} {...props} />
+  <div
+    ref={ref}
+    className={cn("h-px w-full bg-border", className)}
+    {...props}
+  />
 ));
 ItemSeparator.displayName = "ItemSeparator";
 
-const ItemHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
+const ItemHeader = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground",
+      className,
+    )}
+    {...props}
+  />
+));
 ItemHeader.displayName = "ItemHeader";
 
-const ItemFooter = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("px-3 py-2", className)} {...props} />
-  ),
-);
+const ItemFooter = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("px-3 py-2", className)} {...props} />
+));
 ItemFooter.displayName = "ItemFooter";
 
 type ItemMediaProps = React.ComponentProps<"div"> &
@@ -121,22 +129,24 @@ const ItemMedia = React.forwardRef<HTMLDivElement, ItemMediaProps>(
 );
 ItemMedia.displayName = "ItemMedia";
 
-const ItemContent = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("min-w-0 flex-1", className)} {...props} />
-  ),
-);
+const ItemContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("min-w-0 flex-1", className)} {...props} />
+));
 ItemContent.displayName = "ItemContent";
 
-const ItemTitle = React.forwardRef<HTMLParagraphElement, React.ComponentProps<"p">>(
-  ({ className, ...props }, ref) => (
-    <p
-      ref={ref}
-      className={cn("truncate text-sm font-medium leading-none", className)}
-      {...props}
-    />
-  ),
-);
+const ItemTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.ComponentProps<"p">
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("truncate text-sm font-medium leading-none", className)}
+    {...props}
+  />
+));
 ItemTitle.displayName = "ItemTitle";
 
 const ItemDescription = React.forwardRef<
@@ -151,15 +161,16 @@ const ItemDescription = React.forwardRef<
 ));
 ItemDescription.displayName = "ItemDescription";
 
-const ItemActions = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn("ml-auto inline-flex items-center gap-2", className)}
-      {...props}
-    />
-  ),
-);
+const ItemActions = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("ml-auto inline-flex items-center gap-2", className)}
+    {...props}
+  />
+));
 ItemActions.displayName = "ItemActions";
 
 export {

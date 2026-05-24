@@ -7,8 +7,8 @@ import { ArrowLeft, ArrowRight, Circle, MessagesSquare } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import CreateFursona from "@/components/CreateFursona";
-import type { FursonaTypes } from "@/types/fursona"
+import CreateFursona from "@/components/features/CreateFursona";
+import type { FursonaTypes } from "@/types/fursona";
 import { Button } from "@repo/ui/button";
 import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
@@ -34,9 +34,19 @@ export default function SignUpForm() {
   const prefersReducedMotion = useReducedMotion();
   const [step, setStep] = useState<"account" | "fursona">("account");
   const formRef = useRef<HTMLFormElement | null>(null);
-  const stepTransition = prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
+  const stepTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
 
-  const { values, setValues, error, isLoading, setError, handleChange, handleSubmit } = useAuthForm<SignUpValues>(
+  const {
+    values,
+    setValues,
+    error,
+    isLoading,
+    setError,
+    handleChange,
+    handleSubmit,
+  } = useAuthForm<SignUpValues>(
     {
       firstname: "",
       lastname: "",
@@ -65,7 +75,7 @@ export default function SignUpForm() {
         username: formValues.initFursona.username.trim(),
         species: formValues.initFursona.species?.trim(),
         pronouns: formValues.initFursona.pronouns?.trim(),
-        bio: formValues.initFursona.bio?.trim()
+        bio: formValues.initFursona.bio?.trim(),
       };
 
       if (normalizedinitFursona.display_name.length === 0) {
@@ -77,9 +87,15 @@ export default function SignUpForm() {
       const year = Number.parseInt(formValues.dobYear, 10);
 
       const isValidParts =
-        Number.isInteger(day) && day >= 1 && day <= 31
-        && Number.isInteger(month) && month >= 1 && month <= 12
-        && Number.isInteger(year) && year >= 1900 && year <= new Date().getUTCFullYear();
+        Number.isInteger(day) &&
+        day >= 1 &&
+        day <= 31 &&
+        Number.isInteger(month) &&
+        month >= 1 &&
+        month <= 12 &&
+        Number.isInteger(year) &&
+        year >= 1900 &&
+        year <= new Date().getUTCFullYear();
 
       if (!isValidParts) {
         throw new TypeError("Please enter a valid date of birth");
@@ -88,9 +104,9 @@ export default function SignUpForm() {
       const dobIsoDate = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       const dobDate = new Date(dobIsoDate);
       const isSameDate =
-        dobDate.getUTCFullYear() === year
-        && dobDate.getUTCMonth() + 1 === month
-        && dobDate.getUTCDate() === day;
+        dobDate.getUTCFullYear() === year &&
+        dobDate.getUTCMonth() + 1 === month &&
+        dobDate.getUTCDate() === day;
 
       if (!isSameDate) {
         throw new TypeError("Please enter a valid date of birth");
@@ -113,7 +129,7 @@ export default function SignUpForm() {
       if (error) throw error;
 
       router.push(AUTH_ROUTES.SIGNUP_SUCCESS);
-    }
+    },
   );
 
   const goToFursonaStep = () => {
@@ -138,12 +154,15 @@ export default function SignUpForm() {
   };
 
   const updateMainFursona = (field: keyof FursonaTypes, value: string) => {
-    setValues((prev) => ({...prev, initFursona: {...prev.initFursona, [field]: value,}}));
+    setValues((prev) => ({
+      ...prev,
+      initFursona: { ...prev.initFursona, [field]: value },
+    }));
     setError(null);
   };
 
   return (
-    <section className="flex items-center justify-center px-5 pt-32 sm:px-8 lg:px-10 lg:py-16">
+    <section className="flex items-center justify-center px-5 sm:px-8 lg:px-10">
       <Card className="w-full max-w-[640px]">
         <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
           <Link
@@ -162,7 +181,11 @@ export default function SignUpForm() {
         </CardHeader>
 
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
-          <motion.div layout transition={stepTransition} className="relative overflow-hidden px-1">
+          <motion.div
+            layout
+            transition={stepTransition}
+            className="relative overflow-hidden px-1"
+          >
             <AnimatePresence mode="wait" initial={false}>
               {step === "account" ? (
                 <motion.div
@@ -183,7 +206,9 @@ export default function SignUpForm() {
                         type="text"
                         placeholder="Jhon"
                         value={values.firstname}
-                        onChange={(e) => handleChange("firstname", e.target.value)}
+                        onChange={(e) =>
+                          handleChange("firstname", e.target.value)
+                        }
                         variant={"auth"}
                         autoFocus={step === "account"}
                         required
@@ -199,7 +224,9 @@ export default function SignUpForm() {
                         type="text"
                         placeholder="Doe"
                         value={values.lastname}
-                        onChange={(e) => handleChange("lastname", e.target.value)}
+                        onChange={(e) =>
+                          handleChange("lastname", e.target.value)
+                        }
                         variant={"auth"}
                         required
                       />
@@ -233,7 +260,12 @@ export default function SignUpForm() {
                         maxLength={2}
                         placeholder="DD"
                         value={values.dobDay}
-                        onChange={(e) => handleChange("dobDay", e.target.value.replaceAll(/\D/g, ""))}
+                        onChange={(e) =>
+                          handleChange(
+                            "dobDay",
+                            e.target.value.replaceAll(/\D/g, ""),
+                          )
+                        }
                         variant={"auth"}
                         className="text-center rounded-none rounded-l-full"
                         required
@@ -245,7 +277,12 @@ export default function SignUpForm() {
                         maxLength={2}
                         placeholder="MM"
                         value={values.dobMonth}
-                        onChange={(e) => handleChange("dobMonth", e.target.value.replaceAll(/\D/g, ""))}
+                        onChange={(e) =>
+                          handleChange(
+                            "dobMonth",
+                            e.target.value.replaceAll(/\D/g, ""),
+                          )
+                        }
                         variant={"auth"}
                         className="z-0 rounded-none text-center"
                         required
@@ -257,7 +294,12 @@ export default function SignUpForm() {
                         maxLength={4}
                         placeholder="YYYY"
                         value={values.dobYear}
-                        onChange={(e) => handleChange("dobYear", e.target.value.replaceAll(/\D/g, ""))}
+                        onChange={(e) =>
+                          handleChange(
+                            "dobYear",
+                            e.target.value.replaceAll(/\D/g, ""),
+                          )
+                        }
                         variant={"auth"}
                         className="text-center rounded-none rounded-r-full"
                         required
@@ -275,7 +317,9 @@ export default function SignUpForm() {
                         type="password"
                         placeholder="••••••••"
                         value={values.password}
-                        onChange={(e) => handleChange("password", e.target.value)}
+                        onChange={(e) =>
+                          handleChange("password", e.target.value)
+                        }
                         variant={"auth"}
                         required
                       />
@@ -290,7 +334,9 @@ export default function SignUpForm() {
                         type="password"
                         placeholder="••••••••"
                         value={values.confirmPassword}
-                        onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                        onChange={(e) =>
+                          handleChange("confirmPassword", e.target.value)
+                        }
                         variant={"auth"}
                         required
                       />
@@ -377,15 +423,14 @@ export default function SignUpForm() {
               </div>
 
               <TypographyP className="mx-auto max-w-md pt-3 text-center text-[0.62rem] uppercase leading-5 tracking-[0.28em] text-text-muted">
-                By continuing, you agree to our
-                {" "}
+                By continuing, you agree to our{" "}
                 <Link
                   href={AUTH_ROUTES.TERMS_OF_SERVICE}
                   className="text-secondary hover:text-primary"
                 >
                   Terms of Service
-                </Link>
-                {" "}and{" "}
+                </Link>{" "}
+                and{" "}
                 <Link
                   href={AUTH_ROUTES.PRIVACY_POLICY}
                   className="text-secondary hover:text-primary"

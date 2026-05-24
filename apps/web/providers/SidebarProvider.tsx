@@ -1,9 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/helpers/utils";
 import { PawPrint } from "lucide-react";
-import { useState, useCallback, useContext, useMemo, createContext } from "react";
+import {
+  useState,
+  useCallback,
+  useContext,
+  useMemo,
+  createContext,
+} from "react";
 
 type SidebarContextValue = {
   state: "expanded" | "collapsed";
@@ -153,7 +159,9 @@ export function Sidebar({
           "relative hidden h-svh shrink-0 border-r border-border/60 bg-surface-container-low/80 md:flex",
           "transition-[width] duration-200 ease-linear px-4",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
-          isCollapsed && collapsible === "icon" ? "w-[--sidebar-width-icon]" : "w-[--sidebar-width]",
+          isCollapsed && collapsible === "icon"
+            ? "w-[--sidebar-width-icon]"
+            : "w-[--sidebar-width]",
           variant === "floating" && "m-2 rounded-2xl border",
           className,
         )}
@@ -178,35 +186,73 @@ export function Sidebar({
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-full flex-col rounded-xl bg-surface-container-highest/60">{children}</div>
+        <div className="flex h-full flex-col rounded-xl bg-surface-container-highest/60">
+          {children}
+        </div>
       </aside>
     </>
   );
 }
 
-export function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="sidebar-header" className={cn("p-3", className)} {...props} />;
-}
-
-export function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="sidebar-footer" className={cn("mt-auto p-3", className)} {...props} />;
-}
-
-export function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
+export function SidebarHeader({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
     <div
-      data-slot="sidebar-content"
-      className={cn("flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2", className)}
+      data-slot="sidebar-header"
+      className={cn("p-3", className)}
       {...props}
     />
   );
 }
 
-export function SidebarGroup({ className, ...props }: React.ComponentProps<"section">) {
-  return <section data-slot="sidebar-group" className={cn("space-y-2", className)} {...props} />;
+export function SidebarFooter({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sidebar-footer"
+      className={cn("mt-auto p-3", className)}
+      {...props}
+    />
+  );
 }
 
-export function SidebarGroupLabel({ className, ...props }: React.ComponentProps<"p">) {
+export function SidebarContent({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sidebar-content"
+      className={cn(
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function SidebarGroup({
+  className,
+  ...props
+}: React.ComponentProps<"section">) {
+  return (
+    <section
+      data-slot="sidebar-group"
+      className={cn("space-y-2", className)}
+      {...props}
+    />
+  );
+}
+
+export function SidebarGroupLabel({
+  className,
+  ...props
+}: React.ComponentProps<"p">) {
   return (
     <p
       data-slot="sidebar-group-label"
@@ -220,16 +266,43 @@ export function SidebarGroupLabel({ className, ...props }: React.ComponentProps<
   );
 }
 
-export function SidebarGroupContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="sidebar-group-content" className={cn("space-y-1", className)} {...props} />;
+export function SidebarGroupContent({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sidebar-group-content"
+      className={cn("space-y-1", className)}
+      {...props}
+    />
+  );
 }
 
-export function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
-  return <ul data-slot="sidebar-menu" className={cn("space-y-1", className)} {...props} />;
+export function SidebarMenu({
+  className,
+  ...props
+}: React.ComponentProps<"ul">) {
+  return (
+    <ul
+      data-slot="sidebar-menu"
+      className={cn("space-y-1", className)}
+      {...props}
+    />
+  );
 }
 
-export function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
-  return <li data-slot="sidebar-menu-item" className={cn("list-none", className)} {...props} />;
+export function SidebarMenuItem({
+  className,
+  ...props
+}: React.ComponentProps<"li">) {
+  return (
+    <li
+      data-slot="sidebar-menu-item"
+      className={cn("list-none", className)}
+      {...props}
+    />
+  );
 }
 
 type SidebarMenuButtonProps = React.ComponentProps<"button"> & {
@@ -252,7 +325,12 @@ export function SidebarMenuButton({
     className,
   );
 
-  if (asChild && React.isValidElement<{ className?: string; "data-active"?: string }>(children)) {
+  if (
+    asChild &&
+    React.isValidElement<{ className?: string; "data-active"?: string }>(
+      children,
+    )
+  ) {
     return React.cloneElement(children, {
       className: cn(sharedClassName, children.props.className),
       "data-active": isActive ? "true" : "false",
@@ -260,13 +338,20 @@ export function SidebarMenuButton({
   }
 
   return (
-    <button className={sharedClassName} data-active={isActive ? "true" : "false"} {...props}>
+    <button
+      className={sharedClassName}
+      data-active={isActive ? "true" : "false"}
+      {...props}
+    >
       {children}
     </button>
   );
 }
 
-export function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+export function SidebarInset({
+  className,
+  ...props
+}: React.ComponentProps<"main">) {
   const { state } = useSidebar();
 
   return (
@@ -279,7 +364,10 @@ export function SidebarInset({ className, ...props }: React.ComponentProps<"main
   );
 }
 
-export function SidebarTrigger({ className, ...props }: React.ComponentProps<"button">) {
+export function SidebarTrigger({
+  className,
+  ...props
+}: React.ComponentProps<"button">) {
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -299,7 +387,10 @@ export function SidebarTrigger({ className, ...props }: React.ComponentProps<"bu
   );
 }
 
-export function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
+export function SidebarRail({
+  className,
+  ...props
+}: React.ComponentProps<"button">) {
   const { toggleSidebar } = useSidebar();
 
   return (

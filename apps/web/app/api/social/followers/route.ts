@@ -32,8 +32,8 @@ export async function GET() {
       followers_count: stats?.followers_count ?? 0,
       following_count: stats?.following_count ?? 0,
       following: stats?.following ?? [],
-      followers: stats?.followers ?? []
+      followers: stats?.followers ?? [],
     }),
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { "Content-Type": "application/json" } },
   );
 }

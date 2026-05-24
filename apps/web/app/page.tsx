@@ -7,10 +7,11 @@ import Loading from "./loading";
 
 export async function LandingPage() {
   const supabase = await createServer();
-  const { data } = await supabase.auth.getSession();
-  const session = data?.session ?? null;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (session) {
+  if (user) {
     return (
       <DashboardLayout>
         <Dashboard />
@@ -28,9 +29,9 @@ export async function LandingPage() {
 }
 
 export default function Home() {
-  return(
-    <Suspense fallback={(<Loading />)}>
+  return (
+    <Suspense fallback={<Loading />}>
       <LandingPage />
     </Suspense>
-  )
+  );
 }

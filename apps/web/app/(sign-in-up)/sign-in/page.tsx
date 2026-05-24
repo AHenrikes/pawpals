@@ -15,12 +15,18 @@ export default function SignIn() {
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm({ email: "", password: "" }, async (values) => {
-    const { error } = await supabase.auth.signInWithPassword({ email: values.email, password: values.password });
-    if (error) throw error;
+  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm(
+    { email: "", password: "" },
+    async (values) => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+      if (error) throw error;
 
-    router.replace(AUTH_ROUTES.HOME);
-  });
+      router.replace(AUTH_ROUTES.HOME);
+    },
+  );
 
   return (
     <section className="flex items-center justify-center px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
@@ -44,7 +50,9 @@ export default function SignIn() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col gap-6">
             <div className="space-y-2.5">
-              <Label htmlFor="email" variant={"auth"}>Email</Label>
+              <Label htmlFor="email" variant={"auth"}>
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -56,10 +64,12 @@ export default function SignIn() {
                 required
               />
             </div>
-              
+
             <div className="space-y-2.5">
               <div className="flex items-center">
-                <Label htmlFor="password" variant={"auth"}>Password</Label>
+                <Label htmlFor="password" variant={"auth"}>
+                  Password
+                </Label>
 
                 <Link
                   href={AUTH_ROUTES.FORGOT_PASSWORD}

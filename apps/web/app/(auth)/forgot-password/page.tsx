@@ -1,5 +1,11 @@
 "use client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/card";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
@@ -14,13 +20,20 @@ export default function ForgotPasswordForm() {
   const [submitted, setSubmitted] = useState(false);
   const supabase = useSupabaseClient();
 
-  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm({ email: "" }, async (values) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-      redirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.UPDATE_PASSWORD}`,
-    });
+  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm(
+    { email: "" },
+    async (values) => {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        values.email,
+        {
+          redirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.UPDATE_PASSWORD}`,
+        },
+      );
 
-    if (error) throw error;
-  },{ onSuccess: () => setSubmitted(true)});
+      if (error) throw error;
+    },
+    { onSuccess: () => setSubmitted(true) },
+  );
 
   const isSubmitted = submitted && !error && !isLoading;
 
@@ -31,13 +44,15 @@ export default function ForgotPasswordForm() {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Check Your Email</CardTitle>
-              <CardDescription>Password reset instructions sent</CardDescription>
+              <CardDescription>
+                Password reset instructions sent
+              </CardDescription>
             </CardHeader>
 
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                If you registered using your email and password, you will receive
-                a password reset email.
+                If you registered using your email and password, you will
+                receive a password reset email.
               </p>
             </CardContent>
           </Card>
@@ -55,7 +70,9 @@ export default function ForgotPasswordForm() {
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="email" variant={"auth"}>Email</Label>
+                    <Label htmlFor="email" variant={"auth"}>
+                      Email
+                    </Label>
                     <Input
                       id="email"
                       type="email"
@@ -69,12 +86,11 @@ export default function ForgotPasswordForm() {
 
                   <FormError message={error} />
 
-                  <Button 
+                  <Button
                     type="submit"
                     disabled={isLoading}
                     className="h-14 w-full rounded-full bg-gradient-to-r from-primary to-secondary text-base font-semibold text-text-secondary shadow-[0_18px_45px_rgba(190,127,255,0.35)] transition hover:brightness-105"
                   >
-
                     {isLoading ? "Sending..." : "Send reset email"}
                   </Button>
                 </div>

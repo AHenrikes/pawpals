@@ -5,9 +5,13 @@ import { useState, useMemo, Fragment } from "react";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@repo/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@repo/ui/collapsible";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
-import { Settings, User, ArrowDownUp, PlusIcon, LogOutIcon } from "lucide-react";
+import { Settings, User, ArrowDownUp, PlusIcon } from "lucide-react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useRouter } from "next/navigation";
 import {
@@ -18,10 +22,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
-import { TypographyH4, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
+import {
+  TypographyH4,
+  TypographySmall,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 
 function getInitials(name: string) {
   return name
@@ -34,8 +41,8 @@ function getInitials(name: string) {
 
 export default function AuthHeader() {
   const { fursonas, currentFursona, user, signOut } = useUser();
-  const [ isFursonaListOpen, setIsFursonaListOpen ] = useState(false);
-  const [ isMenuOpen, setIsMenuOpen ] = useState(false);
+  const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
   const displayName = useMemo(() => {
@@ -46,7 +53,8 @@ export default function AuthHeader() {
     return "Account";
   }, [currentFursona?.display_name]);
 
-  const profileSubtitle = currentFursona?.username ?? user?.email ?? "No username";
+  const profileSubtitle =
+    currentFursona?.username ?? user?.email ?? "No username";
 
   function handleMenuOpenChange(nextOpen: boolean) {
     setIsMenuOpen(nextOpen);
@@ -57,7 +65,7 @@ export default function AuthHeader() {
   }
 
   const accountMenuGroup = [
-    { href: AUTH_ROUTES.PROFILE, label: "Profile", icon: User },
+    { href: `${currentFursona?.username}`, label: "Profile", icon: User },
     { href: AUTH_ROUTES.SETTINGS, label: "Settings", icon: Settings },
   ];
 
@@ -86,7 +94,10 @@ export default function AuthHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant={"none"} className="p-0 focus-visible:ring-0">
                   <Avatar size="sm">
-                    <AvatarImage src={`${currentFursona?.avatar_url}`} alt={displayName} />
+                    <AvatarImage
+                      src={`${currentFursona?.avatar_url}`}
+                      alt={displayName}
+                    />
                     <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -94,11 +105,19 @@ export default function AuthHeader() {
 
               <DropdownMenuContent align="end" className="w-56 select-none">
                 <DropdownMenuGroup className="flex items-center gap-1">
-                  <DropdownMenuItem asChild className="flex w-full pr-4 rounded-none">
-                    <Link href={AUTH_ROUTES.PROFILE}>
+                  <DropdownMenuItem
+                    asChild
+                    className="flex w-full pr-4 rounded-none"
+                  >
+                    <Link href={`${currentFursona?.username}`}>
                       <Avatar size="sm">
-                        <AvatarImage src={`${currentFursona?.avatar_url}`} alt={displayName} />
-                        <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
+                        <AvatarImage
+                          src={`${currentFursona?.avatar_url}`}
+                          alt={displayName}
+                        />
+                        <AvatarFallback>
+                          {getInitials(displayName)}
+                        </AvatarFallback>
                       </Avatar>
 
                       <span className="flex flex-col">
@@ -124,7 +143,7 @@ export default function AuthHeader() {
 
                 <DropdownMenuGroup className="pb-1">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  
+
                   {accountMenuGroup.map((li) => {
                     const Icon = li.icon;
 
@@ -150,9 +169,7 @@ export default function AuthHeader() {
 
                       return (
                         <Fragment key={elem.id}>
-                          <DropdownMenuItem>
-                            {elem.username}
-                          </DropdownMenuItem>
+                          <DropdownMenuItem>{elem.username}</DropdownMenuItem>
 
                           {count < 3 && (
                             <DropdownMenuItem>
@@ -163,7 +180,7 @@ export default function AuthHeader() {
                             </DropdownMenuItem>
                           )}
                         </Fragment>
-                      )
+                      );
                     })}
                   </DropdownMenuGroup>
                 </CollapsibleContent>
@@ -171,8 +188,7 @@ export default function AuthHeader() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuSub>
-                {/* <DropdownMenuSubTrigger>Signout</DropdownMenuSubTrigger> */}
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={handleSignOut}
                     className="h-8 w-full my-2 rounded-full"
@@ -182,7 +198,6 @@ export default function AuthHeader() {
                     </div>
                   </Button>
                 </DropdownMenuSub>
-
               </DropdownMenuContent>
             </Collapsible>
           </DropdownMenu>

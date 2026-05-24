@@ -1,6 +1,6 @@
-import { AUTH_ROUTES } from "@/lib/auth/routes"
+import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { TypographySmall } from "@repo/ui/typography";
-import Link from "next/link"
+import Link from "next/link";
 
 const footerLinks = [
   {
@@ -8,7 +8,7 @@ const footerLinks = [
     href: AUTH_ROUTES.PRIVACY_POLICY,
     label: "PRIVACY POLICY",
     style: "hover:text-headline",
-    description: "How do we protect your data?"
+    description: "How do we protect your data?",
   },
 
   {
@@ -16,7 +16,7 @@ const footerLinks = [
     href: AUTH_ROUTES.TERMS_OF_SERVICE,
     label: "TERMS OF SERVICE",
     style: "hover:text-headline",
-    description: "Read about our Terms of Service"
+    description: "Read about our Terms of Service",
   },
 
   {
@@ -24,13 +24,13 @@ const footerLinks = [
     href: AUTH_ROUTES.SYSTEM_STATUS,
     label: "SYSTEM STATUS",
     style: "hover:text-green-400",
-    description: "view more about our system uptime"
-  }
+    description: "view more about our system uptime",
+  },
 ];
 
 export default function SignFooter() {
   return (
-    <footer className="container absolute bottom-0 left-0 right-0 py-5 px-2 mx-auto select-none">
+    <footer className="container py-5 px-2 mx-auto select-none">
       <div className="flex flex-col gap-4 md:flex-row justify-between">
         <TypographySmall className="uppercase text-center tracking-widest text-primary md:text-left">
           © 2026 PawPall. All rights reserved.
@@ -43,11 +43,11 @@ export default function SignFooter() {
               href={li.href}
               className={`text-xs ${li.style} text-center`}
             >
-              { li.label }
+              {li.label}
             </Link>
           ))}
         </div>
       </div>
     </footer>
-  )
+  );
 }

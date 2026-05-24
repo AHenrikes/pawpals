@@ -1,27 +1,44 @@
 import type { Metadata } from "next";
-import MainNav from "@/components/asides/MainNav";
+import MainNav from "@/components/navigation/MainNav";
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
 import { UserProvider } from "@/providers/UserProvider";
-import AuthHeader from "@/components/headers/AuthHeader";
+import { ProfileProvider } from "@/providers/ProfileProvider";
+import AuthHeader from "@/components/navigation/AuthHeader";
+import { createServer } from "@repo/supabase/server";
+import { redirect } from "next/navigation";
+import { AUTH_ROUTES } from "@/lib/auth/routes";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-export default async function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function DashboardLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(AUTH_ROUTES.SIGN_IN);
+  }
+
   return (
     <div id="DashboardLayout">
       <UserProvider>
-        <SidebarProvider>
-          <AuthHeader />
-
-          <div className="flex w-svw h-svh pt-16">
+        <ProfileProvider>
+          <SidebarProvider>
             <MainNav />
 
-            <SidebarInset className="overflow-y-auto">
-              {children}
-            </SidebarInset>
-          </div>
-        </SidebarProvider>
+            <div className="flex w-svw h-svh">
+              <AuthHeader />
+
+              <SidebarInset className="overflow-y-auto pt-16">
+                {children}
+              </SidebarInset>
+            </div>
+          </SidebarProvider>
+        </ProfileProvider>
       </UserProvider>
     </div>
-  )
+  );
 }

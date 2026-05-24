@@ -3,5 +3,5 @@ export default function Store() {
     <main className="grid place-content-center">
       <h1>Store</h1>
     </main>
-  )
+  );
 }

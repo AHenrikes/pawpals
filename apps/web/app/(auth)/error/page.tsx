@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { Suspense } from "react";
 
-async function ErrorContent({ searchParams } : Readonly<{ searchParams: Promise<{ error: string }> }>) {
+async function ErrorContent({
+  searchParams,
+}: Readonly<{ searchParams: Promise<{ error: string }> }>) {
   const params = await searchParams;
 
   return (
@@ -19,7 +21,9 @@ async function ErrorContent({ searchParams } : Readonly<{ searchParams: Promise<
   );
 }
 
-export default function Page({ searchParams } : Readonly<{ searchParams: Promise<{ error: string }> }>) {
+export default function Page({
+  searchParams,
+}: Readonly<{ searchParams: Promise<{ error: string }> }>) {
   return (
     <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <Card>
@@ -28,7 +32,7 @@ export default function Page({ searchParams } : Readonly<{ searchParams: Promise
             Sorry, something went wrong.
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent>
           <Suspense>
             <ErrorContent searchParams={searchParams} />

@@ -29,19 +29,11 @@ const ThemeSwitcher = () => {
   const setCurrentTheme = () => {
     if (currentTheme === "light") {
       return (
-        <Sun
-          key="light"
-          size={ICON_SIZE}
-          className="text-muted-foreground"
-        />
+        <Sun key="light" size={ICON_SIZE} className="text-muted-foreground" />
       );
     } else if (currentTheme === "dark") {
       return (
-        <Moon
-          key="dark"
-          size={ICON_SIZE}
-          className="text-muted-foreground"
-        />
+        <Moon key="dark" size={ICON_SIZE} className="text-muted-foreground" />
       );
     } else {
       return (
@@ -57,26 +49,26 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Change theme">
+        <Button variant="outline" size="icon">
           {setCurrentTheme()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40" align="start" sideOffset={5}>
-        <DropdownMenuRadioGroup
-          value={theme ?? "system"}
-          onValueChange={setTheme}
-        >
-          <DropdownMenuRadioItem className="flex gap-2" value="light">
-            <Sun size={ICON_SIZE} className="text-muted-foreground" />{" "}
-            <span>Light</span>
+      <DropdownMenuContent align="end">
+        <DropdownMenuRadioGroup value={theme}>
+          <DropdownMenuRadioItem
+            value="light"
+            onClick={() => setTheme("light")}
+          >
+            Light
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2" value="dark">
-            <Moon size={ICON_SIZE} className="text-muted-foreground" />{" "}
-            <span>Dark</span>
+          <DropdownMenuRadioItem value="dark" onClick={() => setTheme("dark")}>
+            Dark
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2" value="system">
-            <Laptop size={ICON_SIZE} className="text-muted-foreground" />{" "}
-            <span>System</span>
+          <DropdownMenuRadioItem
+            value="system"
+            onClick={() => setTheme("system")}
+          >
+            System
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

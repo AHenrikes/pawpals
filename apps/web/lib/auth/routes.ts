@@ -1,6 +1,6 @@
 /**
  * Centralized auth route constants to avoid hardcoded strings
-**/
+ **/
 export const AUTH_ROUTES = {
   SIGN_IN: "/sign-in",
   SIGN_UP: "/sign-up",
@@ -15,13 +15,12 @@ export const AUTH_ROUTES = {
   PAWPAL_MEET: "/pawpal-meet",
   COMMUNITY: "/community",
   NOTIFICATION: "/notifications",
-  PROFILE: "/profile",
   MESSAGES: "/messages",
   ABOUT: "/about",
   STORE: "/store",
   ERROR: "/error",
   HELP: "/help",
-  HOME: "/"
+  HOME: "/",
 } as const;
 
 export type AuthRoute = (typeof AUTH_ROUTES)[keyof typeof AUTH_ROUTES];

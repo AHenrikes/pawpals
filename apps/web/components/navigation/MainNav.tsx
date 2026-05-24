@@ -4,8 +4,18 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import { cn } from "@/lib/utils";
-import { Home, PawPrint, Settings, Store, Users, BellRing, Inbox, PlusIcon, LogOutIcon } from "lucide-react";
+import { cn } from "@/lib/helpers/utils";
+import {
+  Home,
+  PawPrint,
+  Settings,
+  Store,
+  Users,
+  BellRing,
+  Inbox,
+  PlusIcon,
+  LogOutIcon,
+} from "lucide-react";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import {
@@ -26,13 +36,13 @@ type MainNavItem = {
 };
 
 const mainNavItems: MainNavItem[] = [
-  { href: AUTH_ROUTES.HOME, label: "Home", Icon: Home},
-  { href: AUTH_ROUTES.STORE, label: "Store", Icon: Store},
-  { href: AUTH_ROUTES.MESSAGES, label: "Inbox", Icon: Inbox},
-  { href: AUTH_ROUTES.COMMUNITY, label: "Community", Icon: Users},
-  { href: AUTH_ROUTES.PAWPAL_MEET, label: "Pawpal meet", Icon: PawPrint},
-  { href: AUTH_ROUTES.NOTIFICATION, label: "Notification", Icon: BellRing},
-  { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: Settings},
+  { href: AUTH_ROUTES.HOME, label: "Home", Icon: Home },
+  { href: AUTH_ROUTES.STORE, label: "Store", Icon: Store },
+  { href: AUTH_ROUTES.MESSAGES, label: "Inbox", Icon: Inbox },
+  { href: AUTH_ROUTES.COMMUNITY, label: "Community", Icon: Users },
+  { href: AUTH_ROUTES.PAWPAL_MEET, label: "Pawpal meet", Icon: PawPrint },
+  { href: AUTH_ROUTES.NOTIFICATION, label: "Notification", Icon: BellRing },
+  { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: Settings },
 ];
 
 export default function MainNav() {
@@ -47,7 +57,10 @@ export default function MainNav() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="h-[calc(100svh-64px)] pt-6 group/sidebar border-transparent shrink-0">
+    <Sidebar
+      collapsible="icon"
+      className="min-h-[calc(100svh-64px)] pt-20 group/sidebar border-transparent shrink-0"
+    >
       <SidebarContent className="gap-10">
         <SidebarGroup>
           <SidebarGroupContent>
@@ -59,7 +72,12 @@ export default function MainNav() {
                   <SidebarMenuItem key={label}>
                     <SidebarMenuButton asChild isActive={isActive}>
                       <Link href={href} className="hover:bg-surface-highest">
-                        <Icon className={cn("h-5 w-5 shrink-0", !isActive && "opacity-60") } />
+                        <Icon
+                          className={cn(
+                            "h-5 w-5 shrink-0",
+                            !isActive && "opacity-60",
+                          )}
+                        />
                         <span className="truncate group-data-[collapsible=icon]/sidebar:hidden">
                           {label}
                         </span>
@@ -74,24 +92,29 @@ export default function MainNav() {
       </SidebarContent>
 
       <SidebarFooter>
-        <Button
-          asChild
-          className="mt-3 h-10 w-full rounded-full"
-        >
+        <Button asChild className="mt-3 h-10 w-full rounded-full">
           <div>
-            <span className="group-data-[collapsible=icon]/sidebar:hidden">POST</span>
-            <span className="hidden group-data-[collapsible=icon]/sidebar:inline"><PlusIcon className="h-5 w-5" /></span>
+            <span className="group-data-[collapsible=icon]/sidebar:hidden">
+              POST
+            </span>
+            <span className="hidden group-data-[collapsible=icon]/sidebar:inline">
+              <PlusIcon className="h-5 w-5" />
+            </span>
           </div>
         </Button>
 
-        <Button 
+        <Button
           variant="outline"
-          onClick={handleSignOut} 
+          onClick={handleSignOut}
           className="mt-3 h-10 w-full rounded-full"
         >
           <div>
-            <span className="group-data-[collapsible=icon]/sidebar:hidden">Sign out</span>
-            <span className="hidden group-data-[collapsible=icon]/sidebar:inline"><LogOutIcon className="h-5 w-5" /></span>
+            <span className="group-data-[collapsible=icon]/sidebar:hidden">
+              Sign out
+            </span>
+            <span className="hidden group-data-[collapsible=icon]/sidebar:inline">
+              <LogOutIcon className="h-5 w-5" />
+            </span>
           </div>
         </Button>
       </SidebarFooter>

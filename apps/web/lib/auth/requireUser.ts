@@ -8,7 +8,10 @@ import { NextResponse } from "next/server";
  */
 export async function requireUser() {
   const supabase = await createServer();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
     return {
@@ -32,7 +35,10 @@ export async function requireUser() {
       supabase,
       user: null,
       account: null,
-      response: NextResponse.json({ error: "Account not found" }, { status: 404 }),
+      response: NextResponse.json(
+        { error: "Account not found" },
+        { status: 404 },
+      ),
     };
   }
 

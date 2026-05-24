@@ -19,11 +19,16 @@ export default function UpdatePassword() {
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm({ password: "" }, async (values) => {
-    const { error } = await supabase.auth.updateUser({ password: values.password });
-    if (error) throw error;
-    router.push(AUTH_ROUTES.HOME);
-  });
+  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm(
+    { password: "" },
+    async (values) => {
+      const { error } = await supabase.auth.updateUser({
+        password: values.password,
+      });
+      if (error) throw error;
+      router.push(AUTH_ROUTES.HOME);
+    },
+  );
 
   return (
     <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -31,7 +36,7 @@ export default function UpdatePassword() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            
+
             <CardDescription>
               Please enter your new password below.
             </CardDescription>

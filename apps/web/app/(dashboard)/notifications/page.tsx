@@ -3,5 +3,5 @@ export default function Notifications() {
     <main className="grid place-content-center">
       <h1>Notification</h1>
     </main>
-  )
+  );
 }

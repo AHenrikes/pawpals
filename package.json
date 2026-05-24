@@ -4,9 +4,11 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "start": "turbo run start --filter=@pawpal/web",
     "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "scan": "node scripts/scan.js"
   },
   "devDependencies": {
     "prettier": "^3.7.4",

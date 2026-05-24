@@ -1,21 +1,36 @@
-import SignFooter from "@/components/footers/SignFooter";
-import SignHeader from "@/components/headers/SignHeader";
+import SignFooter from "@/components/footer/SignFooter";
+import SignHeader from "@/components/navigation/SignHeader";
+import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { createServer } from "@repo/supabase/server";
 import { Card, CardContent, CardDescription } from "@repo/ui/card";
 import { TypographyH2, TypographyH3, TypographyP } from "@repo/ui/typography";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = { title: "Register || Login" };
 
-export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function AuthLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const supabase = await createServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect(AUTH_ROUTES.HOME);
+  }
+
   return (
     <>
       <SignHeader />
 
-      <div className="container grid grid-cols-1 flex-1 h-svh mx-auto lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="hidden w-full h-full sm:px-8 lg:flex">
+      <div className="container grid grid-cols-1 flex-1 py-16 mx-auto md:min-h-[calc(100svh-144px)] lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="hidden w-full sm:px-8 lg:flex">
           <div className="flex flex-col justify-center w-full h-full max-w-[720px] mx-auto gap-4">
             <TypographyH2 className="flex flex-col text-5xl leading-[0.92]">
-              Connect with the <span className="text-primary">global pack.</span>
+              Connect with the{" "}
+              <span className="text-primary">global pack.</span>
             </TypographyH2>
 
             <Card className="h-3/6 w-full max-w-[620px] -rotate-6 rounded-[2rem] border border-white/5 bg-background p-5 shadow-[0_28px_80px_rgba(0,0,0,0.52)]">

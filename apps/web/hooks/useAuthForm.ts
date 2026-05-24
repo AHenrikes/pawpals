@@ -10,7 +10,11 @@ interface UseAuthFormOptions {
  * Custom hook for managing auth form state and submission.
  * Centralizes form logic shared across LoginForm, SignUpForm, etc.
  */
-export function useAuthForm<T extends Record<string, unknown>>(initialValues: T, onSubmit: (values: T) => Promise<void>, options?: UseAuthFormOptions) {
+export function useAuthForm<T extends Record<string, unknown>>(
+  initialValues: T,
+  onSubmit: (values: T) => Promise<void>,
+  options?: UseAuthFormOptions,
+) {
   const [values, setValues] = useState<T>(initialValues);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +24,7 @@ export function useAuthForm<T extends Record<string, unknown>>(initialValues: T,
   const handleChange = useCallback((field: keyof T, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
     setError(null);
-  },[]);
+  }, []);
 
   const handleSubmit = useCallback(
     async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -31,16 +35,17 @@ export function useAuthForm<T extends Record<string, unknown>>(initialValues: T,
       try {
         await onSubmit(values);
         onSuccess?.();
-
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "An error occurred";
-        setError(errorMessage)
+        const errorMessage =
+          err instanceof Error ? err.message : "An error occurred";
+        setError(errorMessage);
         onError?.(err instanceof Error ? err : new Error(errorMessage));
-
-      } finally { setIsLoading(false)}
+      } finally {
+        setIsLoading(false);
+      }
     },
 
-    [values, onSubmit, onSuccess, onError]
+    [values, onSubmit, onSuccess, onError],
   );
 
   return {

@@ -13,12 +13,10 @@ export default async function SignUpSuccess() {
       <Card className="text-center space-y-10">
         <CardHeader>
           <CardTitle>
-            <TypographyH2>
-              Thank you for signing up!
-            </TypographyH2>
+            <TypographyH2>Thank you for signing up!</TypographyH2>
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent className="border rounded-sm p-4">
           <CardDescription>Check your email to confirm</CardDescription>
 

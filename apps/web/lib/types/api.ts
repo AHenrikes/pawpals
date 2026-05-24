@@ -3,8 +3,10 @@
  * Prevents duplication across multiple route handlers.
  */
 
-export type RouteContext = {
-  params: Promise<{ id: string }> | { id: string };
+export type RouteContext<
+  T extends Record<string, string> = Record<string, string>,
+> = {
+  params: Promise<T>;
 };
 
 export type ApiResponse<T> = {

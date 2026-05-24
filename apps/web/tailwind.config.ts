@@ -32,7 +32,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          dim: "hsl(var(--primary-dim))"
+          dim: "hsl(var(--primary-dim))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -62,7 +62,7 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
 
-        headline:  "hsl(var(--headline))",
+        headline: "hsl(var(--headline))",
         text: {
           DEFAULT: "hsl(var(--text))",
           primary: "hsl(var(--text-primary))",
@@ -95,8 +95,7 @@ export default {
             hsl(0 0% 0%) 67%,
             hsl(0 0% 0%) 74%,
             transparent
-          )`
-        ,
+          )`,
       },
       boxShadow: {
         ambient: "var(--ambient-shadow)",
