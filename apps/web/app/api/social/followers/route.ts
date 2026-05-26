@@ -22,7 +22,6 @@ export async function GET() {
 
   // Get follow statistics for the current fursona
   const { data: stats, error: statsError } = await supabase
-    .schema("social")
     .rpc("get_fursona_follow_stats", { p_fursona_id: fursona.id });
 
   if (statsError) return serverError(statsError.message);

@@ -1,10 +1,10 @@
 {
-  "name": "pawpal",
+  "name": "pawpals",
   "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "start": "turbo run start --filter=@pawpal/web",
+    "start": "turbo run start --filter=@pawpals/web",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

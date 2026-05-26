@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
-import "./pawpal.css";
+import "./pawpals.css";
+import { Toaster } from "@repo/ui/sonner";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -10,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Pawpal",
+  title: "Pawpals",
   description: "A social app built for furry communities",
 };
 
@@ -45,6 +46,8 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <Toaster position="top-center" />
+
               {children}
             </ThemeProvider>
           </div>

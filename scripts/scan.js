@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Pawpall Comprehensive Code Scanner
+ * Pawpals Comprehensive Code Scanner
  * 
  * Scans for:
  * 1. Performance issues (unused deps, bundle optimization)
@@ -431,7 +431,7 @@ function countImports(dir, importPath) {
 
 // ============ RUN SCAN ============
 
-console.log(`\n${colors.bold}${colors.cyan}🔍 PAWPALL CODE QUALITY SCAN${colors.reset}\n`);
+console.log(`\n${colors.bold}${colors.cyan}🔍 PAWPALS CODE QUALITY SCAN${colors.reset}\n`);
 
 checkLinting();
 checkDuplication();

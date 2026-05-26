@@ -1,6 +1,6 @@
-# Pawpall Monorepo
+# Pawpals Monorepo
 
-Pawpall is a Turborepo workspace centered around the `apps/web` Next.js app,
+Pawpals is a Turborepo workspace centered around the `apps/web` Next.js app,
 with shared packages for Supabase clients, UI primitives, and base configs.
 
 ## Workspace Layout

@@ -62,7 +62,7 @@ export function ReportProfileModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md space-y-4 rounded-lg bg-background p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Report Profile</h2>
+          <h2 className="text-lg font-semibold">Report Fursona</h2>
           <Button
             variant="ghost"
             size="icon"

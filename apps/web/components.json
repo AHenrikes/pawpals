@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "app/pawpal.css",
+    "css": "app/pawpals.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""

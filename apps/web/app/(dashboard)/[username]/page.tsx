@@ -30,6 +30,9 @@ import type { AccountTypesWithID } from "@/types/account";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { ReportProfileModal } from "@/components/dialogs/ReportProfileModal";
 import { AdminPanelModal } from "@/components/dialogs/AdminPanelModal";
+import { toast } from "@repo/ui/sonner";
+import { Skeleton } from "@repo/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
 
 function getInitials(name: string) {
   return name
@@ -57,7 +60,7 @@ function formatNumbers(count: number): string {
 export default function ProfilePage() {
   const params = useParams<{ username: string }>();
   const paramUsername = params.username;
-  const { currentFursona, account } = useUser();
+  const { account, currentFursona, loading: userLoading } = useUser();
   const { getProfile, loading: profileLoading } = useProfile();
   const { followersCount, followingCount, likesCount } = useSocial();
 
@@ -71,13 +74,10 @@ export default function ProfilePage() {
     null,
   );
   const [isOwnProfile, setIsOwnProfile] = useState(false);
-  const [loadingProfile, setLoadingProfile] = useState(true);
 
   // Load profile data
   useEffect(() => {
     const loadProfile = async () => {
-      setLoadingProfile(true);
-
       if (currentFursona?.username === paramUsername) {
         // Viewing own profile
         setIsOwnProfile(true);
@@ -91,14 +91,14 @@ export default function ProfilePage() {
           setViewedFursona(profile);
         }
       }
-
-      setLoadingProfile(false);
     };
 
     if (paramUsername && currentFursona) {
       loadProfile();
     }
   }, [paramUsername, currentFursona, getProfile, account]);
+
+  const isLoading = userLoading || profileLoading || !viewedFursona;
 
   const handleEditSave = async (updates: Partial<FursonaTypesWithID>) => {
     try {
@@ -107,7 +107,10 @@ export default function ProfilePage() {
         updates,
       );
       setViewedFursona(data.fursona);
+      toast.success("Fursona updated");
     } catch (err) {
+      // TODO detail error message
+      toast.error(`update failed`);
       throw new Error(getErrorMessage(err));
     }
   };
@@ -117,7 +120,7 @@ export default function ProfilePage() {
       await api.post("/api/social/reports", {
         reported_fursona_id: viewedFursona?.id,
         reason,
-        report_type: "profile",
+        report_type: "fursona",
       });
       setIsReportOpen(false);
     } catch (err) {
@@ -154,146 +157,212 @@ export default function ProfilePage() {
     { href: "#", label: "LIKE" },
   ];
 
-  if (loadingProfile || profileLoading || !viewedFursona) {
-    return (
-      <div className="flex items-center justify-center">
-        <p className="text-muted-foreground">Loading profile...</p>
-      </div>
-    );
-  }
-
   return (
     <>
       {/* Banner */}
-      <div className="relative w-full h-64 sm:h-96 md:h-[500px]">
-        {viewedFursona?.banner_url && (
-          <Image
-            src={viewedFursona.banner_url}
-            alt={`${viewedFursona.display_name}'s banner`}
-            quality={100}
-            fill
-            className="object-cover z-10"
-            priority
-          />
-        )}
-
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black z-20"></div>
-
-        {isOwnProfile && (
-          <div className="flex place-content-end p-4">
-            <Button
-              size="icon"
-              variant="none"
-              onClick={() => setIsEditOpen(true)}
-              className="z-20"
-            >
-              <SquarePen className="h-6 w-6" />
-            </Button>
-          </div>
-        )}
-
-        {!isOwnProfile && (
-          <div className="flex gap-2 place-content-end p-4">
-            <Button size="icon" variant="none" className="z-20">
-              <MessageCircle className="h-6 w-6" />
-            </Button>
-
-            <Button size="icon" variant="none" className="z-20">
-              <Ellipsis className="h-6 w-6" />
-            </Button>
-
-            <Button
-              size="icon"
-              variant="none"
-              onClick={() => setIsReportOpen(true)}
-              className="z-20"
-            >
-              <Flag className="h-6 w-6" />
-            </Button>
-
-            {account?.role === "admin" && (
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={() => setIsAdminOpen(true)}
-                className="z-20"
-              >
-                <ShieldAlert className="h-4 w-4" />
-              </Button>
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <motion.div
+            key="banner-skeleton"
+            exit={{ opacity: 0 }}
+            className="relative w-full h-64 sm:h-96 md:h-[500px]"
+          >
+            <Skeleton className="h-full" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="banner-content"
+            className="relative w-full h-64 sm:h-96 md:h-[500px]"
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {viewedFursona?.banner_url && (
+              <Image
+                src={viewedFursona.banner_url}
+                alt={`${viewedFursona.display_name}'s banner`}
+                quality={100}
+                fill
+                className="object-cover z-10"
+                priority
+              />
             )}
-          </div>
+
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black z-20"></div>
+
+            {isOwnProfile && (
+              <div className="flex place-content-end p-4">
+                <Button
+                  size="icon"
+                  variant="none"
+                  onClick={() => setIsEditOpen(true)}
+                  className="z-20"
+                >
+                  <SquarePen className="h-6 w-6" />
+                </Button>
+              </div>
+            )}
+
+            {!isOwnProfile && (
+              <div className="flex gap-2 place-content-end p-4">
+                <Button size="icon" variant="none" className="z-20">
+                  <MessageCircle className="h-6 w-6" />
+                </Button>
+
+                <Button size="icon" variant="none" className="z-20">
+                  <Ellipsis className="h-6 w-6" />
+                </Button>
+
+                <Button
+                  size="icon"
+                  variant="none"
+                  onClick={() => setIsReportOpen(true)}
+                  className="z-20"
+                >
+                  <Flag className="h-6 w-6" />
+                </Button>
+
+                {account?.role === "admin" && (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setIsAdminOpen(true)}
+                    className="z-20"
+                  >
+                    <ShieldAlert className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            )}
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
       {/* Profile header section */}
       <section className="px-2 py-4 mb-4 sm:container sm:mx-auto md:px-4">
         <div className="relative -mt-16 space-y-6 sm:-mt-20 md:-mt-24 z-20">
           {/* Avatar */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar
-                size="lg"
-                className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0"
+          <AnimatePresence mode="wait">
+            {isLoading ? (
+              <motion.div
+                key="avatar-skeleton"
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-4"
               >
-                <AvatarImage
-                  src={viewedFursona?.avatar_url || ""}
-                  alt={viewedFursona?.display_name}
-                />
-                <AvatarFallback>
-                  {getInitials(viewedFursona?.display_name || "Profile")}
-                </AvatarFallback>
-              </Avatar>
+                <Skeleton className="h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
 
-              <div className="min-w-0 mb-4">
-                <TypographyH2 className="text-xl sm:text-2xl truncate">
-                  {viewedFursona?.display_name || "Profile"}
-                </TypographyH2>
+                <div className="min-w-0 mb-4 space-y-2">
+                  <Skeleton className="h-9 w-52" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="avatar-content"
+                className="flex items-center gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
+              >
+                <Avatar
+                  size="lg"
+                  className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0"
+                >
+                  <AvatarImage
+                    src={viewedFursona?.avatar_url || ""}
+                    alt={viewedFursona?.display_name}
+                  />
+                  <AvatarFallback>
+                    {getInitials(viewedFursona?.display_name || "Profile")}
+                  </AvatarFallback>
+                </Avatar>
 
-                <TypographySmall className="text-muted-foreground">
-                  @{viewedFursona?.username || "username"}
-                </TypographySmall>
-              </div>
-            </div>
-          </div>
+                <div className="min-w-0 mb-4">
+                  <TypographyH2 className="text-xl sm:text-2xl truncate">
+                    {viewedFursona?.display_name}
+                  </TypographyH2>
 
-          {/* Profile info */}
-          <div className="flex-1 w-full pb-0 space-y-6">
-            <TypographyXSmall className="text-muted-foreground">
-              {viewedFursona?.bio || "Empty!"}
-            </TypographyXSmall>
+                  <TypographySmall className="text-muted-foreground">
+                    @{viewedFursona?.username}
+                  </TypographySmall>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            <div className="flex gap-3 sm:gap-6 justify-start">
-              <div className="text-center">
-                <TypographyLead className="font-bold text-lg sm:text-xl">
-                  {formatNumbers(followersCount)}
-                </TypographyLead>
+          <AnimatePresence mode="wait">
+            {/* Profile info */}
+            {isLoading ? (
+              <motion.div
+                key="info-skeleton"
+                exit={{ opacity: 0 }}
+                className="flex-1 w-full pb-0 space-y-6"
+              >
+                <Skeleton className="h-4 w-72" />
 
-                <TypographyXSmall className="text-muted-foreground text-xs">
-                  Following
+                <div className="flex gap-3 sm:gap-6 justify-start">
+                  <div className="flex flex-col items-center w-16 gap-2">
+                    <Skeleton className="h-9 w-8 rounded-full" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+
+                  <div className="flex flex-col items-center w-16 gap-2">
+                    <Skeleton className="h-9 w-8 rounded-full" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+
+                  <div className="flex flex-col items-center w-16 gap-2">
+                    <Skeleton className="h-9 w-8 rounded-full" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="info-content"
+                className="flex-1 w-full pb-0 space-y-6"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
+              >
+                <TypographyXSmall className="text-muted-foreground">
+                  {viewedFursona?.bio || "Empty!"}
                 </TypographyXSmall>
-              </div>
 
-              <div className="text-center">
-                <TypographyLead className="font-bold text-lg sm:text-xl">
-                  {formatNumbers(followingCount)}
-                </TypographyLead>
+                <div className="flex gap-3 sm:gap-6 justify-start">
+                  <div className="text-center">
+                    <TypographyLead className="font-bold text-lg sm:text-xl">
+                      {formatNumbers(followersCount)}
+                    </TypographyLead>
 
-                <TypographyXSmall className="text-muted-foreground text-xs">
-                  Followers
-                </TypographyXSmall>
-              </div>
+                    <TypographyXSmall className="text-muted-foreground text-xs">
+                      Following
+                    </TypographyXSmall>
+                  </div>
 
-              <div className="text-center">
-                <TypographyLead className="font-bold text-lg sm:text-xl">
-                  {formatNumbers(likesCount)}
-                </TypographyLead>
+                  <div className="text-center">
+                    <TypographyLead className="font-bold text-lg sm:text-xl">
+                      {formatNumbers(followingCount)}
+                    </TypographyLead>
 
-                <TypographyXSmall className="text-muted-foreground text-xs">
-                  Likes
-                </TypographyXSmall>
-              </div>
-            </div>
-          </div>
+                    <TypographyXSmall className="text-muted-foreground text-xs">
+                      Followers
+                    </TypographyXSmall>
+                  </div>
+
+                  <div className="text-center">
+                    <TypographyLead className="font-bold text-lg sm:text-xl">
+                      {formatNumbers(likesCount)}
+                    </TypographyLead>
+
+                    <TypographyXSmall className="text-muted-foreground text-xs">
+                      Likes
+                    </TypographyXSmall>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
 

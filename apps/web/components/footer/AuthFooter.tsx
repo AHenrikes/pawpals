@@ -28,12 +28,12 @@ const footerLinks = [
   },
 ];
 
-export default function SignFooter() {
+export default function AuthFooter() {
   return (
     <footer className="container py-5 px-2 mx-auto select-none">
       <div className="flex flex-col gap-4 md:flex-row justify-between">
         <TypographySmall className="uppercase text-center tracking-widest text-primary md:text-left">
-          © 2026 PawPall. All rights reserved.
+          © 2026 PawPals. All rights reserved.
         </TypographySmall>
 
         <div className="flex justify-center tracking-widest text-text-muted gap-8 md:justify-start">

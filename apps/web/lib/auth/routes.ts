@@ -12,7 +12,7 @@ export const AUTH_ROUTES = {
   TERMS_OF_SERVICE: "#",
   PRIVACY_POLICY: "#",
   SYSTEM_STATUS: "#",
-  PAWPAL_MEET: "/pawpal-meet",
+  PAWPALS_MEET: "/pawpals-meet",
   COMMUNITY: "/community",
   NOTIFICATION: "/notifications",
   MESSAGES: "/messages",
@@ -21,6 +21,8 @@ export const AUTH_ROUTES = {
   ERROR: "/error",
   HELP: "/help",
   HOME: "/",
+  PUBLIC_HOME: "/home",
+  CONTACT_US: "/contact-us",
 } as const;
 
 export type AuthRoute = (typeof AUTH_ROUTES)[keyof typeof AUTH_ROUTES];

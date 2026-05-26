@@ -80,7 +80,7 @@ export default {
         full: "9999px",
       },
       backgroundImage: {
-        "pawpal-primary": "var(--gradient-primary)",
+        "pawpals-primary": "var(--gradient-primary)",
         "fur-gradient": `
           linear-gradient(
             0deg,

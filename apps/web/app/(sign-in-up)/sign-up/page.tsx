@@ -33,6 +33,8 @@ export default function SignUpForm() {
   const supabase = useSupabaseClient();
   const prefersReducedMotion = useReducedMotion();
   const [step, setStep] = useState<"account" | "fursona">("account");
+  const [isUsernameAvailable, setIsUsernameAvailable] =
+    useState<boolean>(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const stepTransition = prefersReducedMotion
     ? { duration: 0 }
@@ -112,11 +114,20 @@ export default function SignUpForm() {
         throw new TypeError("Please enter a valid date of birth");
       }
 
+      if (!isUsernameAvailable) {
+        throw new Error("Username already taken");
+      }
+
+      // TODO temp local dev testing
+      const origin =
+        globalThis.window?.location?.origin ?? "http://192.168.1.219:3000";
+
       const { error } = await supabase.auth.signUp({
         email: formValues.email,
         password: formValues.password,
         options: {
-          emailRedirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.CONFIRM}`,
+          // emailRedirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.CONFIRM}`,
+          emailRedirectTo: `${origin}${AUTH_ROUTES.CONFIRM}`,
           data: {
             firstname: formValues.firstname,
             lastname: formValues.lastname,
@@ -126,6 +137,7 @@ export default function SignUpForm() {
         },
       });
 
+      //TODO add email error
       if (error) throw error;
 
       router.push(AUTH_ROUTES.SIGNUP_SUCCESS);
@@ -240,7 +252,7 @@ export default function SignUpForm() {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="example@pawpal.com"
+                      placeholder="example@pawpals.com"
                       value={values.email}
                       onChange={(e) => handleChange("email", e.target.value)}
                       variant={"auth"}
@@ -356,6 +368,7 @@ export default function SignUpForm() {
                     fursona={values.initFursona}
                     onFursonaChange={updateMainFursona}
                     isActive={step === "fursona"}
+                    onUsernameAvailability={setIsUsernameAvailable}
                   />
                 </motion.div>
               )}

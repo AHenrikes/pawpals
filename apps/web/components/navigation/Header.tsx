@@ -1,175 +1,214 @@
 "use client";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+
+import Link from "next/link";
+import { useState, useMemo, Fragment } from "react";
+import { Button } from "@repo/ui/button";
+import { useUser } from "@/providers/UserProvider";
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { Skeleton } from "@repo/ui/skeleton";
 import {
-  TypographyH3,
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@repo/ui/collapsible";
+import { SidebarTrigger } from "@/providers/SidebarProvider";
+import { Settings, User, ArrowDownUp, PlusIcon } from "lucide-react";
+import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuTrigger,
+} from "@repo/ui/dropdown-menu";
+import {
+  TypographyH4,
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { Button } from "@repo/ui/button";
-import Link from "next/link";
-import {
-  House,
-  Menu,
-  PawPrint,
-  UsersRound,
-  MessageCircleQuestion,
-  X,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
-const navLinks = [
-  {
-    id: "home",
-    href: AUTH_ROUTES.HOME,
-    label: "Home",
-    icon: House,
-    description: "Start here",
-  },
-  {
-    id: "about",
-    href: AUTH_ROUTES.ABOUT,
-    label: "About",
-    icon: MessageCircleQuestion,
-    description: "What PawPall is",
-  },
-  {
-    id: "community",
-    href: AUTH_ROUTES.COMMUNITY,
-    label: "Community",
-    icon: UsersRound,
-    description: "Meet the pack",
-  },
-];
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
-export default function UnAuthHeader() {
-  const [mobileNav, setMobileNav] = useState(false);
-  const pathname = usePathname();
+export default function Header() {
+  const { user, fursonas, currentFursona, loading, signOut } = useUser();
+  const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    setMobileNav(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (mobileNav) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+  const displayName = useMemo(() => {
+    if (currentFursona?.display_name) {
+      return currentFursona.display_name;
     }
 
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileNav]);
+    return "Account";
+  }, [currentFursona?.display_name]);
+
+  const profileSubtitle =
+    currentFursona?.username ?? user?.email ?? "No username";
+
+  function handleMenuOpenChange(nextOpen: boolean) {
+    setIsMenuOpen(nextOpen);
+
+    if (!nextOpen) {
+      setIsFursonaListOpen(false);
+    }
+  }
+
+  const accountMenuGroup = [
+    { href: `${currentFursona?.username}`, label: "Fursona", icon: User },
+    { href: AUTH_ROUTES.SETTINGS, label: "Settings", icon: Settings },
+  ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push(AUTH_ROUTES.SIGN_IN);
+    router.refresh();
+  };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="container mx-auto max-w-screen-2xl">
-        <div className="flex h-16 items-center justify-between px-4">
-          {/* Logo */}
-          <Link href={AUTH_ROUTES.HOME} className="flex items-center gap-2">
-            <PawPrint className="h-8 w-8 text-primary" />
-            <TypographyH3 className="m-0">PawPall</TypographyH3>
+    <header className="fixed inset-x-0 top-0 z-40 h-16 border-b border-popover bg-background/90 backdrop-blur">
+      <div className="mx-auto flex h-full w-full items-center justify-between px-2 md:px-6">
+        <div className="flex gap-1 items-center">
+          <SidebarTrigger className="border-none" />
+          <Link href={AUTH_ROUTES.HOME}>
+            <TypographyH4 className="text-primary">PAWPALS</TypographyH4>
           </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden gap-6 md:flex">
-            {navLinks.map((link) => (
-              <Link key={link.id} href={link.href}>
-                <Button
-                  variant={pathname === link.href ? "default" : "ghost"}
-                  className="gap-2"
-                >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
-                </Button>
-              </Link>
-            ))}
-          </div>
-
-          {/* Auth Links - Desktop */}
-          <Link className="hidden md:block" href={AUTH_ROUTES.SIGN_IN}>
-            <Button variant="outline">Sign In</Button>
-          </Link>
-
-          {/* Mobile Menu Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setMobileNav(!mobileNav)}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={mobileNav ? "close" : "open"}
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.15 }}
-              >
-                {mobileNav ? <X /> : <Menu />}
-              </motion.div>
-            </AnimatePresence>
-          </Button>
         </div>
 
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {mobileNav && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden border-t md:hidden"
+        <div>
+          <DropdownMenu open={isMenuOpen} onOpenChange={handleMenuOpenChange}>
+            <Collapsible
+              open={isFursonaListOpen}
+              onOpenChange={setIsFursonaListOpen}
             >
-              <div className="flex flex-col justify-between min-h-[calc(100svh-64px)] py-6 px-2 sm:px-4">
-                <div className="space-y-1">
-                  {navLinks.map((link, i) => (
-                    <motion.div
-                      key={link.id}
-                      initial={{ x: -16, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: i * 0.07, duration: 0.2 }}
-                    >
-                      <Link href={link.href}>
-                        <Button
-                          variant={pathname === link.href ? "default" : "ghost"}
-                          className="w-full justify-start gap-3 h-14"
-                        >
-                          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-muted">
-                            <link.icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex flex-col items-start">
-                            <TypographySmall>{link.label}</TypographySmall>
-                            <TypographyXSmall className="text-muted-foreground">
-                              {link.description}
-                            </TypographyXSmall>
-                          </div>
-                        </Button>
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
+              <DropdownMenuTrigger asChild>
+                {loading ? (
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                ) : (
+                  <Button variant={"none"} className="p-0 focus-visible:ring-0">
+                    <Avatar size="sm">
+                      <AvatarImage
+                        src={`${currentFursona?.avatar_url}`}
+                        alt={displayName}
+                      />
+                      <AvatarFallback>
+                        {getInitials(displayName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                )}
+              </DropdownMenuTrigger>
 
-                <motion.div
-                  initial={{ x: -16, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: navLinks.length * 0.07, duration: 0.2 }}
-                  className="border-t pt-4 mt-2 flex flex-col gap-2"
-                >
-                  <Link href={AUTH_ROUTES.SIGN_IN}>
-                    <Button variant="outline" className="w-full">
-                      Sign In
+              <DropdownMenuContent align="end" className="w-60 select-none">
+                <DropdownMenuGroup className="flex items-center gap-1">
+                  <DropdownMenuItem
+                    asChild
+                    className="flex w-full rounded-none"
+                  >
+                    <Link href={`${currentFursona?.username}`}>
+                      <Avatar size="sm">
+                        <AvatarImage
+                          src={`${currentFursona?.avatar_url}`}
+                          alt={displayName}
+                        />
+                        <AvatarFallback>
+                          {getInitials(displayName)}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <span className="flex flex-col">
+                        <TypographySmall>{displayName}</TypographySmall>
+                        <TypographyXSmall>{profileSubtitle}</TypographyXSmall>
+                      </span>
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant={"none"}
+                      className="h-[52px] hover:bg-popover rounded-none"
+                    >
+                      <ArrowDownUp className="h-5 w-5" />
+                      <span className="sr-only">Switch Fursona</span>
                     </Button>
-                  </Link>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+                  </CollapsibleTrigger>
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuGroup className="pb-1">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+
+                  {accountMenuGroup.map((li) => {
+                    const Icon = li.icon;
+
+                    return (
+                      <DropdownMenuItem key={li.label} asChild>
+                        <Link href={li.href}>
+                          <Icon className="h-4 w-4" />
+                          {li.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuGroup>
+
+                <CollapsibleContent>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>My Fursonas</DropdownMenuLabel>
+
+                    {fursonas.map((elem) => {
+                      const count = fursonas.length;
+
+                      return (
+                        <Fragment key={elem.id}>
+                          <DropdownMenuItem>{elem.username}</DropdownMenuItem>
+
+                          {count < 3 && (
+                            <DropdownMenuItem>
+                              <PlusIcon className="h-4 w-4" />
+                              <Button variant={"none"} className="p-0 h-fit">
+                                Create Fursona
+                              </Button>
+                            </DropdownMenuItem>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </DropdownMenuGroup>
+                </CollapsibleContent>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuSub>
+                  <Button
+                    variant="outline"
+                    onClick={handleSignOut}
+                    className="h-8 w-full my-2 rounded-full"
+                  >
+                    <div>
+                      <span>Sign out</span>
+                    </div>
+                  </Button>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </Collapsible>
+          </DropdownMenu>
+        </div>
+      </div>
     </header>
   );
 }

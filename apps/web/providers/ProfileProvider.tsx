@@ -10,11 +10,7 @@ import React, {
 } from "react";
 import { api } from "@/lib/api/api-client";
 import type { FursonaTypesWithID } from "@/types/fursona";
-
-interface CachedProfile {
-  fursona: FursonaTypesWithID;
-  timestamp: number;
-}
+import { makeCache } from "@/lib/helpers/profile-cache";
 
 export type ProfileContextType = {
   getProfile: (username: string) => Promise<FursonaTypesWithID | null>;
@@ -34,35 +30,22 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 export function ProfileProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cacheRef = useRef<Map<string, CachedProfile>>(new Map());
+  const cacheRef = useRef(makeCache<FursonaTypesWithID>(CACHE_TTL));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const getProfile = useCallback(
     async (username: string): Promise<FursonaTypesWithID | null> => {
       const cacheKey = username;
-
-      // Check cache first
-      const cached = cacheRef.current.get(cacheKey);
-      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-        setError(null);
-        return cached.fursona;
-      }
-
       try {
         setLoading(true);
         setError(null);
 
-        const data = await api.get<{ fursona: FursonaTypesWithID }>(
-          `/api/core/fursonas/username/${cacheKey}`,
-        );
-
-        const fursona = data.fursona;
-
-        // Cache it
-        cacheRef.current.set(cacheKey, {
-          fursona,
-          timestamp: Date.now(),
+        const fursona = await cacheRef.current.get(cacheKey, async () => {
+          const data = await api.get<{ fursona: FursonaTypesWithID }>(
+            `/api/core/fursonas/username/${cacheKey}`,
+          );
+          return data.fursona;
         });
 
         setError(null);

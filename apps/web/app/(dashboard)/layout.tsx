@@ -3,7 +3,7 @@ import MainNav from "@/components/navigation/MainNav";
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
 import { UserProvider } from "@/providers/UserProvider";
 import { ProfileProvider } from "@/providers/ProfileProvider";
-import AuthHeader from "@/components/navigation/AuthHeader";
+import Header from "@/components/navigation/Header";
 import { createServer } from "@repo/supabase/server";
 import { redirect } from "next/navigation";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
@@ -30,7 +30,7 @@ export default async function DashboardLayout({
             <MainNav />
 
             <div className="flex w-svw h-svh">
-              <AuthHeader />
+              <Header />
 
               <SidebarInset className="overflow-y-auto pt-16">
                 {children}

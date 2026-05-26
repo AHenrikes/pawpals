@@ -60,7 +60,7 @@ export function EditProfileModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md space-y-4 rounded-lg bg-background p-6">
         <div className="flex items-center justify-between">
-          <TypographySmall className="font-bold">Edit Profile</TypographySmall>
+          <TypographySmall className="font-bold">Edit Fursona</TypographySmall>
           <Button
             variant="ghost"
             size="icon"

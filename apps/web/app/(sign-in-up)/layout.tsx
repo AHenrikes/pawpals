@@ -1,5 +1,5 @@
-import SignFooter from "@/components/footer/SignFooter";
-import SignHeader from "@/components/navigation/SignHeader";
+import AuthFooter from "@/components/footer/AuthFooter";
+import AuthHeader from "@/components/navigation/AuthHeader";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { createServer } from "@repo/supabase/server";
 import { Card, CardContent, CardDescription } from "@repo/ui/card";
@@ -23,7 +23,7 @@ export default async function AuthLayout({
 
   return (
     <>
-      <SignHeader />
+      <AuthHeader />
 
       <div className="container grid grid-cols-1 flex-1 py-16 mx-auto md:min-h-[calc(100svh-144px)] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="hidden w-full sm:px-8 lg:flex">
@@ -64,7 +64,7 @@ export default async function AuthLayout({
         {children}
       </div>
 
-      <SignFooter />
+      <AuthFooter />
     </>
   );
 }

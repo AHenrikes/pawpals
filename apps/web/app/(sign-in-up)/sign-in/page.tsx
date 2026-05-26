@@ -56,7 +56,7 @@ export default function SignIn() {
               <Input
                 id="email"
                 type="email"
-                placeholder="example@pawpal.com"
+                placeholder="example@pawpals.com"
                 value={values.email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 variant={"auth"}

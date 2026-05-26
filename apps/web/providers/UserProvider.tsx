@@ -15,6 +15,7 @@ import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import type { FursonaTypesWithID } from "@/types/fursona";
 import type { AccountTypesWithID } from "@/types/account";
 import type { User } from "@supabase/supabase-js";
+import { makeCache } from "@/lib/helpers/profile-cache";
 
 export type UserContextType = {
   user: User | null;
@@ -82,14 +83,22 @@ export function UserProvider({
         return;
       }
 
-      // Fetch user data in parallel using centralized API client
+      // Fetch user data in parallel using centralized API client (cache fursonas)
       try {
-        const [accountData, fursonautasData] = await Promise.all([
+        const fursonasCache = makeCache<FursonaTypesWithID[]>();
+
+        const fursonasKey = `user:${authUser.id}:fursonas`;
+
+        const [accountData, nextFursonas] = await Promise.all([
           api.get<{ account: AccountTypesWithID }>("/api/core/accounts"),
-          api.get<{ fursonas: FursonaTypesWithID[] }>("/api/core/fursonas"),
+          fursonasCache.get(fursonasKey, async () => {
+            const res = await api.get<{ fursonas: FursonaTypesWithID[] }>(
+              "/api/core/fursonas",
+            );
+            return res.fursonas ?? [];
+          }),
         ]);
 
-        const nextFursonas = fursonautasData.fursonas ?? [];
         const currentFursona =
           nextFursonas.find((f: FursonaTypesWithID) => f.is_current) ??
           nextFursonas[0] ??

@@ -40,7 +40,7 @@ const mainNavItems: MainNavItem[] = [
   { href: AUTH_ROUTES.STORE, label: "Store", Icon: Store },
   { href: AUTH_ROUTES.MESSAGES, label: "Inbox", Icon: Inbox },
   { href: AUTH_ROUTES.COMMUNITY, label: "Community", Icon: Users },
-  { href: AUTH_ROUTES.PAWPAL_MEET, label: "Pawpal meet", Icon: PawPrint },
+  { href: AUTH_ROUTES.PAWPALS_MEET, label: "Pawpals meet", Icon: PawPrint },
   { href: AUTH_ROUTES.NOTIFICATION, label: "Notification", Icon: BellRing },
   { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: Settings },
 ];
