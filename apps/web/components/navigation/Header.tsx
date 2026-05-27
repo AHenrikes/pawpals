@@ -13,7 +13,9 @@ import {
 } from "@repo/ui/collapsible";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
 import { Settings, User, ArrowDownUp, PlusIcon } from "lucide-react";
+import { CreateFursonaPanelModal } from "@/components/dialogs/CreateFursonaPanelModal";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -41,10 +43,16 @@ function getInitials(name: string) {
 }
 
 export default function Header() {
-  const { user, fursonas, currentFursona, loading, signOut } = useUser();
+  const { user, fursonas, currentFursona, loading, signOut, refresh } = useUser();
   const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCreateFursonaOpen, setCreateFursonaOpen] = useState(false);
   const router = useRouter();
+
+  const handleFursonaCreated = () => {
+    refresh();
+    setIsFursonaListOpen(false);
+  };
 
   const displayName = useMemo(() => {
     if (currentFursona?.display_name) {
@@ -66,7 +74,7 @@ export default function Header() {
   }
 
   const accountMenuGroup = [
-    { href: `${currentFursona?.username}`, label: "Fursona", icon: User },
+    { href: `/${currentFursona?.username}`, label: "Fursona", icon: User },
     { href: AUTH_ROUTES.SETTINGS, label: "Settings", icon: Settings },
   ];
 
@@ -75,6 +83,8 @@ export default function Header() {
     router.push(AUTH_ROUTES.SIGN_IN);
     router.refresh();
   };
+
+  const count = fursonas.length;
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 h-16 border-b border-popover bg-background/90 backdrop-blur">
@@ -116,7 +126,7 @@ export default function Header() {
                     asChild
                     className="flex w-full rounded-none"
                   >
-                    <Link href={`${currentFursona?.username}`}>
+                    <Link href={`/${currentFursona?.username}`}>
                       <Avatar size="sm">
                         <AvatarImage
                           src={`${currentFursona?.avatar_url}`}
@@ -171,23 +181,25 @@ export default function Header() {
                     <DropdownMenuLabel>My Fursonas</DropdownMenuLabel>
 
                     {fursonas.map((elem) => {
-                      const count = fursonas.length;
-
                       return (
                         <Fragment key={elem.id}>
-                          <DropdownMenuItem>{elem.username}</DropdownMenuItem>
-
-                          {count < 3 && (
-                            <DropdownMenuItem>
-                              <PlusIcon className="h-4 w-4" />
-                              <Button variant={"none"} className="p-0 h-fit">
-                                Create Fursona
-                              </Button>
-                            </DropdownMenuItem>
-                          )}
+                          <DropdownMenuItem>{elem.display_name}</DropdownMenuItem>
                         </Fragment>
                       );
                     })}
+
+                    {count < 3 && (
+                      <DropdownMenuItem>
+                        <PlusIcon className="h-4 w-4" />
+                        <Button
+                          variant={"none"}
+                          onClick={() => setCreateFursonaOpen(true)}
+                          className="p-0 h-fit"
+                        >
+                          Create Fursona
+                        </Button>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuGroup>
                 </CollapsibleContent>
 
@@ -209,6 +221,24 @@ export default function Header() {
           </DropdownMenu>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isCreateFursonaOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
+            className="absolute inset-0 h-svh"
+          >
+            <CreateFursonaPanelModal
+              isOpen={isCreateFursonaOpen}
+              onClose={() => setCreateFursonaOpen(false)}
+              onSuccess={handleFursonaCreated}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

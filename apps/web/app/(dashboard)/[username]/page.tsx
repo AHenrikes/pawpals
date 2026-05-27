@@ -109,9 +109,9 @@ export default function ProfilePage() {
       setViewedFursona(data.fursona);
       toast.success("Fursona updated");
     } catch (err) {
-      // TODO detail error message
-      toast.error(`update failed`);
-      throw new Error(getErrorMessage(err));
+      const message = getErrorMessage(err);
+      toast.error(`Update failed: ${message}`);
+      throw new Error(message);
     }
   };
 
@@ -336,7 +336,7 @@ export default function ProfilePage() {
                     </TypographyLead>
 
                     <TypographyXSmall className="text-muted-foreground text-xs">
-                      Following
+                      Followers
                     </TypographyXSmall>
                   </div>
 
@@ -346,7 +346,7 @@ export default function ProfilePage() {
                     </TypographyLead>
 
                     <TypographyXSmall className="text-muted-foreground text-xs">
-                      Followers
+                      Following
                     </TypographyXSmall>
                   </div>
 

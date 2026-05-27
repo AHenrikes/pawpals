@@ -55,6 +55,7 @@ export default function CreateFursona({
       onUsernameAvailability?.(available);
     } catch {
       setUsernameAvailable(null);
+      onUsernameAvailability?.(false);
     } finally {
       setCheckingUsername(false);
     }
