@@ -156,7 +156,7 @@ export function Sidebar({
         data-state={state}
         data-collapsible={isCollapsed ? collapsible : ""}
         className={cn(
-          "relative hidden h-svh shrink-0 border-r border-border/60 bg-surface-container-low/80 md:flex",
+          "relative hidden h-svh mt-16 pt-8 shrink-0 border-r border-border/60 bg-surface-container-low/80 md:flex",
           "transition-[width] duration-200 ease-linear px-4",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
           isCollapsed && collapsible === "icon"
@@ -172,7 +172,7 @@ export function Sidebar({
 
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-black/50 transition-opacity md:hidden",
+          "fixed inset-0 z-40 bg-black/50 transition-opacity md:hidden",
           openMobile ? "opacity-100" : "pointer-events-none opacity-0",
         )}
         onClick={() => setOpenMobile(false)}
@@ -182,7 +182,7 @@ export function Sidebar({
       <aside
         data-mobile="true"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[--sidebar-width-mobile] border-r border-border bg-surface-container-low p-1 transition-transform md:hidden",
+          "fixed inset-y-0 left-0 mt-16 pt-8 z-40 w-[--sidebar-width-mobile] border-r border-border bg-background transition-transform md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >

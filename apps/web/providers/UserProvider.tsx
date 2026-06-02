@@ -26,6 +26,7 @@ export type UserContextType = {
   error: Error | null;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
+  switchCurrentFursona: (id: number) => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -175,6 +176,37 @@ export function UserProvider({
     }
   }, [supabase, setState]);
 
+  const switchCurrentFursona = useCallback(
+    async (fursonaId: number) => {
+      try {
+        setState({ loading: true, error: null });
+
+        const res = await api.patch<{ fursona: FursonaTypesWithID }>(
+          `/api/core/fursonas/${fursonaId}`,
+          { is_current: true },
+        );
+
+        const updated = res.fursona;
+
+        // Update local fursonas list to reflect the current flag
+        const next = fursonas.map((f) => ({
+          ...f,
+          is_current: f.id === updated.id,
+        }));
+
+        setState({ fursonas: next, currentFursona: updated });
+        
+      } catch (err) {
+        setState({ error: toError(err) });
+        throw err;
+
+      } finally {
+        setState({ loading: false });
+      }
+    },
+    [fursonas, setState],
+  );
+
   const value: UserContextType = useMemo(
     () => ({
       user,
@@ -185,8 +217,9 @@ export function UserProvider({
       error,
       refresh,
       signOut,
+      switchCurrentFursona,
     }),
-    [user, account, fursonas, currentFursona, loading, error, refresh, signOut],
+    [user, account, fursonas, currentFursona, loading, error, refresh, signOut, switchCurrentFursona],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

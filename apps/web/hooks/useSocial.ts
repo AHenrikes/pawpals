@@ -22,7 +22,7 @@ type SocialData = {
   refetch: () => Promise<void>;
 };
 
-export function useSocial(): SocialData {
+export function useSocial(username?: string): SocialData {
   const [following, setFollowing] = useState<FursonaTypesWithID[] | null>(null);
   const [followers, setFollowers] = useState<FursonaTypesWithID[] | null>(null);
   const [likes, setLikes] = useState<FursonaTypesWithID[] | null>(null);
@@ -42,7 +42,11 @@ export function useSocial(): SocialData {
       setLoading(true);
       setError(null);
 
-      // Use centralized API client instead of raw fetch
+      // If username provided, fetch stats for that user; otherwise fetch for current user
+      const endpoint = username
+        ? `/api/social/followers?username=${encodeURIComponent(username)}`
+        : "/api/social/followers";
+
       const data = await api.get<{
         following: FursonaTypesWithID[] | null;
         followers: FursonaTypesWithID[] | null;
@@ -52,7 +56,7 @@ export function useSocial(): SocialData {
         followers_count: number;
         likes_count: number;
         posts_count: number;
-      }>("/api/social/followers");
+      }>(endpoint);
 
       setFollowing(data.following ?? []);
       setFollowingCount(data.following_count ?? 0);
@@ -92,7 +96,7 @@ export function useSocial(): SocialData {
     } finally {
       setLoading(false);
     }
-  }, [signOut]);
+  }, [signOut, username]);
 
   // Auto-fetch on mount
   useEffect(() => {

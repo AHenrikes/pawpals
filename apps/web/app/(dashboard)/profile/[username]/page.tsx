@@ -26,10 +26,10 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import useSocial from "@/hooks/useSocial";
 import type { FursonaTypesWithID } from "@/types/fursona";
-import type { AccountTypesWithID } from "@/types/account";
+// import type { AccountTypesWithID } from "@/types/account";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
-import { ReportProfileModal } from "@/components/dialogs/ReportProfileModal";
-import { AdminPanelModal } from "@/components/dialogs/AdminPanelModal";
+// import { ReportProfileModal } from "@/components/dialogs/ReportProfileModal";
+// import { AdminPanelModal } from "@/components/dialogs/AdminPanelModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,20 +60,18 @@ function formatNumbers(count: number): string {
 export default function ProfilePage() {
   const params = useParams<{ username: string }>();
   const paramUsername = params.username;
+
   const { account, currentFursona, loading: userLoading } = useUser();
   const { getProfile, loading: profileLoading } = useProfile();
-  const { followersCount, followingCount, likesCount } = useSocial();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isReportOpen, setIsReportOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [viewedFursona, setViewedFursona] = useState<FursonaTypesWithID | null>(
-    null,
-  );
-  const [viewedAccount, setViewedAccount] = useState<AccountTypesWithID | null>(
-    null,
-  );
+  // const [isReportOpen, setIsReportOpen] = useState(false);
+  // const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [viewedFursona, setViewedFursona] = useState<FursonaTypesWithID | null>(null);
+  // const [viewedAccount, setViewedAccount] = useState<AccountTypesWithID | null>(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+
+  const { followersCount, followingCount, likesCount } = useSocial(paramUsername);
 
   // Load profile data
   useEffect(() => {
@@ -82,14 +80,14 @@ export default function ProfilePage() {
         // Viewing own profile
         setIsOwnProfile(true);
         setViewedFursona(currentFursona);
-        setViewedAccount(account || null);
+        // setViewedAccount(account || null);
       } else {
         // Viewing other profile
         setIsOwnProfile(false);
+
         const profile = await getProfile(paramUsername);
-        if (profile) {
-          setViewedFursona(profile);
-        }
+
+        if (profile) setViewedFursona(profile);
       }
     };
 
@@ -115,40 +113,40 @@ export default function ProfilePage() {
     }
   };
 
-  const handleReport = async (reason: string) => {
-    try {
-      await api.post("/api/social/reports", {
-        reported_fursona_id: viewedFursona?.id,
-        reason,
-        report_type: "fursona",
-      });
-      setIsReportOpen(false);
-    } catch (err) {
-      throw new Error(getErrorMessage(err));
-    }
-  };
+  // const handleReport = async (reason: string) => {
+  //   try {
+  //     await api.post("/api/social/reports", {
+  //       reported_fursona_id: viewedFursona?.id,
+  //       reason,
+  //       report_type: "fursona",
+  //     });
+  //     setIsReportOpen(false);
+  //   } catch (err) {
+  //     throw new Error(getErrorMessage(err));
+  //   }
+  // };
 
-  const handleSuspend = async (reason: string) => {
-    try {
-      await api.post(`/api/admin/fursonas/${viewedFursona?.id}/suspend`, {
-        reason,
-      });
-      setIsAdminOpen(false);
-    } catch (err) {
-      throw new Error(getErrorMessage(err));
-    }
-  };
+  // const handleSuspend = async (reason: string) => {
+  //   try {
+  //     await api.post(`/api/admin/fursonas/${viewedFursona?.id}/suspend`, {
+  //       reason,
+  //     });
+  //     setIsAdminOpen(false);
+  //   } catch (err) {
+  //     throw new Error(getErrorMessage(err));
+  //   }
+  // };
 
-  const handleDelete = async (reason: string) => {
-    try {
-      await api.post(`/api/admin/fursonas/${viewedFursona?.id}/delete`, {
-        reason,
-      });
-      setIsAdminOpen(false);
-    } catch (err) {
-      throw new Error(getErrorMessage(err));
-    }
-  };
+  // const handleDelete = async (reason: string) => {
+  //   try {
+  //     await api.post(`/api/admin/fursonas/${viewedFursona?.id}/delete`, {
+  //       reason,
+  //     });
+  //     setIsAdminOpen(false);
+  //   } catch (err) {
+  //     throw new Error(getErrorMessage(err));
+  //   }
+  // };
 
   const profileNav = [
     { href: "#", label: "POST" },
@@ -173,7 +171,7 @@ export default function ProfilePage() {
           <motion.div
             key="banner-content"
             className="relative w-full h-64 sm:h-96 md:h-[500px]"
-            initial={{ opacity: 0, scale: 1.03 }}
+            initial={{ opacity: 0, scale: .99 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
@@ -216,7 +214,7 @@ export default function ProfilePage() {
                 <Button
                   size="icon"
                   variant="none"
-                  onClick={() => setIsReportOpen(true)}
+                  // onClick={() => setIsReportOpen(true)}
                   className="z-20"
                 >
                   <Flag className="h-6 w-6" />
@@ -226,7 +224,7 @@ export default function ProfilePage() {
                   <Button
                     size="icon"
                     variant="outline"
-                    onClick={() => setIsAdminOpen(true)}
+                    // onClick={() => setIsAdminOpen(true)}
                     className="z-20"
                   >
                     <ShieldAlert className="h-4 w-4" />
@@ -249,11 +247,11 @@ export default function ProfilePage() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-4"
               >
-                <Skeleton className="h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
+                <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
 
                 <div className="min-w-0 mb-4 space-y-2">
-                  <Skeleton className="h-9 w-52" />
-                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-9 w-52 animate-none border-2 border-background " />
+                  <Skeleton className="h-4 w-40 animate-none border-2 border-background " />
                 </div>
               </motion.div>
             ) : (
@@ -405,7 +403,7 @@ export default function ProfilePage() {
         />
       )}
 
-      {viewedFursona && !isOwnProfile && (
+      {/* {viewedFursona && !isOwnProfile && (
         <>
           <ReportProfileModal
             fursona={viewedFursona}
@@ -425,7 +423,7 @@ export default function ProfilePage() {
             />
           )}
         </>
-      )}
+      )} */}
     </>
   );
 }

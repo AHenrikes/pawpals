@@ -8,6 +8,9 @@ import { X } from "lucide-react";
 import CreateFursona from "@/components/features/CreateFursona";
 import { motion } from "framer-motion";
 import { toast } from "@repo/ui/sonner";
+import { FormError } from "@repo/ui/form-error";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/providers/UserProvider";
 
 interface CreateFursonaPanelModalProps {
   isOpen: boolean;
@@ -20,6 +23,9 @@ export function CreateFursonaPanelModal({
   onClose,
   onSuccess,
 }: Readonly<CreateFursonaPanelModalProps>) {
+  const router = useRouter();
+  const { switchCurrentFursona } = useUser();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
@@ -72,6 +78,12 @@ export function CreateFursonaPanelModal({
         throw new Error(data.message || "Failed to create fursona");
       }
 
+      const data = await response.json();
+      const createdFursona = data.fursona;
+      
+      // Switch to the newly created fursona
+      await switchCurrentFursona(createdFursona.id);
+
       onSuccess?.();
       onClose();
       setFursona({
@@ -79,10 +91,14 @@ export function CreateFursonaPanelModal({
         username: "",
         species: "",
         pronouns: "",
-        bio: "",
+        bio: ""
       });
+
+      router.push(`/${createdFursona.username}`);
+      toast.success(`Created ${createdFursona.display_name} successfully`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create fursona");
+      setError(err instanceof Error ? err.message : "Failed to create fursona")
+      toast.error(err instanceof Error ? err.message : "Failed to create fursona");
     } finally {
       setLoading(false);
     }
@@ -102,23 +118,19 @@ export function CreateFursonaPanelModal({
     }
   };
 
-  if (error) {
-    toast(error);
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 1.1 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: .4, delay: .35, ease: "easeOut" }}
+      transition={{ duration: .4, delay: .1, ease: "easeOut" }}
       className="flex items-center justify-center h-full bg-black/50"
     >
-      <div className="relative w-full max-w-[640px] mx-4 rounded-lg bg-background p-6 shadow-lg max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-[640px] mx-4 rounded-lg bg-background p-6 shadow-lg max-h-[90vh]">
         <Button
           variant={"none"}
           onClick={handleClose}
           disabled={loading}
-          className="absolute right-4 top-4 rounded-full p-1 hover:bg-popover disabled:opacity-50"
+          className="absolute right-4 top-4 p-2 rounded-full hover:bg-popover disabled:opacity-50"
         >
           <X className="h-5 w-5" />
           <span className="sr-only">Close</span>
@@ -138,6 +150,12 @@ export function CreateFursonaPanelModal({
             onUsernameAvailability={setIsUsernameAvailable}
           />
         </div>
+
+        {error && (
+          <div className="mb-4">
+            <FormError message={error} />
+          </div>
+        )}
 
         <div className="flex gap-3">
           <Button

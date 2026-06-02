@@ -224,3 +224,10 @@
     text-transform: uppercase;
   }
 }
+
+
+[data-sonner-toast] {
+  display: flex;
+  justify-content: center;
+  user-select: none;
+}

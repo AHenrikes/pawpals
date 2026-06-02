@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
@@ -12,10 +12,11 @@ import {
   CollapsibleContent,
 } from "@repo/ui/collapsible";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
-import { Settings, User, ArrowDownUp, PlusIcon } from "lucide-react";
+import { Settings, User, PlusIcon, Check, Loader2, ChevronDown } from "lucide-react";
 import { CreateFursonaPanelModal } from "@/components/dialogs/CreateFursonaPanelModal";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "@repo/ui/sonner";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -30,8 +31,8 @@ import {
 import {
   TypographyH4,
   TypographySmall,
-  TypographyXSmall,
 } from "@repo/ui/typography";
+import { useCurrentPath } from "@/hooks/useCurrentPath";
 
 function getInitials(name: string) {
   return name
@@ -43,15 +44,45 @@ function getInitials(name: string) {
 }
 
 export default function Header() {
-  const { user, fursonas, currentFursona, loading, signOut, refresh } = useUser();
+  const { fursonas, currentFursona, loading, signOut, refresh, switchCurrentFursona } = useUser();
   const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateFursonaOpen, setCreateFursonaOpen] = useState(false);
+  const [switchingId, setSwitchingId] = useState<number | null>(null);
+  const path = useCurrentPath(`@${currentFursona?.username ?? ''}`)
   const router = useRouter();
 
   const handleFursonaCreated = () => {
     refresh();
     setIsFursonaListOpen(false);
+  };
+
+  const handleSwitchFursona = async (id: number) => {
+    setIsFursonaListOpen(false);
+    setIsMenuOpen(false);
+
+    try {
+      setSwitchingId(id);
+
+      // Dropdown menu ui glitch
+      // Jumps to top left corner before profile switch 
+      // TEMP fix: setTimout to wait for dropdown to close before switching profile
+      setTimeout(async()  => {
+        await switchCurrentFursona(id);
+
+        const newCurrentFursona = fursonas.find((f) => f.id === id);
+        toast(`Switched to ${newCurrentFursona?.display_name ?? "fursona"}`);
+
+        router.refresh();
+      }, 350)
+      
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to switch fursona";
+      toast(msg);
+
+    } finally {
+        setSwitchingId(null);
+    }
   };
 
   const displayName = useMemo(() => {
@@ -61,9 +92,6 @@ export default function Header() {
 
     return "Account";
   }, [currentFursona?.display_name]);
-
-  const profileSubtitle =
-    currentFursona?.username ?? user?.email ?? "No username";
 
   function handleMenuOpenChange(nextOpen: boolean) {
     setIsMenuOpen(nextOpen);
@@ -87,7 +115,7 @@ export default function Header() {
   const count = fursonas.length;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 h-16 border-b border-popover bg-background/90 backdrop-blur">
+    <header className="absolute w-full h-16 left-0 border-b border-popover bg-background/90 backdrop-blur z-50">
       <div className="mx-auto flex h-full w-full items-center justify-between px-2 md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
@@ -102,10 +130,10 @@ export default function Header() {
               open={isFursonaListOpen}
               onOpenChange={setIsFursonaListOpen}
             >
-              <DropdownMenuTrigger asChild>
-                {loading ? (
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                ) : (
+              {loading ? (
+                <Skeleton className="h-8 w-8 rounded-full" />
+              ) : (
+                <DropdownMenuTrigger asChild>
                   <Button variant={"none"} className="p-0 focus-visible:ring-0">
                     <Avatar size="sm">
                       <AvatarImage
@@ -117,8 +145,8 @@ export default function Header() {
                       </AvatarFallback>
                     </Avatar>
                   </Button>
-                )}
-              </DropdownMenuTrigger>
+                </DropdownMenuTrigger>
+              )}
 
               <DropdownMenuContent align="end" className="w-60 select-none">
                 <DropdownMenuGroup className="flex items-center gap-1">
@@ -126,8 +154,8 @@ export default function Header() {
                     asChild
                     className="flex w-full rounded-none"
                   >
-                    <Link href={`/${currentFursona?.username}`}>
-                      <Avatar size="sm">
+                    <Link href={`/@${currentFursona?.username}`}>
+                      <Avatar size="default">
                         <AvatarImage
                           src={`${currentFursona?.avatar_url}`}
                           alt={displayName}
@@ -137,22 +165,9 @@ export default function Header() {
                         </AvatarFallback>
                       </Avatar>
 
-                      <span className="flex flex-col">
-                        <TypographySmall>{displayName}</TypographySmall>
-                        <TypographyXSmall>{profileSubtitle}</TypographyXSmall>
-                      </span>
+                      <TypographySmall>{displayName}</TypographySmall>
                     </Link>
                   </DropdownMenuItem>
-
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant={"none"}
-                      className="h-[52px] hover:bg-popover rounded-none"
-                    >
-                      <ArrowDownUp className="h-5 w-5" />
-                      <span className="sr-only">Switch Fursona</span>
-                    </Button>
-                  </CollapsibleTrigger>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
@@ -174,34 +189,66 @@ export default function Header() {
                   })}
                 </DropdownMenuGroup>
 
-                <CollapsibleContent>
-                  <DropdownMenuSeparator />
+                <DropdownMenuSeparator />
 
-                  <DropdownMenuGroup>
+                <DropdownMenuGroup>
+                  <CollapsibleTrigger className="flex justify-between items-center w-full pr-2 hover:bg-popover">
                     <DropdownMenuLabel>My Fursonas</DropdownMenuLabel>
 
-                    {fursonas.map((elem) => {
-                      return (
-                        <Fragment key={elem.id}>
-                          <DropdownMenuItem>{elem.display_name}</DropdownMenuItem>
-                        </Fragment>
-                      );
-                    })}
+                    <span>
+                      <ChevronDown className="h-4 w-4" />
+                      <p className="sr-only">Switch Fursona</p>
+                    </span>
+                  </CollapsibleTrigger>
 
-                    {count < 3 && (
-                      <DropdownMenuItem>
-                        <PlusIcon className="h-4 w-4" />
-                        <Button
-                          variant={"none"}
-                          onClick={() => setCreateFursonaOpen(true)}
-                          className="p-0 h-fit"
+                  <CollapsibleContent>
+                    <DropdownMenuGroup>
+                      {fursonas.map((elem) => {
+                        const isActive = elem.id === currentFursona?.id;
+
+                        return (
+                          <DropdownMenuItem
+                            key={elem.id}
+                          >
+                            {isActive ? (
+                              <span className="flex w-full items-center justify-between text-start font-semibold">
+                                <TypographySmall>{elem.display_name}</TypographySmall>
+                                <Check className="h-4 w-4" />
+                              </span>
+                            ) : (
+                              <Link
+                                href={path === true ? `/@${elem.username}` : path}
+                                onClick={() => void handleSwitchFursona(elem.id)}
+                                className={"flex w-full items-center justify-between text-start font-semibold"}
+                              >
+                                <TypographySmall>{elem.display_name}</TypographySmall>
+
+                                {switchingId === elem.id && ( <Loader2 className="h-4 w-4 animate-spin" />)}
+                              </Link>
+                            )}
+                          </DropdownMenuItem>
+                        );
+                      })}
+
+                      {count < 3 && (
+                        <DropdownMenuItem 
+                          asChild
+                          className="mt-2"
                         >
-                          Create Fursona
-                        </Button>
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuGroup>
-                </CollapsibleContent>
+                          <Button
+                            variant={"outline"}
+                            onClick={() => setCreateFursonaOpen(true)}
+                            className="h-8 w-full my-2 rounded-full"
+                          >
+                            <PlusIcon className="h-4 w-4" />
+
+                            Create Fursona
+                          </Button>
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuGroup>
+                  </CollapsibleContent>
+                </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
 
@@ -228,7 +275,7 @@ export default function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
+            transition={{ duration: 0.4, delay: .1, ease: "easeOut" }}
             className="absolute inset-0 h-svh"
           >
             <CreateFursonaPanelModal

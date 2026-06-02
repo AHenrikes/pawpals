@@ -11,10 +11,16 @@ const inputVariants = cva(
         auth: "h-14 rounded-full border-surface bg-popover px-5 text-base text-headline shadow-ambient placeholder:text-text-muted focus-visible:ring-2 focus-visible:ring-secondary",
         none: "",
       },
+
+      error: {
+        true: "focus-visible:ring-destructive",
+        false: ""
+      }
     },
 
     defaultVariants: {
       variant: "default",
+      error: false
     },
   },
 );
@@ -23,11 +29,11 @@ type InputProps = React.ComponentProps<"input"> &
   VariantProps<typeof inputVariants>;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, variant, ...props }, ref) => {
+  ({ className, type, variant, error, ...props }, ref) => {
     return (
       <input
         type={type}
-        className={cn(inputVariants({ variant }), className)}
+        className={cn(inputVariants({ variant, error }), className)}
         ref={ref}
         {...props}
       />

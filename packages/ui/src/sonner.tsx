@@ -27,9 +27,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          "--normal-bg": "hsl(var(--popover))",
+          "--normal-text": "hsl(var(--text))",
+          "--normal-border": "hsl(var(--ring))",
           "--success-bg": "hsl(var(--primary))",
           "--success-border": "hsl(var(--primary-dim))",
           "--success-text": "hsl(var(--primary-foreground))",

@@ -59,7 +59,7 @@ export default function MainNav() {
   return (
     <Sidebar
       collapsible="icon"
-      className="min-h-[calc(100svh-64px)] pt-20 group/sidebar border-transparent shrink-0"
+      className="h-[calc(100svh-64px)] group/sidebar border-transparent shrink-0"
     >
       <SidebarContent className="gap-10">
         <SidebarGroup>
@@ -71,7 +71,7 @@ export default function MainNav() {
                 return (
                   <SidebarMenuItem key={label}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={href} className="hover:bg-surface-highest">
+                      <Link href={href} className="hover:bg-surface-highest" draggable="false">
                         <Icon
                           className={cn(
                             "h-5 w-5 shrink-0",

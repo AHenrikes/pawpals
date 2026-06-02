@@ -102,6 +102,7 @@ export default function CreateFursona({
             onFocus={seedUsernameSuggestion}
             variant={"auth"}
             className="pl-8 pr-8"
+            error={!checkingUsername && usernameAvailable === false}
             required
           />
 
@@ -117,11 +118,6 @@ export default function CreateFursona({
             )}
           </div>
         </div>
-        {!checkingUsername &&
-          usernameAvailable === false &&
-          fursona.username.length >= 3 && (
-            <p className="text-xs text-destructive">Username already taken</p>
-          )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
