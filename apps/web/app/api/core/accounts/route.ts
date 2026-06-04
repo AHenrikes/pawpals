@@ -10,7 +10,7 @@ export async function GET() {
   const { data: accountData, error } = await supabase
     .schema("core")
     .from("accounts")
-    .select("id, user_id, firstname, lastname, email, dob, role")
+    .select("id, firstname, lastname, email, dob")
     .eq("id", account.id)
     .maybeSingle();
 

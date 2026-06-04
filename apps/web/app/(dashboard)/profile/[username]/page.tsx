@@ -25,7 +25,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import useSocial from "@/hooks/useSocial";
-import type { FursonaTypesWithID } from "@/types/fursona";
+import type { FursonaTypes, FursonaTypesWithID } from "@/types/fursona";
 // import type { AccountTypesWithID } from "@/types/account";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 // import { ReportProfileModal } from "@/components/dialogs/ReportProfileModal";
@@ -33,6 +33,7 @@ import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { FollowButton } from "@/components/buttons/FollowButton";
 
 function getInitials(name: string) {
   return name
@@ -61,17 +62,25 @@ export default function ProfilePage() {
   const params = useParams<{ username: string }>();
   const paramUsername = params.username;
 
+  const {
+    followersCount,
+    followingCount,
+    likesCount,
+    isFollowing,
+    followLoading,
+    toggleFollow,
+  } = useSocial(paramUsername);
   const { account, currentFursona, loading: userLoading } = useUser();
   const { getProfile, loading: profileLoading } = useProfile();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   // const [isReportOpen, setIsReportOpen] = useState(false);
   // const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [viewedFursona, setViewedFursona] = useState<FursonaTypesWithID | null>(null);
+  const [viewedFursona, setViewedFursona] = useState<
+    FursonaTypesWithID | FursonaTypes | null
+  >(null);
   // const [viewedAccount, setViewedAccount] = useState<AccountTypesWithID | null>(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
-
-  const { followersCount, followingCount, likesCount } = useSocial(paramUsername);
 
   // Load profile data
   useEffect(() => {
@@ -99,9 +108,13 @@ export default function ProfilePage() {
   const isLoading = userLoading || profileLoading || !viewedFursona;
 
   const handleEditSave = async (updates: Partial<FursonaTypesWithID>) => {
+    if (!isOwnProfile || !("id" in viewedFursona!)) {
+      throw new Error("Cannot edit other profiles");
+    }
+
     try {
       const data = await api.patch<{ fursona: FursonaTypesWithID }>(
-        `/api/core/fursonas/${viewedFursona?.id}`,
+        `/api/core/fursonas/${viewedFursona.id}`,
         updates,
       );
       setViewedFursona(data.fursona);
@@ -171,7 +184,7 @@ export default function ProfilePage() {
           <motion.div
             key="banner-content"
             className="relative w-full h-64 sm:h-96 md:h-[500px]"
-            initial={{ opacity: 0, scale: .99 }}
+            initial={{ opacity: 0, scale: 0.99 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
@@ -284,6 +297,13 @@ export default function ProfilePage() {
                     @{viewedFursona?.username}
                   </TypographySmall>
                 </div>
+
+                <FollowButton
+                  isOwnProfile={isOwnProfile}
+                  isFollowing={isFollowing}
+                  loading={followLoading}
+                  onToggle={toggleFollow}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -394,7 +414,7 @@ export default function ProfilePage() {
       </section>
 
       {/* Modals */}
-      {viewedFursona && isOwnProfile && (
+      {viewedFursona && isOwnProfile && "id" in viewedFursona && (
         <EditProfileModal
           fursona={viewedFursona}
           isOpen={isEditOpen}

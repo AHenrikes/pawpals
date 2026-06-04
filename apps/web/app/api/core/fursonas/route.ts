@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import type { FursonaTypes } from "@/types/fursona";
+import type { FursonaTypesWithID } from "@/types/fursona";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
@@ -8,16 +8,15 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { unauthorized, badRequest, serverError } from "@/lib/api/responses";
 
 export async function GET() {
-  const { supabase, user, account, response } = await requireUser();
+  const { supabase, account, response } = await requireUser();
   if (response) return response;
-  if (user === null) return unauthorized();
   if (account === null) return unauthorized();
 
   const { data: fursonas, error } = await supabase
     .schema("core")
     .from("fursonas")
     .select(
-      "id, account_id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, created_at",
+      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, created_at",
     )
     .eq("account_id", account.id)
     .order("created_at", { ascending: true });
@@ -30,12 +29,11 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, account, response } = await requireUser();
+  const { supabase, account, response } = await requireUser();
   if (response) return response;
-  if (user === null) return unauthorized();
   if (account === null) return unauthorized();
 
-  const body = (await request.json().catch(() => ({}))) as FursonaTypes;
+  const body = (await request.json().catch(() => ({}))) as FursonaTypesWithID;
   const display_name = normalizeRequiredName(body.display_name);
 
   if (display_name.length === 0) {
@@ -58,7 +56,7 @@ export async function POST(request: NextRequest) {
       is_current: body.is_current,
     })
     .select(
-      "id, account_id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current",
+      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current",
     )
     .single();
 

@@ -14,13 +14,13 @@ const inputVariants = cva(
 
       error: {
         true: "focus-visible:ring-destructive",
-        false: ""
-      }
+        false: "",
+      },
     },
 
     defaultVariants: {
       variant: "default",
-      error: false
+      error: false,
     },
   },
 );

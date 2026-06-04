@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "external-content.duckduckgo.com",
       },
+      {
+        protocol: "http",
+        hostname: "192.168.1.219",
+      },
     ],
     qualities: [75, 100],
   },

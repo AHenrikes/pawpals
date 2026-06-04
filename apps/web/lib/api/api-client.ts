@@ -62,11 +62,15 @@ class APIClient {
   /**
    * GET request
    */
-  async get<T = unknown>(endpoint: string): Promise<T> {
+  async get<T = unknown>(
+    endpoint: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const response = await fetch(url, {
       method: "GET",
       headers: this.defaultHeaders,
+      signal: options?.signal,
     });
 
     return this.handleResponse<T>(response, endpoint);
@@ -103,13 +107,13 @@ class APIClient {
   /**
    * DELETE request
    */
-  async delete<T = unknown>(endpoint: string): Promise<T> {
+  async delete<T = unknown>(endpoint: string, body?: unknown): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const response = await fetch(url, {
       method: "DELETE",
       headers: this.defaultHeaders,
+      body: body ? JSON.stringify(body) : undefined,
     });
-
     return this.handleResponse<T>(response, endpoint);
   }
 }

@@ -7,11 +7,11 @@ export type FursonaTypes = {
   pronouns?: string;
   bio?: string;
   reputation?: number;
-  is_current?: boolean;
-  is_default?: boolean;
 };
 
 export type FursonaTypesWithID = FursonaTypes & {
-  id: number;
-  account_id: number;
+  id: string;
+  account_id: string;
+  is_current?: boolean;
+  is_default?: boolean;
 };

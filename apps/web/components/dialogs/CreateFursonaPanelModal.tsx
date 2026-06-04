@@ -39,10 +39,7 @@ export function CreateFursonaPanelModal({
 
   if (!isOpen) return null;
 
-  const handleFursonaChange = (
-    field: keyof FursonaTypes,
-    value: string,
-  ) => {
+  const handleFursonaChange = (field: keyof FursonaTypes, value: string) => {
     setFursona((prev) => ({ ...prev, [field]: value }));
     setError(null);
   };
@@ -80,7 +77,7 @@ export function CreateFursonaPanelModal({
 
       const data = await response.json();
       const createdFursona = data.fursona;
-      
+
       // Switch to the newly created fursona
       await switchCurrentFursona(createdFursona.id);
 
@@ -91,14 +88,16 @@ export function CreateFursonaPanelModal({
         username: "",
         species: "",
         pronouns: "",
-        bio: ""
+        bio: "",
       });
 
-      router.push(`/${createdFursona.username}`);
+      router.push(`/@${createdFursona.username}`);
       toast.success(`Created ${createdFursona.display_name} successfully`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create fursona")
-      toast.error(err instanceof Error ? err.message : "Failed to create fursona");
+      setError(err instanceof Error ? err.message : "Failed to create fursona");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to create fursona",
+      );
     } finally {
       setLoading(false);
     }
@@ -122,7 +121,7 @@ export function CreateFursonaPanelModal({
     <motion.div
       initial={{ opacity: 0, scale: 1.1 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: .4, delay: .1, ease: "easeOut" }}
+      transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
       className="flex items-center justify-center h-full bg-black/50"
     >
       <div className="relative w-full max-w-[640px] mx-4 rounded-lg bg-background p-6 shadow-lg max-h-[90vh]">

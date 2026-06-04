@@ -49,7 +49,7 @@ export default function CreateFursona({
 
     setCheckingUsername(true);
     try {
-      const res = await fetch(`/api/core/fursonas/username/${username.trim()}`);
+      const res = await fetch(`/api/search/username/${username.trim()}`);
       const available = res.status === 404;
       setUsernameAvailable(available);
       onUsernameAvailability?.(available);

@@ -9,36 +9,19 @@ export async function GET(
 ) {
   try {
     const supabase = await createServer();
-    const { username } = await context.params;
+    const { username: query } = await context.params;
 
     const { data: fursona, error } = await supabase
       .schema("core")
       .from("fursonas")
-      .select(
-        `
-        id,
-        account_id,
-        display_name,
-        username,
-        avatar_url,
-        banner_url,
-        species,
-        pronouns,
-        bio,
-        reputation,
-        is_default,
-        is_current,
-        created_at
-      `,
-      )
-      .eq("username", username)
-      .single();
+      .select("username")
+      .eq("username", query)
+      .maybeSingle();
 
-    if (error || !fursona) return notFound();
+    if (error) throw new Error(error.message);
+    if (!fursona) return notFound();
 
-    return new Response(JSON.stringify({ fursona }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    return Response.json({ exists: true });
   } catch (error) {
     return serverError((error as Error).message);
   }

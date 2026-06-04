@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Textarea } from "@repo/ui/textarea";
 import { TypographySmall } from "@repo/ui/typography";
 import type { FursonaTypesWithID } from "@/types/fursona";
-import { X } from "lucide-react";
+import { X, Camera } from "lucide-react";
+import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia"; // your upload fn from before
+import Image from "next/image";
 
 interface EditProfileModalProps {
   fursona: FursonaTypesWithID;
@@ -29,7 +31,36 @@ export function EditProfileModal({
   const [pronouns, setPronouns] = useState(fursona.pronouns || "");
   const [error, setError] = useState<string | null>(null);
 
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    fursona.avatar_url ?? null,
+  );
+  const [bannerPreview, setBannerPreview] = useState<string | null>(
+    fursona.banner_url ?? null,
+  );
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+
   if (!isOpen) return null;
+
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "avatar" | "banner",
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+    if (type === "avatar") {
+      setAvatarFile(file);
+      setAvatarPreview(preview);
+    } else {
+      setBannerFile(file);
+      setBannerPreview(preview);
+    }
+  };
 
   const handleSave = async () => {
     if (!displayName.trim() || !username.trim()) {
@@ -41,12 +72,34 @@ export function EditProfileModal({
     setError(null);
 
     try {
+      // Upload images first if changed
+      const [newAvatarUrl, newBannerUrl] = await Promise.all([
+        avatarFile
+          ? uploadFursonaImage(
+              avatarFile,
+              fursona.account_id,
+              fursona.id,
+              "fursona-avatars",
+            )
+          : Promise.resolve(null),
+        bannerFile
+          ? uploadFursonaImage(
+              bannerFile,
+              fursona.account_id,
+              fursona.id,
+              "fursona-banners",
+            )
+          : Promise.resolve(null),
+      ]);
+
       await onSave({
         display_name: displayName,
         username,
         bio,
         species,
         pronouns,
+        ...(newAvatarUrl && { avatar_url: newAvatarUrl }),
+        ...(newBannerUrl && { banner_url: newBannerUrl }),
       });
       onClose();
     } catch (err) {
@@ -78,33 +131,80 @@ export function EditProfileModal({
             </div>
           )}
 
+          {/* Banner */}
+          <div
+            className="relative h-28 w-full cursor-pointer overflow-hidden rounded-md bg-muted"
+            onClick={() => !loading && bannerInputRef.current?.click()}
+          >
+            {bannerPreview && (
+              <Image
+                src={bannerPreview}
+                alt="Banner"
+                quality={100}
+                fill
+                className="h-full w-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity hover:opacity-100">
+              <Camera className="h-6 w-6 text-white" />
+            </div>
+            <input
+              ref={bannerInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              className="hidden"
+              onChange={(e) => handleImageChange(e, "banner")}
+            />
+          </div>
+
+          {/* Avatar — overlapping the banner */}
+          <div className="-mt-10 ml-4">
+            <div
+              className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-full border-2 border-background bg-muted"
+              onClick={() => !loading && avatarInputRef.current?.click()}
+            >
+              {avatarPreview && (
+                <Image
+                  src={avatarPreview}
+                  alt="Avatar"
+                  quality={100}
+                  fill
+                  className="h-full w-full object-cover"
+                />
+              )}
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/30 opacity-0 transition-opacity hover:opacity-100">
+                <Camera className="h-4 w-4 text-white" />
+              </div>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                className="hidden"
+                onChange={(e) => handleImageChange(e, "avatar")}
+              />
+            </div>
+          </div>
+
+          {/* Rest of fields unchanged */}
           <div className="space-y-2">
-            <label htmlFor="displayName" className="text-sm font-medium">
-              Display Name
-            </label>
+            <label className="text-sm font-medium">Display Name</label>
             <Input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               disabled={loading}
             />
           </div>
-
           <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium">
-              Username
-            </label>
+            <label className="text-sm font-medium">Username</label>
             <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={loading}
             />
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="species" className="text-sm font-medium">
-                Species
-              </label>
+              <label className="text-sm font-medium">Species</label>
               <Input
                 value={species}
                 onChange={(e) => setSpecies(e.target.value)}
@@ -112,9 +212,7 @@ export function EditProfileModal({
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="pronouns" className="text-sm font-medium">
-                Pronouns
-              </label>
+              <label className="text-sm font-medium">Pronouns</label>
               <Input
                 value={pronouns}
                 onChange={(e) => setPronouns(e.target.value)}
@@ -122,11 +220,8 @@ export function EditProfileModal({
               />
             </div>
           </div>
-
           <div className="space-y-2">
-            <label htmlFor="bio" className="text-sm font-medium">
-              Bio
-            </label>
+            <label className="text-sm font-medium">Bio</label>
             <Textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}

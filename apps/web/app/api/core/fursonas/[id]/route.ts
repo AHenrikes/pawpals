@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import type { FursonaTypes } from "@/types/fursona";
+import type { FursonaTypesWithID } from "@/types/fursona";
 import type { RouteContext } from "@/lib/types/api";
 import {
   normalizeOptionalText,
@@ -13,7 +13,7 @@ import {
   notFound,
 } from "@/lib/api/responses";
 
-function buildPatchUpdates(body: FursonaTypes) {
+function buildPatchUpdates(body: FursonaTypesWithID) {
   const updates: Record<string, unknown> = {};
 
   if (body.display_name !== undefined) {
@@ -54,99 +54,20 @@ function buildPatchUpdates(body: FursonaTypes) {
   return { updates, error: null };
 }
 
-// export async function PATCH(
-//   request: NextRequest,
-//   context: RouteContext<{ id: string }>,
-// ) {
-//   const { supabase, user, account, response } = await requireUser();
-
-//   if (response) return response;
-//   if (user === null) return unauthorized();
-//   if (account === null) return unauthorized();
-
-//   const { id: fursonaId } = await context.params;
-
-//   if (!fursonaId) return badRequest("Missing fursona id.");
-
-//   const body = (await request.json().catch(() => ({}))) as FursonaTypes;
-//   const { updates, error } = buildPatchUpdates(body);
-
-//   if (error) return badRequest(error);
-
-//   if (Object.keys(updates).length > 0) {
-//     // If we're marking this fursona as current, clear the old current first
-//     if (body.is_current === true) {
-//       // unset is_current for all other fursonas for this account
-//       const { error: unsetError } = await supabase
-//         .schema("core")
-//         .from("fursonas")
-//         .update({ is_current: false })
-//         .eq("account_id", account.id)
-//         .neq("id", fursonaId);
-
-//       if (unsetError) return badRequest(unsetError.message);
-
-//       const { error: updateError } = await supabase
-//         .schema("core")
-//         .from("fursonas")
-//         .update(updates)
-//         .eq("id", fursonaId)
-//         .eq("account_id", account.id);
-
-//       if (updateError) return badRequest(updateError.message);
-//     } else {
-//       const { error: updateError } = await supabase
-//         .schema("core")
-//         .from("fursonas")
-//         .update(updates)
-//         .eq("id", fursonaId)
-//         .eq("account_id", account.id);
-
-//       if (updateError) return badRequest(updateError.message);
-//     }
-//   }
-
-//   if (body.is_default === true) {
-//     const { error: setDefaultError } = await supabase.rpc(
-//       "set_default_fursona",
-//       { p_fursona_id: fursonaId },
-//     );
-//     if (setDefaultError) return badRequest(setDefaultError.message);
-//   }
-
-//   const { data: fursona, error: fetchError } = await supabase
-//     .schema("core")
-//     .from("fursonas")
-//     .select(
-//       "id, account_id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current",
-//     )
-//     .eq("id", fursonaId)
-//     .eq("account_id", account.id)
-//     .maybeSingle();
-
-//   if (fetchError) return serverError(fetchError.message);
-//   if (!fursona) return notFound("Fursona not found.");
-
-//   return new Response(JSON.stringify({ fursona }), {
-//     headers: { "Content-Type": "application/json" },
-//   });
-// }
-
 export async function PATCH(
   request: NextRequest,
   context: RouteContext<{ id: string }>,
 ) {
-  const { supabase, user, account, response } = await requireUser();
-  
+  const { supabase, account, response } = await requireUser();
+
   if (response) return response;
-  if (user === null) return unauthorized();
   if (account === null) return unauthorized();
 
   const { id: fursonaId } = await context.params;
 
   if (!fursonaId) return badRequest("Missing fursona id.");
 
-  const body = (await request.json().catch(() => ({}))) as FursonaTypes;
+  const body = (await request.json().catch(() => ({}))) as FursonaTypesWithID;
   const { updates, error } = buildPatchUpdates(body);
 
   if (error) return badRequest(error);
@@ -162,11 +83,14 @@ export async function PATCH(
   if (hasUpdates) {
     if (isSettingCurrent) {
       // Use a transaction-safe RPC to atomically switch is_current
-      const { error: switchError } = await supabase.rpc("switch_current_fursona", {
-        p_account_id: account.id,
-        p_fursona_id: fursonaId,
-        p_updates: updates, // pass remaining field updates too
-      });
+      const { error: switchError } = await supabase.rpc(
+        "switch_current_fursona",
+        {
+          p_account_id: account.id,
+          p_fursona_id: fursonaId,
+          p_updates: updates, // pass remaining field updates too
+        },
+      );
       if (switchError) return badRequest(switchError.message);
     } else {
       const { error: updateError } = await supabase
@@ -181,9 +105,12 @@ export async function PATCH(
   }
 
   if (isSettingDefault) {
-    const { error: setDefaultError } = await supabase.rpc("set_default_fursona", {
-      p_fursona_id: fursonaId,
-    });
+    const { error: setDefaultError } = await supabase.rpc(
+      "set_default_fursona",
+      {
+        p_fursona_id: fursonaId,
+      },
+    );
     if (setDefaultError) return badRequest(setDefaultError.message);
   }
 
@@ -191,7 +118,7 @@ export async function PATCH(
     .schema("core")
     .from("fursonas")
     .select(
-      "id, account_id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current",
+      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current",
     )
     .eq("id", fursonaId)
     .eq("account_id", account.id)
@@ -209,9 +136,8 @@ export async function DELETE(
   request: NextRequest,
   context: RouteContext<{ id: string }>,
 ) {
-  const { supabase, user, account, response } = await requireUser();
+  const { supabase, account, response } = await requireUser();
   if (response) return response;
-  if (user === null) return unauthorized();
   if (account === null) return unauthorized();
 
   const { id: fursonaId } = await context.params;

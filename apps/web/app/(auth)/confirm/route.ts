@@ -37,24 +37,19 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const { data, error } = await supabase.auth.verifyOtp({ type, token_hash });
+
     if (error) errorRedirect(error.message);
     if (data.user) await handleUser(data.user);
-    const safeNext = next?.startsWith("/") ? next : "/";
-    return NextResponse.redirect(new URL(safeNext, request.url));
-  }
+  }  else if (code) {
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (code) {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.exchangeCodeForSession(code);
     if (error) errorRedirect(error.message);
     if (user) await handleUser(user);
-    const safeNext = next?.startsWith("/") ? next : "/";
-    return NextResponse.redirect(new URL(safeNext, request.url));
+  } else {
+    return NextResponse.redirect(new URL(`/error?error=No token hash or type`, request.url));
   }
 
-  return NextResponse.redirect(
-    new URL(`/error?error=No token hash or type`, request.url),
-  );
+  const safeNext = next?.startsWith("/") ? next : "/";
+  await supabase.auth.updateUser({ data: { onboarding_init_fursona: null } });
+  return NextResponse.redirect(new URL(safeNext, request.url));
 }

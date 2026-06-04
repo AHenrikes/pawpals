@@ -26,7 +26,7 @@ export async function requireUser() {
   const { data: account, error: accountError } = await supabase
     .schema("core")
     .from("accounts")
-    .select("id")
+    .select("id, firstname, lastname, email, dob, role") 
     .eq("user_id", user.id)
     .single();
 

@@ -12,7 +12,14 @@ import {
   CollapsibleContent,
 } from "@repo/ui/collapsible";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
-import { Settings, User, PlusIcon, Check, Loader2, ChevronDown } from "lucide-react";
+import {
+  Settings,
+  User,
+  PlusIcon,
+  Check,
+  Loader2,
+  ChevronDown,
+} from "lucide-react";
 import { CreateFursonaPanelModal } from "@/components/dialogs/CreateFursonaPanelModal";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,10 +35,8 @@ import {
   DropdownMenuSub,
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
-import {
-  TypographyH4,
-  TypographySmall,
-} from "@repo/ui/typography";
+import { TypographyH4, TypographySmall } from "@repo/ui/typography";
+import { Searchbar } from "@/components/searchbar/Searchbar";
 import { useCurrentPath } from "@/hooks/useCurrentPath";
 
 function getInitials(name: string) {
@@ -44,12 +49,19 @@ function getInitials(name: string) {
 }
 
 export default function Header() {
-  const { fursonas, currentFursona, loading, signOut, refresh, switchCurrentFursona } = useUser();
+  const {
+    fursonas,
+    currentFursona,
+    loading,
+    signOut,
+    refresh,
+    switchCurrentFursona,
+  } = useUser();
   const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateFursonaOpen, setCreateFursonaOpen] = useState(false);
-  const [switchingId, setSwitchingId] = useState<number | null>(null);
-  const path = useCurrentPath(`@${currentFursona?.username ?? ''}`)
+  const [switchingId, setSwitchingId] = useState<string | null>(null);
+  const path = useCurrentPath(`@${currentFursona?.username ?? ""}`);
   const router = useRouter();
 
   const handleFursonaCreated = () => {
@@ -57,7 +69,7 @@ export default function Header() {
     setIsFursonaListOpen(false);
   };
 
-  const handleSwitchFursona = async (id: number) => {
+  const handleSwitchFursona = async (id: string) => {
     setIsFursonaListOpen(false);
     setIsMenuOpen(false);
 
@@ -65,23 +77,22 @@ export default function Header() {
       setSwitchingId(id);
 
       // Dropdown menu ui glitch
-      // Jumps to top left corner before profile switch 
+      // Jumps to top left corner before profile switch
       // TEMP fix: setTimout to wait for dropdown to close before switching profile
-      setTimeout(async()  => {
+      setTimeout(async () => {
         await switchCurrentFursona(id);
 
         const newCurrentFursona = fursonas.find((f) => f.id === id);
         toast(`Switched to ${newCurrentFursona?.display_name ?? "fursona"}`);
 
         router.refresh();
-      }, 350)
-      
+      }, 350);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to switch fursona";
+      const msg =
+        err instanceof Error ? err.message : "Failed to switch fursona";
       toast(msg);
-
     } finally {
-        setSwitchingId(null);
+      setSwitchingId(null);
     }
   };
 
@@ -124,7 +135,9 @@ export default function Header() {
           </Link>
         </div>
 
-        <div>
+        <div className="flex gap-2">
+          <Searchbar />
+
           <DropdownMenu open={isMenuOpen} onOpenChange={handleMenuOpenChange}>
             <Collapsible
               open={isFursonaListOpen}
@@ -207,23 +220,33 @@ export default function Header() {
                         const isActive = elem.id === currentFursona?.id;
 
                         return (
-                          <DropdownMenuItem
-                            key={elem.id}
-                          >
+                          <DropdownMenuItem key={elem.id}>
                             {isActive ? (
                               <span className="flex w-full items-center justify-between text-start font-semibold">
-                                <TypographySmall>{elem.display_name}</TypographySmall>
+                                <TypographySmall>
+                                  {elem.display_name}
+                                </TypographySmall>
                                 <Check className="h-4 w-4" />
                               </span>
                             ) : (
                               <Link
-                                href={path === true ? `/@${elem.username}` : path}
-                                onClick={() => void handleSwitchFursona(elem.id)}
-                                className={"flex w-full items-center justify-between text-start font-semibold"}
+                                href={
+                                  path === true ? `/@${elem.username}` : path
+                                }
+                                onClick={() =>
+                                  void handleSwitchFursona(elem.id)
+                                }
+                                className={
+                                  "flex w-full items-center justify-between text-start font-semibold"
+                                }
                               >
-                                <TypographySmall>{elem.display_name}</TypographySmall>
+                                <TypographySmall>
+                                  {elem.display_name}
+                                </TypographySmall>
 
-                                {switchingId === elem.id && ( <Loader2 className="h-4 w-4 animate-spin" />)}
+                                {switchingId === elem.id && (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                )}
                               </Link>
                             )}
                           </DropdownMenuItem>
@@ -231,17 +254,13 @@ export default function Header() {
                       })}
 
                       {count < 3 && (
-                        <DropdownMenuItem 
-                          asChild
-                          className="mt-2"
-                        >
+                        <DropdownMenuItem asChild className="mt-2">
                           <Button
                             variant={"outline"}
                             onClick={() => setCreateFursonaOpen(true)}
                             className="h-8 w-full my-2 rounded-full"
                           >
                             <PlusIcon className="h-4 w-4" />
-
                             Create Fursona
                           </Button>
                         </DropdownMenuItem>
@@ -275,7 +294,7 @@ export default function Header() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, delay: .1, ease: "easeOut" }}
+            transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
             className="absolute inset-0 h-svh"
           >
             <CreateFursonaPanelModal

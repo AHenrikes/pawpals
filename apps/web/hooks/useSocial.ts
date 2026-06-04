@@ -3,19 +3,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
-import type { FursonaTypesWithID } from "@/types/fursona";
+import type { FursonaTypes } from "@/types/fursona";
 import { useUser } from "@/providers/UserProvider";
 
 type SocialData = {
-  following: FursonaTypesWithID[] | null;
-  followers: FursonaTypesWithID[] | null;
-  likes: FursonaTypesWithID[] | null;
-  posts: FursonaTypesWithID[] | null;
+  following: FursonaTypes[] | null;
+  followers: FursonaTypes[] | null;
+  likes: FursonaTypes[] | null;
+  posts: FursonaTypes[] | null;
 
   followingCount: number;
   followersCount: number;
   likesCount: number;
   postsCount: number;
+
+  isFollowing: boolean;
+  followLoading: boolean;
+  toggleFollow: () => Promise<void>;
 
   error: Error | null;
   loading: boolean;
@@ -23,15 +27,18 @@ type SocialData = {
 };
 
 export function useSocial(username?: string): SocialData {
-  const [following, setFollowing] = useState<FursonaTypesWithID[] | null>(null);
-  const [followers, setFollowers] = useState<FursonaTypesWithID[] | null>(null);
-  const [likes, setLikes] = useState<FursonaTypesWithID[] | null>(null);
-  const [posts, setPosts] = useState<FursonaTypesWithID[] | null>(null);
+  const [following, setFollowing] = useState<FursonaTypes[] | null>(null);
+  const [followers, setFollowers] = useState<FursonaTypes[] | null>(null);
+  const [likes, setLikes] = useState<FursonaTypes[] | null>(null);
+  const [posts, setPosts] = useState<FursonaTypes[] | null>(null);
 
   const [followingCount, setFollowingCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
+
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,14 +55,15 @@ export function useSocial(username?: string): SocialData {
         : "/api/social/followers";
 
       const data = await api.get<{
-        following: FursonaTypesWithID[] | null;
-        followers: FursonaTypesWithID[] | null;
-        likes: FursonaTypesWithID[] | null;
-        posts: FursonaTypesWithID[] | null;
+        following: FursonaTypes[] | null;
+        followers: FursonaTypes[] | null;
+        likes: FursonaTypes[] | null;
+        posts: FursonaTypes[] | null;
         following_count: number;
         followers_count: number;
         likes_count: number;
         posts_count: number;
+        is_following: boolean;
       }>(endpoint);
 
       setFollowing(data.following ?? []);
@@ -69,6 +77,8 @@ export function useSocial(username?: string): SocialData {
 
       setPosts(data.posts ?? []);
       setPostsCount(data.posts_count ?? 0);
+
+      setIsFollowing(data.is_following ?? false);
     } catch (err) {
       const error = toError(err);
 
@@ -93,10 +103,34 @@ export function useSocial(username?: string): SocialData {
       setFollowersCount(0);
       setLikesCount(0);
       setPostsCount(0);
+
+      setIsFollowing(false);
     } finally {
       setLoading(false);
+      setFollowLoading(false);
     }
   }, [signOut, username]);
+
+  const toggleFollow = useCallback(async () => {
+    if (!username) return;
+    setFollowLoading(true);
+
+    setIsFollowing((prev) => !prev);
+    setFollowersCount((prev) => (isFollowing ? prev - 1 : prev + 1));
+
+    try {
+      if (isFollowing) {
+        await api.delete("/api/social/followers", { username });
+      } else {
+        await api.post("/api/social/followers", { username });
+      }
+    } catch {
+      setIsFollowing((prev) => !prev);
+      setFollowersCount((prev) => (isFollowing ? prev + 1 : prev - 1));
+    } finally {
+      setFollowLoading(false);
+    }
+  }, [username, isFollowing]);
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -112,6 +146,9 @@ export function useSocial(username?: string): SocialData {
     followersCount,
     likesCount,
     postsCount,
+    isFollowing,
+    toggleFollow,
+    followLoading,
     loading,
     error,
     refetch: fetchSocialData,

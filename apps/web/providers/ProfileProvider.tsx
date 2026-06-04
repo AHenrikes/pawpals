@@ -9,11 +9,11 @@ import React, {
   useState,
 } from "react";
 import { api } from "@/lib/api/api-client";
-import type { FursonaTypesWithID } from "@/types/fursona";
+import type { FursonaTypes } from "@/types/fursona";
 import { makeCache } from "@/lib/helpers/profile-cache";
 
 export type ProfileContextType = {
-  getProfile: (username: string) => Promise<FursonaTypesWithID | null>;
+  getProfile: (username: string) => Promise<FursonaTypes | null>;
   loading: boolean;
   error: string | null;
 };
@@ -30,22 +30,23 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 export function ProfileProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cacheRef = useRef(makeCache<FursonaTypesWithID>(CACHE_TTL));
+  const cacheRef = useRef(makeCache<FursonaTypes | null>(CACHE_TTL));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const getProfile = useCallback(
-    async (username: string): Promise<FursonaTypesWithID | null> => {
+    async (username: string): Promise<FursonaTypes | null> => {
       const cacheKey = username;
       try {
         setLoading(true);
         setError(null);
 
         const fursona = await cacheRef.current.get(cacheKey, async () => {
-          const data = await api.get<{ fursona: FursonaTypesWithID }>(
-            `/api/core/fursonas/username/${cacheKey}`,
+          const data = await api.get<{ fursonas: FursonaTypes[] }>(
+            `/api/search/fursonas/${cacheKey}`,
           );
-          return data.fursona;
+          // Return first match (most relevant)
+          return data.fursonas[0] || null;
         });
 
         setError(null);
