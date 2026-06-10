@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import type { FursonaTypesWithID } from "@/types/fursona";
+import type { FursonaTypesWithId } from "@/types/fursona";
 import type { RouteContext } from "@/lib/types/api";
 import {
   normalizeOptionalText,
@@ -13,7 +13,7 @@ import {
   notFound,
 } from "@/lib/api/responses";
 
-function buildPatchUpdates(body: FursonaTypesWithID) {
+function buildPatchUpdates(body: FursonaTypesWithId) {
   const updates: Record<string, unknown> = {};
 
   if (body.display_name !== undefined) {
@@ -67,7 +67,7 @@ export async function PATCH(
 
   if (!fursonaId) return badRequest("Missing fursona id.");
 
-  const body = (await request.json().catch(() => ({}))) as FursonaTypesWithID;
+  const body = (await request.json().catch(() => ({}))) as FursonaTypesWithId;
   const { updates, error } = buildPatchUpdates(body);
 
   if (error) return badRequest(error);
@@ -86,9 +86,7 @@ export async function PATCH(
       const { error: switchError } = await supabase.rpc(
         "switch_current_fursona",
         {
-          p_account_id: account.id,
           p_fursona_id: fursonaId,
-          p_updates: updates, // pass remaining field updates too
         },
       );
       if (switchError) return badRequest(switchError.message);

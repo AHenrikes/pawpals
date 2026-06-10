@@ -3,14 +3,13 @@ import { unauthorized, serverError, notFound } from "@/lib/api/responses";
 
 export async function GET() {
   const { supabase, account, response } = await requireUser();
-
   if (response) return response;
   if (account === null) return unauthorized();
 
   const { data: accountData, error } = await supabase
     .schema("core")
     .from("accounts")
-    .select("id, firstname, lastname, email, dob")
+    .select("id, firstname, lastname, email, dob, created_at")
     .eq("id", account.id)
     .maybeSingle();
 

@@ -1,30 +1,54 @@
 "use client";
 import React, { useState, useCallback } from "react";
+import { getErrorMessage } from "@/lib/helpers/error-utils";
 
-interface UseAuthFormOptions {
+interface UseFormOptions {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
+  resetOnSuccess?: boolean;
+}
+
+interface UseFormReturn<T> {
+  values: T;
+  setValues: (values: T | ((prev: T) => T)) => void;
+  error: string | null;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+  isLoading: boolean;
+  handleChange: (field: keyof T, value: string) => void;
+  handleSubmit: (e: React.SubmitEvent<HTMLFormElement>) => Promise<void>;
 }
 
 /**
- * Custom hook for managing auth form state and submission.
- * Centralizes form logic shared across LoginForm, SignUpForm, etc.
+ * Universal form hook for managing form state and submission.
+ * @example
+ * const { values, error, handleSubmit } = useForm(
+ *   { email: '', password: '' },
+ *   async (values) => await api.post('/login', values),
+ *   { onSuccess: () => router.push('/') }
+ * );
+ * 
+ * const { isLoading, error, handleSubmit } = useForm(
+ *   {},
+ *   async (values) => { ... },
+ *   { onSuccess: () => {} }
+ * );
  */
-export function useAuthForm<T extends Record<string, unknown>>(
+export function useForm<T extends Record<string, unknown>>(
   initialValues: T,
   onSubmit: (values: T) => Promise<void>,
-  options?: UseAuthFormOptions,
-) {
+  options?: UseFormOptions,
+): UseFormReturn<T> {
   const [values, setValues] = useState<T>(initialValues);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const onSuccess = options?.onSuccess;
-  const onError = options?.onError;
 
   const handleChange = useCallback((field: keyof T, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
     setError(null);
   }, []);
+
+  const clearError = useCallback(() => setError(null), []);
 
   const handleSubmit = useCallback(
     async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -34,18 +58,19 @@ export function useAuthForm<T extends Record<string, unknown>>(
 
       try {
         await onSubmit(values);
-        onSuccess?.();
+        if (options?.resetOnSuccess) {
+          setValues(initialValues);
+        }
+        options?.onSuccess?.();
       } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : "An error occurred";
+        const errorMessage = getErrorMessage(err);
         setError(errorMessage);
-        onError?.(err instanceof Error ? err : new Error(errorMessage));
+        options?.onError?.(err instanceof Error ? err : new Error(errorMessage));
       } finally {
         setIsLoading(false);
       }
     },
-
-    [values, onSubmit, onSuccess, onError],
+    [values, onSubmit, options, initialValues],
   );
 
   return {
@@ -53,8 +78,12 @@ export function useAuthForm<T extends Record<string, unknown>>(
     setValues,
     error,
     setError,
+    clearError,
     isLoading,
     handleChange,
     handleSubmit,
   };
 }
+
+// Backward compatibility exports
+export { useForm as useAuthForm };

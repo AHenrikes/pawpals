@@ -1,20 +1,22 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Textarea } from "@repo/ui/textarea";
 import { TypographySmall } from "@repo/ui/typography";
-import type { FursonaTypesWithID } from "@/types/fursona";
+import type { FursonaTypesWithId } from "@/types/fursona";
+import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
+import { useUser } from "@/providers/UserProvider";
+import { useCleanupBlobUrl } from "@/hooks/useCleanupBlobUrl";
 import { X, Camera } from "lucide-react";
-import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia"; // your upload fn from before
 import Image from "next/image";
 
 interface EditProfileModalProps {
-  fursona: FursonaTypesWithID;
+  fursona: FursonaTypesWithId;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updates: Partial<FursonaTypesWithID>) => Promise<void>;
+  onSave: (updates: Partial<FursonaTypesWithId>) => Promise<void>;
 }
 
 export function EditProfileModal({
@@ -23,6 +25,8 @@ export function EditProfileModal({
   onClose,
   onSave,
 }: Readonly<EditProfileModalProps>) {
+  const { account, currentFursona, refresh } = useUser();
+  
   const [loading, setLoading] = useState(false);
   const [displayName, setDisplayName] = useState(fursona.display_name);
   const [username, setUsername] = useState(fursona.username);
@@ -30,18 +34,34 @@ export function EditProfileModal({
   const [species, setSpecies] = useState(fursona.species || "");
   const [pronouns, setPronouns] = useState(fursona.pronouns || "");
   const [error, setError] = useState<string | null>(null);
-
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(
-    fursona.avatar_url ?? null,
-  );
-  const [bannerPreview, setBannerPreview] = useState<string | null>(
-    fursona.banner_url ?? null,
-  );
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(fursona.avatar_url);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(fursona.banner_url);
+
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview state when modal opens or fursona changes
+  useEffect(() => {
+    if (!isOpen) return;
+
+    setAvatarPreview(fursona.avatar_url);
+    setBannerPreview(fursona.banner_url);
+    setAvatarFile(null);
+    setBannerFile(null);
+    setError(null);
+    setDisplayName(fursona.display_name);
+    setUsername(fursona.username);
+    setBio(fursona.bio || "");
+    setSpecies(fursona.species || "");
+    setPronouns(fursona.pronouns || "");
+  }, [isOpen, fursona]);
+
+  // Cleanup blob URLs when component unmounts or preview changes
+  useCleanupBlobUrl(avatarPreview);
+  useCleanupBlobUrl(bannerPreview);
 
   if (!isOpen) return null;
 
@@ -54,9 +74,17 @@ export function EditProfileModal({
 
     const preview = URL.createObjectURL(file);
     if (type === "avatar") {
+      // Revoke old blob URL if it exists
+      if (avatarPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(avatarPreview);
+      }
       setAvatarFile(file);
       setAvatarPreview(preview);
     } else {
+      // Revoke old blob URL if it exists
+      if (bannerPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(bannerPreview);
+      }
       setBannerFile(file);
       setBannerPreview(preview);
     }
@@ -68,25 +96,32 @@ export function EditProfileModal({
       return;
     }
 
+    if (!account?.id) {
+      setError("Account not loaded - cannot upload");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
+      const fursonaId = currentFursona?.id ?? fursona.id;
+
       // Upload images first if changed
       const [newAvatarUrl, newBannerUrl] = await Promise.all([
         avatarFile
           ? uploadFursonaImage(
               avatarFile,
-              fursona.account_id,
-              fursona.id,
+              account.id,
+              fursonaId,
               "fursona-avatars",
             )
           : Promise.resolve(null),
         bannerFile
           ? uploadFursonaImage(
               bannerFile,
-              fursona.account_id,
-              fursona.id,
+              account.id,
+              fursonaId,
               "fursona-banners",
             )
           : Promise.resolve(null),
@@ -102,6 +137,9 @@ export function EditProfileModal({
         ...(newBannerUrl && { banner_url: newBannerUrl }),
       });
       onClose();
+      
+      // Refresh profile cache
+      await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save changes");
     } finally {

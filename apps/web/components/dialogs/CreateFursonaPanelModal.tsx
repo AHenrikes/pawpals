@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { TypographySmall } from "@repo/ui/typography";
-import type { FursonaTypes } from "@/types/fursona";
+import type { FursonaCreateTypes } from "@/types/fursona";
 import { X } from "lucide-react";
 import CreateFursona from "@/components/features/CreateFursona";
 import { motion } from "framer-motion";
 import { toast } from "@repo/ui/sonner";
-import { FormError } from "@repo/ui/form-error";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
 
@@ -27,9 +26,8 @@ export function CreateFursonaPanelModal({
   const { switchCurrentFursona } = useUser();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
-  const [fursona, setFursona] = useState<FursonaTypes>({
+  const [fursona, setFursona] = useState<FursonaCreateTypes>({
     display_name: "",
     username: "",
     species: "",
@@ -39,29 +37,27 @@ export function CreateFursonaPanelModal({
 
   if (!isOpen) return null;
 
-  const handleFursonaChange = (field: keyof FursonaTypes, value: string) => {
+  const handleFursonaChange = (field: keyof FursonaCreateTypes, value: string) => {
     setFursona((prev) => ({ ...prev, [field]: value }));
-    setError(null);
   };
 
   const handleCreate = async () => {
     if (!fursona.display_name.trim()) {
-      setError("Display name is required");
+      toast.error("Display name is required");
       return;
     }
 
     if (!fursona.username.trim()) {
-      setError("Username is required");
+      toast.error("Username is required");
       return;
     }
 
     if (!isUsernameAvailable) {
-      setError("Username is not available");
+      toast.error("Username is not available");
       return;
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const response = await fetch("/api/core/fursonas", {
@@ -94,10 +90,7 @@ export function CreateFursonaPanelModal({
       router.push(`/@${createdFursona.username}`);
       toast.success(`Created ${createdFursona.display_name} successfully`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create fursona");
-      toast.error(
-        err instanceof Error ? err.message : "Failed to create fursona",
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to create fursona");
     } finally {
       setLoading(false);
     }
@@ -112,7 +105,6 @@ export function CreateFursonaPanelModal({
         pronouns: "",
         bio: "",
       });
-      setError(null);
       onClose();
     }
   };
@@ -150,11 +142,11 @@ export function CreateFursonaPanelModal({
           />
         </div>
 
-        {error && (
+        {/* {error && (
           <div className="mb-4">
             <FormError message={error} />
           </div>
-        )}
+        )} */}
 
         <div className="flex gap-3">
           <Button

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
@@ -37,7 +37,7 @@ import {
 } from "@repo/ui/dropdown-menu";
 import { TypographyH4, TypographySmall } from "@repo/ui/typography";
 import { Searchbar } from "@/components/searchbar/Searchbar";
-import { useCurrentPath } from "@/hooks/useCurrentPath";
+import { useIsCurrentPath, useCurrentPath } from "@/hooks/useCurrentPath";
 
 function getInitials(name: string) {
   return name
@@ -55,13 +55,16 @@ export default function Header() {
     loading,
     signOut,
     refresh,
+    fetchFursonas,
     switchCurrentFursona,
   } = useUser();
   const [isFursonaListOpen, setIsFursonaListOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateFursonaOpen, setCreateFursonaOpen] = useState(false);
   const [switchingId, setSwitchingId] = useState<string | null>(null);
-  const path = useCurrentPath(`@${currentFursona?.username ?? ""}`);
+  const [, startTransition] = useTransition();
+  const isCurrentProfile = useIsCurrentPath(`@${currentFursona?.username}`);
+  const currentPath = useCurrentPath();
   const router = useRouter();
 
   const handleFursonaCreated = () => {
@@ -72,28 +75,22 @@ export default function Header() {
   const handleSwitchFursona = async (id: string) => {
     setIsFursonaListOpen(false);
     setIsMenuOpen(false);
+    setSwitchingId(id);
 
-    try {
-      setSwitchingId(id);
-
-      // Dropdown menu ui glitch
-      // Jumps to top left corner before profile switch
-      // TEMP fix: setTimout to wait for dropdown to close before switching profile
-      setTimeout(async () => {
+    startTransition(async () => {
+      try {
         await switchCurrentFursona(id);
 
         const newCurrentFursona = fursonas.find((f) => f.id === id);
         toast(`Switched to ${newCurrentFursona?.display_name ?? "fursona"}`);
-
-        router.refresh();
-      }, 350);
-    } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to switch fursona";
-      toast(msg);
-    } finally {
-      setSwitchingId(null);
-    }
+      } catch (err: unknown) {
+        const msg =
+          err instanceof Error ? err.message : "Failed to switch fursona";
+        toast(msg);
+      } finally {
+        setSwitchingId(null);
+      }
+    });
   };
 
   const displayName = useMemo(() => {
@@ -109,6 +106,13 @@ export default function Header() {
 
     if (!nextOpen) {
       setIsFursonaListOpen(false);
+    }
+  }
+
+  function handleFursonaListOpen(nextOpen: boolean) {
+    setIsFursonaListOpen(nextOpen);
+    if (nextOpen) {
+      void fetchFursonas();
     }
   }
 
@@ -141,7 +145,7 @@ export default function Header() {
           <DropdownMenu open={isMenuOpen} onOpenChange={handleMenuOpenChange}>
             <Collapsible
               open={isFursonaListOpen}
-              onOpenChange={setIsFursonaListOpen}
+              onOpenChange={handleFursonaListOpen}
             >
               {loading ? (
                 <Skeleton className="h-8 w-8 rounded-full" />
@@ -231,7 +235,7 @@ export default function Header() {
                             ) : (
                               <Link
                                 href={
-                                  path === true ? `/@${elem.username}` : path
+                                  isCurrentProfile ? `/@${elem.username}` : currentPath
                                 }
                                 onClick={() =>
                                   void handleSwitchFursona(elem.id)

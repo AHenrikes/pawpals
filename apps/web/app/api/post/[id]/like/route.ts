@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const username = searchParams.get("username");
 
   let fursonaId: string;
-  let isFollowing = false;
+  let isLiked = false;
 
   if (username) {
     // Viewing someone else's profile — look up by username
@@ -41,14 +41,14 @@ export async function GET(request: Request) {
       .single();
 
     if (myFursona) {
-      const { data: followRow } = await supabase
+      const { data: likeRow } = await supabase
         .schema("social")
-        .from("followers")
+        .from("fursona_likes")
         .select("id")
-        .eq("follower_fursona_id", myFursona.id)
-        .eq("following_fursona_id", fursonaId)
+        .eq("liker_fursona_id", myFursona.id)
+        .eq("liked_fursona_id", fursonaId)
         .maybeSingle();
-      isFollowing = !!followRow;
+      isLiked = !!likeRow;
     }
   } else {
     // No username — fetch current user's active fursona
@@ -65,18 +65,18 @@ export async function GET(request: Request) {
   }
 
   const { data: stats, error: statsError } = await supabase.rpc(
-    "get_fursona_follow_stats",
+    "get_profile_stats",
     { p_fursona_id: fursonaId },
   );
 
   if (statsError) return serverError(statsError.message);
 
   return NextResponse.json({
-    followers_count: stats?.followers_count ?? 0,
-    following_count: stats?.following_count ?? 0,
-    following: (stats?.following ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
-    followers: (stats?.followers ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
-    is_following: isFollowing,
+    likes_received_count: stats?.likes_received_count ?? 0,
+    // likes_given_count: stats?.likes_given_count ?? 0,
+    // liked_by: (stats?.liked_by ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
+    // likes_given: (stats?.likes_given ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
+    is_liked: isLiked,
   });
 }
 
@@ -111,14 +111,17 @@ export async function POST(request: Request) {
   if (myFursona.id === targetFursona.id)
     return badRequest("Cannot follow yourself!");
 
-  const { error } = await supabase.schema("social").from("followers").insert({
-    follower_fursona_id: myFursona.id,
-    following_fursona_id: targetFursona.id,
-  });
+  const { error } = await supabase
+    .schema("social")
+    .from("fursona_likes")
+    .insert({
+      liker_fuserona_id: myFursona.id,
+      liked_fursona_id: targetFursona.id,
+    });
 
   if (error) {
     if (error.code === "23505") {
-      return NextResponse.json({ error: "Already following" }, { status: 409 });
+      return NextResponse.json({ error: "Already liked" }, { status: 409 });
     }
 
     return serverError(error.message);
@@ -160,10 +163,10 @@ export async function DELETE(request: Request) {
 
   const { error } = await supabase
     .schema("social")
-    .from("followers")
+    .from("fursona_likes")
     .delete()
-    .eq("follower_fursona_id", myFursona.id)
-    .eq("following_fursona_id", targetFursona.id);
+    .eq("liker_fursona_id", myFursona.id)
+    .eq("liked_fursona_id", targetFursona.id);
 
   if (error) return serverError(error.message);
 

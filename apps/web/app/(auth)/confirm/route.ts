@@ -19,18 +19,18 @@ export async function GET(request: NextRequest) {
     const metadata = user.user_metadata ?? {};
     const initFursona = metadata.onboarding_init_fursona;
 
-    const { error } = await supabase.rpc("create_account_with_fursona", {
-      p_user_id: user.id,
-      p_firstname: metadata.firstname,
-      p_lastname: metadata.lastname,
-      p_email: user.email,
-      p_dob: metadata.dob,
-      p_display_name: initFursona.display_name,
-      p_username: initFursona.username,
-      p_species: initFursona.species ?? null,
-      p_pronouns: initFursona.pronouns ?? null,
-      p_bio: initFursona.bio ?? null,
-    });
+  const { error } = await supabase.rpc("create_account", {
+    p_user_id: user.id,
+    p_firstname: metadata.firstname,
+    p_lastname: metadata.lastname,
+    p_email: user.email,
+    p_dob: metadata.dob,
+    p_display_name: initFursona.display_name,
+    p_username: initFursona.username,
+    p_species: initFursona.species ?? null,
+    p_pronouns: initFursona.pronouns ?? null,
+    p_bio: initFursona.bio ?? null,
+  });
 
     if (error) errorRedirect(error.message);
   };

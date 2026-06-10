@@ -1,13 +1,21 @@
+"use client";
+
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
-import type { FursonaTypes } from "@/types/fursona";
 import { AtSign, Check, X, Loader2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import { useEffect, useState } from "react";
+import { useUsernameManager } from "@/hooks/useUsernameManager";
 
 type CreateFursonaProps = {
-  fursona: FursonaTypes;
+  fursona: {
+    display_name: string;
+    username: string;
+    species: string | null;
+    pronouns: string | null;
+    bio: string | null;
+  };
   onFursonaChange: (
     field: "display_name" | "username" | "species" | "pronouns" | "bio",
     value: string,
@@ -22,9 +30,8 @@ export default function CreateFursona({
   isActive,
   onUsernameAvailability,
 }: Readonly<CreateFursonaProps>) {
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
-    null,
-  );
+  const { checkAvailability } = useUsernameManager();
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
 
   const display_name = fursona.display_name.trim();
@@ -39,26 +46,15 @@ export default function CreateFursona({
       onFursonaChange("username", usernameSuggestion);
     }
   };
-
+  
   const checkUsername = useDebouncedCallback(async (username: string) => {
-    if (!username || username.trim().length < 3) {
-      setUsernameAvailable(null);
-      onUsernameAvailability?.(false);
-      return;
-    }
-
+    onUsernameAvailability?.(false);
     setCheckingUsername(true);
-    try {
-      const res = await fetch(`/api/search/username/${username.trim()}`);
-      const available = res.status === 404;
-      setUsernameAvailable(available);
-      onUsernameAvailability?.(available);
-    } catch {
-      setUsernameAvailable(null);
-      onUsernameAvailability?.(false);
-    } finally {
-      setCheckingUsername(false);
-    }
+
+    const res = await checkAvailability(username);
+    setUsernameAvailable(res.available);
+    onUsernameAvailability?.(res.available);
+    setCheckingUsername(false);
   }, 500);
 
   useEffect(() => {

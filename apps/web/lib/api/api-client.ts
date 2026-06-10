@@ -23,7 +23,7 @@ class APIClient {
   }
 
   /**
-   * Centralized error handling
+   * Centralized error handling with sanitization
    */
   private async handleResponse<T>(
     response: Response,
@@ -34,7 +34,12 @@ class APIClient {
 
       try {
         const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
+        // Sanitize error messages to prevent exposing sensitive information
+        if (response.status === 500) {
+          errorMessage = "Server error occurred. Please try again later.";
+        } else {
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        }
       } catch {
         errorMessage = response.statusText || errorMessage;
       }
@@ -77,44 +82,42 @@ class APIClient {
   }
 
   /**
-   * POST request
+   * Unified request method for POST, PATCH, DELETE
    */
-  async post<T = unknown>(endpoint: string, body?: unknown): Promise<T> {
+  private async request<T = unknown>(
+    method: "POST" | "PATCH" | "DELETE",
+    endpoint: string,
+    body?: unknown,
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const response = await fetch(url, {
-      method: "POST",
+      method,
       headers: this.defaultHeaders,
       body: body ? JSON.stringify(body) : undefined,
     });
 
     return this.handleResponse<T>(response, endpoint);
+  }
+
+  /**
+   * POST request
+   */
+  async post<T = unknown>(endpoint: string, body?: unknown): Promise<T> {
+    return this.request<T>("POST", endpoint, body);
   }
 
   /**
    * PATCH request
    */
   async patch<T = unknown>(endpoint: string, body?: unknown): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, {
-      method: "PATCH",
-      headers: this.defaultHeaders,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    return this.handleResponse<T>(response, endpoint);
+    return this.request<T>("PATCH", endpoint, body);
   }
 
   /**
    * DELETE request
    */
   async delete<T = unknown>(endpoint: string, body?: unknown): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: this.defaultHeaders,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    return this.handleResponse<T>(response, endpoint);
+    return this.request<T>("DELETE", endpoint, body);
   }
 }
 

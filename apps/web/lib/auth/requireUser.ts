@@ -26,17 +26,29 @@ export async function requireUser() {
   const { data: account, error: accountError } = await supabase
     .schema("core")
     .from("accounts")
-    .select("id, firstname, lastname, email, dob, role") 
+    .select("id, firstname, lastname, email, dob")
     .eq("user_id", user.id)
     .single();
 
-  if (accountError || !account) {
+  if (accountError) {
     return {
       supabase,
       user: null,
       account: null,
       response: NextResponse.json(
-        { error: "Account not found" },
+        { error: `Account query failed: ${accountError.message}` },
+        { status: 404 },
+      ),
+    };
+  }
+
+  if (!account) {
+    return {
+      supabase,
+      user: null,
+      account: null,
+      response: NextResponse.json(
+        { error: "Account not WTF" },
         { status: 404 },
       ),
     };
