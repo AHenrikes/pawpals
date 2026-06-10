@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import Header from "@/components/navigation/Header";
 import MainNav from "@/components/navigation/MainNav";
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
 import { UserProvider } from "@/providers/UserProvider";
-import Header from "@/components/navigation/Header";
 import { requireUser } from "@/lib/auth/requireUser";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { redirect } from "next/navigation";

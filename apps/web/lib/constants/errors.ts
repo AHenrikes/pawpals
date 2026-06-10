@@ -45,5 +45,5 @@ export const ERROR_MESSAGES = {
   NOT_FOUND: "Resource not found.",
 
   // General
-  SOMETHING_WENT_WRONG: "Something went wrong. Please try again.",
+  SOMETHING_WENT_WRONG: "Something went wrong. Please try again later.",
 } as const;

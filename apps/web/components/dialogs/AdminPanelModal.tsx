@@ -80,7 +80,7 @@ export function AdminPanelModal({
           )}
         </div>
 
-        {!action ? (
+        {action ? (
           <div className="space-y-2">
             <Button
               variant="outline"

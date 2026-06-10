@@ -1,4 +1,5 @@
 "use client";
+
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { TypographyH1, TypographyP } from "@repo/ui/typography";
 import Link from "next/link";
