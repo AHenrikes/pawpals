@@ -73,8 +73,6 @@ export default function Header() {
   };
 
   const handleSwitchFursona = async (id: string) => {
-    setIsFursonaListOpen(false);
-    setIsMenuOpen(false);
     setSwitchingId(id);
 
     startTransition(async () => {
@@ -89,6 +87,12 @@ export default function Header() {
         toast(msg);
       } finally {
         setSwitchingId(null);
+        setIsMenuOpen(false);
+
+        // Wait for menu to close
+        setTimeout(() => {
+          setIsFursonaListOpen(false);
+        }, 350)
       }
     });
   };

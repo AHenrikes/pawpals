@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/helpers/utils";
 import { PawPrint } from "lucide-react";
+import { motion } from "framer-motion";
 import {
   useState,
   useCallback,
@@ -144,31 +145,28 @@ export function Sidebar({
   ...props
 }: SidebarProps) {
   const { state, openMobile, setOpenMobile } = useSidebar();
-
   const isCollapsed = collapsible !== "none" && state === "collapsed";
 
   return (
     <>
-      <aside
+      <motion.aside
         data-slot="sidebar"
         data-side={side}
         data-variant={variant}
         data-state={state}
         data-collapsible={isCollapsed ? collapsible : ""}
+        animate={{ width: isCollapsed ? "6rem" : "20rem" }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "relative hidden h-svh mt-16 pt-8 shrink-0 border-r border-border/60 bg-surface-container-low/80 md:flex",
-          "transition-[width] duration-200 ease-linear px-4",
+          "relative hidden h-svh mt-16 pt-8 shrink-0 border-r border-border/60 bg-surface-container-low/80 md:flex overflow-hidden px-4",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
-          isCollapsed && collapsible === "icon"
-            ? "w-[--sidebar-width-icon]"
-            : "w-[--sidebar-width]",
           variant === "floating" && "m-2 rounded-2xl border",
           className,
         )}
-        {...props}
+        {...(props as React.ComponentProps<typeof motion.aside>)}
       >
         <div className="flex h-full w-full flex-col gap-4">{children}</div>
-      </aside>
+      </motion.aside>
 
       <div
         className={cn(
