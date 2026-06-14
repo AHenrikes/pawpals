@@ -121,7 +121,7 @@ export default function Header() {
   }
 
   const accountMenuGroup = [
-    { href: `/${currentFursona?.username}`, label: "Fursona", icon: User },
+    { href: `/@${currentFursona?.username}`, label: "Fursona", icon: User },
     { href: AUTH_ROUTES.SETTINGS, label: "Settings", icon: Settings },
   ];
 
@@ -134,7 +134,7 @@ export default function Header() {
   const count = fursonas.length;
 
   return (
-    <header className="absolute w-full h-16 left-0 border-b border-popover bg-background/90 backdrop-blur z-50">
+    <header className="sticky top-0 w-full h-16 border-b border-popover bg-background backdrop-blur z-50">
       <div className="mx-auto flex h-full w-full items-center justify-between px-2 md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
@@ -143,7 +143,7 @@ export default function Header() {
           </Link>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Searchbar />
 
           <DropdownMenu open={isMenuOpen} onOpenChange={handleMenuOpenChange}>
@@ -155,7 +155,10 @@ export default function Header() {
                 <Skeleton className="h-8 w-8 rounded-full" />
               ) : (
                 <DropdownMenuTrigger asChild>
-                  <Button variant={"none"} className="p-0 focus-visible:ring-0">
+                  <Button 
+                    variant={"none"}
+                    className="p-0 focus-visible:ring-0"
+                  >
                     <Avatar size="sm">
                       <AvatarImage
                         src={`${currentFursona?.avatar_url}`}

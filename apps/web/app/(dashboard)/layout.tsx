@@ -21,16 +21,16 @@ export default async function DashboardLayout({
   return (
     <div id="DashboardLayout">
       <UserProvider>
-        <SidebarProvider>
-          <MainNav />
+        <SidebarProvider className="flex flex-col">
+          <Header />
 
-          <div className="flex w-svw h-svh">
-            <Header />
+          <SidebarInset>
+            <MainNav />
 
-            <SidebarInset className="overflow-y-auto pt-16">
+            <div className="w-full">
               {children}
-            </SidebarInset>
-          </div>
+            </div>
+          </SidebarInset>
         </SidebarProvider>
       </UserProvider>
     </div>

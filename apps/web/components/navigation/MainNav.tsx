@@ -51,9 +51,9 @@ export default function MainNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useUser();
-  const { state } = useSidebar();
+  const { state, openMobile, isMobile } = useSidebar();
 
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = isMobile ? !openMobile : state === "collapsed";
   const handleSignOut = async () => {
     await signOut();
     router.push(AUTH_ROUTES.SIGN_IN);
@@ -63,9 +63,9 @@ export default function MainNav() {
   return (
     <Sidebar
       collapsible="icon"
-      className="h-[calc(100svh-64px)] group/sidebar border-transparent shrink-0"
+      className="group/sidebar border-transparent shrink-0"
     >
-      <SidebarContent className="gap-10">
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -74,10 +74,14 @@ export default function MainNav() {
 
                 return (
                   <SidebarMenuItem key={label}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton 
+                      asChild
+                      isActive={isActive}
+                      className=""
+                    >
                       <Link 
                         href={href}
-                        className="hover:bg-surface-highest"
+                        className="hover:bg-surface-highest p-3"
                         draggable="false"
                       >
                         <Icon className={cn("h-6 w-6  shrink-0", !isActive && "opacity-60")} />
