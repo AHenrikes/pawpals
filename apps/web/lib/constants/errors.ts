@@ -15,6 +15,7 @@ export const ERROR_MESSAGES = {
   SEARCH_NO_RESULTS: "No results found",
 
   // Profile/Account
+  ACCOUNT_NOT_FOUND: "Could not find account.",
   ACCOUNT_NOT_LOADED: "Account not loaded - cannot upload",
   PROFILE_UPDATE_FAILED: "Failed to update profile",
   PROFILE_LOAD_FAILED: "Failed to load profile",
@@ -26,8 +27,15 @@ export const ERROR_MESSAGES = {
   UNLIKE_FAILED: "Failed to unlike fursona",
 
   // Fursona management
+  FURSONA_NOT_IDENTIFIED: "Failed to identify fursona",
+  FURSONA_NOT_FOUND: "Failed to find fursona.",
+  FURSONAS_NOT_FOUND: "Failed to find fursonas.",
+  FURSONA_NAME_REQUIRED: "Fursona name required.",
+  FURSONA_USERNAME_REQUIRED: "Fursona username required.",
+  FURSONA_NAME_TOO_LONG: "The display name is too long",
   FURSONA_CREATE_FAILED: "Failed to create fursona",
   FURSONA_UPDATE_FAILED: "Failed to update fursona",
+  FURSONA_USERNAME_FORMAT: "Invalid username format: 3-50 characters, alphanumeric/underscore/hyphen only.",
   FURSONA_DELETE_FAILED: "Failed to delete fursona",
   FURSONA_SWITCH_FAILED: "Failed to switch fursona",
   MAX_FURSONAS_REACHED: "Maximum number of fursonas reached",

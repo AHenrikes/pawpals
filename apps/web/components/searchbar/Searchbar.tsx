@@ -3,20 +3,20 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Label } from "@repo/ui/label";
 import { Loader2, SearchIcon } from "lucide-react";
-import Link from "next/link";
 import { TypographyLead, TypographyXSmall } from "@repo/ui/typography";
 import { useRouter } from "next/navigation";
 import { useProfileSearch } from "@/hooks/useProfileSearch";
 import { createPortal } from "react-dom";
+import type { FursonaSearch } from "@/types/fursona";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/input-group";
-import type { FursonaSearchResult } from "@/types/fursona";
 import { Kbd } from "@repo/ui/kbd";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@repo/ui/button";
+import Link from "next/link";
 
 type SearchType = "fursona" | "nav" | null;
 
@@ -27,7 +27,7 @@ interface NavOption {
 
 interface SearchResult {
   type: "fursona" | "nav";
-  data: FursonaSearchResult | NavOption;
+  data: FursonaSearch | NavOption;
 }
 
 const NAV_OPTIONS: NavOption[] = [
@@ -101,7 +101,7 @@ export function Searchbar() {
     if (e.key === "Enter" && results.length > 0) {
       const first = results[0];
       const href = first?.type === "fursona"
-        ? `/@${(first.data as FursonaSearchResult).username}`
+        ? `/@${(first.data as FursonaSearch).username}`
         : (first?.data as NavOption).path;
       router.push(href);
       handleClose();
@@ -213,7 +213,7 @@ export function Searchbar() {
                           {results
                             .filter((r) => r.type === "fursona")
                             .map((r) => {
-                              const f = r.data as FursonaSearchResult;
+                              const f = r.data as FursonaSearch;
                               return (
                                 <Link
                                   key={f.username}

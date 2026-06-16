@@ -12,16 +12,16 @@ import React, {
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
-import type { FursonaTypesWithId } from "@/types/fursona";
-import type { AccountTypesWithRole } from "@/types/account";
 import { makeCache } from "@/lib/helpers/profile-cache";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useRouter } from "next/navigation";
+import type { AccountTypes } from "@/types/account";
+import type { FursonaTypes } from "@/types/fursona";
 
 export type UserContextType = {
-  account: AccountTypesWithRole | null;
-  fursonas: FursonaTypesWithId[];
-  currentFursona: FursonaTypesWithId | null;
+  account: AccountTypes | null;
+  fursonas: FursonaTypes[];
+  currentFursona: FursonaTypes | null;
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
@@ -38,12 +38,12 @@ export function UserProvider({
   const supabase = useSupabaseClient();
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
-  const fursonasCacheRef = useRef(makeCache<FursonaTypesWithId[]>());
+  const fursonasCacheRef = useRef(makeCache<FursonaTypes[]>());
   const router = useRouter();
 
-  const [account, setAccount] = useState<AccountTypesWithRole | null>(null);
-  const [fursonas, setFursonas] = useState<FursonaTypesWithId[]>([]);
-  const [currentFursona, setCurrentFursona] = useState<FursonaTypesWithId | null>(null);
+  const [account, setAccount] = useState<AccountTypes | null>(null);
+  const [fursonas, setFursonas] = useState<FursonaTypes[]>([]);
+  const [currentFursona, setCurrentFursona] = useState<FursonaTypes | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -71,57 +71,24 @@ export function UserProvider({
     setState({ loading: true, error: null });
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError) throw authError;
-      if (!authData.user) {
-        clearAuthState();
-        return;
-      }
+      const res = await api.get<{
+        account: AccountTypes;
+        currentFursona: FursonaTypes | null;
+      }>("/api/core/account");
 
-      const { data: profileRows, error: rpcError } = await supabase.rpc('get_user_profile');
-      if (rpcError) throw rpcError;
+      setState({
+        account: {
+          ...res.account,
+          dob: new Date(res.account.dob),
+          created_at: new Date(res.account.created_at),
+          updated_at: new Date(res.account.updated_at),
+        },
+        currentFursona: res.currentFursona,
+      });
 
-      if (!profileRows || profileRows.length === 0) {
-        await supabase.auth.signOut();
-        return;
-      }
-
-      const profile = profileRows[0];
-
-      const account: AccountTypesWithRole = {
-        id: profile.account_id,
-        firstname: profile.account_firstname,
-        lastname: profile.account_lastname,
-        email: profile.account_email,
-        dob: new Date(profile.account_dob),
-        account_role: profile.account_role,
-        created_at: new Date(profile.account_created_at),
-        updated_at: new Date(profile.account_updated_at),
-      };
-
-      const currentFursona: FursonaTypesWithId | null = profile.current_fursona_id ? {
-        id: profile.current_fursona_id,
-        account_id: account.id,
-        username: profile.current_fursona_username,
-        display_name: profile.current_fursona_display_name,
-        avatar_url: profile.current_fursona_avatar_url,
-        banner_url: profile.current_fursona_banner_url,
-        species: profile.current_fursona_species,
-        pronouns: profile.current_fursona_pronouns,
-        bio: profile.current_fursona_bio,
-        reputation: profile.current_fursona_reputation,
-        created_at: profile.current_fursona_created_at,
-        updated_at: profile.current_fursona_updated_at,
-        is_default: profile.current_fursona_is_default,
-        is_current: true,
-      } : null;
-
-      setState({ account, currentFursona });
       initialLoadDone.current = true;
-
     } catch (err: unknown) {
-      if (err && typeof err === "object" && "status" in err &&
-          (err as { status: number }).status === 401) {
+      if (err && typeof err === "object" && "status" in err && (err as { status: number }).status === 401) {
         await supabase.auth.signOut();
         return;
       }
@@ -129,12 +96,12 @@ export function UserProvider({
     } finally {
       setState({ loading: false });
     }
-  }, [supabase, clearAuthState, setState]);
+}, [supabase, setState]);
 
   const fetchFursonas = useCallback(async () => {
     try {
       const fursonas = await fursonasCacheRef.current.get("fursonas", async () => {
-        const res = await api.get<{ fursonas: FursonaTypesWithId[] }>("/api/core/fursonas");
+        const res = await api.get<{ fursonas: FursonaTypes[] }>("/api/core/fursona");
         return res.fursonas ?? [];
       });
       setState({ fursonas });
@@ -192,7 +159,7 @@ export function UserProvider({
       try {
         setState({ loading: true, error: null });
 
-        const res = await api.patch<{ fursona: FursonaTypesWithId }>(
+        const res = await api.patch<{ fursona: FursonaTypes }>(
           `/api/profile/me/${fursonaId}`,
           { is_current: true },
         );
@@ -206,6 +173,7 @@ export function UserProvider({
         }));
 
         setState({ fursonas: next, currentFursona: updated });
+
         fursonasCacheRef.current.set("fursonas", next);
       } catch (err) {
         setState({ error: toError(err) });

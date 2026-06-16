@@ -241,12 +241,8 @@ export default function Header() {
                               </span>
                             ) : (
                               <Link
-                                href={
-                                  isCurrentProfile ? `/@${elem.username}` : currentPath
-                                }
-                                onClick={() =>
-                                  void handleSwitchFursona(elem.id)
-                                }
+                                href={ isCurrentProfile ? `/@${elem.username}` : currentPath }
+                                onClick={() => void handleSwitchFursona(elem.id) }
                                 className={
                                   "flex w-full items-center justify-between text-start font-semibold"
                                 }

@@ -44,7 +44,7 @@ export function useProfileCounts(username?: string): SocialData {
         like_count: number;
         post_count: number;
         reputation_count: number;
-      }>(`/api/core/fursonas/${username}/counts`);
+      }>(`/api/core/fursona/${username}/counts`);
 
       setSocial({
         follower: data.follower_count ?? 0,

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { TypographySmall } from "@repo/ui/typography";
-import type { FursonaCreateTypes } from "@/types/fursona";
+import type { FursonaCreate } from "@/types/fursona";
 import { X } from "lucide-react";
 import CreateFursona from "@/components/features/CreateFursona";
 import { motion } from "framer-motion";
@@ -27,7 +27,7 @@ export function CreateFursonaPanelModal({
 
   const [loading, setLoading] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
-  const [fursona, setFursona] = useState<FursonaCreateTypes>({
+  const [fursona, setFursona] = useState<FursonaCreate>({
     display_name: "",
     username: "",
     species: "",
@@ -37,7 +37,7 @@ export function CreateFursonaPanelModal({
 
   if (!isOpen) return null;
 
-  const handleFursonaChange = (field: keyof FursonaCreateTypes, value: string) => {
+  const handleFursonaChange = (field: keyof FursonaCreate, value: string) => {
     setFursona((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -60,7 +60,7 @@ export function CreateFursonaPanelModal({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/core/fursonas", {
+      const response = await fetch("/api/core/fursona", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(fursona),
@@ -141,12 +141,6 @@ export function CreateFursonaPanelModal({
             onUsernameAvailability={setIsUsernameAvailable}
           />
         </div>
-
-        {/* {error && (
-          <div className="mb-4">
-            <FormError message={error} />
-          </div>
-        )} */}
 
         <div className="flex gap-3">
           <Button

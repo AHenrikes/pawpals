@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import type { FursonaTypesWithId } from "@/types/fursona";
+import type { FursonaInput, FursonaWithBoolean } from "@/types/fursona";
 import type { RouteContext } from "@/lib/types/api";
 import {
   normalizeOptionalText,
@@ -11,9 +11,11 @@ import {
   badRequest,
   serverError,
   notFound,
+  ok,
 } from "@/lib/api/responses";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 
-function buildPatchUpdates(body: FursonaTypesWithId) {
+function buildPatchUpdates(body: FursonaWithBoolean) {
   const updates: Record<string, unknown> = {};
 
   if (body.display_name !== undefined) {
@@ -59,15 +61,13 @@ export async function PATCH(
   context: RouteContext<{ id: string }>,
 ) {
   const { supabase, account, response } = await requireUser();
-
-  if (response) return response;
   if (account === null) return unauthorized();
+  if (response) return response;
 
   const { id: fursonaId } = await context.params;
+  if (!fursonaId) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
-  if (!fursonaId) return badRequest("Missing fursona id.");
-
-  const body = (await request.json().catch(() => ({}))) as FursonaTypesWithId;
+  const body = (await request.json().catch(() => ({}))) as FursonaWithBoolean;
   const { updates, error } = buildPatchUpdates(body);
 
   if (error) return badRequest(error);
@@ -76,20 +76,17 @@ export async function PATCH(
   const isSettingCurrent = body.is_current === true;
   const isSettingDefault = body.is_default === true;
 
-  if (!hasUpdates && !isSettingDefault) {
-    return badRequest("No valid fields to update.");
-  }
+  if (!hasUpdates && !isSettingDefault) return badRequest("No valid fields to update.");
 
   if (hasUpdates) {
     if (isSettingCurrent) {
-      // Use a transaction-safe RPC to atomically switch is_current
       const { error: switchError } = await supabase.rpc(
         "switch_current_fursona",
         {
           p_fursona_id: fursonaId,
         },
       );
-      if (switchError) return badRequest(switchError.message);
+      if (switchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
     } else {
       const { error: updateError } = await supabase
         .schema("core")
@@ -98,7 +95,7 @@ export async function PATCH(
         .eq("id", fursonaId)
         .eq("account_id", account.id);
 
-      if (updateError) return badRequest(updateError.message);
+      if (updateError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
     }
   }
 
@@ -109,29 +106,30 @@ export async function PATCH(
         p_fursona_id: fursonaId,
       },
     );
-    if (setDefaultError) return badRequest(setDefaultError.message);
+
+    if (setDefaultError) {
+      badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    };
   }
 
   const { data: fursona, error: fetchError } = await supabase
     .schema("core")
     .from("fursonas")
     .select(
-      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current",
+      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, updated_at",
     )
     .eq("id", fursonaId)
     .eq("account_id", account.id)
     .maybeSingle();
 
-  if (fetchError) return serverError(fetchError.message);
-  if (!fursona) return notFound("Fursona not found.");
+  if (fetchError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+  if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  return new Response(JSON.stringify({ fursona }), {
-    headers: { "Content-Type": "application/json" },
-  });
+  return ok<{ fursona: FursonaInput }>({ fursona });
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   context: RouteContext<{ id: string }>,
 ) {
   const { supabase, account, response } = await requireUser();
@@ -140,7 +138,7 @@ export async function DELETE(
 
   const { id: fursonaId } = await context.params;
 
-  if (!fursonaId) return badRequest("Missing fursona id.");
+  if (!fursonaId) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
   // Verify user has at least one fursona after deletion
   const { count, error: countError } = await supabase
@@ -149,9 +147,9 @@ export async function DELETE(
     .select("id", { count: "exact", head: true })
     .eq("account_id", account.id);
 
-  if (countError) return serverError(countError.message);
+  if (countError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if ((count ?? 0) <= 1) {
-    return badRequest("At least one fursona is required.");
+    return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   }
 
   // Delete the fursona
@@ -164,7 +162,5 @@ export async function DELETE(
 
   if (deleteError) return badRequest(deleteError.message);
 
-  return new Response(JSON.stringify({ ok: true }), {
-    headers: { "Content-Type": "application/json" },
-  });
+  return ok({ ok: true })
 }

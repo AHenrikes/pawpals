@@ -1,3 +1,6 @@
+import { ok, serverError } from "@/lib/api/responses";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import { FursonaSearch } from "@/types/fursona";
 import { createServer } from "@repo/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,13 +13,14 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createServer();
 
-  const { data, error } = await supabase.rpc("search_fursonas", {
-    search_term: term,
-  });
+  const { data, error } = await supabase
+    .schema("core")
+    .rpc("search_fursonas", {
+      search_term: term,
+    }
+  );
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
-  return NextResponse.json({ fursonas: data ?? [] });
+  return ok<{ fursonas: FursonaSearch }>({ fursonas: data ?? [] });
 }

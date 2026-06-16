@@ -7,21 +7,22 @@ import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { useFollow } from "@/hooks/useFollow";
 import {
   TypographyH2,
   TypographyLead,
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { SquarePen, ShieldAlert, Flag, MessageCircle, Ellipsis, EllipsisVerticalIcon, TriangleAlertIcon } from "lucide-react";
+import { EllipsisVerticalIcon } from "lucide-react";
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
-import type { FursonaTypes, FursonaTypesWithId } from "@/types/fursona";
+import type { FursonaProfile, FursonaTypes } from "@/types/fursona";
 import ProfilePost from "@/components/ProfilePost";
 import ProfileRepost from "@/components/ProfileRepost";
 import Image from "next/image";
@@ -54,11 +55,11 @@ const profileNav = [
 type ContentKey = typeof profileNav[number]["key"];
 
 export default function ProfilePage() {
-  const router = useRouter();
-
-  const { account, currentFursona, loading: userLoading } = useUser();
+  const { currentFursona, refresh, loading: userLoading } = useUser();
   const { username: paramUsername } = useParams<{ username: string }>();
-  const { following, follower, like, } = useProfileCounts(paramUsername);
+  const { following, follower, refetch, like, } = useProfileCounts(paramUsername);
+  const { isFollowing, toggle: follow, loading: followLoading } = useFollow(paramUsername);
+
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [content, setContent] = useState<ContentKey>("post");
   const [direction, setDirection] = useState(0);
@@ -69,21 +70,21 @@ export default function ProfilePage() {
     isOwnProfile ? "" : paramUsername
   );
 
-  const viewedFursona: FursonaTypes | FursonaTypesWithId | null = isOwnProfile
+  const viewedFursona: FursonaProfile | null = isOwnProfile
     ? currentFursona
     : profile;
 
   const isLoading = isOwnProfile ? userLoading || !currentFursona : profileLoading;
 
-  const handleEditSave = async (updates: Partial<FursonaTypesWithId>) => {
+  const handleEditSave = async (updates: Partial<FursonaTypes>) => {
     if (!isOwnProfile || !viewedFursona) throw new Error("Cannot edit other profiles");
     try {
-      await api.patch<{ fursona: FursonaTypesWithId }>(
-        `/api/profile/me/${(viewedFursona as FursonaTypesWithId).id}`,
+      await api.patch<{ fursona: FursonaTypes }>(
+        `/api/profile/me/${(viewedFursona as FursonaTypes).id}`,
         updates,
       );
       toast.success("Fursona updated");
-      router.refresh();
+      refresh()
     } catch (err) {
       const message = getErrorMessage(err);
       toast.error(`Update failed: ${message}`);
@@ -105,6 +106,16 @@ export default function ProfilePage() {
   };
 
   if (isLoading || !viewedFursona) return null;
+  
+  let followLabel = "";
+  
+  if(followLoading) {
+    followLabel = "...";
+  } else if (isFollowing) {
+    followLabel = "Unfollow";
+  } else {
+    followLabel = "Follow";
+  }
   
   return (
     <>
@@ -169,22 +180,34 @@ export default function ProfilePage() {
                       <AvatarFallback>{getInitials(viewedFursona.display_name)}</AvatarFallback>
                     </Avatar>
 
-                    <div className="relative top-5 hidden px-2 sm:block">
-                      <TypographyH2 className="text-xl sm:text-2xl truncate">{viewedFursona.display_name}</TypographyH2>
-                      <TypographySmall className="text-muted-foreground">@{viewedFursona.username}</TypographySmall>
+                    <div className="hidden relative px-2 top-5 sm:flex flex-1 flex-col sm:max-w-52 xl:max-w-full">
+                      <TypographyH2 className="truncate text-xl sm:text-2xl">
+                        {viewedFursona.display_name}
+                      </TypographyH2>
+
+                      <TypographySmall className="text-muted-foreground truncate">
+                        @{viewedFursona.username}
+                      </TypographySmall>
                     </div>
                   </div>
 
                   <div className="relative top-4 flex items-center gap-4">
                     {isOwnProfile ? (
-                      <Button
-                        onClick={() => setIsEditOpen(true)}
-                      >
+                      <Button onClick={() => setIsEditOpen(true)}>
                         <p>Edit Profile</p>
                       </Button>
                     ) : (
-                      <Button>
-                        <p>Follow</p>
+                      <Button 
+                        onClick={() => {
+                          follow();
+                          
+                          setTimeout(() => {
+                            refetch();
+                          }, 350)
+                        }}
+                        disabled={followLoading}
+                      >
+                        { followLoading ? "..." : followLabel }
                       </Button>
                     )}
 
@@ -226,8 +249,8 @@ export default function ProfilePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
               >
-                <TypographyXSmall className="text-muted-foreground">
-                  { viewedFursona?.bio }
+                <TypographyXSmall className="block max-w-xl text-muted-foreground break-words">
+                    { viewedFursona?.bio }
                 </TypographyXSmall>
 
                 <div className="flex gap-3 sm:gap-6 justify-start">
@@ -240,8 +263,9 @@ export default function ProfilePage() {
                       <TypographyLead className="font-bold text-lg sm:text-xl">
                         {formatNumbers(count)}
                       </TypographyLead>
+
                       <TypographyXSmall className="text-muted-foreground text-xs">
-                        {label}
+                        { label }
                       </TypographyXSmall>
                     </div>
                   ))}
@@ -293,7 +317,7 @@ export default function ProfilePage() {
       {/* Modals */}
       {isOwnProfile && viewedFursona && (
         <EditProfileModal
-          fursona={viewedFursona as FursonaTypesWithId}
+          fursona={viewedFursona as FursonaTypes}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
           onSave={handleEditSave}

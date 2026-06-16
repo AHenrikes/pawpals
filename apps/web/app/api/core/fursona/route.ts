@@ -1,56 +1,57 @@
+import { requireUser } from "@/lib/auth/requireUser";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { type NextRequest } from "next/server";
-import type { FursonaTypesWithId } from "@/types/fursona";
+import type { FursonaWithBoolean, FursonaInput } from "@/types/fursona";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
-import { requireUser } from "@/lib/auth/requireUser";
 import {
   unauthorized,
   badRequest,
-  serverError
+  serverError,
+  ok
 } from "@/lib/api/responses";
 
 export async function GET() {
   const { supabase, account, response } = await requireUser();
-  if (response) return response;
   if (account === null) return unauthorized();
+  if (response) return response;
 
   const { data: fursonas, error } = await supabase
     .schema("core")
     .from("fursonas")
     .select(
-      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, created_at",
+      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, reputation, is_current, is_default, created_at, updated_at",
     )
     .eq("account_id", account.id)
     .order("created_at", { ascending: true });
 
-  if (error) return serverError(error.message);
+  if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (!fursonas) return badRequest(ERROR_MESSAGES.FURSONAS_NOT_FOUND);
 
-  return new Response(JSON.stringify({ fursonas: fursonas ?? [] }), {
-    headers: { "Content-Type": "application/json" },
-  });
+  return ok<{ fursonas: FursonaWithBoolean[] }>({fursonas: fursonas ?? []});
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   const { supabase, account, response } = await requireUser();
-  if (response) return response;
   if (account === null) return unauthorized();
+  if (response) return response;
 
-  const body = (await request.json().catch(() => ({}))) as FursonaTypesWithId;
+  const body = (await req.json().catch(() => ({}))) as FursonaWithBoolean;
   const display_name = normalizeRequiredName(body.display_name);
   const username = normalizeOptionalText(body.username);
 
   if (display_name.length === 0) {
-    return badRequest("Fursona name is required.");
+    return badRequest(ERROR_MESSAGES.FURSONA_NAME_REQUIRED);
   }
 
   if (!username || username.length === 0) {
-    return badRequest("Username is required.");
+    return badRequest(ERROR_MESSAGES.FURSONA_USERNAME_REQUIRED);
   }
 
   if (!/^[a-zA-Z0-9_-]{3,50}$/.test(username)) {
-    return badRequest("Invalid username format: 3-50 characters, alphanumeric/underscore/hyphen only");
+    return badRequest(ERROR_MESSAGES.FURSONA_USERNAME_FORMAT);
   }
 
   const { data: inserted, error } = await supabase
@@ -65,25 +66,23 @@ export async function POST(request: NextRequest) {
       species: normalizeOptionalText(body.species),
       pronouns: normalizeOptionalText(body.pronouns),
       bio: normalizeOptionalText(body.bio),
+      updated_at: new Date(),
       is_default: body.is_default ?? false,
       is_current: body.is_current ?? false,
     })
     .select(
-      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, created_at",
+      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, updated_at",
     )
     .single();
 
-  if (error) return badRequest(error.message);
+  if (error) return badRequest(ERROR_MESSAGES.FURSONA_UPDATE_FAILED);
 
   // A transaction-safe RPC to switch current fursona
   const { error: switchError } = await supabase.rpc("switch_current_fursona",
     { p_fursona_id: inserted.id }
   );
 
-  if (switchError) return badRequest(switchError.message);
+  if (switchError) return badRequest(ERROR_MESSAGES.FURSONA_SWITCH_FAILED);
 
-  return new Response(JSON.stringify({ fursona: inserted }), {
-    status: 201,
-    headers: { "Content-Type": "application/json" },
-  });
+  return ok<{ fursona: FursonaInput }>({ fursona: inserted });
 }

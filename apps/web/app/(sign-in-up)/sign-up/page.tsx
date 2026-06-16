@@ -9,7 +9,7 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import CreateFursona from "@/components/features/CreateFursona";
-import type { FursonaCreateTypes } from "@/types/fursona";
+import type { FursonaCreate } from "@/types/fursona";
 import { Button } from "@repo/ui/button";
 import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
@@ -26,7 +26,7 @@ type SignUpValues = {
   dobYear: string;
   password: string;
   confirmPassword: string;
-  initFursona: FursonaCreateTypes;
+  initFursona: FursonaCreate;
 };
 
 export default function SignUpForm() {
@@ -165,7 +165,7 @@ export default function SignUpForm() {
     setStep("fursona");
   };
 
-  const updateMainFursona = (field: keyof FursonaCreateTypes, value: string) => {
+  const updateMainFursona = (field: keyof FursonaCreate, value: string) => {
     setValues((prev) => ({
       ...prev,
       initFursona: { ...prev.initFursona, [field]: value },
@@ -201,7 +201,7 @@ export default function SignUpForm() {
           <motion.div
             layout
             transition={stepTransition}
-            className="relative overflow-hidden px-1"
+            className="relative overflow-hidden px-1 py-1"
           >
             <AnimatePresence mode="wait" initial={false}>
               {step === "account" ? (

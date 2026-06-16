@@ -7,15 +7,10 @@ import { AtSign, Check, X, Loader2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import { useEffect, useState } from "react";
 import { useUsernameManager } from "@/hooks/useUsernameManager";
+import { type FursonaCreate } from "@/types/fursona";
 
 type CreateFursonaProps = {
-  fursona: {
-    display_name: string;
-    username: string;
-    species: string | null;
-    pronouns: string | null;
-    bio: string | null;
-  };
+  fursona: FursonaCreate;
   onFursonaChange: (
     field: "display_name" | "username" | "species" | "pronouns" | "bio",
     value: string,
@@ -30,9 +25,8 @@ export default function CreateFursona({
   isActive,
   onUsernameAvailability,
 }: Readonly<CreateFursonaProps>) {
-  const { checkAvailability } = useUsernameManager();
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const [checkingUsername, setCheckingUsername] = useState(false);
+  const { checkAvailability, loading } = useUsernameManager();
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
   const display_name = fursona.display_name.trim();
   const species = (fursona.species ?? "").trim();
@@ -49,12 +43,10 @@ export default function CreateFursona({
   
   const checkUsername = useDebouncedCallback(async (username: string) => {
     onUsernameAvailability?.(false);
-    setCheckingUsername(true);
 
     const res = await checkAvailability(username);
-    setUsernameAvailable(res.available);
+    setIsAvailable(res.available);
     onUsernameAvailability?.(res.available);
-    setCheckingUsername(false);
   }, 500);
 
   useEffect(() => {
@@ -98,18 +90,18 @@ export default function CreateFursona({
             onFocus={seedUsernameSuggestion}
             variant={"auth"}
             className="pl-8 pr-8"
-            error={!checkingUsername && usernameAvailable === false}
+            error={isAvailable === false}
             required
           />
 
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {checkingUsername && (
+            {loading && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             )}
-            {!checkingUsername && usernameAvailable === true && (
+            {!loading && isAvailable === true && (
               <Check className="h-4 w-4 text-green-500" />
             )}
-            {!checkingUsername && usernameAvailable === false && (
+            {!loading && isAvailable === false && (
               <X className="h-4 w-4 text-destructive" />
             )}
           </div>

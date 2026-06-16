@@ -5,18 +5,18 @@ import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Textarea } from "@repo/ui/textarea";
 import { TypographySmall } from "@repo/ui/typography";
-import type { FursonaTypesWithId } from "@/types/fursona";
 import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
 import { useUser } from "@/providers/UserProvider";
 import { useCleanupBlobUrl } from "@/hooks/useCleanupBlobUrl";
 import { X, Camera } from "lucide-react";
+import type { FursonaTypes } from "@/types/fursona";
 import Image from "next/image";
 
 interface EditProfileModalProps {
-  fursona: FursonaTypesWithId;
+  fursona: FursonaTypes;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updates: Partial<FursonaTypesWithId>) => Promise<void>;
+  onSave: (updates: Partial<FursonaTypes>) => Promise<void>;
 }
 
 export function EditProfileModal({

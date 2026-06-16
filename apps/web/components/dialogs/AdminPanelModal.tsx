@@ -8,12 +8,12 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import type { FursonaTypesWithId } from "@/types/fursona";
+import type { FursonaTypes } from "@/types/fursona";
 import type { AccountTypeWithId } from "@/types/account";
 import { X, AlertTriangle } from "lucide-react";
 
 interface AdminPanelModalProps {
-  fursona: FursonaTypesWithId;
+  fursona: FursonaTypes;
   account?: AccountTypeWithId | null;
   isOpen: boolean;
   onClose: () => void;

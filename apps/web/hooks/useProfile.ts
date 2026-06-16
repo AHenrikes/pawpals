@@ -21,7 +21,7 @@ export function useProfile(username: string) {
 
     profileCache
       .get(username, async () => {
-        const res = await fetch(`/api/core/fursonas/${encodeURIComponent(username)}`);
+        const res = await fetch(`/api/core/fursona/${encodeURIComponent(username)}`);
 
         if (res.status === 404) return null;
         if (!res.ok) {
