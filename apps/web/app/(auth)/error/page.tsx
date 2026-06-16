@@ -25,8 +25,8 @@ export default function Page({
   searchParams,
 }: Readonly<{ searchParams: Promise<{ error: string }> }>) {
   return (
-    <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <Card>
+    <main className="container grid place-content-center h-svh mx-auto">
+      <Card className="text-center space-y-2">
         <CardHeader>
           <CardTitle className="text-2xl">
             Sorry, something went wrong.

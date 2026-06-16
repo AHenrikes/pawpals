@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -8,7 +9,7 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import CreateFursona from "@/components/features/CreateFursona";
-import type { FursonaTypes } from "@/types/fursona";
+import type { FursonaCreate } from "@/types/fursona";
 import { Button } from "@repo/ui/button";
 import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
@@ -25,7 +26,7 @@ type SignUpValues = {
   dobYear: string;
   password: string;
   confirmPassword: string;
-  initFursona: FursonaTypes;
+  initFursona: FursonaCreate;
 };
 
 export default function SignUpForm() {
@@ -33,8 +34,7 @@ export default function SignUpForm() {
   const supabase = useSupabaseClient();
   const prefersReducedMotion = useReducedMotion();
   const [step, setStep] = useState<"account" | "fursona">("account");
-  const [isUsernameAvailable, setIsUsernameAvailable] =
-    useState<boolean>(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean>(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const stepTransition = prefersReducedMotion
     ? { duration: 0 }
@@ -118,7 +118,7 @@ export default function SignUpForm() {
         throw new Error("Username already taken");
       }
 
-      // TODO temp local dev testing
+      // Temporary local development testing - remove before production
       const origin =
         globalThis.window?.location?.origin ?? "http://192.168.1.219:3000";
 
@@ -137,7 +137,7 @@ export default function SignUpForm() {
         },
       });
 
-      //TODO add email error
+      // TODO: Implement email validation error display
       if (error) throw error;
 
       router.push(AUTH_ROUTES.SIGNUP_SUCCESS);
@@ -165,7 +165,7 @@ export default function SignUpForm() {
     setStep("fursona");
   };
 
-  const updateMainFursona = (field: keyof FursonaTypes, value: string) => {
+  const updateMainFursona = (field: keyof FursonaCreate, value: string) => {
     setValues((prev) => ({
       ...prev,
       initFursona: { ...prev.initFursona, [field]: value },
@@ -192,11 +192,16 @@ export default function SignUpForm() {
           </Link>
         </CardHeader>
 
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+        <form 
+          ref={formRef}
+          className="space-y-5"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+        >
           <motion.div
             layout
             transition={stepTransition}
-            className="relative overflow-hidden px-1"
+            className="relative overflow-hidden px-1 py-1"
           >
             <AnimatePresence mode="wait" initial={false}>
               {step === "account" ? (
@@ -224,6 +229,7 @@ export default function SignUpForm() {
                         variant={"auth"}
                         autoFocus={step === "account"}
                         required
+                        
                       />
                     </div>
 

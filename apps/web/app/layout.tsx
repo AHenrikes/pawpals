@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { SmoothScroll } from "@/components/ui/SmoothScroll";
-import "./pawpals.css";
 import { Toaster } from "@repo/ui/sonner";
+import "./pawpals.css";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -37,21 +36,16 @@ export default function RootLayout({
       <body
         className={`${displayFont.variable} ${bodyFont.variable} antialiased`}
       >
-        <div id="smooth-wrapper">
-          <div id="smooth-content">
-            <SmoothScroll />
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Toaster position="top-center" />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Toaster position="top-center" />
 
-              {children}
-            </ThemeProvider>
-          </div>
-        </div>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,8 +1,8 @@
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { createServer } from "@repo/supabase/server";
-import { type User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { redirect } from "next/navigation";
+import { type User } from "@supabase/supabase-js";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const metadata = user.user_metadata ?? {};
     const initFursona = metadata.onboarding_init_fursona;
 
-    const { error } = await supabase.rpc("create_account_with_fursona", {
+    const { error } = await supabase.rpc("create_account", {
       p_user_id: user.id,
       p_firstname: metadata.firstname,
       p_lastname: metadata.lastname,
@@ -37,24 +37,19 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const { data, error } = await supabase.auth.verifyOtp({ type, token_hash });
+
     if (error) errorRedirect(error.message);
     if (data.user) await handleUser(data.user);
-    const safeNext = next?.startsWith("/") ? next : "/";
-    return NextResponse.redirect(new URL(safeNext, request.url));
-  }
+  } else if (code) {
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (code) {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.exchangeCodeForSession(code);
     if (error) errorRedirect(error.message);
     if (user) await handleUser(user);
-    const safeNext = next?.startsWith("/") ? next : "/";
-    return NextResponse.redirect(new URL(safeNext, request.url));
+  } else {
+    return NextResponse.redirect(new URL(`/error?error=No token hash or type`, request.url));
   }
 
-  return NextResponse.redirect(
-    new URL(`/error?error=No token hash or type`, request.url),
-  );
+  const safeNext = next?.startsWith("/") ? next : "/";
+  await supabase.auth.updateUser({ data: { onboarding_init_fursona: null } });
+  return NextResponse.redirect(new URL(safeNext, request.url));
 }

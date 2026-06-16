@@ -12,21 +12,22 @@ import React, {
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
-import type { FursonaTypesWithID } from "@/types/fursona";
-import type { AccountTypesWithID } from "@/types/account";
-import type { User } from "@supabase/supabase-js";
 import { makeCache } from "@/lib/helpers/profile-cache";
+import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { useRouter } from "next/navigation";
+import type { AccountTypes } from "@/types/account";
+import type { FursonaTypes } from "@/types/fursona";
 
 export type UserContextType = {
-  user: User | null;
-  account: AccountTypesWithID | null;
-  fursonas: FursonaTypesWithID[];
-  currentFursona: FursonaTypesWithID | null;
+  account: AccountTypes | null;
+  fursonas: FursonaTypes[];
+  currentFursona: FursonaTypes | null;
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
-  switchCurrentFursona: (id: number) => Promise<void>;
+  fetchFursonas: () => Promise<void>
+  switchCurrentFursona: (id: string) => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -37,18 +38,17 @@ export function UserProvider({
   const supabase = useSupabaseClient();
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
+  const fursonasCacheRef = useRef(makeCache<FursonaTypes[]>());
+  const router = useRouter();
 
-  const [user, setUser] = useState<User | null>(null);
-  const [account, setAccount] = useState<AccountTypesWithID | null>(null);
-  const [fursonas, setFursonas] = useState<FursonaTypesWithID[]>([]);
-  const [currentFursona, setCurrentFursona] =
-    useState<FursonaTypesWithID | null>(null);
+  const [account, setAccount] = useState<AccountTypes | null>(null);
+  const [fursonas, setFursonas] = useState<FursonaTypes[]>([]);
+  const [currentFursona, setCurrentFursona] = useState<FursonaTypes | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
   const setState = useCallback((updates: Partial<UserContextType>) => {
     if (!isMountedRef.current) return;
-    if ("user" in updates) setUser(updates.user ?? null);
     if ("account" in updates) setAccount(updates.account ?? null);
     if ("fursonas" in updates) setFursonas(updates.fursonas ?? []);
     if ("currentFursona" in updates)
@@ -58,8 +58,8 @@ export function UserProvider({
   }, []);
 
   const clearAuthState = useCallback(() => {
+    fursonasCacheRef.current.clear();
     setState({
-      user: null,
       account: null,
       fursonas: [],
       currentFursona: null,
@@ -68,70 +68,47 @@ export function UserProvider({
   }, [setState]);
 
   const refresh = useCallback(async () => {
+    setState({ loading: true, error: null });
+
     try {
-      setState({ loading: true, error: null });
+      const res = await api.get<{
+        account: AccountTypes;
+        currentFursona: FursonaTypes | null;
+      }>("/api/core/account");
 
-      // Get authenticated user
-      const { data: authData, error: authError } =
-        await supabase.auth.getUser();
-      if (authError) throw authError;
+      setState({
+        account: {
+          ...res.account,
+          dob: new Date(res.account.dob),
+          created_at: new Date(res.account.created_at),
+          updated_at: new Date(res.account.updated_at),
+        },
+        currentFursona: res.currentFursona,
+      });
 
-      const authUser = authData.user ?? null;
-      setState({ user: authUser });
-
-      if (!authUser) {
-        clearAuthState();
+      initialLoadDone.current = true;
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "status" in err && (err as { status: number }).status === 401) {
+        await supabase.auth.signOut();
         return;
       }
-
-      // Fetch user data in parallel using centralized API client (cache fursonas)
-      try {
-        const fursonasCache = makeCache<FursonaTypesWithID[]>();
-
-        const fursonasKey = `user:${authUser.id}:fursonas`;
-
-        const [accountData, nextFursonas] = await Promise.all([
-          api.get<{ account: AccountTypesWithID }>("/api/core/accounts"),
-          fursonasCache.get(fursonasKey, async () => {
-            const res = await api.get<{ fursonas: FursonaTypesWithID[] }>(
-              "/api/core/fursonas",
-            );
-            return res.fursonas ?? [];
-          }),
-        ]);
-
-        const currentFursona =
-          nextFursonas.find((f: FursonaTypesWithID) => f.is_current) ??
-          nextFursonas[0] ??
-          null;
-
-        setState({
-          account: accountData.account ?? null,
-          fursonas: nextFursonas,
-          currentFursona: currentFursona,
-        });
-      } catch (err: unknown) {
-        // Check if error is 401 (unauthorized)
-        if (
-          err &&
-          typeof err === "object" &&
-          "status" in err &&
-          (err as { status: number }).status === 401
-        ) {
-          await supabase.auth.signOut();
-          return;
-        }
-        throw err;
-      }
-    } catch (err) {
-      if (isMountedRef.current) {
-        const error = toError(err);
-        setState({ error });
-      }
+      if (isMountedRef.current) setState({ error: toError(err) });
     } finally {
       setState({ loading: false });
     }
-  }, [supabase, clearAuthState, setState]);
+}, [supabase, setState]);
+
+  const fetchFursonas = useCallback(async () => {
+    try {
+      const fursonas = await fursonasCacheRef.current.get("fursonas", async () => {
+        const res = await api.get<{ fursonas: FursonaTypes[] }>("/api/core/fursona");
+        return res.fursonas ?? [];
+      });
+      setState({ fursonas });
+    } catch (err) {
+      setState({ error: toError(err) });
+    }
+  }, [setState]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -143,6 +120,7 @@ export function UserProvider({
       if (event === "SIGNED_OUT") {
         clearAuthState();
         setState({ loading: false });
+        router.push(AUTH_ROUTES.SIGN_IN);
         return;
       }
 
@@ -165,7 +143,7 @@ export function UserProvider({
       isMountedRef.current = false;
       data?.subscription?.unsubscribe();
     };
-  }, [refresh, supabase, clearAuthState, setState]);
+  }, [router, refresh, supabase, clearAuthState, setState]);
 
   const signOut = useCallback(async () => {
     try {
@@ -177,12 +155,12 @@ export function UserProvider({
   }, [supabase, setState]);
 
   const switchCurrentFursona = useCallback(
-    async (fursonaId: number) => {
+    async (fursonaId: string) => {
       try {
         setState({ loading: true, error: null });
 
-        const res = await api.patch<{ fursona: FursonaTypesWithID }>(
-          `/api/core/fursonas/${fursonaId}`,
+        const res = await api.patch<{ fursona: FursonaTypes }>(
+          `/api/profile/me/${fursonaId}`,
           { is_current: true },
         );
 
@@ -195,11 +173,11 @@ export function UserProvider({
         }));
 
         setState({ fursonas: next, currentFursona: updated });
-        
+
+        fursonasCacheRef.current.set("fursonas", next);
       } catch (err) {
         setState({ error: toError(err) });
         throw err;
-
       } finally {
         setState({ loading: false });
       }
@@ -209,7 +187,6 @@ export function UserProvider({
 
   const value: UserContextType = useMemo(
     () => ({
-      user,
       account,
       fursonas,
       currentFursona,
@@ -217,9 +194,20 @@ export function UserProvider({
       error,
       refresh,
       signOut,
+      fetchFursonas,
       switchCurrentFursona,
     }),
-    [user, account, fursonas, currentFursona, loading, error, refresh, signOut, switchCurrentFursona],
+    [
+      account,
+      fursonas,
+      currentFursona,
+      loading,
+      error,
+      refresh,
+      signOut,
+      fetchFursonas,
+      switchCurrentFursona,
+    ],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

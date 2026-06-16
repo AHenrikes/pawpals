@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { cn } from "@/lib/helpers/utils";
+import { Button } from "@repo/ui/button";
+import { useUser } from "@/providers/UserProvider";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Home,
   PawPrint,
@@ -16,8 +18,6 @@ import {
   PlusIcon,
   LogOutIcon,
 } from "lucide-react";
-import { Button } from "@repo/ui/button";
-import { useUser } from "@/providers/UserProvider";
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +27,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/providers/SidebarProvider";
+import type { LucideIcon } from "lucide-react";
 
 type MainNavItem = {
   href: string;
@@ -49,7 +51,9 @@ export default function MainNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useUser();
+  const { state, openMobile, isMobile } = useSidebar();
 
+  const isCollapsed = isMobile ? !openMobile : state === "collapsed";
   const handleSignOut = async () => {
     await signOut();
     router.push(AUTH_ROUTES.SIGN_IN);
@@ -59,9 +63,9 @@ export default function MainNav() {
   return (
     <Sidebar
       collapsible="icon"
-      className="h-[calc(100svh-64px)] group/sidebar border-transparent shrink-0"
+      className="group/sidebar border-transparent shrink-0"
     >
-      <SidebarContent className="gap-10">
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -70,17 +74,32 @@ export default function MainNav() {
 
                 return (
                   <SidebarMenuItem key={label}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={href} className="hover:bg-surface-highest" draggable="false">
-                        <Icon
-                          className={cn(
-                            "h-5 w-5 shrink-0",
-                            !isActive && "opacity-60",
+                    <SidebarMenuButton 
+                      asChild
+                      isActive={isActive}
+                      className=""
+                    >
+                      <Link 
+                        href={href}
+                        className="hover:bg-surface-highest p-3"
+                        draggable="false"
+                      >
+                        <Icon className={cn("h-6 w-6  shrink-0", !isActive && "opacity-60")} />
+
+                        <AnimatePresence initial={false}>
+                          {!isCollapsed && (
+                            <motion.span
+                              key="label"
+                              initial={{ opacity: 0, width: 0 }}
+                              animate={{ opacity: 1, width: "auto" }}
+                              exit={{ opacity: 0, width: 0 }}
+                              transition={{ duration: 0.15, ease: "easeInOut" }}
+                              className="truncate overflow-hidden whitespace-nowrap"
+                            >
+                              {label}
+                            </motion.span>
                           )}
-                        />
-                        <span className="truncate group-data-[collapsible=icon]/sidebar:hidden">
-                          {label}
-                        </span>
+                        </AnimatePresence>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -91,31 +110,49 @@ export default function MainNav() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
-        <Button asChild className="mt-3 h-10 w-full rounded-full">
-          <div>
-            <span className="group-data-[collapsible=icon]/sidebar:hidden">
-              POST
-            </span>
-            <span className="hidden group-data-[collapsible=icon]/sidebar:inline">
-              <PlusIcon className="h-5 w-5" />
-            </span>
-          </div>
+      <SidebarFooter className="flex flex-col">
+        <Button
+          className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
+        >
+          <PlusIcon className="h-6 w-6 shrink-0" />
+
+          <AnimatePresence initial={false}>
+            {!isCollapsed && (
+              <motion.span
+                key="post-label"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.15, ease: "easeInOut" }}
+                className="overflow-hidden whitespace-nowrap"
+              >
+                POST
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Button>
 
         <Button
           variant="outline"
           onClick={handleSignOut}
-          className="mt-3 h-10 w-full rounded-full"
+          className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
         >
-          <div>
-            <span className="group-data-[collapsible=icon]/sidebar:hidden">
-              Sign out
-            </span>
-            <span className="hidden group-data-[collapsible=icon]/sidebar:inline">
-              <LogOutIcon className="h-5 w-5" />
-            </span>
-          </div>
+          <LogOutIcon className="h-6 w-6 p-[2px] shrink-0" />
+
+          <AnimatePresence initial={false}>
+            {!isCollapsed && (
+              <motion.span
+                key="signout-label"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.15, ease: "easeInOut" }}
+                className="overflow-hidden whitespace-nowrap"
+              >
+                Sign Out
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Button>
       </SidebarFooter>
     </Sidebar>

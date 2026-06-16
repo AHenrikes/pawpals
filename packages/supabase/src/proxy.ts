@@ -39,9 +39,13 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   const protectedPaths = ["/api","/pawspot", "/store", "/messages", "/community", "/pawpal-meet", "/notifications", "/settings"];
+  const publicApiPaths = ["/api/search/username/"];
   const pathname = request.nextUrl.pathname;
 
-  if (protectedPaths.some((path) => pathname.startsWith(path)) && !user) {
+  // Check if this is a public API route that doesn't require auth
+  const isPublicApi = publicApiPaths.some((path) => pathname.startsWith(path));
+  
+  if (!isPublicApi && protectedPaths.some((path) => pathname.startsWith(path)) && !user) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";

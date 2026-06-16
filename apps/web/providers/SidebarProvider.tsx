@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/helpers/utils";
 import { PawPrint } from "lucide-react";
+import { motion } from "framer-motion";
 import {
   useState,
   useCallback,
@@ -25,7 +26,7 @@ const SidebarContext = createContext<SidebarContextValue | null>(null);
 
 const SIDEBAR_WIDTH = "20rem";
 const SIDEBAR_WIDTH_ICON = "6rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "20rem";
 
 export function useSidebar() {
   const context = useContext(SidebarContext);
@@ -112,7 +113,7 @@ export function SidebarProvider({
       <div
         data-slot="sidebar-provider"
         data-state={contextValue.state}
-        className={cn("group/sidebar-wrapper flex min-h-svh w-full", className)}
+        className={cn("group/sidebar-wrapper flex w-full", className)}
         style={
           {
             "--sidebar-width": SIDEBAR_WIDTH,
@@ -144,52 +145,54 @@ export function Sidebar({
   ...props
 }: SidebarProps) {
   const { state, openMobile, setOpenMobile } = useSidebar();
-
   const isCollapsed = collapsible !== "none" && state === "collapsed";
 
   return (
     <>
-      <aside
+      <motion.aside
         data-slot="sidebar"
         data-side={side}
         data-variant={variant}
         data-state={state}
         data-collapsible={isCollapsed ? collapsible : ""}
+        animate={{ width: isCollapsed ? "6rem" : "20rem" }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "relative hidden h-svh mt-16 pt-8 shrink-0 border-r border-border/60 bg-surface-container-low/80 md:flex",
-          "transition-[width] duration-200 ease-linear px-4",
+          "sticky top-16 hidden pl-5 pr-6 py-4 h-[calc(100svh-64px)] shrink-0 bg-surface-container-low/80 overflow-hidden md:flex",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
-          isCollapsed && collapsible === "icon"
-            ? "w-[--sidebar-width-icon]"
-            : "w-[--sidebar-width]",
           variant === "floating" && "m-2 rounded-2xl border",
           className,
         )}
-        {...props}
+        {...(props as React.ComponentProps<typeof motion.aside>)}
       >
         <div className="flex h-full w-full flex-col gap-4">{children}</div>
-      </aside>
+      </motion.aside>
 
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-black/50 transition-opacity md:hidden",
-          openMobile ? "opacity-100" : "pointer-events-none opacity-0",
+          "absolute inset-0 z-40 bg-black/50 transition-opacity hidden",
+          openMobile ? "opacity-100 block" : "pointer-events-none opacity-0",
         )}
         onClick={() => setOpenMobile(false)}
         aria-hidden="true"
       />
 
-      <aside
+      <motion.aside
         data-mobile="true"
+        data-side={side}
+        data-variant={variant}
+         data-state={openMobile ? "expanded" : "collapsed"}
+        animate={{ width: isCollapsed ? "w-[--sidebar-width-mobile]" : "" }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "fixed inset-y-0 left-0 mt-16 pt-8 z-40 w-[--sidebar-width-mobile] border-r border-border bg-background transition-transform md:hidden",
+         "group/sidebar fixed top-16 py-4 px-2 h-[calc(100svh-64px)] z-40 w-[--sidebar-width-mobile] border-r border-border bg-background transition-transform md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex h-full flex-col rounded-xl bg-surface-container-highest/60">
           {children}
         </div>
-      </aside>
+      </motion.aside>
     </>
   );
 }
@@ -214,7 +217,7 @@ export function SidebarFooter({
   return (
     <div
       data-slot="sidebar-footer"
-      className={cn("mt-auto p-3", className)}
+      className={cn("mt-auto", className)}
       {...props}
     />
   );
@@ -228,7 +231,7 @@ export function SidebarContent({
     <div
       data-slot="sidebar-content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 pb-2",
+        "flex flex-1 flex-col gap-2 overflow-y-auto",
         className,
       )}
       {...props}
@@ -358,7 +361,7 @@ export function SidebarInset({
     <main
       data-slot="sidebar-inset"
       data-state={state}
-      className={cn("min-h-svh flex-1", className)}
+      className={cn("flex flex-1", className)}
       {...props}
     />
   );

@@ -1,4 +1,5 @@
 "use client";
+
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";

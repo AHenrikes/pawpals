@@ -8,13 +8,13 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import type { FursonaTypesWithID } from "@/types/fursona";
-import type { AccountTypesWithID } from "@/types/account";
+import type { FursonaTypes } from "@/types/fursona";
+import type { AccountTypeWithId } from "@/types/account";
 import { X, AlertTriangle } from "lucide-react";
 
 interface AdminPanelModalProps {
-  fursona: FursonaTypesWithID;
-  account?: AccountTypesWithID | null;
+  fursona: FursonaTypes;
+  account?: AccountTypeWithId | null;
   isOpen: boolean;
   onClose: () => void;
   onSuspend: (reason: string) => Promise<void>;
@@ -80,7 +80,7 @@ export function AdminPanelModal({
           )}
         </div>
 
-        {!action ? (
+        {action ? (
           <div className="space-y-2">
             <Button
               variant="outline"

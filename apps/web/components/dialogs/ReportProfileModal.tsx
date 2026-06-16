@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
-import type { FursonaTypesWithID } from "@/types/fursona";
+import type { FursonaTypes } from "@/types/fursona";
 import { X } from "lucide-react";
 
 interface ReportProfileModalProps {
-  fursona: FursonaTypesWithID;
+  fursona: FursonaTypes;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (reason: string, details: string) => Promise<void>;
