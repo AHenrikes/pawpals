@@ -38,7 +38,7 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const protectedPaths = ["/api","/pawspot", "/store", "/messages", "/community", "/pawpal-meet", "/notifications", "/settings"];
+  const protectedPaths = ["/api","/@", "/pawspot", "/store", "/messages", "/community", "/pawpal-meet", "/notifications", "/settings"];
   const publicApiPaths = ["/api/search/username/"];
   const pathname = request.nextUrl.pathname;
 

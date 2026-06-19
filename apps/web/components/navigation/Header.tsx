@@ -134,7 +134,7 @@ export default function Header() {
   const count = fursonas.length;
 
   return (
-    <header className="sticky top-0 w-full h-16 border-b border-popover bg-background backdrop-blur z-50">
+    <header className="sticky top-0 w-full h-16 border-b border-popover bg-background backdrop-blur z-40">
       <div className="mx-auto flex h-full w-full items-center justify-between px-2 md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />

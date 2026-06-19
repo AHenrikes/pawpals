@@ -7,6 +7,7 @@ import { cn } from "@/lib/helpers/utils";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useState } from "react";
 import {
   Home,
   PawPrint,
@@ -30,6 +31,7 @@ import {
   useSidebar,
 } from "@/providers/SidebarProvider";
 import type { LucideIcon } from "lucide-react";
+import PostModal from "@/components/dialogs/PostModal"
 
 type MainNavItem = {
   href: string;
@@ -53,12 +55,15 @@ export default function MainNav() {
   const { signOut } = useUser();
   const { state, openMobile, isMobile } = useSidebar();
 
+  const [postOpen, setPostOpen] = useState(false)
+
   const isCollapsed = isMobile ? !openMobile : state === "collapsed";
-  const handleSignOut = async () => {
-    await signOut();
-    router.push(AUTH_ROUTES.SIGN_IN);
-    router.refresh();
-  };
+
+  const handleSignOut = useCallback(async () => {
+    await signOut()
+    router.push(AUTH_ROUTES.SIGN_IN)
+    router.refresh()
+  }, [signOut, router])
 
   return (
     <Sidebar
@@ -86,7 +91,7 @@ export default function MainNav() {
                       >
                         <Icon className={cn("h-6 w-6  shrink-0", !isActive && "opacity-60")} />
 
-                        <AnimatePresence initial={false}>
+                        <AnimatePresence initial={false} mode="wait">
                           {!isCollapsed && (
                             <motion.span
                               key="label"
@@ -110,13 +115,14 @@ export default function MainNav() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="flex flex-col">
+      <SidebarFooter className="flex flex-col px-1">
         <Button
-          className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
+          onClick={() => setPostOpen(true)}
+          className={cn("mt-3 h-10 rounded-full shadow-none", !isCollapsed && "w-full")}
         >
           <PlusIcon className="h-6 w-6 shrink-0" />
 
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} mode="wait">
             {!isCollapsed && (
               <motion.span
                 key="post-label"
@@ -139,7 +145,7 @@ export default function MainNav() {
         >
           <LogOutIcon className="h-6 w-6 p-[2px] shrink-0" />
 
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} mode="wait">
             {!isCollapsed && (
               <motion.span
                 key="signout-label"
@@ -155,6 +161,11 @@ export default function MainNav() {
           </AnimatePresence>
         </Button>
       </SidebarFooter>
+
+      <PostModal
+        isOpen={postOpen}
+        onClose={() => setPostOpen(false)}
+      />
     </Sidebar>
   );
 }

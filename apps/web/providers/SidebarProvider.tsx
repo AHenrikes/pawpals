@@ -170,7 +170,7 @@ export function Sidebar({
 
       <div
         className={cn(
-          "absolute inset-0 z-40 bg-black/50 transition-opacity hidden",
+          "absolute inset-0 top-16 z-40 bg-black/50 transition-opacity hidden",
           openMobile ? "opacity-100 block" : "pointer-events-none opacity-0",
         )}
         onClick={() => setOpenMobile(false)}

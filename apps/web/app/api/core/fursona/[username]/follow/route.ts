@@ -28,7 +28,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     .eq("is_active", true)
     .single();
 
-  if (targetError) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (targetError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if (!target) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
   const { data: self, error: selfError } = await supabase
@@ -39,7 +39,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     .eq("is_current", true)
     .single();
 
-  if (selfError) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (selfError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if (!self) return ok({ isFollowing: false });
 
   const { data } = await supabase
@@ -69,8 +69,8 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .eq("is_active", true)
     .single();
 
-    if (targetError) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    if (!target) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  if (targetError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+  if (!target) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
   const { data: self, error: selfError } = await supabase
     .schema("core")
@@ -80,7 +80,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .eq("is_current", true)
     .single();
 
-  if (selfError) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (selfError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if (!self) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
   if (self.id === target.id) return badRequest("Cannot follow yourself");
 
@@ -90,7 +90,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .insert({ follower_fursona_id: self.id, following_fursona_id: target.id });
 
   if (error?.code === "23505") return conflict("Already following");
-  if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (error) return serverError(error.message);
 
   return ok({ following: true });
 }

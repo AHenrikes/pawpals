@@ -11,6 +11,7 @@ const labelVariants = cva(
       variant: {
         default: "",
         auth: "text-sm tracking-wide text-muted-foreground",
+        muted: "text-muted-foreground"
       },
     },
     defaultVariants: {
