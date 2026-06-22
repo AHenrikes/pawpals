@@ -48,7 +48,7 @@ export async function requireUser() {
       user: null,
       account: null,
       response: NextResponse.json(
-        { error: "Account not WTF" },
+        { error: "Account not found" },
         { status: 404 },
       ),
     };

@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import AuthHeader from "@/components/navigation/AuthHeader";

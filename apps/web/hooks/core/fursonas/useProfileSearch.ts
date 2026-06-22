@@ -2,44 +2,38 @@
 
 import { useState, useEffect } from "react";
 import { makeCache } from "@/lib/helpers/profile-cache";
-import { toError } from "@/lib/helpers/error-utils";
 import type { FursonaSearch } from "@/types/fursona";
 import { api } from "@/lib/api/api-client";
+import { useAsyncDataWithCache } from "@/hooks/useAsyncData";
 
 const searchCache = makeCache<FursonaSearch[]>(2 * 60 * 1000);
 
 export function useProfileSearch(term: string, debounceMs = 300) {
   const [debouncedTerm, setDebouncedTerm] = useState(term);
-  const [results, setResults] = useState<FursonaSearch[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedTerm(term), debounceMs);
     return () => clearTimeout(timer);
   }, [term, debounceMs]);
 
-  useEffect(() => {
-    if (!debouncedTerm.trim()) {
-      setResults([]);
-      return;
-    }
-
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    searchCache
-      .get(debouncedTerm, () => 
-        api.get<{ fursonas: FursonaSearch[] }>(`/api/core/fursonas/search?q=${encodeURIComponent(debouncedTerm)}`)
-        .then((res) => res.fursonas ?? [])
+  const { data: results = [], loading, error } = useAsyncDataWithCache(
+    () => api
+      .get<{ fursonas: FursonaSearch[] }>(
+        `/api/core/fursonas/search?q=${encodeURIComponent(debouncedTerm)}`
       )
-      .then((data) => { if (!cancelled) setResults(data); })
-      .catch((err) => { if (!cancelled) setError(toError(err)); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .then((res) => res.fursonas ?? []),
+    (fetcher) => {
+      if (!debouncedTerm.trim()) {
+        return Promise.resolve([]);
+      }
+      return searchCache.get(debouncedTerm, fetcher);
+    },
+    [debouncedTerm]
+  );
 
-    return () => { cancelled = true; };
-  }, [debouncedTerm]);
-
-  return { results, loading, error };
+  return {
+    results: results || [],
+    loading,
+    error,
+  };
 }

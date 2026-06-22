@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { NextResponse, type NextRequest } from "next/server";
-import type { FursonaWithBoolean, FursonaInput, FursonaSearch } from "@/types/fursona";
+import { type NextRequest } from "next/server";
+import type { FursonaWithBoolean, FursonaInput } from "@/types/fursona";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
@@ -31,29 +31,6 @@ export async function GET() {
   if (!fursonas) return badRequest(ERROR_MESSAGES.FURSONAS_NOT_FOUND);
 
   return ok<{ fursonas: FursonaWithBoolean[] }>({fursonas: fursonas ?? []});
-}
-
-export async function SEARCH(req: NextRequest) {
-  const { supabase, account, response } = await requireUser();
-  if (response) return response;
-  if (!account) return unauthorized();
-
-  const term = req.nextUrl.searchParams.get("q");
-
-  if (!term?.trim()) {
-    return NextResponse.json({ fursonas: [] });
-  }
-
-  const { data, error } = await supabase
-    .schema("core")
-    .rpc("search_fursonas", {
-      search_term: term,
-    }
-  );
-
-  if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-
-  return ok<{ fursonas: FursonaSearch }>({ fursonas: data ?? [] });
 }
 
 export async function POST(req: NextRequest) {

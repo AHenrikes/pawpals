@@ -32,9 +32,3 @@ export function created<T>(data: T) {
 export function ok<T>(data: T) {
   return NextResponse.json(data, { status: 200 });
 }
-
-
-// conflic {
-//  status: 409;
-//  code: 23505;
-// }

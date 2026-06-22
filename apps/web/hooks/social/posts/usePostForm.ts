@@ -128,8 +128,6 @@ export function usePostForm(onClose: () => void) {
         state.postMedia.map((file) => uploadPostMedia(file, accountId, fursonaId))
       );
 
-      console.log(fursonaId);
-
       await api.post("/api/social/posts", {
         fursona_id: fursonaId,
         content: state.content,
@@ -139,8 +137,8 @@ export function usePostForm(onClose: () => void) {
 
       clearAll();
       onClose();
-    } catch (err) {
-      console.error("Post failed:", err);
+    } catch {
+
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
