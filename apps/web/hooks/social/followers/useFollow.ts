@@ -30,7 +30,7 @@ export function useFollow(username: string): UseFollowReturn {
       setLoading(true);
 
       try {
-        const res = await api.get<{ isFollowing: boolean }>(`/api/core/fursona/${username}/follow`);
+        const res = await api.get<{ isFollowing: boolean }>(`/api/core/fursonas/${username}/follow`);
 
         if (!cancelled) setIsFollowing(res.isFollowing);
       } catch {
@@ -50,7 +50,7 @@ export function useFollow(username: string): UseFollowReturn {
 
   try {
     const method = isFollowing ? "delete" : "post";
-    const endpoint = `/api/core/fursona/${username}/follow`;
+    const endpoint = `/api/core/fursonas/${username}/follow`;
 
     await api[method](endpoint);
     

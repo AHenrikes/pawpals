@@ -6,7 +6,7 @@ import { Textarea } from "@repo/ui/textarea";
 import { AtSign, Check, X, Loader2 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 import { useEffect, useState } from "react";
-import { useUsernameManager } from "@/hooks/useUsernameManager";
+import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
 import { type FursonaCreate } from "@/types/fursona";
 
 type CreateFursonaProps = {
@@ -40,7 +40,7 @@ export default function CreateFursona({
       onFursonaChange("username", usernameSuggestion);
     }
   };
-  
+
   const checkUsername = useDebouncedCallback(async (username: string) => {
     onUsernameAvailability?.(false);
 

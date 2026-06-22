@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useReducer, useRef, useCallback } from "react"
+import { uploadPostMedia } from "@/lib/uploads/postMedia";
+import { api } from "@/lib/api/api-client";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 export const POST_MAX_MEDIA   = 5
@@ -9,7 +11,7 @@ export const POST_WARN_CHARS  = 1800
 export const POST_DANGER_CHARS = 2100
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-export type Visibility = "everyone" | "verified" | "followers" | "mutuals" | "mentioned"
+export type Visibility = "everyone" | "verified" | "followers" | "mutuals" | "mentioned";
 
 interface PostState {
   content: string
@@ -117,33 +119,32 @@ export function usePostForm(onClose: () => void) {
     dispatch({ type: "CLEAR_ALL" })
   }, [state.mediaPreviews])
 
-  const handleSubmit = useCallback(async () => {
-    if (!state.content.trim() && state.postMedia.length === 0) return
-    dispatch({ type: "SET_LOADING", payload: true })
+  const handleSubmit = useCallback(async (accountId: string, fursonaId: string) => {
+    if (!state.content.trim() && state.postMedia.length === 0) return;
+    dispatch({ type: "SET_LOADING", payload: true });
+
     try {
-      const formData = new FormData()
-      formData.append("content",  state.content)
-      formData.append("isNSFW",   String(state.isNSFW))
-      formData.append("visibility", state.visibility)
-      state.postMedia.forEach((f) => formData.append("media", f))
+      const mediaUrls = await Promise.all(
+        state.postMedia.map((file) => uploadPostMedia(file, accountId, fursonaId))
+      );
 
-      // TODO: replace with your actual API call
-      // await yourApiCall(formData)
-      console.log("Submitting post:", {
-        content:    state.content,
-        isNSFW:     state.isNSFW,
-        visibility: state.visibility,
-        files:      state.postMedia.length,
-      })
+      console.log(fursonaId);
 
-      clearAll()
-      onClose()
+      await api.post("/api/social/posts", {
+        fursona_id: fursonaId,
+        content: state.content,
+        media_urls: mediaUrls,
+        is_published: true,
+      });
+
+      clearAll();
+      onClose();
     } catch (err) {
-      console.error("Post failed:", err)
+      console.error("Post failed:", err);
     } finally {
-      dispatch({ type: "SET_LOADING", payload: false })
+      dispatch({ type: "SET_LOADING", payload: false });
     }
-  }, [state, clearAll, onClose])
+  }, [state, clearAll, onClose]);
 
   return {
     // State

@@ -3,11 +3,11 @@
 import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { useUser } from "@/providers/UserProvider";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { useFollow } from "@/hooks/useFollow";
+import { useFollow } from "@/hooks/social/followers/useFollow";
 import {
   TypographyH2,
   TypographyLead,
@@ -17,7 +17,7 @@ import {
 import { EllipsisVerticalIcon } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useProfileCounts } from "@/hooks/useProfileCounts";
+import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
@@ -80,7 +80,7 @@ export default function ProfilePage() {
     if (!isOwnProfile || !viewedFursona) throw new Error("Cannot edit other profiles");
     try {
       await api.patch<{ fursona: FursonaTypes }>(
-        `/api/profile/me/${(viewedFursona as FursonaTypes).id}`,
+        `/api/core/fursonas/me/${(viewedFursona as FursonaTypes).id}`,
         updates,
       );
       toast.success("Fursona updated");
@@ -116,7 +116,7 @@ export default function ProfilePage() {
   } else {
     followLabel = "Follow";
   }
-  
+
   return (
     <>
       {/* Banner */}
@@ -306,7 +306,7 @@ export default function ProfilePage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
           >
-            {content === "post"    && <ProfilePost username={paramUsername} />}
+            {content === "post"    && <ProfilePost username={viewedFursona.username} />}
             {content === "repost"  && <ProfileRepost username={paramUsername} />}
             {content === "archive" && <div>Archive coming soon</div>}
             {content === "likes"   && <div>Likes coming soon</div>}

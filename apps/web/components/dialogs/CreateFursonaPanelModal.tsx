@@ -60,7 +60,7 @@ export function CreateFursonaPanelModal({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/core/fursona", {
+      const response = await fetch("/api/core/fursonas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(fursona),

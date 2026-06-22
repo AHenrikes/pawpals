@@ -74,7 +74,7 @@ export function UserProvider({
       const res = await api.get<{
         account: AccountTypes;
         currentFursona: FursonaTypes | null;
-      }>("/api/core/account");
+      }>("/api/core/accounts");
 
       setState({
         account: {
@@ -101,7 +101,7 @@ export function UserProvider({
   const fetchFursonas = useCallback(async () => {
     try {
       const fursonas = await fursonasCacheRef.current.get("fursonas", async () => {
-        const res = await api.get<{ fursonas: FursonaTypes[] }>("/api/core/fursona");
+        const res = await api.get<{ fursonas: FursonaTypes[] }>("/api/core/fursonas");
         return res.fursonas ?? [];
       });
       setState({ fursonas });
@@ -160,7 +160,7 @@ export function UserProvider({
         setState({ loading: true, error: null });
 
         const res = await api.patch<{ fursona: FursonaTypes }>(
-          `/api/profile/me/${fursonaId}`,
+          `/api/core/fursonas/me/${fursonaId}`,
           { is_current: true },
         );
 

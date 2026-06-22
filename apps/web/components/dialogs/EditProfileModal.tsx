@@ -9,7 +9,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useCleanupBlobUrl } from "@/hooks/useCleanupBlobUrl";
 import { X, Camera, AtSignIcon, Loader2Icon, CheckIcon } from "lucide-react";
 import { Dialog, DialogContent } from "@repo/ui/dialog";
-import { useUsernameManager } from "@/hooks/useUsernameManager";
+import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
 import { useDebouncedCallback } from "use-debounce";
 import { Label } from "@repo/ui/label";
 import type { FursonaTypes } from "@/types/fursona";

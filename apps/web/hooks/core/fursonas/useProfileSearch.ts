@@ -31,7 +31,7 @@ export function useProfileSearch(term: string, debounceMs = 300) {
 
     searchCache
       .get(debouncedTerm, () => 
-        api.get<{ fursonas: FursonaSearch[] }>(`/api/search/fursonas?q=${encodeURIComponent(debouncedTerm)}`)
+        api.get<{ fursonas: FursonaSearch[] }>(`/api/core/fursonas/search?q=${encodeURIComponent(debouncedTerm)}`)
         .then((res) => res.fursonas ?? [])
       )
       .then((data) => { if (!cancelled) setResults(data); })

@@ -5,7 +5,7 @@ import { Label } from "@repo/ui/label";
 import { Loader2, SearchIcon } from "lucide-react";
 import { TypographyLead, TypographyXSmall } from "@repo/ui/typography";
 import { useRouter } from "next/navigation";
-import { useProfileSearch } from "@/hooks/useProfileSearch";
+import { useProfileSearch } from "@/hooks/core/fursonas/useProfileSearch";
 import { createPortal } from "react-dom";
 import type { FursonaSearch } from "@/types/fursona";
 import {

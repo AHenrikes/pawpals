@@ -1,10 +1,10 @@
-import { type NextRequest } from "next/server";
-import type { RouteContext } from "@/lib/types/api";
 import { serverError, badRequest } from "@/lib/api/responses";
 import { createServer } from "@repo/supabase/server";
+import type { RouteContext } from "@/lib/types/api";
+import type { NextRequest } from "next/server";
 
 /**
- * GET /api/search/username/[username]/available
+ * GET /api/core/fursonas/[username]/available
  * Check username availability and get suggestions if taken
  * 
  * Response:

@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { type NextRequest } from "next/server";
-import type { FursonaWithBoolean, FursonaInput } from "@/types/fursona";
+import { NextResponse, type NextRequest } from "next/server";
+import type { FursonaWithBoolean, FursonaInput, FursonaSearch } from "@/types/fursona";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
@@ -31,6 +31,29 @@ export async function GET() {
   if (!fursonas) return badRequest(ERROR_MESSAGES.FURSONAS_NOT_FOUND);
 
   return ok<{ fursonas: FursonaWithBoolean[] }>({fursonas: fursonas ?? []});
+}
+
+export async function SEARCH(req: NextRequest) {
+  const { supabase, account, response } = await requireUser();
+  if (response) return response;
+  if (!account) return unauthorized();
+
+  const term = req.nextUrl.searchParams.get("q");
+
+  if (!term?.trim()) {
+    return NextResponse.json({ fursonas: [] });
+  }
+
+  const { data, error } = await supabase
+    .schema("core")
+    .rpc("search_fursonas", {
+      search_term: term,
+    }
+  );
+
+  if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+
+  return ok<{ fursonas: FursonaSearch }>({ fursonas: data ?? [] });
 }
 
 export async function POST(req: NextRequest) {
@@ -66,7 +89,7 @@ export async function POST(req: NextRequest) {
       species: normalizeOptionalText(body.species),
       pronouns: normalizeOptionalText(body.pronouns),
       bio: normalizeOptionalText(body.bio),
-      updated_at: new Date(),
+      updated_at: body.updated_at ?? null,
       is_default: body.is_default ?? false,
       is_current: body.is_current ?? false,
     })
@@ -75,7 +98,8 @@ export async function POST(req: NextRequest) {
     )
     .single();
 
-  if (error) return badRequest(ERROR_MESSAGES.FURSONA_UPDATE_FAILED);
+  // if (error) return badRequest(ERROR_MESSAGES.FURSONA_UPDATE_FAILED);
+  if (error) return badRequest(error.message);
 
   // A transaction-safe RPC to switch current fursona
   const { error: switchError } = await supabase.rpc("switch_current_fursona",

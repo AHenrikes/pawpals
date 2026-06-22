@@ -18,8 +18,9 @@ import {
   POST_MAX_CHARS,
   POST_WARN_CHARS,
   POST_DANGER_CHARS,
-} from "@/hooks/usePostForm"
+} from "@/hooks/social/posts/usePostForm"
 import Image from "next/image"
+import { toast } from "@repo/ui/sonner"
 
 // ─── Static config ────────────────────────────────────────────────────────────
 const VISIBILITY_OPTIONS: { value: Visibility; label: string; Icon: React.ElementType }[] = [
@@ -167,7 +168,7 @@ export default function PostForm({
   placeholder = "Write a caption...",
   onClose,
 }: Readonly<PostFormProps>) {
-  const { currentFursona } = useUser()
+  const { currentFursona, account } = useUser()
   const {
     content, setContent,
     mediaPreviews,
@@ -182,6 +183,16 @@ export default function PostForm({
 
   const [visOpen, setVisOpen] = useState(false)
   
+  if (!account) {
+    toast.error("Could not identify account")
+    return null
+  };
+
+  if (!currentFursona?.id) {
+    toast.error("Could not post at this time, please try refreshing")
+    return null
+  };
+
   const currentVis = VISIBILITY_OPTIONS.find(o => o.value === visibility) ?? VISIBILITY_OPTIONS[0]
   if (!currentVis) {
     return null;
@@ -191,7 +202,7 @@ export default function PostForm({
 
   return (
     <form
-      onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
+      onSubmit={(e) => { e.preventDefault(); handleSubmit(account.id, currentFursona.id) }}
       className={cn(
         // Mobile: single column. Desktop: side-by-side.
         "flex flex-col lg:grid h-full w-full overflow-hidden rounded-[22px] border transition-colors duration-300",

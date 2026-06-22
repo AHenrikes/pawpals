@@ -71,7 +71,7 @@ export function useUsernameManager() {
         };
       }
 
-      if (!/^[a-zA-Z0-9_-]+$/.test(trimmedUsername)) {
+      if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
         const errorMsg = "Only alphanumeric characters, underscore, and hyphen allowed";
         setError(errorMsg);
         return {
@@ -80,11 +80,11 @@ export function useUsernameManager() {
         };
       }
 
-      // Server-side check (with loading state)
       setLoading(true);
+
       try {
         const response = await fetch(
-          `/api/search/username/${encodeURIComponent(trimmedUsername)}/available`
+          `/api/core/fursonas/${encodeURIComponent(trimmedUsername)}/available`
         );
 
         if (!response.ok) {
@@ -106,8 +106,7 @@ export function useUsernameManager() {
       } finally {
         setLoading(false);
       }
-    },
-    []
+    }, []
   );
 
   /**
@@ -137,7 +136,7 @@ export function useUsernameManager() {
   //       }
 
   //       const response = await fetch(
-  //         `/api/profile/me/${encodeURIComponent(fursonaId)}/change-username`,
+  //         `/api/core/fursonas/me/${encodeURIComponent(fursonaId)}/change-username`,
   //         {
   //           method: "POST",
   //           headers: {
@@ -178,7 +177,7 @@ export function useUsernameManager() {
 
   //     try {
   //       const response = await fetch(
-  //         `/api/profile/me/${encodeURIComponent(fursonaId)}/change-username`
+  //         `/api/core/fursonas/me/${encodeURIComponent(fursonaId)}/change-username`
   //       );
 
   //       if (!response.ok) {

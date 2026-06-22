@@ -4,7 +4,7 @@ import { serverError, badRequest, unauthorized } from "@/lib/api/responses";
 import { requireUser } from "@/lib/auth/requireUser";
 
 /**
- * GET /api/profile/me/[id]/username-history
+ * GET /api/core/fursonas/[id]/username-history
  * Get the complete username change history for a fursona
  * 
  * Returns array of username changes in chronological order
