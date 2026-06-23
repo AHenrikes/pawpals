@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { cn } from "@/lib/helpers/utils";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   Home,
   PawPrint,
@@ -51,7 +51,6 @@ const mainNavItems: MainNavItem[] = [
 
 export default function MainNav() {
   const pathname = usePathname();
-  const router = useRouter();
   const { signOut } = useUser();
   const { state, openMobile, isMobile } = useSidebar();
 
