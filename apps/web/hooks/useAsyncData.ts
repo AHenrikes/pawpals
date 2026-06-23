@@ -22,7 +22,7 @@ import { toError } from "@/lib/helpers/error-utils";
  */
 export function useAsyncData<T>(
   fetcher: () => Promise<T>,
-  deps: React.DependencyList
+  deps: React.DependencyList,
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +47,7 @@ export function useAsyncData<T>(
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return { data, loading, error };
@@ -75,7 +76,7 @@ export function useAsyncData<T>(
 export function useAsyncDataWithCache<T>(
   fetcher: () => Promise<T>,
   cacheGetter: (fetcher: () => Promise<T>) => Promise<T | null>,
-  deps: React.DependencyList
+  deps: React.DependencyList,
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,6 +101,7 @@ export function useAsyncDataWithCache<T>(
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return { data, loading, error };

@@ -38,7 +38,7 @@ interface UseSocialActionReturn {
  * ```
  */
 export function useSocialAction(
-  resource: SocialActionType
+  resource: SocialActionType,
 ): UseSocialActionReturn {
   const [isActive, setIsActive] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,7 +57,7 @@ export function useSocialAction(
         const method = previousState ? "delete" : "post";
         const endpoint = `/api/social/${resource}/${id}`;
 
-        await api[method as "post" | "delete"](endpoint);
+        await api[method](endpoint);
       } catch (err) {
         // Rollback on error
         setIsActive(previousState);
@@ -66,7 +66,7 @@ export function useSocialAction(
         setLoading(false);
       }
     },
-    [isActive, resource]
+    [isActive, resource],
   );
 
   const clearError = useCallback(() => {

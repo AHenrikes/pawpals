@@ -12,19 +12,21 @@ export type ProfileCounts = {
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ username: string }> }
+  { params }: { params: Promise<{ username: string }> },
 ) {
   const { supabase, response } = await requireUser();
   if (response) return response;
 
-  const {username} = await params;
+  const { username } = await params;
 
   if (!username) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
   const { data, error } = await supabase
     .schema("social")
     .from("v_fursona_stats")
-    .select("follower_count, following_count, post_count, like_count, reputation")
+    .select(
+      "follower_count, following_count, post_count, like_count, reputation",
+    )
     .eq("username", username)
     .single();
 

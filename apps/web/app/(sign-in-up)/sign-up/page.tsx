@@ -1,21 +1,23 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Circle, MessagesSquare } from "lucide-react";
-import { useAuthForm } from "@/hooks/useAuthForm";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
+import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import CreateFursona from "@/components/features/CreateFursona";
-import type { FursonaCreate } from "@/types/fursona";
 import { Button } from "@repo/ui/button";
-import { FormError } from "@repo/ui/form-error";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
+import { toast } from "@repo/ui/sonner";
+import { FormError } from "@repo/ui/form-error";
 import { Card, CardHeader } from "@repo/ui/card";
 import { TypographyP } from "@repo/ui/typography";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import type { FursonaCreate } from "@/types/fursona";
+import CreateFursona from "@/components/features/CreateFursona";
+import Link from "next/link";
 
 type SignUpValues = {
   firstname: string;
@@ -34,7 +36,8 @@ export default function SignUpForm() {
   const supabase = useSupabaseClient();
   const prefersReducedMotion = useReducedMotion();
   const [step, setStep] = useState<"account" | "fursona">("account");
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean>(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] =
+    useState<boolean>(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const stepTransition = prefersReducedMotion
     ? { duration: 0 }
@@ -69,7 +72,8 @@ export default function SignUpForm() {
 
     async (formValues) => {
       if (formValues.password !== formValues.confirmPassword) {
-        throw new Error("Passwords do not match");
+        toast.error("Passwords do not match");
+        return;
       }
 
       const normalizedinitFursona = {
@@ -81,7 +85,8 @@ export default function SignUpForm() {
       };
 
       if (normalizedinitFursona.display_name.length === 0) {
-        throw new TypeError("Add your fursona name before finishing sign up");
+        toast.error("Add your fursona name before finishing sign up");
+        return;
       }
 
       const day = Number.parseInt(formValues.dobDay, 10);
@@ -100,7 +105,8 @@ export default function SignUpForm() {
         year <= new Date().getUTCFullYear();
 
       if (!isValidParts) {
-        throw new TypeError("Please enter a valid date of birth");
+        toast.error("Please enter a valid date of birth");
+        return;
       }
 
       const dobIsoDate = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -111,13 +117,16 @@ export default function SignUpForm() {
         dobDate.getUTCDate() === day;
 
       if (!isSameDate) {
-        throw new TypeError("Please enter a valid date of birth");
+        toast.error("Please enter a valid date of birth");
+        return;
       }
 
       if (!isUsernameAvailable) {
-        throw new Error("Username already taken");
+        toast.error("Username already taken");
+        return;
       }
 
+      // TODO:
       // Temporary local development testing - remove before production
       const origin =
         globalThis.window?.location?.origin ?? "http://192.168.1.219:3000";
@@ -126,7 +135,6 @@ export default function SignUpForm() {
         email: formValues.email,
         password: formValues.password,
         options: {
-          // emailRedirectTo: `${globalThis.window?.location.origin ?? ""}${AUTH_ROUTES.CONFIRM}`,
           emailRedirectTo: `${origin}${AUTH_ROUTES.CONFIRM}`,
           data: {
             firstname: formValues.firstname,
@@ -137,8 +145,11 @@ export default function SignUpForm() {
         },
       });
 
-      // TODO: Implement email validation error display
-      if (error) throw error;
+      // TODO: email validation error display
+      if (error) {
+        toast.error(ERROR_MESSAGES.SERVER_ERROR);
+        return;
+      }
 
       router.push(AUTH_ROUTES.SIGNUP_SUCCESS);
     },
@@ -147,17 +158,10 @@ export default function SignUpForm() {
   const goToFursonaStep = () => {
     const form = formRef.current;
 
-    if (!form) {
-      return;
-    }
+    if (!form) return;
 
     if (!form.checkValidity()) {
       form.reportValidity();
-      return;
-    }
-
-    if (values.password !== values.confirmPassword) {
-      setError("Passwords do not match");
       return;
     }
 
@@ -192,7 +196,7 @@ export default function SignUpForm() {
           </Link>
         </CardHeader>
 
-        <form 
+        <form
           ref={formRef}
           className="space-y-5"
           onSubmit={handleSubmit}
@@ -218,6 +222,7 @@ export default function SignUpForm() {
                       <Label htmlFor="firstname" variant={"auth"}>
                         Firstname
                       </Label>
+
                       <Input
                         id="firstname"
                         type="text"
@@ -229,7 +234,6 @@ export default function SignUpForm() {
                         variant={"auth"}
                         autoFocus={step === "account"}
                         required
-                        
                       />
                     </div>
 
@@ -237,6 +241,7 @@ export default function SignUpForm() {
                       <Label htmlFor="lastname" variant={"auth"}>
                         Lastname
                       </Label>
+
                       <Input
                         id="lastname"
                         type="text"
@@ -255,6 +260,7 @@ export default function SignUpForm() {
                     <Label htmlFor="email" variant={"auth"}>
                       Email
                     </Label>
+
                     <Input
                       id="email"
                       type="email"
@@ -270,6 +276,7 @@ export default function SignUpForm() {
                     <Label htmlFor="dob-day" variant={"auth"}>
                       Date of birth
                     </Label>
+
                     <div className="grid grid-cols-3">
                       <Input
                         id="dob-day"
@@ -288,6 +295,7 @@ export default function SignUpForm() {
                         className="text-center rounded-none rounded-l-full"
                         required
                       />
+
                       <Input
                         id="dob-month"
                         type="text"
@@ -305,6 +313,7 @@ export default function SignUpForm() {
                         className="z-0 rounded-none text-center"
                         required
                       />
+
                       <Input
                         id="dob-year"
                         type="text"
@@ -330,6 +339,7 @@ export default function SignUpForm() {
                       <Label htmlFor="password" variant={"auth"}>
                         Password
                       </Label>
+
                       <Input
                         id="password"
                         type="password"
@@ -347,6 +357,7 @@ export default function SignUpForm() {
                       <Label htmlFor="confirmfname" variant={"auth"}>
                         Confirm Password
                       </Label>
+
                       <Input
                         id="confirmfname"
                         type="password"
@@ -390,6 +401,7 @@ export default function SignUpForm() {
               className="h-14 w-full rounded-full"
             >
               <span>Create Fursona</span>
+
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -399,6 +411,7 @@ export default function SignUpForm() {
                 className="h-14 w-full bg-primary rounded-l-full"
               >
                 <ArrowLeft className="h-4 w-4" />
+
                 <span>Back</span>
               </Button>
 
@@ -408,6 +421,7 @@ export default function SignUpForm() {
                 className="h-14 w-full rounded-r-full"
               >
                 <span>{isLoading ? "Creating account..." : "Sign up"}</span>
+
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>

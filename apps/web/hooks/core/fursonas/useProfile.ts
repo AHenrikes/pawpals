@@ -2,14 +2,20 @@
 
 import { makeCache } from "@/lib/helpers/profile-cache";
 import { useAsyncDataWithCache } from "@/hooks/useAsyncData";
-import type { FursonaTypes } from "@/types/fursona";
+import { type FursonaTypes } from "@/types/fursona";
 
 const profileCache = makeCache<FursonaTypes | null>(10 * 60 * 1000);
 
 export function useProfile(username: string) {
-  const { data: profile, loading, error } = useAsyncDataWithCache(
+  const {
+    data: profile,
+    loading,
+    error,
+  } = useAsyncDataWithCache(
     async () => {
-      const res = await fetch(`/api/core/fursonas/${encodeURIComponent(username)}`);
+      const res = await fetch(
+        `/api/core/fursonas/${encodeURIComponent(username)}`,
+      );
 
       if (res.status === 404) return null;
       if (!res.ok) {
@@ -20,7 +26,7 @@ export function useProfile(username: string) {
       return res.json() as Promise<FursonaTypes>;
     },
     (fetcher) => profileCache.get(username, fetcher),
-    [username]
+    [username],
   );
 
   return { profile, loading, error };

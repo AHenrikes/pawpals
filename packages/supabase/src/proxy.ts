@@ -38,8 +38,8 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const protectedPaths = ["/api","/@", "/pawspot", "/store", "/messages", "/community", "/pawpal-meet", "/notifications", "/settings"];
-  const publicApiPaths = ["/api/search/username/"];
+  const protectedPaths = ["/", "/store", "/messages", "/community", "/pawpal-meet", "/notifications", "/settings", "/@", "/api"];
+  const publicApiPaths = ["/home", "/about", "/contact-us", "/sign-out", "/sign-in", "/api/search/username/", "/forgot-password"];
   const pathname = request.nextUrl.pathname;
 
   // Check if this is a public API route that doesn't require auth

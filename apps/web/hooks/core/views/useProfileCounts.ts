@@ -24,7 +24,7 @@ const initialState: SocialStats = {
   follower: 0,
   like: 0,
   post: 0,
-  reputation: 0
+  reputation: 0,
 };
 
 export function useProfileCounts(username?: string): SocialData {
@@ -51,7 +51,7 @@ export function useProfileCounts(username?: string): SocialData {
         following: data.following_count ?? 0,
         like: data.like_count ?? 0,
         post: data.post_count ?? 0,
-        reputation: data.reputation_count ?? 0
+        reputation: data.reputation_count ?? 0,
       });
     } catch (err) {
       const error = toError(err);

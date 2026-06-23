@@ -6,7 +6,7 @@ import type { NextRequest } from "next/server";
 /**
  * GET /api/core/fursonas/[username]/available
  * Check username availability and get suggestions if taken
- * 
+ *
  * Response:
  * - available: true → username is free
  * - error: string → validation failed
@@ -25,13 +25,16 @@ export async function GET(
 
     if (!/^[a-zA-Z0-9_-]+$/.test(query)) {
       return badRequest(
-        "Invalid username format: only alphanumeric, underscore, and hyphen allowed"
+        "Invalid username format: only alphanumeric, underscore, and hyphen allowed",
       );
     }
 
-    const { data: isAvailable, error } = await supabase.rpc('check_username_availability', {
-      p_username: query
-    });
+    const { data: isAvailable, error } = await supabase.rpc(
+      "check_username_availability",
+      {
+        p_username: query,
+      },
+    );
 
     if (error) return serverError(error.message);
 

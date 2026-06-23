@@ -1,11 +1,11 @@
-import AuthFooter from "@/components/footer/AuthFooter";
-import AuthHeader from "@/components/navigation/AuthHeader";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { createServer } from "@repo/supabase/server";
 import { Card, CardContent, CardDescription } from "@repo/ui/card";
 import { TypographyH2, TypographyH3, TypographyP } from "@repo/ui/typography";
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import AuthFooter from "@/components/footer/AuthFooter";
+import AuthHeader from "@/components/navigation/AuthHeader";
 
 export const metadata: Metadata = { title: "Register || Login" };
 

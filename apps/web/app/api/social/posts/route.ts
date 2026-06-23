@@ -1,6 +1,12 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth/requireUser";
-import { badRequest, notFound, ok, serverError, unauthorized } from "@/lib/api/responses";
+import {
+  badRequest,
+  notFound,
+  ok,
+  serverError,
+  unauthorized,
+} from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { PostCreate, PostWithId } from "@/types/post";
 import { normalizeOptionalText } from "@/lib/helpers/normalizeInput";
@@ -16,7 +22,7 @@ export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const cursor = params.get("cursor");
   const username = params.get("username");
-  const limit  = Math.min(
+  const limit = Math.min(
     Number.parseInt(params.get("limit") ?? String(DEFAULT_LIMIT), 10),
     MAX_LIMIT,
   );
@@ -28,7 +34,7 @@ export async function GET(req: NextRequest) {
     .from("fursonas")
     .select("id")
     .eq("username", username)
-    .single()
+    .single();
 
   if (selfError) {
     if (selfError.code === "PGRST116") {
@@ -42,7 +48,8 @@ export async function GET(req: NextRequest) {
   let query = supabase
     .schema("social")
     .from("posts")
-    .select(`
+    .select(
+      `
       id,
       fursona_id,
       content,
@@ -54,7 +61,8 @@ export async function GET(req: NextRequest) {
       shares_count,
       is_published,
       created_at
-    `)
+    `,
+    )
     .eq("fursona_id", self.id)
     .eq("is_published", true)
     .order("created_at", { ascending: false })
@@ -68,9 +76,13 @@ export async function GET(req: NextRequest) {
 
   if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
-  const hasMore   = data.length > limit;
-  const posts     = (hasMore ? data.slice(0, limit) : data) as PostWithId[];
-  const nextCursor = hasMore ? (posts.at(-1)?.created_at ? new Date(posts.at(-1)!.created_at).toISOString() : null) : null;
+  const hasMore = data.length > limit;
+  const posts = (hasMore ? data.slice(0, limit) : data) as PostWithId[];
+  const nextCursor = hasMore
+    ? posts.at(-1)?.created_at
+      ? new Date(posts.at(-1)!.created_at).toISOString()
+      : null
+    : null;
 
   return ok<{ posts: PostWithId[]; nextCursor: string | null }>({
     posts,
@@ -86,7 +98,8 @@ export async function POST(req: NextRequest) {
   const media = Array.isArray(body.media_urls) ? body.media_urls : [];
 
   // Bug 1 fixed: reject when there's NO content (and no media either)
-  if (!content?.length && media.length === 0) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (!content?.length && media.length === 0)
+    return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
   const { data, error } = await supabase
     .schema("social")
@@ -97,6 +110,6 @@ export async function POST(req: NextRequest) {
 
   // if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if (error) return serverError(error.message);
-  
+
   return ok<{ post: PostCreate }>({ post: data });
 }

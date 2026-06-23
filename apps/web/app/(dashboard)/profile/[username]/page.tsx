@@ -22,12 +22,14 @@ import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
-import type { FursonaProfile, FursonaTypes } from "@/types/fursona";
-import ProfilePost from "@/components/ProfilePost";
+import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
 import ProfileRepost from "@/components/ProfileRepost";
+import PostCards from "@/components/cards/PostCads";
 import Image from "next/image";
 
 function getInitials(name: string) {
+  if (!name) return "";
+
   return name
     .split(" ")
     .filter(Boolean)
@@ -46,19 +48,24 @@ function formatNumbers(count: number): string {
 }
 
 const profileNav = [
-  { label: "POST",    key: "post" },
-  { label: "REPOST",  key: "repost" },
+  { label: "POST", key: "post" },
+  { label: "REPOST", key: "repost" },
   { label: "ARCHIVE", key: "archive" },
-  { label: "LIKE",    key: "likes" },
+  { label: "LIKE", key: "likes" },
 ] as const;
 
-type ContentKey = typeof profileNav[number]["key"];
+type ContentKey = (typeof profileNav)[number]["key"];
 
 export default function ProfilePage() {
   const { currentFursona, refresh, loading: userLoading } = useUser();
   const { username: paramUsername } = useParams<{ username: string }>();
-  const { following, follower, refetch, like, } = useProfileCounts(paramUsername);
-  const { isFollowing, toggle: follow, loading: followLoading } = useFollow(paramUsername);
+  const { following, follower, refetch, like } =
+    useProfileCounts(paramUsername);
+  const {
+    isFollowing,
+    toggle: follow,
+    loading: followLoading,
+  } = useFollow(paramUsername);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [content, setContent] = useState<ContentKey>("post");
@@ -67,24 +74,27 @@ export default function ProfilePage() {
   const isOwnProfile = currentFursona?.username === paramUsername;
 
   const { profile, loading: profileLoading } = useProfile(
-    isOwnProfile ? "" : paramUsername
+    isOwnProfile ? "" : paramUsername,
   );
 
   const viewedFursona: FursonaProfile | null = isOwnProfile
     ? currentFursona
     : profile;
 
-  const isLoading = isOwnProfile ? userLoading || !currentFursona : profileLoading;
+  const isLoading = isOwnProfile
+    ? userLoading || !currentFursona
+    : profileLoading;
 
   const handleEditSave = async (updates: Partial<FursonaTypes>) => {
-    if (!isOwnProfile || !viewedFursona) throw new Error("Cannot edit other profiles");
+    if (!isOwnProfile || !viewedFursona)
+      throw new Error("Cannot edit other profiles");
     try {
       await api.patch<{ fursona: FursonaTypes }>(
         `/api/core/fursonas/me/${(viewedFursona as FursonaTypes).id}`,
         updates,
       );
       toast.success("Fursona updated");
-      refresh()
+      refresh();
     } catch (err) {
       const message = getErrorMessage(err);
       toast.error(`Update failed: ${message}`);
@@ -93,8 +103,8 @@ export default function ProfilePage() {
   };
 
   const handleNavClick = (key: ContentKey) => {
-    const oldIndex = profileNav.findIndex(n => n.key === content);
-    const newIndex = profileNav.findIndex(n => n.key === key);
+    const oldIndex = profileNav.findIndex((n) => n.key === content);
+    const newIndex = profileNav.findIndex((n) => n.key === key);
     setDirection(newIndex > oldIndex ? 1 : -1);
     setContent(key);
   };
@@ -106,10 +116,10 @@ export default function ProfilePage() {
   };
 
   if (isLoading || !viewedFursona) return null;
-  
+
   let followLabel = "";
-  
-  if(followLoading) {
+
+  if (followLoading) {
     followLabel = "...";
   } else if (isFollowing) {
     followLabel = "Unfollow";
@@ -158,7 +168,11 @@ export default function ProfilePage() {
         <div className="relative -mt-16 space-y-6 sm:-mt-20 md:-mt-24 z-20">
           <AnimatePresence mode="wait">
             {isLoading ? (
-              <motion.div key="avatar-skeleton" exit={{ opacity: 0 }} className="flex items-center gap-4">
+              <motion.div
+                key="avatar-skeleton"
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-4"
+              >
                 <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
                 <div className="min-w-0 mb-4 space-y-2">
                   <Skeleton className="h-9 w-52 animate-none border-2 border-background" />
@@ -175,9 +189,17 @@ export default function ProfilePage() {
               >
                 <div className="flex justify-between">
                   <div className="flex items-center gap-2">
-                    <Avatar size="lg" className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0">
-                      <AvatarImage src={viewedFursona.avatar_url ?? undefined} alt={viewedFursona.display_name} />
-                      <AvatarFallback>{getInitials(viewedFursona.display_name)}</AvatarFallback>
+                    <Avatar
+                      size="lg"
+                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0"
+                    >
+                      <AvatarImage
+                        src={viewedFursona.avatar_url ?? undefined}
+                        alt={viewedFursona.display_name}
+                      />
+                      <AvatarFallback>
+                        {getInitials(viewedFursona.display_name)}
+                      </AvatarFallback>
                     </Avatar>
 
                     <div className="hidden relative px-2 top-5 sm:flex flex-1 flex-col sm:max-w-52 xl:max-w-full">
@@ -197,32 +219,33 @@ export default function ProfilePage() {
                         <p>Edit Profile</p>
                       </Button>
                     ) : (
-                      <Button 
+                      <Button
                         onClick={() => {
                           follow();
-                          
+
                           setTimeout(() => {
                             refetch();
-                          }, 350)
+                          }, 350);
                         }}
                         disabled={followLoading}
                       >
-                        { followLoading ? "..." : followLabel }
+                        {followLoading ? "..." : followLabel}
                       </Button>
                     )}
 
-                    <Button
-                      size={"icon"}
-                      variant={"outline"}
-                    >
+                    <Button size={"icon"} variant={"outline"}>
                       <EllipsisVerticalIcon className="h-6 w-6" />
                     </Button>
                   </div>
                 </div>
 
                 <div className="px-2 sm:hidden">
-                  <TypographyH2 className="text-xl sm:text-2xl truncate">{viewedFursona.display_name}</TypographyH2>
-                  <TypographySmall className="text-muted-foreground">@{viewedFursona.username}</TypographySmall>
+                  <TypographyH2 className="text-xl sm:text-2xl truncate">
+                    {viewedFursona.display_name}
+                  </TypographyH2>
+                  <TypographySmall className="text-muted-foreground">
+                    @{viewedFursona.username}
+                  </TypographySmall>
                 </div>
               </motion.div>
             )}
@@ -230,11 +253,18 @@ export default function ProfilePage() {
 
           <AnimatePresence mode="wait">
             {isLoading ? (
-              <motion.div key="info-skeleton" exit={{ opacity: 0 }} className="flex-1 w-full pb-0 space-y-6">
+              <motion.div
+                key="info-skeleton"
+                exit={{ opacity: 0 }}
+                className="flex-1 w-full pb-0 space-y-6"
+              >
                 <Skeleton className="h-4 w-72" />
                 <div className="flex gap-3 sm:gap-6 justify-start">
                   {[0, 1, 2].map((i) => (
-                    <div key={i} className="flex flex-col items-center w-16 gap-2">
+                    <div
+                      key={i}
+                      className="flex flex-col items-center w-16 gap-2"
+                    >
                       <Skeleton className="h-9 w-8 rounded-full" />
                       <Skeleton className="h-4 w-full" />
                     </div>
@@ -250,7 +280,7 @@ export default function ProfilePage() {
                 transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
               >
                 <TypographyXSmall className="block max-w-xl text-muted-foreground break-words">
-                    { viewedFursona?.bio }
+                  {viewedFursona?.bio}
                 </TypographyXSmall>
 
                 <div className="flex gap-3 sm:gap-6 justify-start">
@@ -265,7 +295,7 @@ export default function ProfilePage() {
                       </TypographyLead>
 
                       <TypographyXSmall className="text-muted-foreground text-xs">
-                        { label }
+                        {label}
                       </TypographyXSmall>
                     </div>
                   ))}
@@ -306,10 +336,12 @@ export default function ProfilePage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
           >
-            {content === "post"    && <ProfilePost username={viewedFursona.username} />}
-            {content === "repost"  && <ProfileRepost username={paramUsername} />}
+            {content === "post" && (
+              <PostCards username={viewedFursona.username} />
+            )}
+            {content === "repost" && <ProfileRepost username={paramUsername} />}
             {content === "archive" && <div>Archive coming soon</div>}
-            {content === "likes"   && <div>Likes coming soon</div>}
+            {content === "likes" && <div>Likes coming soon</div>}
           </motion.section>
         </AnimatePresence>
       </div>

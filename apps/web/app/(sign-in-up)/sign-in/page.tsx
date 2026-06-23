@@ -9,8 +9,8 @@ import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Circle, MessagesSquare } from "lucide-react";
+import Link from "next/link";
 
 export default function SignIn() {
   const router = useRouter();

@@ -13,12 +13,9 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createServer();
 
-  const { data, error } = await supabase
-    .schema("core")
-    .rpc("search_fursonas", {
-      search_term: term,
-    }
-  );
+  const { data, error } = await supabase.schema("core").rpc("search_fursonas", {
+    search_term: term,
+  });
 
   if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 

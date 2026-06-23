@@ -7,6 +7,7 @@ import { notFound, serverError } from "@/lib/api/responses";
  */
 
 export interface SupabaseClient {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   schema(name: string): any;
 }
 
@@ -21,7 +22,7 @@ export interface SupabaseClient {
  */
 export async function getFursonaByUsername(
   supabase: SupabaseClient,
-  username: string
+  username: string,
 ) {
   const { data: target, error: targetError } = await supabase
     .schema("core")
@@ -55,7 +56,7 @@ export async function getFursonaByUsername(
  */
 export async function getCurrentUserFursona(
   supabase: SupabaseClient,
-  accountId: string
+  accountId: string,
 ) {
   const { data: self, error: selfError } = await supabase
     .schema("core")
@@ -88,7 +89,7 @@ export async function getCurrentUserFursona(
 export async function checkFollowExists(
   supabase: SupabaseClient,
   followerFursonaId: string,
-  followingFursonaId: string
+  followingFursonaId: string,
 ) {
   const { data, error } = await supabase
     .schema("social")
@@ -115,7 +116,7 @@ export async function checkFollowExists(
  */
 export async function getFursonaById(
   supabase: SupabaseClient,
-  fursonaId: string
+  fursonaId: string,
 ) {
   const { data, error } = await supabase
     .schema("core")

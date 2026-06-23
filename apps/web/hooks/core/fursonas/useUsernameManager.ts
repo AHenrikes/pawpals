@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useCallback, useState } from "react";
 
@@ -10,17 +10,17 @@ interface UsernameAvailability {
 
 /**
  * Hook for managing username operations (checking availability, changing username, etc.)
- * 
+ *
  * Usage:
  * ```tsx
  * const { checkAvailability, changeUsername, getCooldown } = useUsernameManager();
- * 
+ *
  * // Check if username is available
  * const result = await checkAvailability('newname');
  * if (result.available) {
  *   // Username is available
  * }
- * 
+ *
  * // Change username (with cooldown enforcement)
  * const changeResult = await changeUsername(fursonaId, 'newname');
  * if (changeResult.success) {
@@ -39,11 +39,15 @@ export function useUsernameManager() {
   const checkAvailability = useCallback(
     async (username: string): Promise<UsernameAvailability> => {
       setError(null);
-      
+
       // Client-side validation (no loading state for instant feedback)
       const trimmedUsername = username.trim().toLowerCase();
-      
-      if (!trimmedUsername || trimmedUsername.length < 3 || trimmedUsername.length > 50) {
+
+      if (
+        !trimmedUsername ||
+        trimmedUsername.length < 3 ||
+        trimmedUsername.length > 50
+      ) {
         const errorMsg = "Username must be 3-50 characters";
         setError(errorMsg);
         return {
@@ -53,7 +57,8 @@ export function useUsernameManager() {
       }
 
       if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-        const errorMsg = "Only alphanumeric characters, underscore, and hyphen allowed";
+        const errorMsg =
+          "Only alphanumeric characters, underscore, and hyphen allowed";
         setError(errorMsg);
         return {
           available: false,
@@ -65,12 +70,13 @@ export function useUsernameManager() {
 
       try {
         const response = await fetch(
-          `/api/core/fursonas/${encodeURIComponent(trimmedUsername)}/available`
+          `/api/core/fursonas/${encodeURIComponent(trimmedUsername)}/available`,
         );
 
         if (!response.ok) {
           const data = await response.json();
-          const errorMsg = data.error || "Failed to check username availability";
+          const errorMsg =
+            data.error || "Failed to check username availability";
           setError(errorMsg);
           return {
             available: false,
@@ -87,10 +93,11 @@ export function useUsernameManager() {
       } finally {
         setLoading(false);
       }
-    }, []
+    },
+    [],
   );
 
-  // TODO: Implement changeUsername and getCooldown
+  // TODO:
   // - changeUsername: Enforce 30-day cooldown, validate, update username
   // - getCooldown: Get cooldown status for a fursona
 

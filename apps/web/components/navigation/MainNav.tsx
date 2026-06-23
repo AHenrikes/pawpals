@@ -31,7 +31,7 @@ import {
   useSidebar,
 } from "@/providers/SidebarProvider";
 import type { LucideIcon } from "lucide-react";
-import PostModal from "@/components/dialogs/PostModal"
+import PostModal from "@/components/dialogs/PostModal";
 
 type MainNavItem = {
   href: string;
@@ -55,15 +55,9 @@ export default function MainNav() {
   const { signOut } = useUser();
   const { state, openMobile, isMobile } = useSidebar();
 
-  const [postOpen, setPostOpen] = useState(false)
+  const [postOpen, setPostOpen] = useState(false);
 
   const isCollapsed = isMobile ? !openMobile : state === "collapsed";
-
-  const handleSignOut = useCallback(async () => {
-    await signOut()
-    router.push(AUTH_ROUTES.SIGN_IN)
-    router.refresh()
-  }, [signOut, router])
 
   return (
     <Sidebar
@@ -79,17 +73,18 @@ export default function MainNav() {
 
                 return (
                   <SidebarMenuItem key={label}>
-                    <SidebarMenuButton 
-                      asChild
-                      isActive={isActive}
-                      className=""
-                    >
-                      <Link 
+                    <SidebarMenuButton asChild isActive={isActive} className="">
+                      <Link
                         href={href}
                         className="hover:bg-surface-highest p-3"
                         draggable="false"
                       >
-                        <Icon className={cn("h-6 w-6  shrink-0", !isActive && "opacity-60")} />
+                        <Icon
+                          className={cn(
+                            "h-6 w-6  shrink-0",
+                            !isActive && "opacity-60",
+                          )}
+                        />
 
                         <AnimatePresence initial={false} mode="wait">
                           {!isCollapsed && (
@@ -118,7 +113,10 @@ export default function MainNav() {
       <SidebarFooter className="flex flex-col px-1">
         <Button
           onClick={() => setPostOpen(true)}
-          className={cn("mt-3 h-10 rounded-full shadow-none", !isCollapsed && "w-full")}
+          className={cn(
+            "mt-3 h-10 rounded-full shadow-none",
+            !isCollapsed && "w-full",
+          )}
         >
           <PlusIcon className="h-6 w-6 shrink-0" />
 
@@ -140,7 +138,7 @@ export default function MainNav() {
 
         <Button
           variant="outline"
-          onClick={handleSignOut}
+          onClick={() => signOut()}
           className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
         >
           <LogOutIcon className="h-6 w-6 p-[2px] shrink-0" />
@@ -162,10 +160,7 @@ export default function MainNav() {
         </Button>
       </SidebarFooter>
 
-      <PostModal
-        isOpen={postOpen}
-        onClose={() => setPostOpen(false)}
-      />
+      <PostModal isOpen={postOpen} onClose={() => setPostOpen(false)} />
     </Sidebar>
   );
 }

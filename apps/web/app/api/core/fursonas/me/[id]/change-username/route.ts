@@ -53,7 +53,7 @@ export async function GET(
       "check_username_cooldown",
       {
         p_fursona_id: fursonaId,
-      }
+      },
     );
 
     if (cooldownError) {
@@ -74,7 +74,7 @@ export async function GET(
     const cooldownUntil = new Date(cooldownData);
     const now = new Date();
     const daysRemaining = Math.ceil(
-      (cooldownUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      (cooldownUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     return Response.json({
@@ -93,12 +93,12 @@ export async function GET(
 /**
  * POST /api/core/fursonas/me/[id]/change-username
  * Change a fursona's username with 30-day cooldown enforcement
- * 
+ *
  * Request body:
  * {
  *   "new_username": "new_name"
  * }
- * 
+ *
  * Response:
  * - success: true → username changed
  * - success: false → includes error and optionally cooldown_until date
@@ -131,8 +131,10 @@ export async function POST(
     }
 
     // Parse request body
-    const body = (await request.json().catch(() => ({}))) as ChangeUsernameRequest;
-    
+    const body = (await request
+      .json()
+      .catch(() => ({}))) as ChangeUsernameRequest;
+
     if (!body.new_username || typeof body.new_username !== "string") {
       return badRequest("new_username is required");
     }

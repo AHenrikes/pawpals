@@ -32,7 +32,7 @@ export function useFollow(username: string): UseFollowReturn {
 
       try {
         const res = await api.get<{ isFollowing: boolean }>(
-          `/api/core/fursonas/${username}/follow`
+          `/api/core/fursonas/${username}/follow`,
         );
 
         if (!cancelled) setIsFollowing(res.isFollowing);
@@ -49,26 +49,23 @@ export function useFollow(username: string): UseFollowReturn {
     };
   }, [username]);
 
-  const toggle = useCallback(
-    async () => {
-      setLoading(true);
-      setError(null);
+  const toggle = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const method = isFollowing ? "delete" : "post";
-        const endpoint = `/api/core/fursonas/${username}/follow`;
+    try {
+      const method = isFollowing ? "delete" : "post";
+      const endpoint = `/api/core/fursonas/${username}/follow`;
 
-        await api[method](endpoint);
+      await api[method](endpoint);
 
-        setIsFollowing((prev) => !prev);
-      } catch (err) {
-        setError(toError(err));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [username, isFollowing]
-  );
+      setIsFollowing((prev) => !prev);
+    } catch (err) {
+      setError(toError(err));
+    } finally {
+      setLoading(false);
+    }
+  }, [username, isFollowing]);
 
   return { isFollowing, loading, error, toggle };
 }

@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 /**
  * GET /api/core/fursonas/[id]/username-history
  * Get the complete username change history for a fursona
- * 
+ *
  * Returns array of username changes in chronological order
  */
 export async function GET(
@@ -40,9 +40,7 @@ export async function GET(
     const { data: history, error } = await supabase
       .schema("core")
       .from("username_history")
-      .select(
-        "id, old_username, new_username, changed_at, reason"
-      )
+      .select("id, old_username, new_username, changed_at, reason")
       .eq("fursona_id", fursonaId)
       .order("changed_at", { ascending: false });
 

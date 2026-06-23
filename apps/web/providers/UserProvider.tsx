@@ -11,12 +11,12 @@ import React, {
 } from "react";
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
-import { useSupabaseClient } from "@/hooks/useSupabaseClient";
+import { createClient } from "@repo/supabase/client";
 import { makeCache } from "@/lib/helpers/profile-cache";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useRouter } from "next/navigation";
-import type { AccountTypes } from "@/types/account";
-import type { FursonaTypes } from "@/types/fursona";
+import { type AccountTypes } from "@/types/account";
+import { type FursonaTypes } from "@/types/fursona";
 
 export type UserContextType = {
   account: AccountTypes | null;
@@ -26,7 +26,7 @@ export type UserContextType = {
   error: Error | null;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
-  fetchFursonas: () => Promise<void>
+  fetchFursonas: () => Promise<void>;
   switchCurrentFursona: (id: string) => Promise<void>;
 };
 
@@ -35,7 +35,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
   const fursonasCacheRef = useRef(makeCache<FursonaTypes[]>());
@@ -43,7 +43,9 @@ export function UserProvider({
 
   const [account, setAccount] = useState<AccountTypes | null>(null);
   const [fursonas, setFursonas] = useState<FursonaTypes[]>([]);
-  const [currentFursona, setCurrentFursona] = useState<FursonaTypes | null>(null);
+  const [currentFursona, setCurrentFursona] = useState<FursonaTypes | null>(
+    null,
+  );
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -88,7 +90,12 @@ export function UserProvider({
 
       initialLoadDone.current = true;
     } catch (err: unknown) {
-      if (err && typeof err === "object" && "status" in err && (err as { status: number }).status === 401) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "status" in err &&
+        (err as { status: number }).status === 401
+      ) {
         await supabase.auth.signOut();
         return;
       }
@@ -96,14 +103,19 @@ export function UserProvider({
     } finally {
       setState({ loading: false });
     }
-}, [supabase, setState]);
+  }, [supabase, setState]);
 
   const fetchFursonas = useCallback(async () => {
     try {
-      const fursonas = await fursonasCacheRef.current.get("fursonas", async () => {
-        const res = await api.get<{ fursonas: FursonaTypes[] }>("/api/core/fursonas");
-        return res.fursonas ?? [];
-      });
+      const fursonas = await fursonasCacheRef.current.get(
+        "fursonas",
+        async () => {
+          const res = await api.get<{ fursonas: FursonaTypes[] }>(
+            "/api/core/fursonas",
+          );
+          return res.fursonas ?? [];
+        },
+      );
       setState({ fursonas });
     } catch (err) {
       setState({ error: toError(err) });
@@ -118,9 +130,9 @@ export function UserProvider({
       if (!isMountedRef.current) return;
 
       if (event === "SIGNED_OUT") {
+        router.push(AUTH_ROUTES.SIGN_IN);
         clearAuthState();
         setState({ loading: false });
-        router.push(AUTH_ROUTES.SIGN_IN);
         return;
       }
 
@@ -146,13 +158,10 @@ export function UserProvider({
   }, [router, refresh, supabase, clearAuthState, setState]);
 
   const signOut = useCallback(async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (err) {
-      setState({ error: toError(err) });
-    }
-  }, [supabase, setState]);
+    const { error } = await supabase.auth.signOut();
+
+    if (error) throw error;
+  }, [supabase]);
 
   const switchCurrentFursona = useCallback(
     async (fursonaId: string) => {

@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
+import { TypographySmall } from "@repo/ui/typography";
 import { Suspense } from "react";
 
 async function ErrorContent({
@@ -9,13 +10,13 @@ async function ErrorContent({
   return (
     <>
       {params?.error ? (
-        <p className="text-sm text-muted-foreground">
+        <TypographySmall className="text-muted-foreground">
           Code error: {params.error}
-        </p>
+        </TypographySmall>
       ) : (
-        <p className="text-sm text-muted-foreground">
+        <TypographySmall className="text-muted-foreground">
           An unspecified error occurred.
-        </p>
+        </TypographySmall>
       )}
     </>
   );

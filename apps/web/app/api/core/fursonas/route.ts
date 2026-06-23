@@ -6,12 +6,7 @@ import {
   normalizeOptionalText,
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
-import {
-  unauthorized,
-  badRequest,
-  serverError,
-  ok
-} from "@/lib/api/responses";
+import { unauthorized, badRequest, serverError, ok } from "@/lib/api/responses";
 
 export async function GET() {
   const { supabase, account, response } = await requireUser();
@@ -30,7 +25,7 @@ export async function GET() {
   if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   if (!fursonas) return badRequest(ERROR_MESSAGES.FURSONAS_NOT_FOUND);
 
-  return ok<{ fursonas: FursonaWithBoolean[] }>({fursonas: fursonas ?? []});
+  return ok<{ fursonas: FursonaWithBoolean[] }>({ fursonas: fursonas ?? [] });
 }
 
 export async function POST(req: NextRequest) {
@@ -79,9 +74,9 @@ export async function POST(req: NextRequest) {
   if (error) return badRequest(error.message);
 
   // A transaction-safe RPC to switch current fursona
-  const { error: switchError } = await supabase.rpc("switch_current_fursona",
-    { p_fursona_id: inserted.id }
-  );
+  const { error: switchError } = await supabase.rpc("switch_current_fursona", {
+    p_fursona_id: inserted.id,
+  });
 
   if (switchError) return badRequest(ERROR_MESSAGES.FURSONA_SWITCH_FAILED);
 

@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { cn } from "@/lib/helpers/utils";
 import { PawPrint } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,6 +9,9 @@ import {
   useContext,
   useMemo,
   createContext,
+  useEffect,
+  isValidElement,
+  cloneElement,
 } from "react";
 
 type SidebarContextValue = {
@@ -57,7 +59,7 @@ export function SidebarProvider({
   const [openMobile, setOpenMobile] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const mediaQuery = globalThis.matchMedia("(max-width: 767px)");
 
     const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
@@ -181,11 +183,11 @@ export function Sidebar({
         data-mobile="true"
         data-side={side}
         data-variant={variant}
-         data-state={openMobile ? "expanded" : "collapsed"}
+        data-state={openMobile ? "expanded" : "collapsed"}
         animate={{ width: isCollapsed ? "w-[--sidebar-width-mobile]" : "" }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-         "group/sidebar fixed top-16 py-4 px-2 h-[calc(100svh-64px)] z-40 w-[--sidebar-width-mobile] border-r border-border bg-background transition-transform md:hidden",
+          "group/sidebar fixed top-16 py-4 px-2 h-[calc(100svh-64px)] z-40 w-[--sidebar-width-mobile] border-r border-border bg-background transition-transform md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -230,10 +232,7 @@ export function SidebarContent({
   return (
     <div
       data-slot="sidebar-content"
-      className={cn(
-        "flex flex-1 flex-col gap-2 overflow-y-auto",
-        className,
-      )}
+      className={cn("flex flex-1 flex-col gap-2 overflow-y-auto", className)}
       {...props}
     />
   );
@@ -330,11 +329,9 @@ export function SidebarMenuButton({
 
   if (
     asChild &&
-    React.isValidElement<{ className?: string; "data-active"?: string }>(
-      children,
-    )
+    isValidElement<{ className?: string; "data-active"?: string }>(children)
   ) {
-    return React.cloneElement(children, {
+    return cloneElement(children, {
       className: cn(sharedClassName, children.props.className),
       "data-active": isActive ? "true" : "false",
     });

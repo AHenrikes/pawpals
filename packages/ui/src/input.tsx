@@ -9,7 +9,8 @@ export const inputVariants = cva(
       variant: {
         default: "h-9 rounded-md border border-input",
         auth: "h-14 rounded-full border-surface bg-popover px-5 text-base text-headline shadow-ambient placeholder:text-text-muted focus-visible:ring-2 focus-visible:ring-secondary",
-        popover: "rounded-full border-popover bg-popover px-5 text-base text-text shadow-ambient placeholder:text-text-muted focus-visible:ring-2 focus-visible:ring-secondary",
+        popover:
+          "rounded-full border-popover bg-popover px-5 text-base text-text shadow-ambient placeholder:text-text-muted focus-visible:ring-2 focus-visible:ring-secondary",
         none: "",
       },
 

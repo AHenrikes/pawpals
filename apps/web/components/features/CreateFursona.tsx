@@ -2,10 +2,10 @@
 
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { Textarea } from "@repo/ui/textarea";
-import { AtSign, Check, X, Loader2 } from "lucide-react";
-import { useDebouncedCallback } from "use-debounce";
 import { useEffect, useState } from "react";
+import { Textarea } from "@repo/ui/textarea";
+import { useDebouncedCallback } from "use-debounce";
+import { AtSign, Check, X, Loader2 } from "lucide-react";
 import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
 import { type FursonaCreate } from "@/types/fursona";
 

@@ -52,7 +52,7 @@ type FollowType = "followers" | "following";
  */
 export function useFollows(
   username: string,
-  type: FollowType
+  type: FollowType,
 ): UseFollowsReturn {
   const [follows, setFollows] = useState<FursonaPreview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,8 +89,8 @@ export function useFollows(
         nextCursor: string | null;
       }>(
         `/api/core/fursonas/${username}/${type}?cursor=${encodeURIComponent(
-          nextCursor
-        )}`
+          nextCursor,
+        )}`,
       );
       setFollows((prev) => [...prev, ...res.follows]);
       setNextCursor(res.nextCursor);

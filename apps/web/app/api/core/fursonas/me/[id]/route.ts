@@ -76,7 +76,8 @@ export async function PATCH(
   const isSettingCurrent = body.is_current === true;
   const isSettingDefault = body.is_default === true;
 
-  if (!hasUpdates && !isSettingDefault) return badRequest("No valid fields to update.");
+  if (!hasUpdates && !isSettingDefault)
+    return badRequest("No valid fields to update.");
 
   if (hasUpdates) {
     if (isSettingCurrent) {
@@ -109,7 +110,7 @@ export async function PATCH(
 
     if (setDefaultError) {
       badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    };
+    }
   }
 
   const { data: fursona, error: fetchError } = await supabase
@@ -162,5 +163,5 @@ export async function DELETE(
 
   if (deleteError) return badRequest(deleteError.message);
 
-  return ok({ ok: true })
+  return ok({ ok: true });
 }

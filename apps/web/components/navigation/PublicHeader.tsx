@@ -9,7 +9,6 @@ import {
   TypographyXSmall,
 } from "@repo/ui/typography";
 import { Button } from "@repo/ui/button";
-import Link from "next/link";
 import {
   House,
   Menu,
@@ -19,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 const navLinks = [
   {
@@ -35,13 +35,6 @@ const navLinks = [
     icon: MessageCircleQuestion,
     description: "What PawPals is",
   },
-  // {
-  //   id: "community",
-  //   href: AUTH_ROUTES.COMMUNITY,
-  //   label: "Community",
-  //   icon: UsersRound,
-  //   description: "Meet the pack",
-  // },
   {
     id: "contactUs",
     href: AUTH_ROUTES.CONTACT_US,

@@ -19,6 +19,12 @@ import { Label } from "@repo/ui/label";
 import AuthHeader from "@/components/navigation/AuthHeader";
 import AuthFooter from "@/components/footer/AuthFooter";
 import Link from "next/link";
+import {
+  TypographyH2,
+  TypographyP,
+  TypographySmall,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 
 export default function ForgotPasswordForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -56,6 +62,7 @@ export default function ForgotPasswordForm() {
         <div className="w-full max-w-md">
           <AnimatePresence mode="wait">
             {isSubmitted ? (
+              // Submitted email:
               <motion.div
                 key="success"
                 initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -78,22 +85,20 @@ export default function ForgotPasswordForm() {
                       <CheckCircle2 className="h-8 w-8 text-green-500" />
                     </motion.div>
 
-                    <h2 className="text-2xl font-semibold">
-                      Check your inbox
-                    </h2>
+                    <TypographyH2>Check your inbox</TypographyH2>
 
-                    <p className="mt-3 text-sm text-muted-foreground">
+                    <TypographyXSmall className="mt-3 text-muted-foreground">
                       If an account exists for
-                    </p>
+                    </TypographyXSmall>
 
-                    <p className="mt-1 font-medium break-all">
+                    <TypographyP className="mt-1 font-medium break-all">
                       {values.email}
-                    </p>
+                    </TypographyP>
 
-                    <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+                    <TypographySmall className="mt-4">
                       We&apos;ve sent password reset instructions. Follow the
                       link in the email to create a new password.
-                    </p>
+                    </TypographySmall>
 
                     <Button
                       variant="outline"
@@ -106,6 +111,7 @@ export default function ForgotPasswordForm() {
                 </Card>
               </motion.div>
             ) : (
+              // Forgot password:
               <motion.div
                 key="form"
                 initial={{ opacity: 0, y: 12 }}
@@ -126,7 +132,8 @@ export default function ForgotPasswordForm() {
 
                       <CardDescription className="mx-auto max-w-sm">
                         Enter the email associated with your account and
-                        we&apos;ll send you a secure link to reset your password.
+                        we&apos;ll send you a secure link to reset your
+                        password.
                       </CardDescription>
                     </div>
                   </CardHeader>
@@ -135,7 +142,11 @@ export default function ForgotPasswordForm() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="space-y-6">
                         <div>
-                          <Label htmlFor="email" variant="muted" className="sr-only">
+                          <Label
+                            htmlFor="email"
+                            variant="muted"
+                            className="sr-only"
+                          >
                             Email address
                           </Label>
 

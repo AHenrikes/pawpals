@@ -12,9 +12,9 @@ import { Dialog, DialogContent } from "@repo/ui/dialog";
 import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
 import { useDebouncedCallback } from "use-debounce";
 import { Label } from "@repo/ui/label";
-import type { FursonaTypes } from "@/types/fursona";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { type FursonaTypes } from "@/types/fursona";
+import Image from "next/image";
 
 interface EditProfileModalProps {
   fursona: FursonaTypes;
@@ -77,7 +77,7 @@ export function EditProfileModal({
   useCleanupBlobUrl(bannerPreview);
 
   const checkUsername = useDebouncedCallback(async (username: string) => {
-    if(currentFursona?.username === username) return setIsAvailable(true);
+    if (currentFursona?.username === username) return setIsAvailable(true);
 
     const res = await checkAvailability(username);
     setIsAvailable(res.available);
@@ -95,10 +95,7 @@ export function EditProfileModal({
 
     if (!file) return;
 
-    const maxSize =
-      type === "banner"
-        ? 10 * 1024 * 1024
-        : 5 * 1024 * 1024;
+    const maxSize = type === "banner" ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
 
     if (file.size > maxSize) {
       setError(
@@ -180,11 +177,7 @@ export function EditProfileModal({
       await refresh();
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to save changes",
-      );
+      setError(err instanceof Error ? err.message : "Failed to save changes");
     } finally {
       setLoading(false);
     }
@@ -313,7 +306,6 @@ export function EditProfileModal({
             </div>
           </div>
         </div>
-        
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">

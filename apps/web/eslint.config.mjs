@@ -14,13 +14,13 @@ const eslintConfig = [
   {
     ignores: [".next/**", "next-env.d.ts"],
   },
-  {
-    files: ["**/*.tsx", "**/*.ts"],
-    rules: {
-      "@typescript-eslint/prefer-readonly": "warn",
-      "@typescript-eslint/prefer-function-type": "warn",
-    },
-  },
+  // {
+  //   files: ["**/*.tsx", "**/*.ts"],
+  //   rules: {
+  //     "@typescript-eslint/prefer-readonly": "warn",
+  //     "@typescript-eslint/prefer-function-type": "warn",
+  //   },
+  // },
 ];
 
 export default eslintConfig;

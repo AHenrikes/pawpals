@@ -1,6 +1,12 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth/requireUser";
-import { badRequest, notFound, ok, serverError, unauthorized } from "@/lib/api/responses";
+import {
+  badRequest,
+  notFound,
+  ok,
+  serverError,
+  unauthorized,
+} from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 
 export async function GET(req: NextRequest) {
@@ -14,7 +20,8 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase
     .schema("social")
     .from("posts")
-    .select(`
+    .select(
+      `
       id,
       fursona_id,
       content,
@@ -26,7 +33,8 @@ export async function GET(req: NextRequest) {
       shares_count,
       is_published,
       created_at
-    `)
+    `,
+    )
     .eq("id", id)
     .eq("is_published", true)
     .single();

@@ -1,7 +1,14 @@
+export interface MediaItem {
+  url: string;
+  width: number;
+  height: number;
+  type: "image" | "video";
+}
+
 export type PostType = {
   title: string;
   content: string;
-  media_urls?: string[];
+  media_urls?: MediaItem[];
   likes_count: number;
   comments_count: number;
   views_count: number;
@@ -9,17 +16,17 @@ export type PostType = {
   shares_count: number;
   is_published: boolean;
   created_at: Date;
-}
+};
 
 export type PostCreate = {
   fursona_id: string;
   content: string;
-  media_urls?: string[];
+  media_urls?: MediaItem[];
   is_published: boolean;
-}
+};
 
 export type PostWithId = PostType & {
   id: string;
   fursona_id: string;
   updated_at: Date;
-}
+};

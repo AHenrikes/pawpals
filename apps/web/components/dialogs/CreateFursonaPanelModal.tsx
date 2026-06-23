@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { TypographySmall } from "@repo/ui/typography";
-import type { FursonaCreate } from "@/types/fursona";
 import { X } from "lucide-react";
-import CreateFursona from "@/components/features/CreateFursona";
 import { motion } from "framer-motion";
 import { toast } from "@repo/ui/sonner";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
+import { type FursonaCreate } from "@/types/fursona";
+import CreateFursona from "@/components/features/CreateFursona";
 
 interface CreateFursonaPanelModalProps {
   isOpen: boolean;
@@ -68,7 +68,9 @@ export function CreateFursonaPanelModal({
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.message || "Failed to create fursona");
+        toast.error("Failed to create fursona");
+
+        throw new Error(data.message);
       }
 
       const data = await response.json();
@@ -89,8 +91,9 @@ export function CreateFursonaPanelModal({
 
       router.push(`/@${createdFursona.username}`);
       toast.success(`Created ${createdFursona.display_name} successfully`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to create fursona");
+    } catch {
+      toast.error("Failed to create fursona");
+      return;
     } finally {
       setLoading(false);
     }
@@ -124,6 +127,7 @@ export function CreateFursonaPanelModal({
           className="absolute right-4 top-4 p-2 rounded-full hover:bg-popover disabled:opacity-50"
         >
           <X className="h-5 w-5" />
+
           <span className="sr-only">Close</span>
         </Button>
 
