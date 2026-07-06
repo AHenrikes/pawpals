@@ -70,7 +70,7 @@ export function useUsernameManager() {
 
       try {
         const response = await fetch(
-          `/api/core/fursonas/${encodeURIComponent(trimmedUsername)}/available`,
+          `/api/core/fursonas/available/${encodeURIComponent(trimmedUsername)}`,
         );
 
         if (!response.ok) {

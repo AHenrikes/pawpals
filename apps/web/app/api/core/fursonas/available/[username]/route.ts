@@ -4,7 +4,7 @@ import type { RouteContext } from "@/lib/types/api";
 import type { NextRequest } from "next/server";
 
 /**
- * GET /api/core/fursonas/[username]/available
+ * GET /api/core/fursonas/available/[username]
  * Check username availability and get suggestions if taken
  *
  * Response:

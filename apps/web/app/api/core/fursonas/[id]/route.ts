@@ -1,19 +1,15 @@
-import { type NextRequest } from "next/server";
-import type { FursonaInput, FursonaWithBoolean } from "@/types/fursona";
-import type { RouteContext } from "@/lib/types/api";
-import {
-  normalizeOptionalText,
-  normalizeRequiredName,
-} from "@/lib/helpers/normalizeInput";
 import { requireUser } from "@/lib/auth/requireUser";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import { FursonaCreate, FursonaWithBoolean, type FursonaProfile } from "@/types/fursona";
+import { NextRequest } from "next/server";
 import {
-  unauthorized,
   badRequest,
-  serverError,
   notFound,
   ok,
+  serverError,
+  unauthorized,
 } from "@/lib/api/responses";
-import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import { normalizeOptionalText, normalizeRequiredName } from "@/lib/helpers/normalizeInput";
 
 function buildPatchUpdates(body: FursonaWithBoolean) {
   const updates: Record<string, unknown> = {};
@@ -56,16 +52,49 @@ function buildPatchUpdates(body: FursonaWithBoolean) {
   return { updates, error: null };
 }
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { supabase, account, response } = await requireUser();
+  if (!account) return unauthorized();
+  if (response) return response;
+
+  const { id } = await params;
+
+  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
+  
+  // Support both UUID-based ID and username lookups
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  
+  const { data, error } = await supabase
+    .schema("core")
+    .from("fursonas")
+    .select(
+      "id, username, display_name, avatar_url, banner_url, species, pronouns, bio, reputation, created_at",
+    )
+    .eq(isUuid ? "id" : "username", id)
+    .eq("is_active", true)
+    .single();
+
+  if (error?.code === "PGRST116") return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+
+  return ok<FursonaProfile>(data);
+}
+
 export async function PATCH(
   request: NextRequest,
-  context: RouteContext<{ id: string }>,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { supabase, account, response } = await requireUser();
   if (account === null) return unauthorized();
   if (response) return response;
 
-  const { id: fursonaId } = await context.params;
-  if (!fursonaId) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  const { id } = await params;
+
+  if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
   const body = (await request.json().catch(() => ({}))) as FursonaWithBoolean;
   const { updates, error } = buildPatchUpdates(body);
@@ -84,7 +113,7 @@ export async function PATCH(
       const { error: switchError } = await supabase.rpc(
         "switch_current_fursona",
         {
-          p_fursona_id: fursonaId,
+          p_fursona_id: id,
         },
       );
       if (switchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
@@ -93,7 +122,7 @@ export async function PATCH(
         .schema("core")
         .from("fursonas")
         .update(updates)
-        .eq("id", fursonaId)
+        .eq("id", id)
         .eq("account_id", account.id);
 
       if (updateError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
@@ -104,13 +133,11 @@ export async function PATCH(
     const { error: setDefaultError } = await supabase.rpc(
       "set_default_fursona",
       {
-        p_fursona_id: fursonaId,
+        p_fursona_id: id,
       },
     );
 
-    if (setDefaultError) {
-      badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    }
+    if (setDefaultError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   }
 
   const { data: fursona, error: fetchError } = await supabase
@@ -119,27 +146,27 @@ export async function PATCH(
     .select(
       "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, updated_at",
     )
-    .eq("id", fursonaId)
+    .eq("id", id)
     .eq("account_id", account.id)
     .maybeSingle();
 
   if (fetchError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  return ok<{ fursona: FursonaInput }>({ fursona });
+  return ok<{ fursona: FursonaCreate }>({ fursona });
 }
 
 export async function DELETE(
   _request: NextRequest,
-  context: RouteContext<{ id: string }>,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { supabase, account, response } = await requireUser();
   if (response) return response;
   if (account === null) return unauthorized();
 
-  const { id: fursonaId } = await context.params;
+  const { id } = await params;
 
-  if (!fursonaId) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
   // Verify user has at least one fursona after deletion
   const { count, error: countError } = await supabase
@@ -149,16 +176,14 @@ export async function DELETE(
     .eq("account_id", account.id);
 
   if (countError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if ((count ?? 0) <= 1) {
-    return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-  }
+  if ((count ?? 0) <= 1) return badRequest("Cannot delete last fursona");
 
   // Delete the fursona
   const { error: deleteError } = await supabase
     .schema("core")
     .from("fursonas")
     .delete()
-    .eq("id", fursonaId)
+    .eq("id", id)
     .eq("account_id", account.id);
 
   if (deleteError) return badRequest(deleteError.message);

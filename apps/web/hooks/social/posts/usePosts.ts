@@ -1,23 +1,53 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
 import { api } from "@/lib/api/api-client";
-import { PostWithId } from "@/types/post";
+import { useState, useCallback, useRef } from "react";
+import type { PostType, MediaItem } from "@/types/post";
 
 interface PostsFeed {
-  posts: PostWithId[];
+  posts: PostType[];
   nextCursor: string | null;
 }
 
 interface UsePostsState {
-  posts: PostWithId[];
+  posts: PostType[];
   nextCursor: string | null;
   loading: boolean;
   loadingMore: boolean;
   error: string | null;
 }
 
-export function usePosts(username: string) {
+// Helper to parse media_urls from JSON strings to objects
+function parseMediaUrls(posts: PostType[]): PostType[] {
+  return posts.map((post) => {
+    if (!post.media_urls || post.media_urls.length === 0) {
+      return post;
+    }
+
+    const media_urls = post.media_urls
+      .map((item) => {
+        // If it's already an object, return it
+        if (typeof item === "object" && item !== null && "url" in item) {
+          return item;
+        }
+        // If it's a JSON string, parse it
+        if (typeof item === "string") {
+          try {
+            return JSON.parse(item) as MediaItem;
+          } catch {
+            console.warn("Failed to parse media URL:", item);
+            return null;
+          }
+        }
+        return null;
+      })
+      .filter((item): item is MediaItem => item !== null);
+
+    return { ...post, media_urls };
+  });
+}
+
+export function usePosts() {
   const [state, setState] = useState<UsePostsState>({
     posts: [],
     nextCursor: null,
@@ -28,7 +58,7 @@ export function usePosts(username: string) {
 
   // prevent double-fetching in dev (StrictMode)
   const fetchingRef = useRef(false);
-  const baseUrl = `/api/core/fursonas/${username}/posts`;
+  const baseUrl = `/api/social/posts`;
 
   const fetchPosts = useCallback(async () => {
     if (fetchingRef.current) return;
@@ -37,9 +67,10 @@ export function usePosts(username: string) {
 
     try {
       const data = await api.get<PostsFeed>(baseUrl);
+      const parsedPosts = parseMediaUrls(data.posts);
       setState((s) => ({
         ...s,
-        posts: data.posts,
+        posts: parsedPosts,
         nextCursor: data.nextCursor,
       }));
     } catch {
@@ -56,11 +87,12 @@ export function usePosts(username: string) {
 
     try {
       const data = await api.get<PostsFeed>(
-        `${baseUrl}?cursor=${encodeURIComponent(state.nextCursor!)}`,
+        `${baseUrl}?cursor=${encodeURIComponent(state.nextCursor)}`,
       );
+      const parsedPosts = parseMediaUrls(data.posts);
       setState((s) => ({
         ...s,
-        posts: [...s.posts, ...data.posts],
+        posts: [...s.posts, ...parsedPosts],
         nextCursor: data.nextCursor,
       }));
     } catch {

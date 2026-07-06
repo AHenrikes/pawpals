@@ -5,7 +5,7 @@ import { uploadPostMedia } from "@/lib/uploads/postMedia";
 import { api } from "@/lib/api/api-client";
 import { MediaItem } from "@/types/post";
 
-export const POST_MAX_MEDIA = 5;
+export const POST_MAX_MEDIA = 4;
 export const POST_MAX_CHARS = 2200;
 export const POST_WARN_CHARS = 1800;
 export const POST_DANGER_CHARS = 2100;
@@ -136,7 +136,7 @@ export function usePostForm(onClose: () => void) {
             url,
             ...dims,
             type: isVideo ? "video" : "image",
-          } as MediaItem;
+          };
         }),
       );
 

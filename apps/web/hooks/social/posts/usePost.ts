@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api/api-client";
-import { PostWithId } from "@/types/post";
+import { PostType } from "@/types/post";
 
 interface UsePostState {
-  post: PostWithId | null;
+  post: PostType | null;
   loading: boolean;
   error: string | null;
 }
@@ -22,7 +22,7 @@ export function usePost(id: string) {
     setState((s) => ({ ...s, loading: true, error: null }));
 
     try {
-      const data = await api.get<{ post: PostWithId }>(
+      const data = await api.get<{ post: PostType }>(
         `/api/social/posts?id=${id}`,
       );
       setState((s) => ({ ...s, post: data.post }));

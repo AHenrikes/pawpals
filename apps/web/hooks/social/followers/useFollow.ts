@@ -16,13 +16,13 @@ interface UseFollowReturn {
  *
  * @param fursonaUsername - Username of the fursona to follow/unfollow
  */
-export function useFollow(username: string): UseFollowReturn {
+export function useFollow(id?: string): UseFollowReturn {
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!username) return;
+    if (!id) return;
 
     let cancelled = false;
 
@@ -32,7 +32,7 @@ export function useFollow(username: string): UseFollowReturn {
 
       try {
         const res = await api.get<{ isFollowing: boolean }>(
-          `/api/core/fursonas/${username}/follow`,
+          `/api/core/fursonas/${id}/follow`,
         );
 
         if (!cancelled) setIsFollowing(res.isFollowing);
@@ -47,7 +47,7 @@ export function useFollow(username: string): UseFollowReturn {
     return () => {
       cancelled = true;
     };
-  }, [username]);
+  }, [id]);
 
   const toggle = useCallback(async () => {
     setLoading(true);
@@ -55,7 +55,7 @@ export function useFollow(username: string): UseFollowReturn {
 
     try {
       const method = isFollowing ? "delete" : "post";
-      const endpoint = `/api/core/fursonas/${username}/follow`;
+      const endpoint = `/api/core/fursonas/${id}/follow`;
 
       await api[method](endpoint);
 
@@ -65,7 +65,7 @@ export function useFollow(username: string): UseFollowReturn {
     } finally {
       setLoading(false);
     }
-  }, [username, isFollowing]);
+  }, [id, isFollowing]);
 
   return { isFollowing, loading, error, toggle };
 }

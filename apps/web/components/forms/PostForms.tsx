@@ -28,10 +28,14 @@ import {
   POST_MAX_CHARS,
   POST_WARN_CHARS,
   POST_DANGER_CHARS,
-} from "@/hooks/social/posts/usePostForm";
+} from "@/hooks/core/fursonas/usePostForm";
 import Image from "next/image";
 import { toast } from "@repo/ui/sonner";
 import { type MediaItem } from "@/types/post";
+import { Button } from "@repo/ui/button";
+import { TypographyP, TypographySmall } from "@repo/ui/typography";
+import { Input } from "@repo/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
 
 const VISIBILITY_OPTIONS: {
   value: Visibility;
@@ -111,14 +115,16 @@ function MediaItem({
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      <button
+      <Button
         type="button"
+        variant={"destructive"}
+        size={"icon"}
         onClick={() => onRemove(index)}
         aria-label={`Remove media ${index + 1}`}
         className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-black hover:scale-110"
       >
         <XIcon className="h-3 w-3" />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -137,13 +143,13 @@ function MediaGrid({
 
   if (count === 1) {
     return (
-      <div className="flex-1 flex items-center justify-center p-2 bg-black/5 overflow-hidden">
+      <div className="flex-1 flex items-center justify-center p-4 bg-black/5 overflow-hidden">
         <MediaItem
           preview={previews[0]!}
           index={0}
           single
           onRemove={onRemove}
-          className="w-full rounded-xl"
+          className="w-full"
         />
       </div>
     );
@@ -151,14 +157,13 @@ function MediaGrid({
 
   if (count === 2) {
     return (
-      <div className="flex-1 grid grid-cols-2 gap-0.5 p-2">
+      <div className="flex-1 grid grid-cols-2 gap-1 p-4">
         {previews.map((p, i) => (
           <MediaItem
             key={p.url}
             preview={p}
             index={i}
             onRemove={onRemove}
-            className="aspect-[3/4] rounded-xl"
           />
         ))}
       </div>
@@ -168,7 +173,7 @@ function MediaGrid({
   if (count === 3) {
     return (
       <div
-        className="flex-1 grid grid-cols-2 gap-0.5 p-2"
+        className="flex-1 grid grid-cols-2 gap-1 p-4"
         style={{ gridTemplateRows: "1fr 1fr" }}
       >
         <MediaItem
@@ -176,62 +181,32 @@ function MediaGrid({
           preview={previews[0]!}
           index={0}
           onRemove={onRemove}
-          className="row-span-2 rounded-xl"
+          className="row-span-2"
         />
         <MediaItem
           key={previews[1]!.url}
           preview={previews[1]!}
           index={1}
           onRemove={onRemove}
-          className="rounded-xl"
         />
         <MediaItem
           key={previews[2]!.url}
           preview={previews[2]!}
           index={2}
           onRemove={onRemove}
-          className="rounded-xl"
         />
       </div>
     );
   }
 
-  if (count === 4) {
-    return (
-      <div className="flex-1 grid grid-cols-2 gap-0.5 p-2">
-        {previews.map((p, i) => (
-          <MediaItem
-            key={p.url}
-            preview={p}
-            index={i}
-            onRemove={onRemove}
-            className="aspect-square rounded-xl"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  // 5
   return (
-    <div
-      className="flex-1 grid grid-cols-2 gap-0.5 p-2"
-      style={{ gridTemplateRows: "2fr 1fr 1fr" }}
-    >
-      <MediaItem
-        key={previews[0]!.url}
-        preview={previews[0]!}
-        index={0}
-        onRemove={onRemove}
-        className="row-span-2 rounded-xl"
-      />
-      {previews.slice(1).map((p, i) => (
+    <div className="flex-1 grid grid-cols-2 gap-1 p-4">
+      {previews.map((p, i) => (
         <MediaItem
           key={p.url}
           preview={p}
-          index={i + 1}
+          index={i}
           onRemove={onRemove}
-          className="rounded-xl"
         />
       ))}
     </div>
@@ -272,27 +247,31 @@ function MobileMediaStrip({
               className="object-cover"
             />
           )}
-          <button
+          <Button
             type="button"
+            size={"icon"}
+            variant={"outline"}
             onClick={() => onRemove(i)}
             aria-label={`Remove media ${i + 1}`}
             className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
           >
             <XIcon className="h-2.5 w-2.5" />
-          </button>
+          </Button>
         </div>
       ))}
 
       {previews.length < POST_MAX_MEDIA && (
-        <button
+        <Button
           type="button"
+          size={"icon"}
+          variant={"none"}
           onClick={onAdd}
           style={{ width: 72, height: 72 }}
           className="flex-shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5 text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
         >
           <PlusIcon className="h-4 w-4" />
           <span>Add</span>
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -366,18 +345,20 @@ export default function PostForm({
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-primary/10 text-primary">
               <PlusIcon className="h-6 w-6" />
             </div>
-            <div className="text-center">
-              <p
-                className="text-sm font-semibold text-foreground"
+
+            <div className="flex flex-col text-center">
+              <TypographySmall
+                className="font-semibold text-foreground"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 Drag photos and videos here
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+              </TypographySmall>
+
+              <TypographySmall className="mt-1 text-muted-foreground leading-relaxed">
                 or click to browse from your device
                 <br />
                 Up to {POST_MAX_MEDIA} files
-              </p>
+              </TypographySmall>
             </div>
           </motion.button>
         ) : (
@@ -396,20 +377,23 @@ export default function PostForm({
               </span>{" "}
               / {POST_MAX_MEDIA} files
             </span>
+
             {mediaPreviews.length < POST_MAX_MEDIA && (
-              <button
+              <Button
                 type="button"
+                size={"icon"}
+                variant={"ghost"}
                 onClick={openFilePicker}
-                className="flex items-center gap-1 text-xs font-medium text-primary hover:opacity-75 transition-opacity"
+                className="w-fit gap-1 text-xs font-medium text-primary hover:opacity-75 transition-opacity"
               >
                 <PlusIcon className="h-3.5 w-3.5" />
                 Add more
-              </button>
+              </Button>
             )}
           </div>
         )}
 
-        <input
+        <Input
           ref={mediaRef}
           type="file"
           accept="image/*,video/*"
@@ -437,42 +421,47 @@ export default function PostForm({
                 />
               </div>
             )}
+
             <div>
-              <p
-                className="text-sm font-bold leading-tight text-foreground"
+              <TypographySmall
+                className="font-bold leading-tight text-foreground"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 {currentFursona?.display_name}
-              </p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
+              </TypographySmall>
+
+              <TypographyP className="text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
                 Creating new post
-              </p>
+              </TypographyP>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant={"outline"}
               onClick={toggleNSFW}
               aria-pressed={isNSFW}
               className={cn(
-                "rounded-lg border px-2.5 py-1 text-[10px] font-bold tracking-widest transition-all",
+                "rounded-lg px-2.5 py-1 text-[10px] font-bold tracking-widest transition-all hover:border-red-600",
                 isNSFW
                   ? "border-destructive bg-destructive/10 text-destructive"
                   : "border-border text-muted-foreground hover:border-destructive/50 hover:text-destructive/70",
               )}
             >
               NSFW
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              size={"icon"}
+              variant={"outline"}
               onClick={onClose}
               aria-label="Close"
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-surface-variant hover:text-foreground"
+              className="rounded-full text-muted-foreground transition-colors hover:bg-surface-variant hover:text-foreground"
             >
               <XIcon className="h-3.5 w-3.5" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -488,18 +477,20 @@ export default function PostForm({
               onAdd={openFilePicker}
             />
           ) : (
-            <button
+            <Button
               type="button"
+              size={"iconPair"}
+              variant={"ghost"}
               onClick={openFilePicker}
-              className="flex w-full items-center justify-center gap-2 py-3 text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="w-full h-full gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <ImageIcon className="h-5 w-5" />
               Add photos or videos
-            </button>
+            </Button>
           )}
         </div>
 
-        <input
+        <Input
           ref={mediaRef}
           type="file"
           accept="image/*,video/*"
@@ -512,109 +503,112 @@ export default function PostForm({
         />
 
         {/* Caption + meta */}
-        <div className="flex flex-1 flex-col overflow-y-auto min-h-0 border-b border-border">
-          <div className="flex flex-col flex-1 pt-3 gap-2">
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={placeholder}
-              maxLength={POST_MAX_CHARS}
-              rows={4}
-              className="w-full flex-1 px-4 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground outline-none"
-              style={{
-                caretColor: "hsl(var(--primary))",
-                fontFamily: "var(--font-body)",
-              }}
-            />
+        <div className="flex flex-col h-full gap-2 border-b border-border">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={placeholder}
+            maxLength={POST_MAX_CHARS}
+            rows={4}
+            className="w-full flex-1 px-4 py-2 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground outline-none"
+            style={{
+              caretColor: "hsl(var(--primary))",
+              fontFamily: "var(--font-body)",
+            }}
+          />
 
-            <div className="flex justify-end px-4">
-              <span
-                className={cn(
-                  "rounded-full bg-surface-highest px-2.5 py-0.5 text-[11px]",
-                  getCharClass(content.length),
-                )}
+          <div className="flex justify-end px-4">
+            <span
+              className={cn(
+                "rounded-full bg-surface-highest px-2.5 py-0.5 text-[11px]",
+                getCharClass(content.length),
+              )}
+            >
+              {content.length} / {POST_MAX_CHARS}
+            </span>
+          </div>
+
+          <div className="flex flex-col border-t border-border px-4 py-2">
+            {META_ROWS.map(({ Icon, label }) => (
+              <Button
+                type="button"
+                key={label}
+                size={"iconPair"}
+                variant={"ghost"}
+                className="w-full text-muted-foreground hover:opacity-70 transition-opacity"
               >
-                {content.length} / {POST_MAX_CHARS}
-              </span>
-            </div>
-
-            <div className="flex flex-col border-t border-border px-4">
-              {META_ROWS.map(({ Icon, label }) => (
-                <button
-                  key={label}
-                  type="button"
-                  className="flex items-center justify-between py-2.5 border-b border-border/40 last:border-none text-muted-foreground hover:opacity-70 transition-opacity"
+                <span
+                  className="flex items-center w-full gap-2.5 text-sm"
+                  style={{ fontFamily: "var(--font-body)" }}
                 >
-                  <span
-                    className="flex items-center gap-2.5 text-sm"
-                    style={{ fontFamily: "var(--font-body)" }}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {label}
-                  </span>
-                  <ChevronRightIcon className="h-3.5 w-3.5" />
-                </button>
-              ))}
-            </div>
+                  <Icon size={16} />
+                  {label}
+                </span>
 
-            <div className="flex items-center justify-between px-4 pb-3">
-              <span className="text-xs text-muted-foreground">
-                Who can see this?
-              </span>
-              <div className="relative">
-                <button
+                <ChevronRightIcon size={14} />
+              </Button>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between px-4 pb-3">
+            <span className="text-xs text-muted-foreground">
+              Who can see this?
+            </span>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
                   type="button"
+                  size={"iconPair"}
+                  variant={"outline"}
                   onClick={() => setVisOpen((v) => !v)}
                   aria-expanded={visOpen}
                   aria-haspopup="listbox"
-                  className="flex items-center gap-1.5 rounded-full border border-border bg-surface-highest px-2.5 py-1 text-xs text-foreground transition-colors hover:border-primary"
+                  className="px-3 py-1 gap-3 text-sm text-muted-foreground"
                 >
-                  <currentVis.Icon className="h-3 w-3" />
-                  {currentVis.label}
-                  <ChevronDownIcon className="h-3 w-3 text-muted-foreground" />
-                </button>
+                  <div className="flex items-center gap-1.5">
+                    <currentVis.Icon size={12} />
+                    {currentVis.label}
+                  </div>
 
-                <AnimatePresence>
-                  {visOpen && (
-                    <motion.ul
-                      role="listbox"
-                      aria-label="Visibility"
-                      initial={{ opacity: 0, y: -4, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -4, scale: 0.97 }}
-                      transition={{ duration: 0.12 }}
-                      className="absolute right-0 bottom-full lg:top-full lg:bottom-auto z-30 mb-1.5 lg:mb-0 lg:mt-1.5 w-48 overflow-hidden rounded-2xl border border-border bg-surface-highest shadow-lg"
-                    >
-                      {VISIBILITY_OPTIONS.map(({ value, label, Icon }) => (
-                        <li
-                          key={value}
-                          role="option"
-                          aria-selected={visibility === value}
+                  <ChevronDownIcon size={12} />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                {visOpen && (
+                  <DropdownMenuGroup>
+                    {VISIBILITY_OPTIONS.map(({ value, label, Icon }) => (
+                      <DropdownMenuItem
+                        key={value}
+                        role="option"
+                        aria-selected={visibility === value}
+                      >
+                        <Button
+                          type="button"
+                          size={"iconPair"}
+                          variant={"ghost"}
+                          onClick={() => {
+                            setVisibility(value);
+                            setVisOpen(false);
+                          }}
+                          className={cn(
+                            "justify-start w-full h-full px-2.5 py-3 gap-1.5 text-sm text-muted-foreground rounded-none transition-colors hover:bg-surface-variant",
+                            visibility === value
+                              ? "text-primary"
+                              : "text-muted-foreground",
+                          )}
                         >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setVisibility(value);
-                              setVisOpen(false);
-                            }}
-                            className={cn(
-                              "flex w-full items-center gap-2.5 px-3.5 py-2.5 text-xs transition-colors hover:bg-surface-variant",
-                              visibility === value
-                                ? "text-primary"
-                                : "text-muted-foreground",
-                            )}
-                            style={{ fontFamily: "var(--font-body)" }}
-                          >
-                            <Icon className="h-3.5 w-3.5" />
-                            {label}
-                          </button>
-                        </li>
-                      ))}
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+                          <Icon size={16} />
+
+                          {label}
+                        </Button>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -622,26 +616,27 @@ export default function PostForm({
         <div className="flex flex-col gap-2 px-4 pb-4 pt-3">
           <div className="flex items-center gap-1">
             {TOOLBAR_ACTIONS.map(({ Icon, label }) => (
-              <button
+              <Button
                 key={label}
-                type="button"
                 aria-label={label}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-variant hover:text-primary"
+                type="button"
+                size={"icon"}
+                variant={"ghost"}
+                className="p-2 text-muted-foreground transition-colors hover:bg-surface-variant hover:text-primary"
               >
-                <Icon className="h-4 w-4" />
-              </button>
+                <Icon size={16} />
+              </Button>
             ))}
           </div>
 
-          <button
+          <Button
             type="submit"
+            size={"iconPair"}
             disabled={
               loading || (!content.trim() && mediaPreviews.length === 0)
             }
             className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-2xl py-2.5",
-              "bg-primary text-primary-foreground font-bold text-sm",
-              "transition-all hover:bg-primary-dim active:scale-[.98]",
+              "w-full py-2",
               "disabled:opacity-35 disabled:cursor-not-allowed disabled:active:scale-100",
             )}
             style={{ fontFamily: "var(--font-display)" }}
@@ -657,11 +652,11 @@ export default function PostForm({
               </>
             ) : (
               <>
-                <SendIcon className="h-4 w-4" />
+                <SendIcon size={14} />
                 Post
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </form>

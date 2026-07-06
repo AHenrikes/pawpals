@@ -10,26 +10,16 @@ import {
   unauthorized,
 } from "@/lib/api/responses";
 
-type Params = { params: Promise<{ username: string }> };
-
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { supabase, account, response } = await requireUser();
   if (!account) return unauthorized();
   if (response) return response;
 
-  const { username } = await params;
-  if (!username) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
-
-  const { data: target, error: targetError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("username", username)
-    .eq("is_active", true)
-    .single();
-
-  if (targetError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if (!target) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  const { id } = await params;
+  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
   const { data: self, error: selfError } = await supabase
     .schema("core")
@@ -47,30 +37,22 @@ export async function GET(_req: NextRequest, { params }: Params) {
     .from("followers")
     .select("id")
     .eq("follower_fursona_id", self.id)
-    .eq("following_fursona_id", target.id)
+    .eq("following_fursona_id", id)
     .single();
 
   return ok({ isFollowing: !!data });
 }
 
-export async function POST(_req: NextRequest, { params }: Params) {
+export async function POST(
+    _req: NextRequest,
+  { params }: { params: Promise<{ id :string }> }
+) {
   const { supabase, account, response } = await requireUser();
   if (!account) return unauthorized();
   if (response) return response;
 
-  const { username } = await params;
-  if (!username) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
-
-  const { data: target, error: targetError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("username", username)
-    .eq("is_active", true)
-    .single();
-
-  if (targetError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if (!target) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  const { id } = await params;
+  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
   const { data: self, error: selfError } = await supabase
     .schema("core")
@@ -82,12 +64,12 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   if (selfError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
   if (!self) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-  if (self.id === target.id) return badRequest("Cannot follow yourself");
+  if (self.id === id) return badRequest("Cannot follow yourself");
 
   const { error } = await supabase
     .schema("social")
     .from("followers")
-    .insert({ follower_fursona_id: self.id, following_fursona_id: target.id });
+    .insert({ follower_fursona_id: self.id, following_fursona_id: id });
 
   if (error?.code === "23505") return conflict("Already following");
   if (error) return serverError(error.message);
@@ -96,24 +78,16 @@ export async function POST(_req: NextRequest, { params }: Params) {
 }
 
 // follow -> unfollow
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { supabase, account, response } = await requireUser();
   if (!account) return unauthorized();
   if (response) return response;
 
-  const { username } = await params;
-  if (!username) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
-
-  const { data: target, error: targetError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("username", username)
-    .eq("is_active", true)
-    .single();
-
-  if (targetError) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-  if (!target) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  const { id } = await params;
+  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
   const { data: self, error: selfError } = await supabase
     .schema("core")
@@ -131,7 +105,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     .from("followers")
     .delete()
     .eq("follower_fursona_id", self.id)
-    .eq("following_fursona_id", target.id);
+    .eq("following_fursona_id", id);
 
   if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 

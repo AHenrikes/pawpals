@@ -169,7 +169,7 @@ export function UserProvider({
         setState({ loading: true, error: null });
 
         const res = await api.patch<{ fursona: FursonaTypes }>(
-          `/api/core/fursonas/me/${fursonaId}`,
+          `/api/core/fursonas/${fursonaId}`,
           { is_current: true },
         );
 

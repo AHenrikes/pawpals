@@ -6,15 +6,16 @@ import { type FursonaTypes } from "@/types/fursona";
 
 const profileCache = makeCache<FursonaTypes | null>(10 * 60 * 1000);
 
-export function useProfile(username: string) {
+export function useProfile(id: string) {
   const {
     data: profile,
     loading,
     error,
   } = useAsyncDataWithCache(
     async () => {
+
       const res = await fetch(
-        `/api/core/fursonas/${encodeURIComponent(username)}`,
+        `/api/core/fursonas/${encodeURIComponent(id)}`,
       );
 
       if (res.status === 404) return null;
@@ -25,8 +26,8 @@ export function useProfile(username: string) {
 
       return res.json() as Promise<FursonaTypes>;
     },
-    (fetcher) => profileCache.get(username, fetcher),
-    [username],
+    (fetcher) => profileCache.get(id, fetcher),
+    [id],
   );
 
   return { profile, loading, error };

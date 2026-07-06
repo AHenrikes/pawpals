@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
+import scrollbarHide from "tailwind-scrollbar-hide";
 
 export default {
   darkMode: ["class"],
@@ -31,8 +32,8 @@ export default {
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
           dim: "hsl(var(--primary-dim))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -42,10 +43,7 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
+        destructive: "hsl(var(--destructive))",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -58,6 +56,7 @@ export default {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
+        outline: "hsl(var(--outline))", 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -65,6 +64,7 @@ export default {
         headline: "hsl(var(--headline))",
         text: {
           DEFAULT: "hsl(var(--text))",
+          foreground: "hsl(var(--text-foreground))",
           primary: "hsl(var(--text-primary))",
           secondary: "hsl(var(--text-secondary))",
           destructive: "hsl(var(--text-destructive))",
@@ -72,30 +72,15 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "2rem",
-        "2xl": "3rem",
+        sm: "calc(var(--radius) - 8px)",
+        md: "calc(var(--radius) - 4px)",
+        base: "var(--radius)",
+        lg: "calc(var(--radius) + 4px)",
+        xl: "calc(var(--radius) - 8px)",
         full: "9999px",
       },
       backgroundImage: {
         "pawpals-primary": "var(--gradient-primary)",
-        "fur-gradient": `
-          linear-gradient(
-            0deg,
-            transparent,
-            hsl(0 0% 0%) 26%,
-            hsl(0 0% 0%) 33%,
-            hsl(0 0% 0%) 39%,
-            hsl(0 0% 0%) 44%,
-            hsl(0 0% 0%) 50%,
-            hsl(0 0% 0%) 56%,
-            hsl(0 0% 0%) 61%,
-            hsl(0 0% 0%) 67%,
-            hsl(0 0% 0%) 74%,
-            transparent
-          )`,
       },
       boxShadow: {
         ambient: "var(--ambient-shadow)",
@@ -104,9 +89,9 @@ export default {
         display: "-0.02em",
       },
       backdropBlur: {
-        glass: "24px",
+        blur: "hsl(var(--blur))",
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, scrollbarHide],
 } satisfies Config;

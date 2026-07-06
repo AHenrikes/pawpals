@@ -70,8 +70,7 @@ export async function POST(req: NextRequest) {
     )
     .single();
 
-  // if (error) return badRequest(ERROR_MESSAGES.FURSONA_UPDATE_FAILED);
-  if (error) return badRequest(error.message);
+  if (error) return badRequest(ERROR_MESSAGES.FURSONA_UPDATE_FAILED);
 
   // A transaction-safe RPC to switch current fursona
   const { error: switchError } = await supabase.rpc("switch_current_fursona", {

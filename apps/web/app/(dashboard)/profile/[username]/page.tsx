@@ -14,7 +14,7 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { EllipsisVerticalIcon } from "lucide-react";
+import { EllipsisVerticalIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
@@ -22,21 +22,13 @@ import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { ProfilePostCards } from "@/components/cards/PostCards";
 import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
 import ProfileRepost from "@/components/ProfileRepost";
-import PostCards from "@/components/cards/PostCads";
 import Image from "next/image";
-
-function getInitials(name: string) {
-  if (!name) return "";
-
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
+import { getInitials } from "@/utils/getInitials";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import ProfileDropdown from "@/components/dropdowns/Profile";
 
 function formatNumbers(count: number): string {
   if (count < 1000) return `${count}`;
@@ -49,6 +41,7 @@ function formatNumbers(count: number): string {
 
 const profileNav = [
   { label: "POST", key: "post" },
+  { label: "GALLERY", key: "gallery" },
   { label: "REPOST", key: "repost" },
   { label: "ARCHIVE", key: "archive" },
   { label: "LIKE", key: "likes" },
@@ -59,27 +52,19 @@ type ContentKey = (typeof profileNav)[number]["key"];
 export default function ProfilePage() {
   const { currentFursona, refresh, loading: userLoading } = useUser();
   const { username: paramUsername } = useParams<{ username: string }>();
-  const { following, follower, refetch, like } =
-    useProfileCounts(paramUsername);
-  const {
-    isFollowing,
-    toggle: follow,
-    loading: followLoading,
-  } = useFollow(paramUsername);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [content, setContent] = useState<ContentKey>("post");
   const [direction, setDirection] = useState(0);
 
-  const isOwnProfile = currentFursona?.username === paramUsername;
+  const { profile, loading: profileLoading } = useProfile(paramUsername);
 
-  const { profile, loading: profileLoading } = useProfile(
-    isOwnProfile ? "" : paramUsername,
-  );
+  const id = profile?.id;
+  const isOwnProfile = currentFursona?.id === id;
+  const viewedFursona: FursonaProfile | null = profile || currentFursona;
 
-  const viewedFursona: FursonaProfile | null = isOwnProfile
-    ? currentFursona
-    : profile;
+  const { following, follower, refetch, like } = useProfileCounts(id);
+  const { isFollowing, toggle: follow, loading: followLoading } = useFollow(id);
 
   const isLoading = isOwnProfile
     ? userLoading || !currentFursona
@@ -90,7 +75,7 @@ export default function ProfilePage() {
       throw new Error("Cannot edit other profiles");
     try {
       await api.patch<{ fursona: FursonaTypes }>(
-        `/api/core/fursonas/me/${(viewedFursona as FursonaTypes).id}`,
+        `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}`,
         updates,
       );
       toast.success("Fursona updated");
@@ -219,23 +204,45 @@ export default function ProfilePage() {
                         <p>Edit Profile</p>
                       </Button>
                     ) : (
-                      <Button
-                        onClick={() => {
-                          follow();
+                      <>
+                        {isFollowing && (
+                          <Button
+                            size={"icon"}
+                            variant={"secondary"}
+                            className="p-2.5"
+                          >
+                            <MailIcon size={18} />
+                          </Button>
+                        )}
 
-                          setTimeout(() => {
-                            refetch();
-                          }, 350);
-                        }}
-                        disabled={followLoading}
-                      >
-                        {followLoading ? "..." : followLabel}
-                      </Button>
+                        <Button
+                          onClick={() => {
+                            follow();
+
+                            setTimeout(() => {
+                              refetch();
+                            }, 350);
+                          }}
+                          disabled={followLoading}
+                        >
+                          {followLoading ? "..." : followLabel}
+                        </Button>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size={"icon"}
+                              variant={"outline"}
+                              className="p-2.5"
+                            >
+                              <EllipsisVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          
+                          <ProfileDropdown />
+                        </DropdownMenu>
+                      </>
                     )}
-
-                    <Button size={"icon"} variant={"outline"}>
-                      <EllipsisVerticalIcon className="h-6 w-6" />
-                    </Button>
                   </div>
                 </div>
 
@@ -307,16 +314,16 @@ export default function ProfilePage() {
       </section>
 
       {/*  Profile content */}
-      <div className="flex flex-col sm:container sm:mx-auto">
+      <div className="container flex flex-col mx-auto">
         {/* Nav */}
-        <nav className="shrink-0 space-y-1 sm:space-y-2">
-          <ul className="flex flex-wrap gap-2 sm:gap-0">
+        <nav className="space-y-2">
+          <ul className="flex gap-2">
             {profileNav.map(({ label, key }) => (
               <Button
                 key={label}
                 size="sm"
                 variant="ghost"
-                className={`text-xs sm:text-sm ${content === key ? "bg-surface-container-highest" : ""}`}
+                className={`justify-start rounded-none text-xs sm:text-sm ${content === key ? "bg-surface-container-highest" : ""}`}
                 onClick={() => handleNavClick(key)}
               >
                 {label}
@@ -335,11 +342,11 @@ export default function ProfilePage() {
             animate="center"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="grow space-y-4 w-full min-h-[calc(100svh-64px)] lg:overflow-y-auto scrollbar-hide"
           >
-            {content === "post" && (
-              <PostCards username={viewedFursona.username} />
-            )}
-            {content === "repost" && <ProfileRepost username={paramUsername} />}
+            {content === "post" && <ProfilePostCards username={viewedFursona.id} />}
+            {content === "gallery" && <div>Gallery coming soon</div> }
+            {content === "repost" && <ProfileRepost username={viewedFursona?.username} />}
             {content === "archive" && <div>Archive coming soon</div>}
             {content === "likes" && <div>Likes coming soon</div>}
           </motion.section>

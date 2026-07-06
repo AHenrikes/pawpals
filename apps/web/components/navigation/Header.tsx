@@ -41,17 +41,7 @@ import {
 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/searchbar/Searchbar";
 import { useIsCurrentPath, useCurrentPath } from "@/hooks/useCurrentPath";
-
-function getInitials(name: string) {
-  if (!name) return "";
-
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
+import { getInitials } from "@/utils/getInitials";
 
 export default function Header() {
   const {
@@ -132,7 +122,7 @@ export default function Header() {
   const count = fursonas.length;
 
   return (
-    <header className="sticky top-0 w-full h-16 border-b border-popover bg-background backdrop-blur z-40">
+    <header className="sticky top-0 w-full h-16 border-b border-border bg-background backdrop-blur z-40">
       <div className="flex h-full w-full items-center justify-between px-2 mx-auto md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
@@ -154,7 +144,7 @@ export default function Header() {
                 <Skeleton className="h-8 w-8 rounded-full" />
               ) : (
                 <DropdownMenuTrigger asChild>
-                  <Button variant={"none"} className="p-0 focus-visible:ring-0">
+                  <Button variant={"ghost"} className="p-0 focus-visible:ring-0">
                     <Avatar size="sm">
                       <AvatarImage
                         src={`${currentFursona?.avatar_url}`}
@@ -268,18 +258,18 @@ export default function Header() {
                         );
                       })}
 
-                      {count < 3 && (
-                        <DropdownMenuItem asChild className="mt-2">
-                          <Button
-                            variant={"outline"}
-                            onClick={() => setCreateFursonaOpen(true)}
-                            className="h-8 w-full my-2 rounded-full"
-                          >
-                            <PlusIcon className="h-4 w-4" />
-                            Create Fursona
-                          </Button>
-                        </DropdownMenuItem>
-                      )}
+                      { !loading && count < 3 ? (
+                          <DropdownMenuItem asChild className="mt-2">
+                            <Button
+                              variant={"outline"}
+                              onClick={() => setCreateFursonaOpen(true)}
+                              className="h-8 w-full my-2 rounded-full"
+                            >
+                              <PlusIcon className="h-4 w-4" />
+                              Create Fursona
+                            </Button>
+                          </DropdownMenuItem>
+                      ) : null }
                     </DropdownMenuGroup>
                   </CollapsibleContent>
                 </DropdownMenuGroup>

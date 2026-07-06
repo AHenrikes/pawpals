@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
-import type { RouteContext } from "@/lib/types/api";
 import { serverError, badRequest, unauthorized } from "@/lib/api/responses";
 import { requireUser } from "@/lib/auth/requireUser";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 
 /**
  * GET /api/core/fursonas/[id]/username-history
@@ -11,45 +11,39 @@ import { requireUser } from "@/lib/auth/requireUser";
  */
 export async function GET(
   _request: NextRequest,
-  context: RouteContext<{ id: string }>,
+{ params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { supabase, account, response } = await requireUser();
     if (response) return response;
     if (account === null) return unauthorized();
 
-    const { id: fursonaId } = await context.params;
+    const { id } = await params;
 
     // Verify fursona belongs to user
     const { data: fursona, error: fetchError } = await supabase
       .schema("core")
       .from("fursonas")
       .select("id, account_id")
-      .eq("id", fursonaId)
+      .eq("account_id", account.id)
+      .eq("id", id)
       .single();
 
-    if (fetchError || !fursona) {
-      return badRequest("Fursona not found");
-    }
-
-    if (fursona.account_id !== account.id) {
-      return unauthorized();
-    }
+    if (!fursona) return badRequest(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (fetchError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
     // Get username history
     const { data: history, error } = await supabase
       .schema("core")
       .from("username_history")
       .select("id, old_username, new_username, changed_at, reason")
-      .eq("fursona_id", fursonaId)
+      .eq("fursona_id", id)
       .order("changed_at", { ascending: false });
 
-    if (error) {
-      return serverError(error.message);
-    }
+    if (error) return serverError(error.message);
 
     return Response.json({
-      fursona_id: fursonaId,
+      fursona_id: id,
       history: history ?? [],
       total_changes: history?.length ?? 0,
     });

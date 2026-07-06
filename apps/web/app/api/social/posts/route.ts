@@ -1,15 +1,12 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth/requireUser";
 import {
-  badRequest,
-  notFound,
   ok,
   serverError,
   unauthorized,
 } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { PostCreate, PostWithId } from "@/types/post";
-import { normalizeOptionalText } from "@/lib/helpers/normalizeInput";
+import { type PostWithId } from "@/types/post";
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -21,29 +18,10 @@ export async function GET(req: NextRequest) {
 
   const params = req.nextUrl.searchParams;
   const cursor = params.get("cursor");
-  const username = params.get("username");
   const limit = Math.min(
     Number.parseInt(params.get("limit") ?? String(DEFAULT_LIMIT), 10),
     MAX_LIMIT,
   );
-
-  if (!username) return badRequest(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-
-  const { data: self, error: selfError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("username", username)
-    .single();
-
-  if (selfError) {
-    if (selfError.code === "PGRST116") {
-      return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-    }
-
-    return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  }
-  if (!self) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
   let query = supabase
     .schema("social")
@@ -63,7 +41,6 @@ export async function GET(req: NextRequest) {
       created_at
     `,
     )
-    .eq("fursona_id", self.id)
     .eq("is_published", true)
     .order("created_at", { ascending: false })
     .limit(limit + 1); // fetch one extra to determine if there's a next page
@@ -88,28 +65,4 @@ export async function GET(req: NextRequest) {
     posts,
     nextCursor,
   });
-}
-
-export async function POST(req: NextRequest) {
-  const { supabase } = await requireUser();
-
-  const body = (await req.json().catch(() => ({}))) as PostCreate;
-  const content = normalizeOptionalText(body.content);
-  const media = Array.isArray(body.media_urls) ? body.media_urls : [];
-
-  // Bug 1 fixed: reject when there's NO content (and no media either)
-  if (!content?.length && media.length === 0)
-    return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-
-  const { data, error } = await supabase
-    .schema("social")
-    .from("posts")
-    .insert({ ...body, content, media_urls: media })
-    .select("fursona_id, content, media_urls, is_published, created_at")
-    .single();
-
-  // if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if (error) return serverError(error.message);
-
-  return ok<{ post: PostCreate }>({ post: data });
 }

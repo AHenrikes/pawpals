@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Label } from "@repo/ui/label";
 import { Loader2, SearchIcon } from "lucide-react";
-import { TypographyLead, TypographyXSmall } from "@repo/ui/typography";
+import { TypographyLead, TypographyP, TypographyXSmall } from "@repo/ui/typography";
 import { useRouter } from "next/navigation";
 import { useProfileSearch } from "@/hooks/core/fursonas/useProfileSearch";
 import { createPortal } from "react-dom";
@@ -156,18 +156,18 @@ export function Searchbar() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="fixed inset-0 top-16 bg-black/40 backdrop-blur-sm z-40"
+                  transition={{ duration: 0.3 }}
+                  className="fixed inset-0 top-16 bg-black/40 backdrop-blur-sm z-30"
                   onClick={handleClose}
                 />
 
-                {/* Floating search — fixed, aligned to top-right area */}
+                {/* Input */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.96, y: -4 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.96, y: -4 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
-                  className="fixed top-1 right-16 w-72 space-y-3 z-50"
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="fixed top-3.5 right-16 w-72 z-50"
                 >
                   <Label htmlFor="header-search" className="sr-only">
                     Search
@@ -193,9 +193,18 @@ export function Searchbar() {
                       <Kbd>Esc</Kbd>
                     </InputGroupAddon>
                   </InputGroup>
+                </motion.div>
 
-                  {/* Dropdown results */}
-                  <div className="mt-1 w-full bg-popover border border-border rounded-md shadow-md">
+                {/* Results */}
+                <motion.div
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity:0, y: -50 }}
+                  transition={{ duration: .25, ease: "easeOut" }}
+                  className="fixed top-16 left-0 right-0 w-full h-[30svh] mx-auto py-2 bg-background border-b border-border md:px-6 shadow-md z-30"
+                >
+                  <>
+                    {/* Searching */}
                     {loading && (
                       <div className="flex items-center justify-center gap-2 py-4">
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -205,12 +214,14 @@ export function Searchbar() {
                       </div>
                     )}
 
+                    {/* Error */}
                     {error && !loading && (
                       <div className="px-2 py-2 text-sm text-destructive">
                         {error.message}
                       </div>
                     )}
 
+                    {/* Results */}
                     {!loading && !error && results.length > 0 && (
                       <div className="px-2 py-2">
                         {results.some((r) => r.type === "fursona") && (
@@ -266,6 +277,7 @@ export function Searchbar() {
                       </div>
                     )}
 
+                    {/* No results */}
                     {!loading &&
                       !error &&
                       results.length === 0 &&
@@ -273,17 +285,97 @@ export function Searchbar() {
                         <div className="px-2 py-2 text-sm text-muted-foreground">
                           No results found
                         </div>
-                      )}
+                      )
+                    }
 
+                    {/* default */}
                     {!searchQuery && (
-                      <div className="px-2 py-2 text-xs text-muted-foreground space-y-0.5">
-                        <p>🔍 How to search:</p>
-                        <p>Type to search all</p>
-                        <p>@ Search specific username</p>
-                        <p>&gt; Navigate to page</p>
+                      <div className="flex h-full justify-between">
+                        <div className="space-y-10">
+                          <TypographyLead>Users</TypographyLead>
+
+                          <div className="flex gap-5">
+                            <div className="space-y-5">
+                              <div>
+                                <div className="flex gap-2 animate-pulse">
+                                  <div className="h-12 w-12 bg-muted rounded-full" />
+
+                                  <div className="space-y-2">
+                                    <div className="h-4 w-32 bg-muted rounded" />
+                                    <div className="h-4 w-16 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="flex gap-2 animate-pulse">
+                                  <div className="h-12 w-12 bg-muted rounded-full" />
+
+                                  <div className="space-y-2">
+                                    <div className="h-4 w-32 bg-muted rounded" />
+                                    <div className="h-4 w-16 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="flex gap-2 animate-pulse">
+                                  <div className="h-12 w-12 bg-muted rounded-full" />
+
+                                  <div className="space-y-2">
+                                    <div className="h-4 w-32 bg-muted rounded" />
+                                    <div className="h-4 w-16 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-5">
+                              <div>
+                                <div className="flex gap-2 animate-pulse">
+                                  <div className="h-12 w-12 bg-muted rounded-full" />
+
+                                  <div className="space-y-2">
+                                    <div className="h-4 w-32 bg-muted rounded" />
+                                    <div className="h-4 w-16 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="flex gap-2 animate-pulse">
+                                  <div className="h-12 w-12 bg-muted rounded-full" />
+
+                                  <div className="space-y-2">
+                                    <div className="h-4 w-32 bg-muted rounded" />
+                                    <div className="h-4 w-16 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="flex gap-2 animate-pulse">
+                                  <div className="h-12 w-12 bg-muted rounded-full" />
+
+                                  <div className="space-y-2">
+                                    <div className="h-4 w-32 bg-muted rounded" />
+                                    <div className="h-4 w-16 bg-muted rounded" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="px-2 py-2 text-xs text-muted-foreground space-y-0.5">
+                          <p>🔍 How to search:</p>
+                          <p>Type to search all</p>
+                          <p>@ Search specific username</p>
+                          <p>&gt; Navigate to page</p>
+                        </div>
                       </div>
                     )}
-                  </div>
+                  </>
                 </motion.div>
               </>
             )}

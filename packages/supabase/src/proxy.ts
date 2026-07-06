@@ -39,11 +39,11 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   const protectedPaths = ["/", "/store", "/messages", "/community", "/pawpal-meet", "/notifications", "/settings", "/@", "/api"];
-  const publicPaths = ["/home", "/about", "/contact-us", "/sign-up", "/sign-in", "/forgot-password"];
+  const publicPaths = ["/home", "/about", "/contact-us", "/sign-up", "/sign-in", "/forgot-password", "/confirm", "/sign-up-success", "/new-password"];
   const pathname = request.nextUrl.pathname;
 
   // Check if this is a public API route that doesn't require auth
-  const isPublicApi = publicPaths.some((path) => pathname.startsWith(path)) || /^\/api\/core\/fursonas\/[^/]+\/available$/.test(pathname);
+  const isPublicApi = publicPaths.some((path) => pathname.startsWith(path)) || /^\/api\/core\/fursonas\/available\/[^/]+$/.test(pathname);
 
   if (!isPublicApi && protectedPaths.some((path) => pathname.startsWith(path)) && !user) {
     // no user, potentially respond by redirecting the user to the login page

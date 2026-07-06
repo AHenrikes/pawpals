@@ -6,8 +6,10 @@ export interface MediaItem {
 }
 
 export type PostType = {
+  id: string;
+  fursona_id: string;
   title: string;
-  content: string;
+  content?: string;
   media_urls?: MediaItem[];
   likes_count: number;
   comments_count: number;
@@ -20,13 +22,11 @@ export type PostType = {
 
 export type PostCreate = {
   fursona_id: string;
-  content: string;
+  content?: string;
   media_urls?: MediaItem[];
   is_published: boolean;
 };
 
-export type PostWithId = PostType & {
-  id: string;
-  fursona_id: string;
+export type PostWithDetail = PostType & {
   updated_at: Date;
 };

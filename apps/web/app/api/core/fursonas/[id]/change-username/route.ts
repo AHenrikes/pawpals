@@ -1,7 +1,7 @@
-import { type NextRequest } from "next/server";
-import type { RouteContext } from "@/lib/types/api";
-import { serverError, badRequest, unauthorized } from "@/lib/api/responses";
+import { serverError, badRequest, unauthorized, notFound, ok } from "@/lib/api/responses";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { requireUser } from "@/lib/auth/requireUser";
+import { type NextRequest } from "next/server";
 
 interface ChangeUsernameRequest {
   new_username: string;
@@ -18,47 +18,41 @@ interface ChangeUsernameResponse {
 }
 
 /**
- * GET /api/core/fursonas/me/[id]/change-username
+ * GET /api/core/fursonas/[id]/change-username
  * Get cooldown information for username change
  */
 export async function GET(
   _request: NextRequest,
-  context: RouteContext<{ id: string }>,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { supabase, account, response } = await requireUser();
     if (response) return response;
     if (account === null) return unauthorized();
 
-    const { id: fursonaId } = await context.params;
+    const { id } = await params;
 
     // Verify fursona belongs to user
     const { data: fursona, error: fetchError } = await supabase
       .schema("core")
       .from("fursonas")
-      .select("id, account_id, username, last_username_change_at")
-      .eq("id", fursonaId)
+      .select("id, username, last_username_change_at")
+      .eq("account_id", account.id)
+      .eq("id", id)
       .single();
 
-    if (fetchError || !fursona) {
-      return badRequest("Fursona not found");
-    }
-
-    if (fursona.account_id !== account.id) {
-      return unauthorized();
-    }
+    if (!fursona) return badRequest(ERROR_MESSAGES.FURSONAS_NOT_FOUND);
+    if (fetchError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
     // Check cooldown
     const { data: cooldownData, error: cooldownError } = await supabase.rpc(
       "check_username_cooldown",
       {
-        p_fursona_id: fursonaId,
+        p_fursona_id: id,
       },
     );
 
-    if (cooldownError) {
-      return serverError(cooldownError.message);
-    }
+    if (cooldownError) return serverError(cooldownError.message);
 
     if (cooldownData === null) {
       // No cooldown active
@@ -91,7 +85,7 @@ export async function GET(
 }
 
 /**
- * POST /api/core/fursonas/me/[id]/change-username
+ * POST /api/core/fursonas/[id]/change-username
  * Change a fursona's username with 30-day cooldown enforcement
  *
  * Request body:
@@ -105,66 +99,50 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  context: RouteContext<{ id: string }>,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { supabase, account, response } = await requireUser();
     if (response) return response;
     if (account === null) return unauthorized();
 
-    const { id: fursonaId } = await context.params;
+    const { id } = await params;
 
     // Verify fursona belongs to user
     const { data: fursona, error: fetchError } = await supabase
       .schema("core")
       .from("fursonas")
       .select("id, account_id")
-      .eq("id", fursonaId)
+      .eq("account_id", account.id)
+      .eq("id", id)
       .single();
 
-    if (fetchError || !fursona) {
-      return badRequest("Fursona not found");
-    }
-
-    if (fursona.account_id !== account.id) {
-      return unauthorized();
-    }
+    if (fetchError) return badRequest(ERROR_MESSAGES.SERVER_ERROR);
+    if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
     // Parse request body
     const body = (await request
       .json()
       .catch(() => ({}))) as ChangeUsernameRequest;
 
-    if (!body.new_username || typeof body.new_username !== "string") {
-      return badRequest("new_username is required");
-    }
+    if (!body.new_username || typeof body.new_username !== "string")  badRequest("New username is required");
 
     const newUsername = body.new_username.trim().toLowerCase();
 
     // Call database function to change username
     const { data, error } = await supabase.rpc("change_username", {
-      p_fursona_id: fursonaId,
+      p_fursona_id: fursona.id,
       p_new_username: newUsername,
       p_account_id: account.id,
     });
 
-    if (error) {
-      return serverError(error.message);
-    }
+    if (error)  serverError(error.message);
 
     const result = data as ChangeUsernameResponse;
 
-    if (!result.success) {
-      return Response.json(result, {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    if (!result.success) badRequest("Username change failed");
 
-    return Response.json(result, {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return ok(result);
   } catch (error) {
     return serverError((error as Error).message);
   }

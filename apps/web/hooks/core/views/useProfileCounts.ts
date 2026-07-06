@@ -27,13 +27,15 @@ const initialState: SocialStats = {
   reputation: 0,
 };
 
-export function useProfileCounts(username?: string): SocialData {
+export function useProfileCounts(id?: string): SocialData {
   const [social, setSocial] = useState<SocialStats>(initialState);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const { signOut } = useUser();
 
   const fetchSocialData = useCallback(async () => {
+    if (!id) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -44,7 +46,7 @@ export function useProfileCounts(username?: string): SocialData {
         like_count: number;
         post_count: number;
         reputation_count: number;
-      }>(`/api/core/fursonas/${username}/counts`);
+      }>(`/api/core/fursonas/${id}/counts`);
 
       setSocial({
         follower: data.follower_count ?? 0,
@@ -71,7 +73,7 @@ export function useProfileCounts(username?: string): SocialData {
     } finally {
       setLoading(false);
     }
-  }, [signOut, username]);
+  }, [signOut, id]);
 
   // Auto-fetch on mount
   useEffect(() => {

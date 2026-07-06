@@ -61,7 +61,7 @@ export default function MainNav() {
   return (
     <Sidebar
       collapsible="icon"
-      className="group/sidebar border-transparent shrink-0"
+      className="group/sidebar shrink-0 border-r border-border"
     >
       <SidebarContent>
         <SidebarGroup>
