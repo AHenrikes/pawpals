@@ -8,7 +8,7 @@ export default function Dashboard() {
         <PostCards />
       </div>
     
-      <aside className="sticky top-16 flex flex-col w-[500px] h-[calc(100svh-64px)] p-4 gap-5">
+      <aside className="hidden sticky top-16 flex-col w-[500px] h-[calc(100svh-64px)] p-4 gap-5 md:flex">
         <div className="bg-muted animate-pulse w-full h-80 rounded-md" />
 
         <div className="bg-muted animate-pulse w-full h-full rounded-md" />

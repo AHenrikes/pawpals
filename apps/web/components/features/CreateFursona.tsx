@@ -7,6 +7,7 @@ import { Textarea } from "@repo/ui/textarea";
 import { useDebouncedCallback } from "use-debounce";
 import { AtSign, Check, X, Loader2 } from "lucide-react";
 import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
+import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
 import { type FursonaCreate } from "@/types/fursona";
 
 type CreateFursonaProps = {
@@ -54,11 +55,9 @@ export default function CreateFursona({
   }, [checkUsername, fursona.username]);
 
   return (
-    <div className="space-y-5">
-      <div className="space-y-2.5">
-        <Label htmlFor="fursona-name" variant={"auth"}>
-          Displayname
-        </Label>
+    <FieldGroup>
+      <Field>
+        <FieldLabel htmlFor="fursona-name">Displayname</FieldLabel>
 
         <Input
           id="fursona-name"
@@ -67,16 +66,15 @@ export default function CreateFursona({
           value={fursona.display_name}
           onChange={(e) => onFursonaChange("display_name", e.target.value)}
           onClick={() => onFursonaChange("username", "")}
-          variant={"auth"}
+          variant={"popover"}
+          className="h-12"
           autoFocus={isActive}
           required
         />
-      </div>
+      </Field>
 
-      <div className="space-y-2.5">
-        <Label htmlFor="fursona-username" variant={"auth"}>
-          Username
-        </Label>
+      <Field>
+        <FieldLabel htmlFor="fursona-username">Username</FieldLabel>
 
         <div className="relative">
           <AtSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -88,8 +86,8 @@ export default function CreateFursona({
             value={fursona.username}
             onChange={(e) => onFursonaChange("username", e.target.value)}
             onFocus={seedUsernameSuggestion}
-            variant={"auth"}
-            className="pl-8 pr-8"
+            variant={"popover"}
+            className="h-12 pl-8 pr-8"
             error={isAvailable === false}
             required
           />
@@ -106,13 +104,11 @@ export default function CreateFursona({
             )}
           </div>
         </div>
-      </div>
+      </Field>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2.5">
-          <Label htmlFor="fursona-species" variant={"auth"}>
-            Species
-          </Label>
+        <Field>
+          <FieldLabel htmlFor="fursona-species">Species</FieldLabel>
 
           <Input
             id="fursona-species"
@@ -120,14 +116,13 @@ export default function CreateFursona({
             placeholder="Wolf"
             value={fursona.species ?? ""}
             onChange={(e) => onFursonaChange("species", e.target.value)}
-            variant={"auth"}
+            variant={"popover"}
+            className="h-12"
           />
-        </div>
+        </Field>
 
-        <div className="space-y-2.5">
-          <Label htmlFor="fursona-pronouns" variant={"auth"}>
-            Pronouns
-          </Label>
+        <Field>
+          <FieldLabel htmlFor="fursona-pronouns">Pronouns</FieldLabel>
 
           <Input
             id="fursona-pronouns"
@@ -135,15 +130,14 @@ export default function CreateFursona({
             placeholder="he/him"
             value={fursona.pronouns ?? ""}
             onChange={(e) => onFursonaChange("pronouns", e.target.value)}
-            variant={"auth"}
+            variant={"popover"}
+            className="h-12"
           />
-        </div>
+        </Field>
       </div>
 
-      <div className="space-y-2.5">
-        <Label htmlFor="fursona-bio" variant={"auth"}>
-          Bio
-        </Label>
+      <Field>
+        <FieldLabel htmlFor="fursona-bio">Bio</FieldLabel>
 
         <Textarea
           id="fursona-bio"
@@ -151,8 +145,9 @@ export default function CreateFursona({
           value={fursona.bio ?? ""}
           onChange={(e) => onFursonaChange("bio", e.target.value)}
           rows={4}
+          className="h-12"
         />
-      </div>
-    </div>
+      </Field>
+    </FieldGroup>
   );
 }

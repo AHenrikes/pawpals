@@ -317,7 +317,7 @@ export default function ProfilePage() {
       <div className="container flex flex-col mx-auto">
         {/* Nav */}
         <nav className="space-y-2">
-          <ul className="flex gap-2">
+          <ul className="flex gap-2 overflow-x-auto">
             {profileNav.map(({ label, key }) => (
               <Button
                 key={label}

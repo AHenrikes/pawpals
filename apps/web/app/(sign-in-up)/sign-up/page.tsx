@@ -9,13 +9,13 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
 import { toast } from "@repo/ui/sonner";
 import { FormError } from "@repo/ui/form-error";
 import { Card, CardHeader } from "@repo/ui/card";
 import { TypographyP } from "@repo/ui/typography";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import type { FursonaCreate } from "@/types/fursona";
+import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
+import { type FursonaCreate } from "@/types/fursona";
 import CreateFursona from "@/components/features/CreateFursona";
 import Link from "next/link";
 
@@ -217,7 +217,7 @@ export default function SignUpForm() {
                   transition={stepTransition}
                   className="space-y-5"
                 >
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2.5">
                       <Label htmlFor="firstname" variant={"auth"}>
                         Firstname
@@ -254,9 +254,46 @@ export default function SignUpForm() {
                         required
                       />
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div className="space-y-2.5">
+                  <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Field>
+                      <FieldLabel htmlFor="first-name">First Name</FieldLabel>
+
+                      <Input
+                        id="first-name"
+                        type="text"
+                        placeholder="Jhon"
+                        value={values.firstname}
+                        onChange={(e) =>
+                          handleChange("firstname", e.target.value)
+                        }
+                        autoFocus={step === "account"}
+                        variant={"popover"}
+                        className="h-12"
+                        required
+                      />
+                    </Field>
+
+                    <Field>
+                      <FieldLabel htmlFor="last-name">Last Name</FieldLabel>
+
+                      <Input
+                        id="last-name"
+                        type="text"
+                        placeholder="Doe"
+                        value={values.lastname}
+                        onChange={(e) =>
+                          handleChange("lastname", e.target.value)
+                        }
+                        variant={"popover"}
+                        className="h-12"
+                        required
+                      />
+                    </Field>
+                  </FieldGroup>
+
+                  {/* <div className="space-y-2.5">
                     <Label htmlFor="email" variant={"auth"}>
                       Email
                     </Label>
@@ -270,12 +307,24 @@ export default function SignUpForm() {
                       variant={"auth"}
                       required
                     />
-                  </div>
+                  </div> */}
+                  <Field>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
 
-                  <div className="space-y-2.5">
-                    <Label htmlFor="dob-day" variant={"auth"}>
-                      Date of birth
-                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="example@pawpals.com"
+                      value={values.email}
+                      onChange={(e) => handleChange("email", e.target.value)}
+                      variant={"popover"}
+                      className="h-12"
+                      required
+                    />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel htmlFor="dob-day">Date of birth</FieldLabel>
 
                     <div className="grid grid-cols-3">
                       <Input
@@ -291,8 +340,8 @@ export default function SignUpForm() {
                             e.target.value.replaceAll(/\D/g, ""),
                           )
                         }
-                        variant={"auth"}
-                        className="text-center rounded-none rounded-l-full"
+                        variant={"popover"}
+                        className="h-12 text-center rounded-none rounded-l-full"
                         required
                       />
 
@@ -309,8 +358,8 @@ export default function SignUpForm() {
                             e.target.value.replaceAll(/\D/g, ""),
                           )
                         }
-                        variant={"auth"}
-                        className="z-0 rounded-none text-center"
+                        variant={"popover"}
+                        className="h-12 rounded-none text-center z-0"
                         required
                       />
 
@@ -327,18 +376,16 @@ export default function SignUpForm() {
                             e.target.value.replaceAll(/\D/g, ""),
                           )
                         }
-                        variant={"auth"}
-                        className="text-center rounded-none rounded-r-full"
+                        variant={"popover"}
+                        className="h-12 text-center rounded-none rounded-r-full"
                         required
                       />
                     </div>
-                  </div>
+                  </Field>
 
-                  <div className="grid grid-cols-1 gap-4 pb-4 sm:grid-cols-2">
-                    <div className="space-y-2.5">
-                      <Label htmlFor="password" variant={"auth"}>
-                        Password
-                      </Label>
+                  <FieldGroup className="grid grid-cols-1 gap-4 pb-4 sm:grid-cols-2">
+                    <Field>
+                      <FieldLabel htmlFor="password">Password</FieldLabel>
 
                       <Input
                         id="password"
@@ -348,15 +395,14 @@ export default function SignUpForm() {
                         onChange={(e) =>
                           handleChange("password", e.target.value)
                         }
-                        variant={"auth"}
+                        variant={"popover"}
+                        className="h-12"
                         required
                       />
-                    </div>
+                    </Field>
 
-                    <div className="space-y-2.5">
-                      <Label htmlFor="confirmfname" variant={"auth"}>
-                        Confirm Password
-                      </Label>
+                    <Field>
+                      <FieldLabel htmlFor="confirmfname">Confirm Password</FieldLabel>
 
                       <Input
                         id="confirmfname"
@@ -366,11 +412,12 @@ export default function SignUpForm() {
                         onChange={(e) =>
                           handleChange("confirmPassword", e.target.value)
                         }
-                        variant={"auth"}
+                        variant={"popover"}
+                        className="h-12"
                         required
                       />
-                    </div>
-                  </div>
+                    </Field>
+                  </FieldGroup>
                 </motion.div>
               ) : (
                 <motion.div
@@ -398,7 +445,7 @@ export default function SignUpForm() {
             <Button
               onClick={goToFursonaStep}
               disabled={values.email === undefined}
-              className="h-14 w-full rounded-full"
+              className="h-10 w-full rounded-full"
             >
               <span>Create Fursona</span>
 
@@ -408,7 +455,7 @@ export default function SignUpForm() {
             <div className="flex gap-4">
               <Button
                 onClick={() => setStep("account")}
-                className="h-14 w-full bg-primary rounded-l-full"
+                className="h-10 w-full bg-primary rounded-l-full"
               >
                 <ArrowLeft className="h-4 w-4" />
 
@@ -418,7 +465,7 @@ export default function SignUpForm() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="h-14 w-full rounded-r-full"
+                className="h-10 w-full rounded-r-full"
               >
                 <span>{isLoading ? "Creating account..." : "Sign up"}</span>
 

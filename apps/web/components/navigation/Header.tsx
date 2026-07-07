@@ -39,7 +39,7 @@ import {
   TypographyP,
   TypographySmall,
 } from "@repo/ui/typography";
-import { Searchbar } from "@/components/searchbar/Searchbar";
+import { Searchbar } from "@/components/dialogs/search/Searchbar";
 import { useIsCurrentPath, useCurrentPath } from "@/hooks/useCurrentPath";
 import { getInitials } from "@/utils/getInitials";
 

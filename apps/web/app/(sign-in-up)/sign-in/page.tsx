@@ -7,16 +7,16 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
 import { useRouter } from "next/navigation";
 import { Circle, MessagesSquare } from "lucide-react";
+import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
 import Link from "next/link";
 
 export default function SignIn() {
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm(
+  const { values, error, handleChange, handleSubmit } = useAuthForm(
     { email: "", password: "" },
     async (values) => {
       const { error } = await supabase.auth.signInWithPassword({
@@ -49,32 +49,30 @@ export default function SignIn() {
         </CardHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="flex flex-col gap-6">
-            <div className="space-y-2.5">
-              <Label htmlFor="email" variant={"auth"}>
-                Email
-              </Label>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+
               <Input
                 id="email"
                 type="email"
                 placeholder="example@pawpals.com"
                 value={values.email}
                 onChange={(e) => handleChange("email", e.target.value)}
-                variant={"auth"}
+                variant={"popover"}
+                className="h-12"
                 autoFocus
                 required
               />
-            </div>
+            </Field>
 
-            <div className="space-y-2.5">
+            <Field>
               <div className="flex items-center">
-                <Label htmlFor="password" variant={"auth"}>
-                  Password
-                </Label>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
 
                 <Link
                   href={AUTH_ROUTES.FORGOT_PASSWORD}
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  className="ml-auto inline-block text-sm text-muted-foreground underline-offset-4 hover:underline"
                 >
                   Forgot your password?
                 </Link>
@@ -86,21 +84,21 @@ export default function SignIn() {
                 placeholder="••••••••"
                 value={values.password}
                 onChange={(e) => handleChange("password", e.target.value)}
-                variant={"auth"}
+                variant={"popover"}
+                className="h-12"
                 required
               />
-            </div>
+            </Field>
 
             <FormError message={error} className="pb-4" />
 
             <Button
               type="submit"
-              disabled={isLoading}
-              className="h-14 w-full rounded-full bg-gradient-to-r from-primary to-secondary text-base font-semibold text-text-secondary shadow-[0_18px_45px_rgba(190,127,255,0.35)] transition hover:brightness-105"
+              className="h-10 rounded-full"
             >
               <span>Sign in</span>
             </Button>
-          </div>
+          </FieldGroup>
 
           <div className="flex items-center gap-4 pt-2 text-[0.65rem] uppercase tracking-[0.34em] text-text-muted">
             <span className="h-px flex-1 bg-white/10" />

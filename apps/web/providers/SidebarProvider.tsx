@@ -149,6 +149,7 @@ export function Sidebar({
   const { state, openMobile, setOpenMobile } = useSidebar();
   const isCollapsed = collapsible !== "none" && state === "collapsed";
 
+
   return (
     <>
       <motion.aside
@@ -170,14 +171,13 @@ export function Sidebar({
         <div className="flex h-full w-full flex-col gap-4">{children}</div>
       </motion.aside>
 
-      <div
-        className={cn(
-          "absolute inset-0 top-16 z-40 bg-black/50 transition-opacity hidden",
-          openMobile ? "opacity-100 block" : "pointer-events-none opacity-0",
-        )}
-        onClick={() => setOpenMobile(false)}
-        aria-hidden="true"
-      />
+      {openMobile && (
+        <div
+          className="fixed inset-0 top-16 z-40 bg-black/50 transition-opacity md:hidden"
+          onClick={() => setOpenMobile(false)}
+          aria-hidden="true"
+        />
+      )}
 
       <motion.aside
         data-mobile="true"

@@ -32,6 +32,7 @@ import {
 } from "@/providers/SidebarProvider";
 import type { LucideIcon } from "lucide-react";
 import PostModal from "@/components/dialogs/PostModal";
+import { LockScreen } from "@/utils/lock-body";
 
 type MainNavItem = {
   href: string;
@@ -51,6 +52,7 @@ const mainNavItems: MainNavItem[] = [
 
 export default function MainNav() {
   const pathname = usePathname();
+
   const { signOut } = useUser();
   const { state, openMobile, isMobile } = useSidebar();
 
@@ -58,10 +60,12 @@ export default function MainNav() {
 
   const isCollapsed = isMobile ? !openMobile : state === "collapsed";
 
+  LockScreen(isMobile && openMobile);
+
   return (
     <Sidebar
       collapsible="icon"
-      className="group/sidebar shrink-0 border-r border-border"
+      className="group/sidebar shrink-0"
     >
       <SidebarContent>
         <SidebarGroup>

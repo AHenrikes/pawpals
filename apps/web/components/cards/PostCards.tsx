@@ -227,7 +227,7 @@ function PostCard({ post, isLast = false }: Readonly<{ post: PostType; isLast?: 
         </Avatar>
       )}
 
-      <div className="flex-1 space-y-4 pr-12">
+      <div className="flex-1 space-y-4 md:pr-12">
         {/* Header: Name, Username, Timestamp */}
         <div className="flex justify-between items-center">
           {loading ? (
@@ -278,7 +278,7 @@ function PostCard({ post, isLast = false }: Readonly<{ post: PostType; isLast?: 
                 className="overflow-hidden"
               >
                 <div className="flex flex-col">
-                  <TypographySmall className="text-foreground break-words whitespace-pre-wrap">
+                  <TypographySmall className="text-foreground break-words break-all whitespace-pre-wrap">
                     {post.content}
                   </TypographySmall>
                 </div>
@@ -374,7 +374,7 @@ export default function ProfileLists({ posts, hasMore, fetchMore, loading }: Rea
           <div key={i} className={`flex px-4 py-3 gap-3 animate-pulse ${i < skeletonItems.length - 1 ? "border-b border-border" : ""}`}>
             <div className="h-12 w-12 bg-muted rounded-full" />
 
-            <div className="flex-1 space-y-5 pr-12">
+            <div className="flex-1 space-y-5 md:pr-12">
               <div className="flex justify-between">
                 <div className="space-y-2">
                   <div className="h-4 w-32 bg-muted rounded" />

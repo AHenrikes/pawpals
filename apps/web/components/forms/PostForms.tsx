@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   AtSignIcon,
   BadgeCheckIcon,
@@ -455,12 +455,12 @@ export default function PostForm({
             <Button
               type="button"
               size={"icon"}
-              variant={"outline"}
+              variant={"destructive"}
               onClick={onClose}
               aria-label="Close"
-              className="rounded-full text-muted-foreground transition-colors hover:bg-surface-variant hover:text-foreground"
+              className="p-1.5"
             >
-              <XIcon className="h-3.5 w-3.5" />
+              <XIcon size={18} />
             </Button>
           </div>
         </div>
