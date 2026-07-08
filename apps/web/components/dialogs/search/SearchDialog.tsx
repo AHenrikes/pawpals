@@ -192,8 +192,9 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
               >
                 {/* Searching */}
                 {loading && (
-                  <div className="flex items-center justify-center gap-2 py-6 px-4">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  <div className="flex items-center justify-center h-full gap-2 p-4">
+                    <Loader2 size={16} className="animate-spin" />
+
                     <span className="text-sm text-muted-foreground">
                       Searching...
                     </span>
@@ -209,7 +210,7 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
 
                 {/* Results or Default View */}
                 <>
-                  <SearchResults loading={loading} results={results} error={error} />
+                  <SearchResults loading={loading} results={results} error={error} handleClose={handleClose} />
                   <SearchDefault searchQuery={searchQuery} />
 
                   {/* No results */}
@@ -217,7 +218,7 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
                     !error &&
                     results.length === 0 &&
                     searchQuery && (
-                    <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                    <div className="flex items-center justify-center h-full p-4 text-sm text-muted-foreground text-center">
                       No results found
                     </div>
                   )}
