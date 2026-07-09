@@ -1,8 +1,8 @@
 import UnAuthHeader from "@/components/navigation/PublicHeader";
 import { requireUser } from "@/lib/auth/requireUser";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Home" };
 

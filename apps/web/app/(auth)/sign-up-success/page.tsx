@@ -52,8 +52,8 @@ export default function SignUpSuccess() {
         />
       ))}
 
+      {/* Content */}
       <div className="flex flex-col items-center gap-6 z-10">
-        {/* Party popper with spring entrance + float idle */}
         <motion.div
           initial={{ scale: 0, rotate: -30, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}

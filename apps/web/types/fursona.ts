@@ -4,7 +4,7 @@ export type FursonaCreate = {
   species?: string;
   pronouns?: string;
   bio?: string;
-}
+};
 
 export type FursonaTypes = {
   id: string;
@@ -29,7 +29,7 @@ export type FursonaInput = {
   pronouns?: string;
   bio?: string;
   updated_at: Date;
-}
+};
 
 export type FursonaSearch = {
   username: string;
@@ -39,6 +39,7 @@ export type FursonaSearch = {
 };
 
 export type FursonaProfile = {
+  id: string;
   display_name: string;
   username: string;
   avatar_url: string | null;
@@ -48,7 +49,7 @@ export type FursonaProfile = {
   bio?: string;
   reputation: number;
   created_at: Date;
-}
+};
 
 export type FursonaWithBoolean = FursonaTypes & {
   is_current: boolean;
@@ -57,4 +58,4 @@ export type FursonaWithBoolean = FursonaTypes & {
 
 export type FursonaWithAccountId = FursonaWithBoolean & {
   account_id: string;
-}
+};

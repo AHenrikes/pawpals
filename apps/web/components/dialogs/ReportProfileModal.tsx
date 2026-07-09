@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
-import type { FursonaTypes } from "@/types/fursona";
 import { X } from "lucide-react";
+import { type FursonaTypes } from "@/types/fursona";
 
 interface ReportProfileModalProps {
   fursona: FursonaTypes;

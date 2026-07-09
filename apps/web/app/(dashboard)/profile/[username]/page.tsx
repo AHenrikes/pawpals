@@ -3,38 +3,32 @@
 import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { useUser } from "@/providers/UserProvider";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { useFollow } from "@/hooks/useFollow";
+import { useFollow } from "@/hooks/social/followers/useFollow";
 import {
   TypographyH2,
   TypographyLead,
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { EllipsisVerticalIcon } from "lucide-react";
+import { EllipsisVerticalIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useProfileCounts } from "@/hooks/useProfileCounts";
+import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
-import type { FursonaProfile, FursonaTypes } from "@/types/fursona";
-import ProfilePost from "@/components/ProfilePost";
+import { ProfilePostCards } from "@/components/cards/PostCards";
+import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
 import ProfileRepost from "@/components/ProfileRepost";
 import Image from "next/image";
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
+import { getInitials } from "@/utils/getInitials";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import ProfileDropdown from "@/components/dropdowns/Profile";
 
 function formatNumbers(count: number): string {
   if (count < 1000) return `${count}`;
@@ -46,45 +40,46 @@ function formatNumbers(count: number): string {
 }
 
 const profileNav = [
-  { label: "POST",    key: "post" },
-  { label: "REPOST",  key: "repost" },
+  { label: "POST", key: "post" },
+  { label: "GALLERY", key: "gallery" },
+  { label: "REPOST", key: "repost" },
   { label: "ARCHIVE", key: "archive" },
-  { label: "LIKE",    key: "likes" },
+  { label: "LIKE", key: "likes" },
 ] as const;
 
-type ContentKey = typeof profileNav[number]["key"];
+type ContentKey = (typeof profileNav)[number]["key"];
 
 export default function ProfilePage() {
   const { currentFursona, refresh, loading: userLoading } = useUser();
   const { username: paramUsername } = useParams<{ username: string }>();
-  const { following, follower, refetch, like, } = useProfileCounts(paramUsername);
-  const { isFollowing, toggle: follow, loading: followLoading } = useFollow(paramUsername);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [content, setContent] = useState<ContentKey>("post");
   const [direction, setDirection] = useState(0);
 
-  const isOwnProfile = currentFursona?.username === paramUsername;
+  const { profile, loading: profileLoading } = useProfile(paramUsername);
 
-  const { profile, loading: profileLoading } = useProfile(
-    isOwnProfile ? "" : paramUsername
-  );
+  const id = profile?.id;
+  const isOwnProfile = currentFursona?.id === id;
+  const viewedFursona: FursonaProfile | null = profile || currentFursona;
 
-  const viewedFursona: FursonaProfile | null = isOwnProfile
-    ? currentFursona
-    : profile;
+  const { following, follower, refetch, like } = useProfileCounts(id);
+  const { isFollowing, toggle: follow, loading: followLoading } = useFollow(id);
 
-  const isLoading = isOwnProfile ? userLoading || !currentFursona : profileLoading;
+  const isLoading = isOwnProfile
+    ? userLoading || !currentFursona
+    : profileLoading;
 
   const handleEditSave = async (updates: Partial<FursonaTypes>) => {
-    if (!isOwnProfile || !viewedFursona) throw new Error("Cannot edit other profiles");
+    if (!isOwnProfile || !viewedFursona)
+      throw new Error("Cannot edit other profiles");
     try {
       await api.patch<{ fursona: FursonaTypes }>(
-        `/api/profile/me/${(viewedFursona as FursonaTypes).id}`,
+        `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}`,
         updates,
       );
       toast.success("Fursona updated");
-      refresh()
+      refresh();
     } catch (err) {
       const message = getErrorMessage(err);
       toast.error(`Update failed: ${message}`);
@@ -93,8 +88,8 @@ export default function ProfilePage() {
   };
 
   const handleNavClick = (key: ContentKey) => {
-    const oldIndex = profileNav.findIndex(n => n.key === content);
-    const newIndex = profileNav.findIndex(n => n.key === key);
+    const oldIndex = profileNav.findIndex((n) => n.key === content);
+    const newIndex = profileNav.findIndex((n) => n.key === key);
     setDirection(newIndex > oldIndex ? 1 : -1);
     setContent(key);
   };
@@ -106,17 +101,17 @@ export default function ProfilePage() {
   };
 
   if (isLoading || !viewedFursona) return null;
-  
+
   let followLabel = "";
-  
-  if(followLoading) {
+
+  if (followLoading) {
     followLabel = "...";
   } else if (isFollowing) {
     followLabel = "Unfollow";
   } else {
     followLabel = "Follow";
   }
-  
+
   return (
     <>
       {/* Banner */}
@@ -158,7 +153,11 @@ export default function ProfilePage() {
         <div className="relative -mt-16 space-y-6 sm:-mt-20 md:-mt-24 z-20">
           <AnimatePresence mode="wait">
             {isLoading ? (
-              <motion.div key="avatar-skeleton" exit={{ opacity: 0 }} className="flex items-center gap-4">
+              <motion.div
+                key="avatar-skeleton"
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-4"
+              >
                 <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
                 <div className="min-w-0 mb-4 space-y-2">
                   <Skeleton className="h-9 w-52 animate-none border-2 border-background" />
@@ -175,9 +174,17 @@ export default function ProfilePage() {
               >
                 <div className="flex justify-between">
                   <div className="flex items-center gap-2">
-                    <Avatar size="lg" className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0">
-                      <AvatarImage src={viewedFursona.avatar_url ?? undefined} alt={viewedFursona.display_name} />
-                      <AvatarFallback>{getInitials(viewedFursona.display_name)}</AvatarFallback>
+                    <Avatar
+                      size="lg"
+                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0"
+                    >
+                      <AvatarImage
+                        src={viewedFursona.avatar_url ?? undefined}
+                        alt={viewedFursona.display_name}
+                      />
+                      <AvatarFallback>
+                        {getInitials(viewedFursona.display_name)}
+                      </AvatarFallback>
                     </Avatar>
 
                     <div className="hidden relative px-2 top-5 sm:flex flex-1 flex-col sm:max-w-52 xl:max-w-full">
@@ -197,32 +204,55 @@ export default function ProfilePage() {
                         <p>Edit Profile</p>
                       </Button>
                     ) : (
-                      <Button 
-                        onClick={() => {
-                          follow();
-                          
-                          setTimeout(() => {
-                            refetch();
-                          }, 350)
-                        }}
-                        disabled={followLoading}
-                      >
-                        { followLoading ? "..." : followLabel }
-                      </Button>
-                    )}
+                      <>
+                        {isFollowing && (
+                          <Button
+                            size={"icon"}
+                            variant={"secondary"}
+                            className="p-2.5"
+                          >
+                            <MailIcon size={18} />
+                          </Button>
+                        )}
 
-                    <Button
-                      size={"icon"}
-                      variant={"outline"}
-                    >
-                      <EllipsisVerticalIcon className="h-6 w-6" />
-                    </Button>
+                        <Button
+                          onClick={() => {
+                            follow();
+
+                            setTimeout(() => {
+                              refetch();
+                            }, 350);
+                          }}
+                          disabled={followLoading}
+                        >
+                          {followLoading ? "..." : followLabel}
+                        </Button>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size={"icon"}
+                              variant={"outline"}
+                              className="p-2.5"
+                            >
+                              <EllipsisVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          
+                          <ProfileDropdown />
+                        </DropdownMenu>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 <div className="px-2 sm:hidden">
-                  <TypographyH2 className="text-xl sm:text-2xl truncate">{viewedFursona.display_name}</TypographyH2>
-                  <TypographySmall className="text-muted-foreground">@{viewedFursona.username}</TypographySmall>
+                  <TypographyH2 className="text-xl sm:text-2xl truncate">
+                    {viewedFursona.display_name}
+                  </TypographyH2>
+                  <TypographySmall className="text-muted-foreground">
+                    @{viewedFursona.username}
+                  </TypographySmall>
                 </div>
               </motion.div>
             )}
@@ -230,11 +260,18 @@ export default function ProfilePage() {
 
           <AnimatePresence mode="wait">
             {isLoading ? (
-              <motion.div key="info-skeleton" exit={{ opacity: 0 }} className="flex-1 w-full pb-0 space-y-6">
+              <motion.div
+                key="info-skeleton"
+                exit={{ opacity: 0 }}
+                className="flex-1 w-full pb-0 space-y-6"
+              >
                 <Skeleton className="h-4 w-72" />
                 <div className="flex gap-3 sm:gap-6 justify-start">
                   {[0, 1, 2].map((i) => (
-                    <div key={i} className="flex flex-col items-center w-16 gap-2">
+                    <div
+                      key={i}
+                      className="flex flex-col items-center w-16 gap-2"
+                    >
                       <Skeleton className="h-9 w-8 rounded-full" />
                       <Skeleton className="h-4 w-full" />
                     </div>
@@ -250,7 +287,7 @@ export default function ProfilePage() {
                 transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
               >
                 <TypographyXSmall className="block max-w-xl text-muted-foreground break-words">
-                    { viewedFursona?.bio }
+                  {viewedFursona?.bio}
                 </TypographyXSmall>
 
                 <div className="flex gap-3 sm:gap-6 justify-start">
@@ -265,7 +302,7 @@ export default function ProfilePage() {
                       </TypographyLead>
 
                       <TypographyXSmall className="text-muted-foreground text-xs">
-                        { label }
+                        {label}
                       </TypographyXSmall>
                     </div>
                   ))}
@@ -277,16 +314,16 @@ export default function ProfilePage() {
       </section>
 
       {/*  Profile content */}
-      <div className="flex flex-col sm:container sm:mx-auto">
+      <div className="container flex flex-col mx-auto">
         {/* Nav */}
-        <nav className="shrink-0 space-y-1 sm:space-y-2">
-          <ul className="flex flex-wrap gap-2 sm:gap-0">
+        <nav className="space-y-2">
+          <ul className="flex gap-2 overflow-x-auto">
             {profileNav.map(({ label, key }) => (
               <Button
                 key={label}
                 size="sm"
                 variant="ghost"
-                className={`text-xs sm:text-sm ${content === key ? "bg-surface-container-highest" : ""}`}
+                className={`justify-start rounded-none text-xs sm:text-sm ${content === key ? "bg-surface-container-highest" : ""}`}
                 onClick={() => handleNavClick(key)}
               >
                 {label}
@@ -305,11 +342,13 @@ export default function ProfilePage() {
             animate="center"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="grow space-y-4 w-full min-h-[calc(100svh-64px)] lg:overflow-y-auto scrollbar-hide"
           >
-            {content === "post"    && <ProfilePost username={paramUsername} />}
-            {content === "repost"  && <ProfileRepost username={paramUsername} />}
+            {content === "post" && <ProfilePostCards username={viewedFursona.id} />}
+            {content === "gallery" && <div>Gallery coming soon</div> }
+            {content === "repost" && <ProfileRepost username={viewedFursona?.username} />}
             {content === "archive" && <div>Archive coming soon</div>}
-            {content === "likes"   && <div>Likes coming soon</div>}
+            {content === "likes" && <div>Likes coming soon</div>}
           </motion.section>
         </AnimatePresence>
       </div>

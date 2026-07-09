@@ -28,7 +28,7 @@ interface UseFormReturn<T> {
  *   async (values) => await api.post('/login', values),
  *   { onSuccess: () => router.push('/') }
  * );
- * 
+ *
  * const { isLoading, error, handleSubmit } = useForm(
  *   {},
  *   async (values) => { ... },
@@ -66,7 +66,9 @@ export function useForm<T extends Record<string, unknown>>(
       } catch (err: unknown) {
         const errorMessage = getErrorMessage(err);
         setError(errorMessage);
-        options?.onError?.(err instanceof Error ? err : new Error(errorMessage));
+        options?.onError?.(
+          err instanceof Error ? err : new Error(errorMessage),
+        );
       } finally {
         setIsLoading(false);
       }

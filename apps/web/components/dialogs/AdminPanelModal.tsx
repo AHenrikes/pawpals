@@ -8,9 +8,9 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import type { FursonaTypes } from "@/types/fursona";
-import type { AccountTypeWithId } from "@/types/account";
 import { X, AlertTriangle } from "lucide-react";
+import type { AccountTypeWithId } from "@/types/account";
+import type { FursonaTypes } from "@/types/fursona";
 
 interface AdminPanelModalProps {
   fursona: FursonaTypes;
@@ -39,12 +39,14 @@ export function AdminPanelModal({
     if (!action || !reason.trim()) return;
 
     setLoading(true);
+
     try {
       if (action === "suspend") {
         await onSuspend(reason);
       } else {
         await onDelete(reason);
       }
+
       setReason("");
       setAction(null);
       onClose();
@@ -73,6 +75,7 @@ export function AdminPanelModal({
 
         <div className="space-y-2">
           <TypographySmall>Fursona: {fursona.display_name}</TypographySmall>
+
           {account && (
             <TypographyXSmall className="text-muted-foreground">
               Account: {account.email}
@@ -90,6 +93,7 @@ export function AdminPanelModal({
             >
               Suspend Account
             </Button>
+
             <Button
               variant="destructive"
               className="w-full"
@@ -108,6 +112,7 @@ export function AdminPanelModal({
               disabled={loading}
               rows={4}
             />
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -120,6 +125,7 @@ export function AdminPanelModal({
               >
                 Cancel
               </Button>
+
               <Button
                 variant={action === "delete" ? "destructive" : "default"}
                 className="flex-1"

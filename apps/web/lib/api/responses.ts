@@ -22,7 +22,7 @@ export function serverError(message: string) {
 }
 
 export function conflict(message: string) {
-  return NextResponse.json({ error: message }, { status: 409 })
+  return NextResponse.json({ error: message }, { status: 409 });
 }
 
 export function created<T>(data: T) {
@@ -32,9 +32,3 @@ export function created<T>(data: T) {
 export function ok<T>(data: T) {
   return NextResponse.json(data, { status: 200 });
 }
-
-
-// conflic {
-//  status: 409;
-//  code: 23505;
-// }

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { cn } from "@/lib/helpers/utils";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import {
   Home,
   PawPrint,
@@ -30,6 +31,8 @@ import {
   useSidebar,
 } from "@/providers/SidebarProvider";
 import type { LucideIcon } from "lucide-react";
+import PostModal from "@/components/dialogs/PostModal";
+import { LockScreen } from "@/utils/lock-body";
 
 type MainNavItem = {
   href: string;
@@ -49,21 +52,20 @@ const mainNavItems: MainNavItem[] = [
 
 export default function MainNav() {
   const pathname = usePathname();
-  const router = useRouter();
+
   const { signOut } = useUser();
   const { state, openMobile, isMobile } = useSidebar();
 
+  const [postOpen, setPostOpen] = useState(false);
+
   const isCollapsed = isMobile ? !openMobile : state === "collapsed";
-  const handleSignOut = async () => {
-    await signOut();
-    router.push(AUTH_ROUTES.SIGN_IN);
-    router.refresh();
-  };
+
+  LockScreen(isMobile && openMobile);
 
   return (
     <Sidebar
       collapsible="icon"
-      className="group/sidebar border-transparent shrink-0"
+      className="group/sidebar shrink-0"
     >
       <SidebarContent>
         <SidebarGroup>
@@ -74,19 +76,20 @@ export default function MainNav() {
 
                 return (
                   <SidebarMenuItem key={label}>
-                    <SidebarMenuButton 
-                      asChild
-                      isActive={isActive}
-                      className=""
-                    >
-                      <Link 
+                    <SidebarMenuButton asChild isActive={isActive} className="">
+                      <Link
                         href={href}
                         className="hover:bg-surface-highest p-3"
                         draggable="false"
                       >
-                        <Icon className={cn("h-6 w-6  shrink-0", !isActive && "opacity-60")} />
+                        <Icon
+                          className={cn(
+                            "h-6 w-6  shrink-0",
+                            !isActive && "opacity-60",
+                          )}
+                        />
 
-                        <AnimatePresence initial={false}>
+                        <AnimatePresence initial={false} mode="wait">
                           {!isCollapsed && (
                             <motion.span
                               key="label"
@@ -110,13 +113,17 @@ export default function MainNav() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="flex flex-col">
+      <SidebarFooter className="flex flex-col px-1">
         <Button
-          className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
+          onClick={() => setPostOpen(true)}
+          className={cn(
+            "mt-3 h-10 rounded-full shadow-none",
+            !isCollapsed && "w-full",
+          )}
         >
           <PlusIcon className="h-6 w-6 shrink-0" />
 
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} mode="wait">
             {!isCollapsed && (
               <motion.span
                 key="post-label"
@@ -134,12 +141,12 @@ export default function MainNav() {
 
         <Button
           variant="outline"
-          onClick={handleSignOut}
+          onClick={() => signOut()}
           className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
         >
           <LogOutIcon className="h-6 w-6 p-[2px] shrink-0" />
 
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} mode="wait">
             {!isCollapsed && (
               <motion.span
                 key="signout-label"
@@ -155,6 +162,8 @@ export default function MainNav() {
           </AnimatePresence>
         </Button>
       </SidebarFooter>
+
+      <PostModal isOpen={postOpen} onClose={() => setPostOpen(false)} />
     </Sidebar>
   );
 }

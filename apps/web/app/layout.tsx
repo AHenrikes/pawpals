@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@repo/ui/sonner";
+import { type Metadata } from "next";
 import "./pawpals.css";
 
+// TODO remove before publishing
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";

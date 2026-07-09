@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
         hostname: "192.168.1.219",
       },
     ],
-    qualities: [75, 100],
+    qualities: [75, 85],
   },
 };
 

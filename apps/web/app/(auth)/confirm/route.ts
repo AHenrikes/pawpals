@@ -41,12 +41,17 @@ export async function GET(request: NextRequest) {
     if (error) errorRedirect(error.message);
     if (data.user) await handleUser(data.user);
   } else if (code) {
-    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code);
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) errorRedirect(error.message);
     if (user) await handleUser(user);
   } else {
-    return NextResponse.redirect(new URL(`/error?error=No token hash or type`, request.url));
+    return NextResponse.redirect(
+      new URL(`/error?error=No token hash or type`, request.url),
+    );
   }
 
   const safeNext = next?.startsWith("/") ? next : "/";

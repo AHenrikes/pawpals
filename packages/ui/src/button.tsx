@@ -4,28 +4,24 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "./lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center p-4 text-sm font-medium whitespace-nowrap gap-2 rounded-base duration-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-gradient-to-r from-primary to-secondary text-primary-foreground text-base font-semibold text-text-secondary shadow-[0_5px_50px_rgba(190,127,255,0.35)] transition hover:brightness-125",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        default: "bg-primary text-text-foreground hover:bg-primary-dim",
+        secondary: "bg-foreground text-text-foreground hover:bg-muted-foreground",
+        destructive: "bg-accent hover:bg-destructive",
+        outline: "border border-border hover:bg-surface-low",
         link: "text-primary underline-offset-4 hover:underline",
-        transparent: "backdrop-blur-md border border-input p-3",
+        ghost: "hover:bg-card",
         none: "",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-6 w-6 p-0 [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0",
+        sm: "h-7 text-xs rounded-sm",
+        default: "h-9",
+        lg: "h-10 rounded-lg",
+        icon: "h-fit w-fit [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        iconPair: "h-fit w-fit [&_svg]:pointer-events-none [&_svg]:shrink-0",
       },
     },
     defaultVariants: {

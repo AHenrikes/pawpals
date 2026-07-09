@@ -35,7 +35,8 @@ export const ERROR_MESSAGES = {
   FURSONA_NAME_TOO_LONG: "The display name is too long",
   FURSONA_CREATE_FAILED: "Failed to create fursona",
   FURSONA_UPDATE_FAILED: "Failed to update fursona",
-  FURSONA_USERNAME_FORMAT: "Invalid username format: 3-50 characters, alphanumeric/underscore/hyphen only.",
+  FURSONA_USERNAME_FORMAT:
+    "Invalid username format: 3-50 characters, alphanumeric/underscore/hyphen only.",
   FURSONA_DELETE_FAILED: "Failed to delete fursona",
   FURSONA_SWITCH_FAILED: "Failed to switch fursona",
   MAX_FURSONAS_REACHED: "Maximum number of fursonas reached",

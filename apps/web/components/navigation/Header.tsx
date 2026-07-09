@@ -24,7 +24,6 @@ import { CreateFursonaPanelModal } from "@/components/dialogs/CreateFursonaPanel
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "@repo/ui/sonner";
-import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,18 +34,14 @@ import {
   DropdownMenuSub,
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
-import { TypographyH4, TypographySmall } from "@repo/ui/typography";
-import { Searchbar } from "@/components/searchbar/Searchbar";
+import {
+  TypographyH4,
+  TypographyP,
+  TypographySmall,
+} from "@repo/ui/typography";
+import { Searchbar } from "@/components/dialogs/search/Searchbar";
 import { useIsCurrentPath, useCurrentPath } from "@/hooks/useCurrentPath";
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
+import { getInitials } from "@/utils/getInitials";
 
 export default function Header() {
   const {
@@ -65,7 +60,6 @@ export default function Header() {
   const [, startTransition] = useTransition();
   const isCurrentProfile = useIsCurrentPath(`@${currentFursona?.username}`);
   const currentPath = useCurrentPath();
-  const router = useRouter();
 
   const handleFursonaCreated = () => {
     refresh();
@@ -92,7 +86,7 @@ export default function Header() {
         // Wait for menu to close
         setTimeout(() => {
           setIsFursonaListOpen(false);
-        }, 350)
+        }, 350);
       }
     });
   };
@@ -125,19 +119,14 @@ export default function Header() {
     { href: AUTH_ROUTES.SETTINGS, label: "Settings", icon: Settings },
   ];
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push(AUTH_ROUTES.SIGN_IN);
-    router.refresh();
-  };
-
   const count = fursonas.length;
 
   return (
-    <header className="sticky top-0 w-full h-16 border-b border-popover bg-background backdrop-blur z-50">
-      <div className="mx-auto flex h-full w-full items-center justify-between px-2 md:px-6">
+    <header className="sticky top-0 w-full h-16 border-b border-border bg-background backdrop-blur z-40">
+      <div className="flex h-full w-full items-center justify-between px-2 mx-auto md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
+
           <Link href={AUTH_ROUTES.HOME}>
             <TypographyH4 className="text-primary">PAWPALS</TypographyH4>
           </Link>
@@ -155,15 +144,13 @@ export default function Header() {
                 <Skeleton className="h-8 w-8 rounded-full" />
               ) : (
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant={"none"}
-                    className="p-0 focus-visible:ring-0"
-                  >
+                  <Button variant={"ghost"} className="p-0 focus-visible:ring-0">
                     <Avatar size="sm">
                       <AvatarImage
                         src={`${currentFursona?.avatar_url}`}
                         alt={displayName}
                       />
+
                       <AvatarFallback>
                         {getInitials(displayName)}
                       </AvatarFallback>
@@ -184,6 +171,7 @@ export default function Header() {
                           src={`${currentFursona?.avatar_url}`}
                           alt={displayName}
                         />
+
                         <AvatarFallback>
                           {getInitials(displayName)}
                         </AvatarFallback>
@@ -221,7 +209,10 @@ export default function Header() {
 
                     <span>
                       <ChevronDown className="h-4 w-4" />
-                      <p className="sr-only">Switch Fursona</p>
+
+                      <TypographyP className="sr-only">
+                        Switch Fursona
+                      </TypographyP>
                     </span>
                   </CollapsibleTrigger>
 
@@ -237,12 +228,19 @@ export default function Header() {
                                 <TypographySmall>
                                   {elem.display_name}
                                 </TypographySmall>
+
                                 <Check className="h-4 w-4" />
                               </span>
                             ) : (
                               <Link
-                                href={ isCurrentProfile ? `/@${elem.username}` : currentPath }
-                                onClick={() => void handleSwitchFursona(elem.id) }
+                                href={
+                                  isCurrentProfile
+                                    ? `/@${elem.username}`
+                                    : currentPath
+                                }
+                                onClick={() =>
+                                  void handleSwitchFursona(elem.id)
+                                }
                                 className={
                                   "flex w-full items-center justify-between text-start font-semibold"
                                 }
@@ -260,18 +258,18 @@ export default function Header() {
                         );
                       })}
 
-                      {count < 3 && (
-                        <DropdownMenuItem asChild className="mt-2">
-                          <Button
-                            variant={"outline"}
-                            onClick={() => setCreateFursonaOpen(true)}
-                            className="h-8 w-full my-2 rounded-full"
-                          >
-                            <PlusIcon className="h-4 w-4" />
-                            Create Fursona
-                          </Button>
-                        </DropdownMenuItem>
-                      )}
+                      { !loading && count < 3 ? (
+                          <DropdownMenuItem asChild className="mt-2">
+                            <Button
+                              variant={"outline"}
+                              onClick={() => setCreateFursonaOpen(true)}
+                              className="h-8 w-full my-2 rounded-full"
+                            >
+                              <PlusIcon className="h-4 w-4" />
+                              Create Fursona
+                            </Button>
+                          </DropdownMenuItem>
+                      ) : null }
                     </DropdownMenuGroup>
                   </CollapsibleContent>
                 </DropdownMenuGroup>
@@ -281,7 +279,7 @@ export default function Header() {
                 <DropdownMenuSub>
                   <Button
                     variant="outline"
-                    onClick={handleSignOut}
+                    onClick={() => signOut()}
                     className="h-8 w-full my-2 rounded-full"
                   >
                     <div>
