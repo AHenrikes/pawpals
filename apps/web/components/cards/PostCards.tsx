@@ -21,6 +21,7 @@ import type { PostType, MediaItem } from "@/types/post";
 import Image from "next/image";
 import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
 import PostDropdown from "../dropdowns/Post";
+import MediaTiles from "../mediaTiles";
 
 type PostListProps = {
   posts: PostType[];
@@ -29,177 +30,7 @@ type PostListProps = {
   loading: boolean;
 }
 
-function PostMedia({ media }: Readonly<{ media: MediaItem[] }>) {
-  if (!media.length) return null;
-  const count = media.length;
 
-  if (count === 1) {
-    const item = media[0]!;
-
-    return (
-      <div
-        className="rounded-2xl overflow-hidden bg-muted relative w-full"
-        style={{
-          aspectRatio: `${item.width} / ${item.height}`,
-          maxHeight: "400px",
-          position: "relative",
-        }}
-      >
-        {item.type === "video" ? (
-          <video
-            src={item.url}
-            className="w-full h-full object-cover"
-            muted
-            playsInline
-            loop
-            autoPlay
-          />
-        ) : (
-          <Image
-            src={item.url}
-            alt="Post media"
-            fill
-            quality={100}
-            className="object-cover"
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (count === 2) {
-    return (
-      <div className="grid grid-cols-2 gap-1 rounded-2xl overflow-hidden w-full relative" style={{ height: "400px" }}>
-        {media.map((item) => (
-          <div
-            key={item.url}
-            className="bg-muted overflow-hidden relative h-full"
-            style={{ position: "relative" }}
-          >
-            {item.type === "video" ? (
-              <video
-                src={item.url}
-                className="w-full h-full object-cover"
-                muted
-                playsInline
-                loop
-                autoPlay
-              />
-            ) : (
-              <Image
-                src={item.url}
-                alt="Post media"
-                fill
-                quality={100}
-                className="object-cover"
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (count === 3) {
-    return (
-      <div 
-        className="grid gap-1 rounded-2xl overflow-hidden relative w-full"
-        style={{ 
-          gridTemplateColumns: "1fr 1fr",
-          gridTemplateRows: "1fr 1fr",
-          position: "relative",
-          height: "400px"
-        }}
-      >
-        <div
-          className="row-span-2 bg-muted overflow-hidden relative h-full"
-          style={{ position: "relative" }}
-        >
-          {media[0]!.type === "video" ? (
-            <video
-              src={media[0]!.url}
-              className="w-full h-full object-cover"
-              muted
-              playsInline
-              loop
-              autoPlay
-            />
-          ) : (
-            <Image
-              src={media[0]!.url}
-              alt="Post media"
-              fill
-              quality={100}
-              className="object-cover"
-            />
-          )}
-        </div>
-        {[media[1], media[2]].map((item) => (
-          <div
-            key={item!.url}
-            className="bg-muted overflow-hidden relative h-full"
-            style={{ position: "relative" }}
-          >
-            {item!.type === "video" ? (
-              <video
-                src={item!.url}
-                className="w-full h-full object-cover"
-                muted
-                playsInline
-                loop
-                autoPlay
-              />
-            ) : (
-              <Image
-                src={item!.url}
-                alt="Post media"
-                fill
-                quality={100}
-                className="object-cover"
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-2xl overflow-hidden relative w-full" style={{ height: "400px" }}>
-      {media.map((item, idx) => (
-        <div
-          key={item.url}
-          className="bg-muted overflow-hidden relative h-full"
-          style={{ position: "relative" }}
-        >
-          {item.type === "video" ? (
-            <video
-              src={item.url}
-              className="w-full h-full object-cover"
-              muted
-              playsInline
-              loop
-              autoPlay
-            />
-          ) : (
-            <Image
-              src={item.url}
-              alt="Post media"
-              fill
-              quality={100}
-              className="object-cover"
-            />
-          )}
-          {idx === 3 && media.length > 4 && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">+{media.length - 4}</span>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function PostCard({ post, isLast = false }: Readonly<{ post: PostType; isLast?: boolean }>) {
   const { user, loading } = useFursonaData(post.fursona_id);
@@ -301,9 +132,7 @@ function PostCard({ post, isLast = false }: Readonly<{ post: PostType; isLast?: 
 
           {/* Media */}
           {media.length > 0 && (
-            <div className="mt-3">
-              <PostMedia media={media} />
-            </div>
+            <MediaTiles media={media} className="relative h-[400px] rounded-2xl overflow-hidden" />
           )}
         </div>
 
