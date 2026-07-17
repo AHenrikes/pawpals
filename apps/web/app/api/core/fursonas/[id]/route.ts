@@ -1,6 +1,10 @@
 import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { FursonaCreate, FursonaWithBoolean, type FursonaProfile } from "@/types/fursona";
+import {
+  FursonaCreate,
+  FursonaWithBoolean,
+  type FursonaProfile,
+} from "@/types/fursona";
 import { NextRequest } from "next/server";
 import {
   badRequest,
@@ -9,7 +13,10 @@ import {
   serverError,
   unauthorized,
 } from "@/lib/api/responses";
-import { normalizeOptionalText, normalizeRequiredName } from "@/lib/helpers/normalizeInput";
+import {
+  normalizeOptionalText,
+  normalizeRequiredName,
+} from "@/lib/helpers/normalizeInput";
 
 function buildPatchUpdates(body: FursonaWithBoolean) {
   const updates: Record<string, unknown> = {};
@@ -63,10 +70,11 @@ export async function GET(
   const { id } = await params;
 
   if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
-  
+
   // Support both UUID-based ID and username lookups
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-  
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
   const { data, error } = await supabase
     .schema("core")
     .from("fursonas")
@@ -77,7 +85,8 @@ export async function GET(
     .eq("is_active", true)
     .single();
 
-  if (error?.code === "PGRST116") return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  if (error?.code === "PGRST116")
+    return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
   if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 

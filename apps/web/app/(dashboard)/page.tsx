@@ -1,18 +1,54 @@
+"use client";
+
 import { PostCards } from "@/components/cards/PostCards";
+import { AnimatePresence, motion } from "framer-motion";
+import { useHomeTabs } from "@/providers/HomeTabsProvider";
 
 export default function Dashboard() {
+  const { content, direction } = useHomeTabs();
+
+  const slideVariants = {
+    enter: (dir: number) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
+  };
 
   return (
-    <main className="flex">
-      <div className="w-full border-x border-border">
-        <PostCards />
-      </div>
-    
-      <aside className="hidden sticky top-16 flex-col w-[500px] h-[calc(100svh-64px)] p-4 gap-5 md:flex">
-        <div className="bg-muted animate-pulse w-full h-80 rounded-md" />
+    <div className="flex flex-1  py-4 px-2 gap-4 md:px-4">
+      <AnimatePresence mode="popLayout" custom={direction}>
+        <motion.section
+          key={content}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="relative flex grow w-full min-h-[calc(100svh-96px)] lg:overflow-y-auto scrollbar-hide"
+        >
+          {content === "posts" && (
+            <div className="flex flex-col mx-auto gap-8">
+              <PostCards />
+            </div>
+          )}
+          {content === "reels" && (
+            <div className="grid w-full place-content-center">
+              Reels coming soon
+            </div>
+          )}
+          {content === "following" && (
+            <div className="grid w-full place-content-center">
+              Following coming soon
+            </div>
+          )}
+        </motion.section>
+      </AnimatePresence>
 
-        <div className="bg-muted animate-pulse w-full h-full rounded-md" />
+      <aside className="hidden sticky top-20 flex-col w-[500px] h-[calc(100svh-96px)] gap-5 md:flex">
+        <div className="bg-surface-low animate-pulse w-full h-96 rounded-md shadow-lg" />
+
+        <div className="bg-surface-low animate-pulse w-full h-full rounded-md shadow-lg" />
       </aside>
-    </main>
+    </div>
   );
 }

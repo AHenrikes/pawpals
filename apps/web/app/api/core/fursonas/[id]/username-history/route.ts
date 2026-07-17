@@ -11,7 +11,7 @@ import { ERROR_MESSAGES } from "@/lib/constants/errors";
  */
 export async function GET(
   _request: NextRequest,
-{ params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { supabase, account, response } = await requireUser();

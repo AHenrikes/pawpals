@@ -149,7 +149,6 @@ export function Sidebar({
   const { state, openMobile, setOpenMobile } = useSidebar();
   const isCollapsed = collapsible !== "none" && state === "collapsed";
 
-
   return (
     <>
       <motion.aside

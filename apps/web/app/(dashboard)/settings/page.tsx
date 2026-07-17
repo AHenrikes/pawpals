@@ -1,19 +1,51 @@
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@repo/ui/field";
 import { Input } from "@repo/ui/input";
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@repo/ui/input-group";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/select";
-import { TypographyBlockquote, TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyInlineCode, TypographyLarge, TypographyLead, TypographyList, TypographyMuted, TypographyP, TypographySmall, TypographyTable, TypographyXSmall } from "@repo/ui/typography";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@repo/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/select";
+import {
+  TypographyBlockquote,
+  TypographyH1,
+  TypographyH2,
+  TypographyH3,
+  TypographyH4,
+  TypographyInlineCode,
+  TypographyLarge,
+  TypographyLead,
+  TypographyList,
+  TypographyMuted,
+  TypographyP,
+  TypographySmall,
+  TypographyTable,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 import { AtomIcon, InfoIcon, PlayCircleIcon } from "lucide-react";
-import { ButtonGroup } from "@repo/ui/button-group"
+import { ButtonGroup } from "@repo/ui/button-group";
 
 export default function Settings() {
   const countries = [
     { label: "United States", value: "us" },
     { label: "United Kingdom", value: "uk" },
     { label: "Canada", value: "ca" },
-  ]
+  ];
 
   return (
     <main className="space-y-10 bg-background p-5">
@@ -27,7 +59,9 @@ export default function Settings() {
             </div>
 
             <div className="h-64 w-64 bg-foreground p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Foreground</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Foreground
+              </TypographyH2>
             </div>
           </div>
 
@@ -55,11 +89,15 @@ export default function Settings() {
             </div>
 
             <div className="h-64 w-64 bg-primary-dim p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Primary dim</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Primary dim
+              </TypographyH2>
             </div>
 
             <div className="h-64 w-64 bg-primary-foreground p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Primary foreground</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Primary foreground
+              </TypographyH2>
             </div>
           </div>
 
@@ -69,7 +107,9 @@ export default function Settings() {
             </div>
 
             <div className="h-64 w-64 bg-secondary-foreground p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Secondary Foreground</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Secondary Foreground
+              </TypographyH2>
             </div>
           </div>
 
@@ -93,7 +133,9 @@ export default function Settings() {
             </div>
 
             <div className="h-64 w-64 bg-card-foreground p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Card foreground (foreground)</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Card foreground (foreground)
+              </TypographyH2>
             </div>
           </div>
 
@@ -103,7 +145,9 @@ export default function Settings() {
             </div>
 
             <div className="h-64 w-64 bg-popover-foreground p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Popover Foreground (foreground)</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Popover Foreground (foreground)
+              </TypographyH2>
             </div>
           </div>
 
@@ -113,7 +157,9 @@ export default function Settings() {
             </div>
 
             <div className="h-64 w-64 bg-muted-foreground p-4 border rounded-md">
-              <TypographyH2 className="text-text-foreground">Muted Foreground</TypographyH2>
+              <TypographyH2 className="text-text-foreground">
+                Muted Foreground
+              </TypographyH2>
             </div>
           </div>
 
@@ -142,7 +188,9 @@ export default function Settings() {
 
         <div className="flex flex-col pl-10 gap-5">
           <div className="h-64 w-64 bg-pawpals-primary p-4 border rounded-md">
-            <TypographyH2>Pawpals primary (primary dim + primary foreground)</TypographyH2>
+            <TypographyH2>
+              Pawpals primary (primary dim + primary foreground)
+            </TypographyH2>
           </div>
 
           <div className="h-64 w-64 bg-fur-gradient p-4 border rounded-md">
@@ -156,20 +204,22 @@ export default function Settings() {
 
         <div className="flex flex-col pl-10 gap-5">
           <div className="h-64 w-64 shadow-ambient p-4 border rounded-md">
-            <TypographyH2>Ambient (primary dim + primary foreground)</TypographyH2>
+            <TypographyH2>
+              Ambient (primary dim + primary foreground)
+            </TypographyH2>
           </div>
         </div>
       </div>
 
       <div className="space-y-5 border-l rounded-t-md">
         <TypographyH1 className="p-4">HEADERS</TypographyH1>
-        
-          <div className="flex flex-col pl-10 gap-5">
-            <TypographyH1>H1</TypographyH1>
-            <TypographyH2>H2</TypographyH2>
-            <TypographyH3>H3</TypographyH3>
-            <TypographyH4>H4</TypographyH4>
-          </div>
+
+        <div className="flex flex-col pl-10 gap-5">
+          <TypographyH1>H1</TypographyH1>
+          <TypographyH2>H2</TypographyH2>
+          <TypographyH3>H3</TypographyH3>
+          <TypographyH4>H4</TypographyH4>
+        </div>
       </div>
 
       <div className="space-y-5 border-l rounded-t-md">
@@ -199,7 +249,9 @@ export default function Settings() {
           <TypographyList>LIST</TypographyList>
           <TypographyInlineCode>CODE</TypographyInlineCode>
           <TypographyLarge>LARGE</TypographyLarge>
-          <TypographyTable><caption className="text-start">TABLE</caption></TypographyTable>
+          <TypographyTable>
+            <caption className="text-start">TABLE</caption>
+          </TypographyTable>
         </div>
       </div>
 
@@ -208,7 +260,11 @@ export default function Settings() {
 
         <div className="flex pl-10 gap-5">
           <Input className="w-96" placeholder="Default" variant={"default"} />
-          <Input className="w-96" placeholder="Secondary" variant={"secondary"} />
+          <Input
+            className="w-96"
+            placeholder="Secondary"
+            variant={"secondary"}
+          />
           <Input className="w-96" placeholder="Surface" variant={"input"} />
           <Input className="w-96" placeholder="Popover" variant={"popover"} />
         </div>
@@ -216,7 +272,7 @@ export default function Settings() {
 
       <div className="space-y-5 border-l rounded-t-md">
         <TypographyH1 className="p-4">INPUT FIELDS</TypographyH1>
-        
+
         <div className="flex flex-wrap pl-10 gap-5">
           <Field className="w-96 bg-surface rounded-base p-4">
             <FieldLabel htmlFor="input-field-username">Username</FieldLabel>
@@ -238,7 +294,9 @@ export default function Settings() {
               placeholder="Email"
               disabled
             />
-            <FieldDescription>This field is currently disabled.</FieldDescription>
+            <FieldDescription>
+              This field is currently disabled.
+            </FieldDescription>
           </Field>
 
           <Field className="w-96 bg-surface rounded-base p-4" data-invalid>
@@ -255,7 +313,10 @@ export default function Settings() {
             <FieldDescription>Select a picture to upload.</FieldDescription>
           </Field>
 
-          <Field className="w-96 bg-surface rounded-base p-4" orientation="horizontal">
+          <Field
+            className="w-96 bg-surface rounded-base p-4"
+            orientation="horizontal"
+          >
             <Input type="search" placeholder="Search..." />
             <Button>Search</Button>
           </Field>
@@ -361,7 +422,11 @@ export default function Settings() {
 
               <Field>
                 <FieldLabel htmlFor="form-email">Email</FieldLabel>
-                <Input id="form-email" type="email" placeholder="john@example.com" />
+                <Input
+                  id="form-email"
+                  type="email"
+                  placeholder="john@example.com"
+                />
                 <FieldDescription>
                   We&apos;ll never share your email with anyone.
                 </FieldDescription>
@@ -370,7 +435,11 @@ export default function Settings() {
               <div className="grid grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel htmlFor="form-phone">Phone</FieldLabel>
-                  <Input id="form-phone" type="tel" placeholder="+1 (555) 123-4567" />
+                  <Input
+                    id="form-phone"
+                    type="tel"
+                    placeholder="+1 (555) 123-4567"
+                  />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="form-country">Country</FieldLabel>
@@ -393,7 +462,11 @@ export default function Settings() {
 
               <Field>
                 <FieldLabel htmlFor="form-address">Address</FieldLabel>
-                <Input id="form-address" type="text" placeholder="123 Main St" />
+                <Input
+                  id="form-address"
+                  type="text"
+                  placeholder="123 Main St"
+                />
               </Field>
 
               <Field orientation="horizontal">
@@ -413,10 +486,16 @@ export default function Settings() {
         <div className="flex flex-col pl-10 gap-5">
           <TypographyP className="text-headline">HEADLINE</TypographyP>
           <TypographyP className="text-text">TEXT</TypographyP>
-          <TypographyP className="text-text-foreground">TEXT FOREGROUND</TypographyP>
+          <TypographyP className="text-text-foreground">
+            TEXT FOREGROUND
+          </TypographyP>
           <TypographyP className="text-text-primary">TEXT PRIMARY</TypographyP>
-          <TypographyP className="text-text-secondary">TEXT SECONDARY</TypographyP>
-          <TypographyP className="text-text-destructive">TEXT DESTRUCTIVE</TypographyP>
+          <TypographyP className="text-text-secondary">
+            TEXT SECONDARY
+          </TypographyP>
+          <TypographyP className="text-text-destructive">
+            TEXT DESTRUCTIVE
+          </TypographyP>
           <TypographyP className="text-text-muted">TEXT MUTED</TypographyP>
         </div>
       </div>
@@ -425,30 +504,48 @@ export default function Settings() {
         <TypographyH1 className="p-4">RADIUS</TypographyH1>
 
         <div className="flex pl-10 gap-5">
-          <div className="grid place-content-center bg-primary h-20 w-40 rounded-sm">SMALL</div>
-          <div className="grid place-content-center bg-primary h-20 w-40 rounded-md">MD</div>
-          <div className="grid place-content-center bg-primary h-20 w-40 rounded-base">BASE</div>
-          <div className="grid place-content-center bg-primary h-20 w-40 rounded-lg">LG</div>
-          <div className="grid place-content-center bg-primary h-20 w-40 rounded-xl">XL</div>
-          <div className="grid place-content-center bg-primary h-20 w-40 rounded-full">FULL</div>
+          <div className="grid place-content-center bg-primary h-20 w-40 rounded-sm">
+            SMALL
+          </div>
+          <div className="grid place-content-center bg-primary h-20 w-40 rounded-md">
+            MD
+          </div>
+          <div className="grid place-content-center bg-primary h-20 w-40 rounded-base">
+            BASE
+          </div>
+          <div className="grid place-content-center bg-primary h-20 w-40 rounded-lg">
+            LG
+          </div>
+          <div className="grid place-content-center bg-primary h-20 w-40 rounded-xl">
+            XL
+          </div>
+          <div className="grid place-content-center bg-primary h-20 w-40 rounded-full">
+            FULL
+          </div>
         </div>
       </div>
 
       <div className="spce-y-5 border-l rounded-t-md">
         <TypographyH1 className="p-4">BUTTONS</TypographyH1>
-        
+
         <div className="space-y-5">
           <div className="flex pl-10 gap-5">
             <Button size={"lg"}>LG SIZE</Button>
             <Button size={"default"}>DEFAULT SIZE</Button>
             <Button size={"sm"}>SM SIZE</Button>
-            <Button size={"icon"}><AtomIcon /></Button>
-            <Button size={"iconPair"}><PlayCircleIcon /> Pair</Button>
+            <Button size={"icon"}>
+              <AtomIcon />
+            </Button>
+            <Button size={"iconPair"}>
+              <PlayCircleIcon /> Pair
+            </Button>
           </div>
 
           <div className="flex pl-10 gap-5">
             <Button variant={"default"}>DEFAULT VARIANT</Button>
-            <Button variant={"secondary"} className="text-text-foreground">SECONDARY VARIANT</Button>
+            <Button variant={"secondary"} className="text-text-foreground">
+              SECONDARY VARIANT
+            </Button>
             <Button variant={"destructive"}>DESTRUCTIVE VARIANT</Button>
             <Button variant={"outline"}>OUTLINE VARIANT</Button>
             <Button variant={"link"}>LINK VARIANT</Button>

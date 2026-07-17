@@ -217,45 +217,6 @@ export default function SignUpForm() {
                   transition={stepTransition}
                   className="space-y-5"
                 >
-                  {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="space-y-2.5">
-                      <Label htmlFor="firstname" variant={"auth"}>
-                        Firstname
-                      </Label>
-
-                      <Input
-                        id="firstname"
-                        type="text"
-                        placeholder="Jhon"
-                        value={values.firstname}
-                        onChange={(e) =>
-                          handleChange("firstname", e.target.value)
-                        }
-                        variant={"auth"}
-                        autoFocus={step === "account"}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2.5">
-                      <Label htmlFor="lastname" variant={"auth"}>
-                        Lastname
-                      </Label>
-
-                      <Input
-                        id="lastname"
-                        type="text"
-                        placeholder="Doe"
-                        value={values.lastname}
-                        onChange={(e) =>
-                          handleChange("lastname", e.target.value)
-                        }
-                        variant={"auth"}
-                        required
-                      />
-                    </div>
-                  </div> */}
-
                   <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <Field>
                       <FieldLabel htmlFor="first-name">First Name</FieldLabel>
@@ -293,21 +254,6 @@ export default function SignUpForm() {
                     </Field>
                   </FieldGroup>
 
-                  {/* <div className="space-y-2.5">
-                    <Label htmlFor="email" variant={"auth"}>
-                      Email
-                    </Label>
-
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="example@pawpals.com"
-                      value={values.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      variant={"auth"}
-                      required
-                    />
-                  </div> */}
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
 
@@ -402,7 +348,9 @@ export default function SignUpForm() {
                     </Field>
 
                     <Field>
-                      <FieldLabel htmlFor="confirmfname">Confirm Password</FieldLabel>
+                      <FieldLabel htmlFor="confirmfname">
+                        Confirm Password
+                      </FieldLabel>
 
                       <Input
                         id="confirmfname"

@@ -210,7 +210,7 @@ export function EditProfileModal({
               src={bannerPreview}
               alt="Banner"
               fill
-              quality={100}
+              quality={85}
               sizes="(max-width: 768px) 100vw, 448px"
               className="object-cover"
             />
@@ -242,7 +242,7 @@ export function EditProfileModal({
                 src={avatarPreview}
                 alt="Avatar"
                 fill
-                quality={100}
+                quality={85}
                 sizes="64px"
                 className="object-cover"
               />

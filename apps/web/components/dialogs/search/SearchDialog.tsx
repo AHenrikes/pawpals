@@ -66,10 +66,13 @@ function searchNav(term: string): SearchResult[] {
   return options.map((o) => ({ type: "nav" as const, data: o }));
 }
 
-export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps>) {
+export default function SearchDialog({
+  open,
+  onClose,
+}: Readonly<SearchDialogProps>) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const { type, term } = parseSearchQuery(searchQuery);
@@ -88,15 +91,15 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
   useEffect(() => {
     if (open) {
       setTimeout(() => {
-        inputRef.current?.focus()
-      }, 350)
-    };
+        inputRef.current?.focus();
+      }, 350);
+    }
   }, [open]);
 
   LockScreen(open);
   KeyboardEvent(open, handleClose);
 
-  if (!open) return null
+  if (!open) return null;
 
   const results: SearchResult[] =
     type === "nav"
@@ -147,7 +150,9 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
               {/* Input */}
               <div className="flex items-center h-16 px-2 gap-2 bg-background flex-shrink-0 md:px-6 md:bg-transparent">
                 <Field className="md:fixed md:right-16 md:w-72">
-                  <FieldLabel htmlFor="header-search" className="sr-only">Search</FieldLabel>
+                  <FieldLabel htmlFor="header-search" className="sr-only">
+                    Search
+                  </FieldLabel>
 
                   <InputGroup>
                     <InputGroupAddon align="inline-start">
@@ -166,7 +171,10 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
                       className="text-base md:text-sm"
                     />
 
-                    <InputGroupAddon align="inline-end" className="hidden md:flex">
+                    <InputGroupAddon
+                      align="inline-end"
+                      className="hidden md:flex"
+                    >
                       <Kbd>Esc</Kbd>
                     </InputGroupAddon>
                   </InputGroup>
@@ -210,7 +218,12 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
 
                 {/* Results or Default View */}
                 <>
-                  <SearchResults loading={loading} results={results} error={error} handleClose={handleClose} />
+                  <SearchResults
+                    loading={loading}
+                    results={results}
+                    error={error}
+                    handleClose={handleClose}
+                  />
                   <SearchDefault searchQuery={searchQuery} />
 
                   {/* No results */}
@@ -218,10 +231,10 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
                     !error &&
                     results.length === 0 &&
                     searchQuery && (
-                    <div className="flex items-center justify-center h-full p-4 text-sm text-muted-foreground text-center">
-                      No results found
-                    </div>
-                  )}
+                      <div className="flex items-center justify-center h-full p-4 text-sm text-muted-foreground text-center">
+                        No results found
+                      </div>
+                    )}
                 </>
               </motion.div>
             </div>
@@ -229,6 +242,6 @@ export default function SearchDialog({open, onClose}: Readonly<SearchDialogProps
         </>
       )}
     </AnimatePresence>,
-    document.body
-  )
+    document.body,
+  );
 }

@@ -13,10 +13,7 @@ export function useProfile(id: string) {
     error,
   } = useAsyncDataWithCache(
     async () => {
-
-      const res = await fetch(
-        `/api/core/fursonas/${encodeURIComponent(id)}`,
-      );
+      const res = await fetch(`/api/core/fursonas/${encodeURIComponent(id)}`);
 
       if (res.status === 404) return null;
       if (!res.ok) {

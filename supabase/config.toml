@@ -154,10 +154,12 @@ enabled = true
 site_url = "http://127.0.0.1:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
-	"http://127.0.0.1:3000",
-	"http://127.0.0.1:3000/confirm",
 	"http://localhost:3000",
 	"http://localhost:3000/confirm",
+	"http://127.0.0.1:3000",
+	"http://127.0.0.1:3000/confirm",
+	"http://192.168.1.212:3000/",
+	"http://192.168.1.212:3000/confirm",
 	"http://192.168.1.219:3000/",
 	"http://192.168.1.219:3000/confirm",
 ]

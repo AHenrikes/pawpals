@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { FursonaTypes } from "@/types/fursona";
 import { useEffect, useState } from "react";

@@ -12,7 +12,7 @@ import {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { supabase, account, response } = await requireUser();
   if (!account) return unauthorized();
@@ -44,8 +44,8 @@ export async function GET(
 }
 
 export async function POST(
-    _req: NextRequest,
-  { params }: { params: Promise<{ id :string }> }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { supabase, account, response } = await requireUser();
   if (!account) return unauthorized();
@@ -80,7 +80,7 @@ export async function POST(
 // follow -> unfollow
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { supabase, account, response } = await requireUser();
   if (!account) return unauthorized();

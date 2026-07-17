@@ -35,7 +35,15 @@ import { type MediaItem } from "@/types/post";
 import { Button } from "@repo/ui/button";
 import { TypographyP, TypographySmall } from "@repo/ui/typography";
 import { Input } from "@repo/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/dropdown-menu";
+import { getOrderedVisible } from "@/lib/mediaLayout";
+import { type MediaWithOrientation } from "@/lib/mediaLayout";
 
 const VISIBILITY_OPTIONS: {
   value: Visibility;
@@ -70,29 +78,17 @@ function getCharClass(used: number) {
 // ─── Shared media item renderer ───────────────────────────────────────────────
 function MediaItem({
   preview,
-  index,
-  single,
+  displayIndex,
   onRemove,
   className,
 }: Readonly<{
-  preview: MediaItem;
-  index: number;
-  single?: boolean;
+  preview: MediaWithOrientation;
+  displayIndex: number;
   onRemove: (i: number) => void;
   className?: string;
 }>) {
   return (
-    <div
-      className={cn("group relative overflow-hidden bg-black", className)}
-      style={
-        single
-          ? {
-              aspectRatio: `${preview.width}/${preview.height}`,
-              maxHeight: "60svh",
-            }
-          : undefined
-      }
-    >
+    <div className={cn("group relative overflow-hidden bg-black", className)}>
       {preview.type === "video" ? (
         <video
           src={preview.url}
@@ -105,22 +101,24 @@ function MediaItem({
       ) : (
         <Image
           src={preview.url}
-          alt={`Media ${index + 1}`}
-          fill
+          alt={`Media ${displayIndex + 1}`}
+          width={preview.width}
+          height={preview.height}
           quality={100}
-          className="object-cover"
+          className="object-cover w-full h-full"
         />
       )}
 
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <Button
         type="button"
         variant={"destructive"}
         size={"icon"}
-        onClick={() => onRemove(index)}
-        aria-label={`Remove media ${index + 1}`}
+        // preview.originalIndex, not displayIndex — removeMedia needs the index
+        // in the *original* mediaPreviews array, since layout reorders items.
+        onClick={() => onRemove(preview.originalIndex)}
+        aria-label={`Remove media ${displayIndex + 1}`}
         className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-black hover:scale-110"
       >
         <XIcon className="h-3 w-3" />
@@ -133,82 +131,31 @@ function MediaItem({
 function MediaGrid({
   previews,
   onRemove,
-  // onAdd,
 }: Readonly<{
   previews: MediaItem[];
   onRemove: (i: number) => void;
   onAdd: () => void;
 }>) {
-  const count = previews.length;
+  const { visible, container, img } = getOrderedVisible(
+    previews,
+    POST_MAX_MEDIA,
+  );
 
-  if (count === 1) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-4 bg-black/5 overflow-hidden">
-        <MediaItem
-          preview={previews[0]!}
-          index={0}
-          single
-          onRemove={onRemove}
-          className="w-full"
-        />
-      </div>
-    );
-  }
-
-  if (count === 2) {
-    return (
-      <div className="flex-1 grid grid-cols-2 gap-1 p-4">
-        {previews.map((p, i) => (
+  return (
+    <div className="flex items-center h-full overflow-hidden">
+      <div
+        className={`relative ${container} w-full max-w-[1440px] max-h-[60svh] bg-black/50 overflow-hidden`}
+      >
+        {visible.map((item, index) => (
           <MediaItem
-            key={p.url}
-            preview={p}
-            index={i}
+            key={`${item.type}-${item.originalIndex}`}
+            preview={item}
+            displayIndex={index}
             onRemove={onRemove}
+            className={img[index] ?? ""}
           />
         ))}
       </div>
-    );
-  }
-
-  if (count === 3) {
-    return (
-      <div
-        className="flex-1 grid grid-cols-2 gap-1 p-4"
-        style={{ gridTemplateRows: "1fr 1fr" }}
-      >
-        <MediaItem
-          key={previews[0]!.url}
-          preview={previews[0]!}
-          index={0}
-          onRemove={onRemove}
-          className="row-span-2"
-        />
-        <MediaItem
-          key={previews[1]!.url}
-          preview={previews[1]!}
-          index={1}
-          onRemove={onRemove}
-        />
-        <MediaItem
-          key={previews[2]!.url}
-          preview={previews[2]!}
-          index={2}
-          onRemove={onRemove}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-1 grid grid-cols-2 gap-1 p-4">
-      {previews.map((p, i) => (
-        <MediaItem
-          key={p.url}
-          preview={p}
-          index={i}
-          onRemove={onRemove}
-        />
-      ))}
     </div>
   );
 }

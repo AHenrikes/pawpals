@@ -92,10 +92,7 @@ export default function SignIn() {
 
             <FormError message={error} className="pb-4" />
 
-            <Button
-              type="submit"
-              className="h-10 rounded-full"
-            >
+            <Button type="submit" className="h-10 rounded-full">
               <span>Sign in</span>
             </Button>
           </FieldGroup>

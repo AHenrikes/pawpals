@@ -1,11 +1,15 @@
 import { Button } from "@repo/ui/button";
 import { Kbd } from "@repo/ui/kbd";
 import { Separator } from "@repo/ui/separator";
-import { TypographyMuted, TypographyP, TypographyXSmall } from "@repo/ui/typography";
+import {
+  TypographyMuted,
+  TypographyP,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 import { ArrowRightIcon, HistoryIcon } from "lucide-react";
 
 interface Props {
-    searchQuery: string;
+  searchQuery: string;
 }
 
 export default function SearchDefault({ searchQuery }: Readonly<Props>) {
@@ -16,7 +20,9 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
           {/* History Section */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <TypographyMuted className="text-xs md:text-sm">History</TypographyMuted>
+              <TypographyMuted className="text-xs md:text-sm">
+                History
+              </TypographyMuted>
 
               <Button
                 size={"iconPair"}
@@ -45,13 +51,22 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
             </div>
           </div>
 
-          <Separator orientation="horizontal" className="hidden w-[1px] md:block" />
+          <Separator
+            orientation="horizontal"
+            className="hidden w-[1px] md:block"
+          />
 
           {/* Users Section */}
           <div className="space-y-3 md:flex-1">
             <div className="flex justify-between items-center">
-              <TypographyMuted className="text-xs md:text-sm">Users</TypographyMuted>
-              <Button size={"icon"} variant={"ghost"} className="p-1 text-muted-foreground">
+              <TypographyMuted className="text-xs md:text-sm">
+                Users
+              </TypographyMuted>
+              <Button
+                size={"icon"}
+                variant={"ghost"}
+                className="p-1 text-muted-foreground"
+              >
                 <ArrowRightIcon size={16} />
               </Button>
             </div>
@@ -59,7 +74,10 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               <div className="space-y-3 md:space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={`user-col1-${i}`} className="flex gap-2 animate-pulse">
+                  <div
+                    key={`user-col1-${i}`}
+                    className="flex gap-2 animate-pulse"
+                  >
                     <div className="h-14 w-14 md:h-12 md:w-12 bg-muted rounded-full flex-shrink-0" />
 
                     <div className="space-y-2 flex-1">
@@ -72,7 +90,10 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
 
               <div className="space-y-3 md:space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={`user-col2-${i}`} className="flex gap-2 animate-pulse">
+                  <div
+                    key={`user-col2-${i}`}
+                    className="flex gap-2 animate-pulse"
+                  >
                     <div className="h-14 w-14 md:h-12 md:w-12 bg-muted rounded-full flex-shrink-0" />
 
                     <div className="space-y-2 flex-1">
@@ -85,11 +106,16 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
             </div>
           </div>
 
-          <Separator orientation="horizontal" className="hidden w-[1px] lg:block" />
+          <Separator
+            orientation="horizontal"
+            className="hidden w-[1px] lg:block"
+          />
 
           {/* Tags Section */}
           <div className="space-y-3 md:hidden lg:block lg:w-60">
-            <TypographyMuted className="text-xs md:text-sm">#Tags</TypographyMuted>
+            <TypographyMuted className="text-xs md:text-sm">
+              #Tags
+            </TypographyMuted>
 
             <div className="flex flex-col animate-pulse gap-5">
               {[1, 2, 3, 4].map((i) => (
@@ -98,23 +124,40 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
             </div>
           </div>
 
-          <Separator orientation="horizontal" className="hidden w-[1px] xl:block" />
+          <Separator
+            orientation="horizontal"
+            className="hidden w-[1px] xl:block"
+          />
 
           {/* How to Search */}
           <div className="space-y-3 md:hidden xl:block xl:w-[340px]">
-            <TypographyMuted className="text-xs md:text-sm">How to search:</TypographyMuted>
+            <TypographyMuted className="text-xs md:text-sm">
+              How to search:
+            </TypographyMuted>
 
             <div className="text-muted-foreground space-y-2">
-              <TypographyP className="text-xs md:text-sm"><Kbd className="text-xs">@</Kbd> search for username</TypographyP>
-              <TypographyP className="text-xs md:text-sm"><Kbd className="text-xs">#</Kbd> search for tags</TypographyP>
-              <TypographyP className="text-xs md:text-sm"><Kbd className="text-xs">/</Kbd> search for pages</TypographyP>
-              <TypographyP className="text-xs md:text-sm"><Kbd className="text-xs">!</Kbd> placeholder </TypographyP>
-              <TypographyP className="text-xs md:text-sm"><Kbd className="text-xs">:</Kbd> placeholder </TypographyP>
-              <TypographyP className="text-xs md:text-sm"><Kbd className="text-xs">[ ]</Kbd> placeholder </TypographyP>
+              <TypographyP className="text-xs md:text-sm">
+                <Kbd className="text-xs">@</Kbd> search for username
+              </TypographyP>
+              <TypographyP className="text-xs md:text-sm">
+                <Kbd className="text-xs">#</Kbd> search for tags
+              </TypographyP>
+              <TypographyP className="text-xs md:text-sm">
+                <Kbd className="text-xs">/</Kbd> search for pages
+              </TypographyP>
+              <TypographyP className="text-xs md:text-sm">
+                <Kbd className="text-xs">!</Kbd> placeholder{" "}
+              </TypographyP>
+              <TypographyP className="text-xs md:text-sm">
+                <Kbd className="text-xs">:</Kbd> placeholder{" "}
+              </TypographyP>
+              <TypographyP className="text-xs md:text-sm">
+                <Kbd className="text-xs">[ ]</Kbd> placeholder{" "}
+              </TypographyP>
             </div>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }

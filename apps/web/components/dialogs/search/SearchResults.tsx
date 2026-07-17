@@ -1,4 +1,8 @@
-import { TypographyLead, TypographyMuted, TypographyXSmall } from "@repo/ui/typography";
+import {
+  TypographyLead,
+  TypographyMuted,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 import { FursonaSearch } from "@/types/fursona";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { getInitials } from "@/utils/getInitials";
@@ -12,7 +16,12 @@ interface SearchResults {
   handleClose: () => void;
 }
 
-export default function SearchResults({loading, error, results, handleClose}: Readonly<SearchResults>) {
+export default function SearchResults({
+  loading,
+  error,
+  results,
+  handleClose,
+}: Readonly<SearchResults>) {
   return (
     <>
       {/* Results */}
@@ -20,7 +29,9 @@ export default function SearchResults({loading, error, results, handleClose}: Re
         <>
           {results.some((r) => r.type === "fursona") && (
             <div className="space-y-3">
-              <TypographyMuted className="text-xs md:text-sm">Users</TypographyMuted>
+              <TypographyMuted className="text-xs md:text-sm">
+                Users
+              </TypographyMuted>
 
               {results
                 .filter((r) => r.type === "fursona")
@@ -34,9 +45,7 @@ export default function SearchResults({loading, error, results, handleClose}: Re
                       onClick={handleClose}
                       className="flex items-center w-64 gap-2 bg-surface border border-muted shadow-lg hover:bg-surface-highest"
                     >
-                      <Avatar
-                        size="lg"
-                      >
+                      <Avatar size="lg">
                         <AvatarImage
                           src={`${f?.avatar_url}`}
                           alt={f.display_name}
@@ -64,7 +73,9 @@ export default function SearchResults({loading, error, results, handleClose}: Re
 
           {results.some((r) => r.type === "nav") && (
             <div className="space-y-3">
-              <TypographyMuted className="text-xs md:text-sm">Navigate</TypographyMuted>
+              <TypographyMuted className="text-xs md:text-sm">
+                Navigate
+              </TypographyMuted>
 
               <div className="flex flex-col pt-2 gap-2">
                 {results
@@ -88,5 +99,5 @@ export default function SearchResults({loading, error, results, handleClose}: Re
         </>
       )}
     </>
-  )
+  );
 }

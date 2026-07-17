@@ -63,10 +63,7 @@ export default function MainNav() {
   LockScreen(isMobile && openMobile);
 
   return (
-    <Sidebar
-      collapsible="icon"
-      className="group/sidebar shrink-0"
-    >
+    <Sidebar collapsible="icon" className="group/sidebar shrink-0">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>

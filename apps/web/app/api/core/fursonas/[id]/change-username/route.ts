@@ -1,4 +1,10 @@
-import { serverError, badRequest, unauthorized, notFound, ok } from "@/lib/api/responses";
+import {
+  serverError,
+  badRequest,
+  unauthorized,
+  notFound,
+  ok,
+} from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { requireUser } from "@/lib/auth/requireUser";
 import { type NextRequest } from "next/server";
@@ -125,7 +131,8 @@ export async function POST(
       .json()
       .catch(() => ({}))) as ChangeUsernameRequest;
 
-    if (!body.new_username || typeof body.new_username !== "string")  badRequest("New username is required");
+    if (!body.new_username || typeof body.new_username !== "string")
+      badRequest("New username is required");
 
     const newUsername = body.new_username.trim().toLowerCase();
 
@@ -136,7 +143,7 @@ export async function POST(
       p_account_id: account.id,
     });
 
-    if (error)  serverError(error.message);
+    if (error) serverError(error.message);
 
     const result = data as ChangeUsernameResponse;
 
