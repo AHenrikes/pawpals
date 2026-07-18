@@ -1,8 +1,9 @@
 "use client";
 
 import { api } from "@/lib/api/api-client";
+import { parseMediaUrls } from "@/lib/helpers/parseMediaUrls";
 import { useState, useCallback, useRef } from "react";
-import type { PostType, MediaItem } from "@/types/post";
+import type { PostType } from "@/types/post";
 
 interface PostsFeed {
   posts: PostType[];
@@ -15,36 +16,6 @@ interface UsePostsState {
   loading: boolean;
   loadingMore: boolean;
   error: string | null;
-}
-
-// Helper to parse media_urls from JSON strings to objects
-function parseMediaUrls(posts: PostType[]): PostType[] {
-  return posts.map((post) => {
-    if (!post.media_urls || post.media_urls.length === 0) {
-      return post;
-    }
-
-    const media_urls = post.media_urls
-      .map((item) => {
-        // If it's already an object, return it
-        if (typeof item === "object" && item !== null && "url" in item) {
-          return item;
-        }
-        // If it's a JSON string, parse it
-        if (typeof item === "string") {
-          try {
-            return JSON.parse(item) as MediaItem;
-          } catch {
-            console.warn("Failed to parse media URL:", item);
-            return null;
-          }
-        }
-        return null;
-      })
-      .filter((item): item is MediaItem => item !== null);
-
-    return { ...post, media_urls };
-  });
 }
 
 export function useProfilePosts(fursonaId: string) {

@@ -16,7 +16,7 @@ export default function HomeTabs() {
   if (!isCurrentPath) return null;
 
   return (
-    <nav className="h-full space-y-2">
+    <nav className="hidden h-full space-y-2 md:block">
       <ul className="flex items-center h-full gap-2 overflow-x-auto">
         {homeTabs.map(({ label, key }) => (
           <Button

@@ -126,10 +126,12 @@ export default function SignUpForm() {
         return;
       }
 
-      // TODO:
-      // Temporary local development testing - remove before production
-      const origin =
-        globalThis.window?.location?.origin ?? "http://192.168.1.219:3000";
+      const origin = globalThis.window?.location?.origin;
+
+      if (!origin) {
+        toast.error(ERROR_MESSAGES.SERVER_ERROR);
+        return;
+      }
 
       const { error } = await supabase.auth.signUp({
         email: formValues.email,
@@ -145,7 +147,6 @@ export default function SignUpForm() {
         },
       });
 
-      // TODO: email validation error display
       if (error) {
         toast.error(ERROR_MESSAGES.SERVER_ERROR);
         return;

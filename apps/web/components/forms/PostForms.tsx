@@ -104,7 +104,7 @@ function MediaItem({
           alt={`Media ${displayIndex + 1}`}
           width={preview.width}
           height={preview.height}
-          quality={100}
+          quality={85}
           className="object-cover w-full h-full"
         />
       )}
@@ -190,6 +190,7 @@ function MobileMediaStrip({
               src={p.url}
               alt={`Media ${i + 1}`}
               fill
+              sizes="72px"
               quality={90}
               className="object-cover"
             />
@@ -364,6 +365,7 @@ export default function PostForm({
                   src={currentFursona.avatar_url}
                   alt={currentFursona.username ?? ""}
                   fill
+                  sizes="36px"
                   className="object-cover"
                 />
               </div>

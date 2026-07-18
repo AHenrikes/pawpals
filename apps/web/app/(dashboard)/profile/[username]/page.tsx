@@ -24,7 +24,6 @@ import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProfilePostCards } from "@/components/cards/PostCards";
 import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
-import ProfileRepost from "@/components/ProfileRepost";
 import Image from "next/image";
 import { getInitials } from "@/utils/getInitials";
 import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
@@ -42,7 +41,6 @@ function formatNumbers(count: number): string {
 const profileNav = [
   { label: "POST", key: "post" },
   { label: "GALLERY", key: "gallery" },
-  { label: "REPOST", key: "repost" },
   { label: "ARCHIVE", key: "archive" },
   { label: "LIKE", key: "likes" },
 ] as const;
@@ -361,9 +359,6 @@ export default function ProfilePage() {
                         )}
                         {content === "gallery" && (
                           <div>Gallery coming soon</div>
-                        )}
-                        {content === "repost" && (
-                          <ProfileRepost username={viewedFursona?.username} />
                         )}
                         {content === "archive" && (
                           <div>Archive coming soon</div>

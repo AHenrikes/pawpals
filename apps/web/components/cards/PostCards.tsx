@@ -2,7 +2,7 @@
 
 import { useProfilePosts } from "@/hooks/core/fursonas/useProfilePosts";
 import { usePosts } from "@/hooks/social/posts/usePosts";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   HeartIcon,
@@ -33,7 +33,14 @@ type PostListProps = {
   loading: boolean;
 };
 
-function PostCard({
+const ACTION_BUTTON_CLASSES = {
+  comment: "group p-3 text-xs hover:text-primary hover:bg-primary/10",
+  share: "group p-3 text-xs hover:text-emerald-500 hover:bg-emerald-500/10",
+  like: "group p-3 text-xs hover:text-destructive hover:bg-destructive/10",
+  bookmark: "group p-3 text-xs hover:text-primary hover:bg-primary/10",
+} as const;
+
+const PostCard = memo(function PostCard({
   post,
   isLast = false,
 }: Readonly<{ post: PostType; isLast?: boolean }>) {
@@ -59,7 +66,7 @@ function PostCard({
           <div className="flex items-center gap-2">
             <div className="h-12 w-12 bg-muted rounded-full animate-pulse" />
 
-            <div className="space-y-2 animate pulse">
+            <div className="space-y-2 animate-pulse">
               <div className="h-4 w-32 bg-muted rounded" />
               <div className="h-4 w-16 bg-muted rounded" />
             </div>
@@ -142,7 +149,7 @@ function PostCard({
         <Button
           size="iconPair"
           variant="ghost"
-          className="group p-3 text-xs hover:text-blue-500 hover:bg-blue-500/10"
+          className={ACTION_BUTTON_CLASSES.comment}
         >
           <MessageCircleIcon className="size-4" />
           <span className="ml-1">{post.comments_count ?? 0}</span>
@@ -151,7 +158,7 @@ function PostCard({
         <Button
           size="iconPair"
           variant="ghost"
-          className="group p-3 text-xs hover:text-green-500 hover:bg-green-500/10"
+          className={ACTION_BUTTON_CLASSES.share}
         >
           <ShareIcon className="size-4" />
           <span className="ml-1">{post.shares_count ?? 0}</span>
@@ -160,7 +167,7 @@ function PostCard({
         <Button
           size="iconPair"
           variant="ghost"
-          className="group p-3 text-xs hover:text-red-500 hover:bg-red-500/10"
+          className={ACTION_BUTTON_CLASSES.like}
         >
           <HeartIcon className="size-4" />
           <span className="ml-1">{post.likes_count ?? 0}</span>
@@ -169,14 +176,16 @@ function PostCard({
         <Button
           size="icon"
           variant="ghost"
-          className="group p-3 text-xs hover:text-blue-500 hover:bg-blue-500/10"
+          className={ACTION_BUTTON_CLASSES.bookmark}
         >
           <BookmarkIcon className="size-4" />
         </Button>
       </div>
     </article>
   );
-}
+});
+
+PostCard.displayName = "PostCard";
 
 export function ProfilePostCards({
   username: fursonaId,
@@ -222,38 +231,43 @@ export default function ProfileLists({
   loading,
 }: Readonly<PostListProps>) {
   if (loading) {
-    // const skeletonItems = [...Array(5)];
+    const skeletonItems = [...Array(3)];
+
     return (
       <>
-        {/* {skeletonItems.map((_, i) => (
-          <div key={i} className={`flex h-[65svh] max-w-[1440px] px-4 py-3 gap-3 animate-pulse`}>
-            <div className="h-12 w-12 bg-muted rounded-full" />
+        {skeletonItems.map((_, index) => (
+          <div
+            key={`post-skeleton-${index}`}
+            className="flex flex-col max-h-[90svh] max-w-[1440px] py-3 gap-3 animate-pulse"
+          >
+            <div className="flex justify-between items-center px-3">
+              <div className="flex items-center gap-2">
+                <div className="h-12 w-12 bg-muted rounded-full" />
 
-            <div className="flex-1 space-y-5 md:pr-12">
-              <div className="flex justify-between">
                 <div className="space-y-2">
                   <div className="h-4 w-32 bg-muted rounded" />
-
                   <div className="h-4 w-16 bg-muted rounded" />
                 </div>
-
-                <div className="size-8 bg-muted rounded-full" />
               </div>
 
-              <div className="w-full h-[750px] rounded-md bg-muted" />
-
-              <div className="w-1/4 h-6 bg-muted" />
+              <div className="size-8 bg-muted rounded-full" />
             </div>
+
+            <div className="space-y-3 px-3">
+              <div className="h-4 w-full bg-muted rounded" />
+              <div className="h-4 w-3/4 bg-muted rounded" />
+            </div>
+
+            <div className="h-64 w-full bg-muted" />
           </div>
-        ))} */}
-        <h1>LOADING...</h1>
+        ))}
       </>
     );
   }
 
   if (!loading && posts.length < 1) {
     return (
-      <div className="gird place-content-center w-full h-full">
+      <div className="grid place-content-center w-full h-full">
         <TypographyH2>No posted content</TypographyH2>
       </div>
     );
