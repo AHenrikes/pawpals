@@ -73,7 +73,7 @@ export default function MainNav() {
 
                 return (
                   <SidebarMenuItem key={label}>
-                    <SidebarMenuButton asChild isActive={isActive} className="">
+                    <SidebarMenuButton asChild isActive={isActive}>
                       <Link
                         href={href}
                         className="hover:bg-surface-highest p-3"

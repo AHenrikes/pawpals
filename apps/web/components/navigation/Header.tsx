@@ -38,6 +38,7 @@ import {
   TypographyH4,
   TypographyP,
   TypographySmall,
+  TypographyXSmall,
 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/dialogs/search/Searchbar";
 import { useIsCurrentPath, useCurrentPath } from "@/hooks/useCurrentPath";
@@ -100,6 +101,14 @@ export default function Header() {
     return "Account";
   }, [currentFursona?.display_name]);
 
+  const username = useMemo(() => {
+    if (currentFursona?.username) {
+      return currentFursona.username;
+    }
+
+    return "Username";
+  }, [currentFursona?.username]);
+
   function handleMenuOpenChange(nextOpen: boolean) {
     setIsMenuOpen(nextOpen);
 
@@ -146,32 +155,27 @@ export default function Header() {
               {loading ? (
                 <Skeleton className="h-8 w-8 rounded-full" />
               ) : (
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant={"ghost"}
-                    className="p-0 focus-visible:ring-0"
-                  >
-                    <Avatar size="sm">
-                      <AvatarImage
-                        src={`${currentFursona?.avatar_url}`}
-                        alt={displayName}
-                      />
+                <DropdownMenuTrigger>
+                  <Avatar size="sm">
+                    <AvatarImage
+                      src={`${currentFursona?.avatar_url}`}
+                      alt={displayName}
+                    />
 
-                      <AvatarFallback>
-                        {getInitials(displayName)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
+                    <AvatarFallback>
+                      {getInitials(displayName)}
+                    </AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
               )}
 
               <DropdownMenuContent align="end" className="w-60 select-none">
                 <DropdownMenuGroup className="flex items-center gap-1">
-                  <DropdownMenuItem
-                    asChild
-                    className="flex w-full rounded-none"
-                  >
-                    <Link href={`/@${currentFursona?.username}`}>
+                  <DropdownMenuItem className="w-full">
+                    <Link
+                      href={`/@${currentFursona?.username}`}
+                      className="flex items-center w-full gap-2"
+                    >
                       <Avatar size="default">
                         <AvatarImage
                           src={`${currentFursona?.avatar_url}`}
@@ -183,7 +187,10 @@ export default function Header() {
                         </AvatarFallback>
                       </Avatar>
 
-                      <TypographySmall>{displayName}</TypographySmall>
+                      <div className="flex flex-col">
+                        <TypographySmall className="leading-none">{displayName}</TypographySmall>
+                        <TypographyXSmall className="text-muted-foreground">{username}</TypographyXSmall>
+                      </div>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
@@ -197,8 +204,8 @@ export default function Header() {
                     const Icon = li.icon;
 
                     return (
-                      <DropdownMenuItem key={li.label} asChild>
-                        <Link href={li.href}>
+                      <DropdownMenuItem key={li.label}>
+                        <Link href={li.href} className="flex items-center w-full gap-2">
                           <Icon className="h-4 w-4" />
                           {li.label}
                         </Link>
@@ -265,15 +272,9 @@ export default function Header() {
                       })}
 
                       {!loading && count < 3 ? (
-                        <DropdownMenuItem asChild className="mt-2">
-                          <Button
-                            variant={"outline"}
-                            onClick={() => setCreateFursonaOpen(true)}
-                            className="h-8 w-full my-2 rounded-full"
-                          >
-                            <PlusIcon className="h-4 w-4" />
-                            Create Fursona
-                          </Button>
+                        <DropdownMenuItem className="mt-2" onClick={() => setCreateFursonaOpen(true)}>
+                          <PlusIcon className="h-4 w-4" />
+                          Create Fursona
                         </DropdownMenuItem>
                       ) : null}
                     </DropdownMenuGroup>
@@ -282,17 +283,11 @@ export default function Header() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuSub>
-                  <Button
-                    variant="outline"
-                    onClick={() => signOut()}
-                    className="h-8 w-full my-2 rounded-full"
-                  >
-                    <div>
-                      <span>Sign out</span>
-                    </div>
-                  </Button>
-                </DropdownMenuSub>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </Collapsible>
           </DropdownMenu>

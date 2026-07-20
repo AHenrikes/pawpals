@@ -14,9 +14,9 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { EllipsisVerticalIcon, MailIcon } from "lucide-react";
+import { ArrowLeftIcon, EllipsisVerticalIcon, Icon, MailIcon } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
@@ -63,6 +63,8 @@ export default function ProfilePage() {
 
   const { following, follower, refetch, like } = useProfileCounts(id);
   const { isFollowing, toggle: follow, loading: followLoading } = useFollow(id);
+
+  const router = useRouter();
 
   const isLoading = isOwnProfile
     ? userLoading || !currentFursona
@@ -130,6 +132,17 @@ export default function ProfilePage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
+                        <div className="w-full h-16 p-1 lg:p-4 z-30">
+              <Button
+                size={"icon"}
+                variant={"outline"}
+                onClick={() => router.back()}
+                className="p-1 text-primary backdrop-blur-blur"
+              >
+                <ArrowLeftIcon size={24} />
+              </Button>
+            </div>
+
             {viewedFursona.banner_url && (
               <Image
                 src={viewedFursona.banner_url}
@@ -137,11 +150,11 @@ export default function ProfilePage() {
                 fill
                 quality={85}
                 loading="lazy"
-                className="object-cover z-10"
+                className="object-cover pointer-events-none z-10"
               />
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black z-20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none z-20" />
           </motion.section>
         )}
       </AnimatePresence>

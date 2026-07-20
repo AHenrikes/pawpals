@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const devImageHost = process.env.NEXT_PUBLIC_DEV_IMAGE_HOST;
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: [`${devImageHost}`],
+
   devIndicators: {
     position: "bottom-right",
   },
