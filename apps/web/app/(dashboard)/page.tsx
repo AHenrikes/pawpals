@@ -44,7 +44,7 @@ export default function Dashboard() {
         </motion.section>
       </AnimatePresence>
 
-      <aside className="hidden sticky top-20 flex-col w-[500px] h-[calc(100svh-96px)] gap-5 md:flex">
+      <aside className="hidden sticky top-20 flex-col w-125 h-[calc(100svh-96px)] gap-5 md:flex">
         <div className="bg-surface-low animate-pulse w-full h-96 rounded-md shadow-lg" />
 
         <div className="bg-surface-low animate-pulse w-full h-full rounded-md shadow-lg" />

@@ -200,7 +200,7 @@ export function EditProfileModal({
       >
         <Button
           type="button"
-          variant={"none"}
+          variant={"ghost"}
           onClick={() => bannerInputRef.current?.click()}
           className="relative h-28 w-full overflow-hidden rounded-md bg-muted"
           disabled={loading}
@@ -232,7 +232,7 @@ export function EditProfileModal({
         <div className="-mt-10 ml-4">
           <Button
             type="button"
-            variant={"none"}
+            variant={"ghost"}
             onClick={() => avatarInputRef.current?.click()}
             className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-background bg-muted"
             disabled={loading}

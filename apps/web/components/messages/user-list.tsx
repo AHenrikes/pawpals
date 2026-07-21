@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/helpers/utils";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
@@ -29,6 +29,13 @@ type CTAItem = {
   subactions?: CTAItem[];
 };
 
+type ConversationCTAType = {
+  label: string;
+  icon?: LucideIcon;
+  subactions?: CTAItem[];
+  variant?: "destructive" | "default";
+}
+
 const filterButtons = [
   "All", "Unread", "Groups", "Favorites"
 ]
@@ -41,16 +48,45 @@ const menuCTA: CTAItem[] = [
   {label: "Mark all as read", icon: MessageSquareDotIcon},
 ]
 
-const conversasionCTA: CTAItem[] = [
-  {label: "Archive Chat", icon: ArchiveIcon},
-  {label: "Mute Notification", icon: BellOffIcon, subactions: [
-    { label: "1 Hour", }, { label: "1 day" }, { label: "Forever" }
-  ]},
-  {label: "Pin chat", icon: PinIcon},
-  {label: "Mark as unread", icon: MessageSquareDotIcon},
-  {label: "Add to favourites", icon: HeartPlusIcon },
-  {label: "Add to group", icon: UsersRoundIcon, subactions: [{label: "New group", icon: PlusIcon}]},
+const conversationCTA: ConversationCTAType[][] = [
+  [{label: "Mark as read"}],
+
+  [
+    {label: "Profile"},
+    {label: "Start a call"},
+    {label: "Add note"},
+    {label: "Add nickname"},
+    {label: "Close DM"}
+  ],
+
+  [
+    {label: "Apps", subactions: [{label: "No Commands Available"}]},
+    {label: "Invite to server", subactions: [{label: "No Commands Available"}]}
+  ],
+
+  [
+    {label: "Mute", variant: "destructive"},
+    {label: "Remove friend", variant: "destructive"},
+    {label: "Clear chat", variant: "destructive"},
+    {label: "Block", variant: "destructive"},
+    {label: "Report conversation", variant: "destructive"}
+  ],
+
+  [
+    {label: "Share profile"},
+    {label: "Copy channel ID"}
+  ]
 ]
+
+  // {label: "Archive Chat", icon: ArchiveIcon},
+  // {label: "Mute Notification", icon: BellOffIcon, subactions: [
+  //   { label: "1 Hour", }, { label: "1 day" }, { label: "Forever" }
+  // ]},
+  // {label: "Pin chat", icon: PinIcon},
+  // {label: "Mark as unread", icon: MessageSquareDotIcon},
+  // {label: "Add to favourites", icon: HeartPlusIcon },
+  // {label: "Add to group", icon: UsersRoundIcon, subactions: [{label: "New group", icon: PlusIcon}]},
+// ]
 
 export function UserList({
   conversations,
@@ -109,28 +145,32 @@ export function UserList({
           <TypographyH1 className="md:text-xl">PAWPALS</TypographyH1>
         </Link>
 
-        <div className="flex space-x-1">
+        <div className="flex items-center">
           <Button
             size={"icon"}
             variant={"ghost"}
-            className="p-2 rounded-full"
           >
-            <MessageCirclePlusIcon size={20} />
+            <MessageCirclePlusIcon />
           </Button>
 
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <EllipsisVerticalIcon size={20} />
+            <DropdownMenuTrigger asChild>
+              <Button
+                size={"icon"}
+                variant={"ghost"}
+              >
+                <EllipsisVerticalIcon />
+              </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="rounded-md p-1">
+            <DropdownMenuContent>
               <DropdownMenuGroup>
                 {menuCTA.map(elem => {
                   const Icon = elem.icon;
 
                   return (
                     <DropdownMenuItem key={elem.label}>
-                      {Icon && <Icon className="mr-2 h-4 w-4" />}
+                      {Icon && <Icon size={32} />}
                       {elem.label}
                     </DropdownMenuItem>
                   )
@@ -156,7 +196,7 @@ export function UserList({
       </header>
 
       <main className="space-y-2">
-        <header className="px-4 py-2 space-y-2">
+        <header className="px-4 py-2 space-y-3">
           <div className="relative">
             <SearchIcon className="pointer-events-none absolute left-3 top-3 h-4 w-4" />
 
@@ -182,7 +222,7 @@ export function UserList({
           </div>
         </header>
 
-        <main className="space-y-1 md:px-4">
+        <main className="flex flex-col gap-3 md:px-4">
           {filtered.length === 0 && !search.trim() && (
             <p className="p-4 text-sm text-muted-foreground">
               No conversations yet. Find a pal and say hi.
@@ -216,7 +256,7 @@ export function UserList({
                   <button
                     onClick={() => onSelect(conversation)}
                     className={cn(
-                      "group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors md:px-2 md:rounded-md hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+                      "group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors cursor-pointer md:px-2 md:rounded-md hover:bg-muted focus-visible:bg-muted focus-visible:outline-hidden",
                       selectedId === conversation.id && "bg-muted"
                     )}
                   >
@@ -251,67 +291,54 @@ export function UserList({
 
                 <ContextMenuContent
                   side="left"
-                  onClick={(e) => e.stopPropagation()}
-                  className="rounded-md" 
+                  className="rounded-md"
                 >
-                  <ContextMenuGroup>
-                    {conversasionCTA.map(item => {
-                      const Icon = item.icon;
+                  {conversationCTA.map((group, groupIndex) => (
+                    <Fragment key={groupIndex}>
+                        {group.map((item) => {
+                          const Icon = item.icon;
 
-                      if (item.subactions) {
-                        return (
-                          <ContextMenuSub key={item.label}>
-                            <ContextMenuSubTrigger>
-                              {Icon && <Icon className="mr-2 h-4 w-4" />}
-                              {item.label}
-                            </ContextMenuSubTrigger>
+                          if (item.subactions) {
+                            return (
+                              <ContextMenuSub key={item.label}>
+                                <ContextMenuSubTrigger>
+                                  {Icon && <Icon />}
+                                  {item.label}
+                                </ContextMenuSubTrigger>
 
-                            <ContextMenuSubContent>
-                              {item.subactions.map(sub => {
-                                const SubIcon = sub.icon;
+                                <ContextMenuSubContent>
+                                  {item.subactions.map((sub) => {
+                                    const SubIcon = sub.icon;
 
-                                return (
-                                  <ContextMenuItem key={sub.label}>
-                                    {SubIcon && <SubIcon className="mr-2 h-4 w-4" />}
-                                    {sub.label}
-                                  </ContextMenuItem>
-                                );
-                              })}
-                            </ContextMenuSubContent>
-                          </ContextMenuSub>
-                        );
-                      }
+                                    return (
+                                      <ContextMenuItem key={sub.label}>
+                                        {SubIcon && <SubIcon />}
+                                        {sub.label}
+                                      </ContextMenuItem>
+                                    );
+                                  })}
+                                </ContextMenuSubContent>
+                              </ContextMenuSub>
+                            );
+                          }
 
-                      return (
-                        <ContextMenuItem key={item.label}>
-                          {Icon && <Icon className="mr-2 h-4 w-4" />}
-                          {item.label}
-                        </ContextMenuItem>
-                      );
-                    })}
-                  </ContextMenuGroup>
-
-                  <ContextMenuSeparator />
-
-                  <ContextMenuGroup>
-                    <ContextMenuItem variant="destructive">
-                      <BanIcon />
-                      Block
-                    </ContextMenuItem>
-
-                    <ContextMenuItem variant="destructive">
-                      <BrushCleaningIcon />
-                      Clear chat
-                    </ContextMenuItem>
-
-                    <ContextMenuItem variant="destructive">
-                      <Trash2Icon />
-                      Delete chat
-                    </ContextMenuItem>
-                  </ContextMenuGroup>
+                          return (
+                            <ContextMenuGroup key={item.label}>
+                              <ContextMenuItem variant={item.variant}>
+                                {Icon && <Icon />}
+                                {item.label}
+                              </ContextMenuItem>
+                            </ContextMenuGroup>
+                          );
+                        })}
+                      {groupIndex < conversationCTA.length - 1 && (
+                        <ContextMenuSeparator />
+                      )}
+                    </Fragment>
+                  ))}
                 </ContextMenuContent>
               </ContextMenu>
-            );
+            )
           })}
 
           {search.trim() && (
@@ -342,7 +369,7 @@ export function UserList({
                     onClick={() => onStartConversation(user.username)}
                     disabled={creatingConversation}
                     className={cn(
-                      "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+                      "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-hidden",
                       creatingConversation && "cursor-not-allowed opacity-70"
                     )}
                   >

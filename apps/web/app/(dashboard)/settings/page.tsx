@@ -445,7 +445,7 @@ export default function Settings() {
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="form-country">Country</FieldLabel>
-                  <Select items={countries} defaultValue="us">
+                  <Select defaultValue="us">
                     <SelectTrigger id="form-country">
                       <SelectValue />
                     </SelectTrigger>
@@ -538,7 +538,7 @@ export default function Settings() {
             <Button size={"icon"}>
               <AtomIcon />
             </Button>
-            <Button size={"iconPair"}>
+            <Button size={"icon"}>
               <PlayCircleIcon /> Pair
             </Button>
           </div>

@@ -18,7 +18,7 @@ export default function MediaTiles({ media }: Readonly<MediaTilesProps>) {
 
   return (
     <div
-      className={`relative ${container} max-w-[1440px] max-h-[60svh] bg-black/50 overflow-hidden`}
+      className={`relative ${container} max-w-360 max-h-[60svh] bg-black/50 overflow-hidden`}
     >
       {visible.map((item, index) => (
         <Image

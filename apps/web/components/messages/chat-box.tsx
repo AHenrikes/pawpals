@@ -13,10 +13,10 @@ import {
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@repo/ui/Empty";
 import { MessageBubble } from "./message-bubble";
 import { type MessageType } from "@/types/messages";
+import { Marker, MarkerContent } from "@repo/ui/marker";
 
-// Messages from the same sender within this window render as one visual
-// group: avatar + name once, individual bubbles stacked tight underneath.
-const GROUP_GAP_MS = 5 * 60 * 1000;
+// 3 minute
+const GROUP_GAP_MS = 3 * 60 * 1000;
 
 type OtherFursona =
   | {
@@ -29,8 +29,10 @@ type OtherFursona =
 
 interface ChatBoxProps {
   messages: MessageType[];
+  isGroupRoom: boolean;
   currentFursonaId: string;
-  otherFursona?: OtherFursona;
+  otherFursona: OtherFursona;
+  firstUnreadMessageId: string | null;
   onLoadMore?: () => void;
   hasMore?: boolean;
 }
@@ -45,8 +47,9 @@ function groupConsecutiveMessages(messages: MessageType[]) {
     const sameSender = lastMessage?.sender_fursona_id === message.sender_fursona_id;
     const withinGap =
       !!lastMessage &&
-      new Date(message.created_at).getTime() - new Date(lastMessage.created_at).getTime() 
-        GROUP_GAP_MS;
+      new Date(message.created_at).getTime() -
+      new Date(lastMessage.created_at).getTime()
+    <= GROUP_GAP_MS;
 
     if (lastGroup && sameSender && withinGap) {
       lastGroup.push(message);
@@ -60,8 +63,10 @@ function groupConsecutiveMessages(messages: MessageType[]) {
 
 export function ChatBox({
   messages,
-  currentFursonaId,
+  isGroupRoom,
   otherFursona,
+  currentFursonaId,
+  firstUnreadMessageId,
   onLoadMore,
   hasMore,
 }: Readonly<ChatBoxProps>) {
@@ -69,8 +74,6 @@ export function ChatBox({
   const groups = useMemo(() => groupConsecutiveMessages(messages), [messages]);
   const otherName = otherFursona?.display_name ?? otherFursona?.username ?? "Unknown";
 
-  // Loading earlier history is still your job to detect — the scroller only
-  // preserves position once you prepend, it doesn't decide when to fetch.
   const handleScroll = useCallback(() => {
     if (!viewportRef.current || !onLoadMore || !hasMore) return;
     if (viewportRef.current.scrollTop < 80) onLoadMore();
@@ -91,28 +94,37 @@ export function ChatBox({
   }
 
   return (
-    <MessageScroller className="h-full max-h-[calc(100dvh-140px)] px-4 my-2">
+    <MessageScroller className="flex-1 min-h-0 px-4 my-2">
       <MessageScrollerViewport ref={viewportRef} onScroll={handleScroll}>
-        <MessageScrollerContent className="space-y-4 py-2">
+        <MessageScrollerContent className="py-2">
           {groups.map((group) => {
             const isOwn = group[0]?.sender_fursona_id === currentFursonaId;
 
             return (
-              // One item per group, keyed on the first message — the run of
-              // consecutive messages is treated as a single "turn" for anchoring.
               <MessageScrollerItem key={group[0]?.id} messageId={group[0]?.id} scrollAnchor={isOwn}>
                 <MessageGroup>
                   {group.map((message, i) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      isOwn={isOwn}
-                      showAvatar={!isOwn && i === group.length - 1}
-                      showHeader={!isOwn && i === 0}
-                      showFooter={i === group.length - 1}
-                      senderName={otherName}
-                      senderAvatarUrl={otherFursona?.avatar_url}
-                    />
+                    <div 
+                    key={message.id}
+                      className="space-y-5"
+                    >
+                      {message.id === firstUnreadMessageId && (
+                        <Marker variant="separator">
+                          <MarkerContent>New messages</MarkerContent>
+                        </Marker>
+                      )}
+
+                      <MessageBubble
+                        message={message}
+                        isOwn={isOwn}
+                        isGroupMessage={isGroupRoom}
+                        showAvatar={!isOwn && i === group.length - 1}
+                        showHeader={!isOwn && i === 0}
+                        showFooter={i === group.length - 1}
+                        senderName={otherName}
+                        senderAvatarUrl={otherFursona?.avatar_url}
+                      />
+                    </div>                    
                   ))}
                 </MessageGroup>
               </MessageScrollerItem>

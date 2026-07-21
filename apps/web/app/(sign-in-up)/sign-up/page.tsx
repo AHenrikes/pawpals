@@ -10,7 +10,7 @@ import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { toast } from "@repo/ui/sonner";
-import { FormError } from "@repo/ui/form-error";
+import { FormError } from "@/components/ui/form-error";
 import { Card, CardHeader } from "@repo/ui/card";
 import { TypographyP } from "@repo/ui/typography";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
@@ -180,7 +180,7 @@ export default function SignUpForm() {
 
   return (
     <section className="flex items-center justify-center px-5 sm:px-8 lg:px-10">
-      <Card className="w-full max-w-[640px]">
+      <Card className="w-full max-w-160">
         <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
           <Link
             href={AUTH_ROUTES.SIGN_UP}

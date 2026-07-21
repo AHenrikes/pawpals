@@ -16,9 +16,10 @@ import { ChatInput } from "@/components/messages/chat-input";
 import { ChatHeader } from "@/components/messages/chat-header";
 import { useUser } from "@/providers/UserProvider";
 import { api } from "@/lib/api/api-client";
+import { MessageScrollerProvider } from "@repo/ui/message-scroller";
 import { type FursonaProfile } from "@/types/fursona";
 import type { Conversation, MessageType } from "@/types/messages";
-import { MessageScrollerProvider } from "@repo/ui/message-scroller";
+import { TypographyH1, TypographyH2 } from "@repo/ui/typography";
 
 let optimisticCounter = 0;
 
@@ -62,11 +63,13 @@ function makeOptimisticId() {
 
 export default function MessagesPage() {
   const { currentFursona } = useUser();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selected, setSelected] = useState<Conversation | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [startingConversation, setStartingConversation] = useState(false);
+  const [firstUnreadMessageId, setFirstUnreadMessageId] = useState<string | null>(null);
+  const [loadingConversation, setLoadingConversation] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
-  const [loading, setLoading] = useState(false);
   const supabase = useSupabaseClient();
 
   // Each fursona has its own separate inbox. If the active fursona changes
@@ -88,17 +91,77 @@ export default function MessagesPage() {
 
   const loadMessages = useCallback(
     async (conversation: Conversation) => {
-      setLoading(true);
+      setLoadingMessages(true);
 
       try {
         const data = await getMessages(supabase, conversation.id);
         setMessages(data);
+        return data;
       } finally {
-        setLoading(false);
+        setLoadingMessages(false);
       }
     },
     [supabase]
   );
+
+  // Load messages and clear unread count whenever the selected conversation changes.
+  // useEffect(() => {
+  //   if (!selected) return;
+  //   const hadUnread = (selected.unread_count ?? 0) > 0;
+
+  //   loadMessages(selected).then((loadedMessages) => {
+  //     if (hadUnread) {
+  //       const firstUnread = loadedMessages[loadedMessages.length - (selected.unread_count ?? 0)];
+  //       setFirstUnreadMessageId(firstUnread?.id ?? null);
+  //     } else {
+  //       setFirstUnreadMessageId(null);
+  //     }
+  //   });
+
+  //   markSelectedConversationRead(selected.id);
+  // }, [selected]);
+
+  useEffect(() => {
+    if (!selected) return;
+    
+    let cancelled = false;
+
+    const selectedConversation = selected;
+
+    async function openConversation() {
+      setLoadingConversation(true);
+
+      try {
+        const hadUnread = (selectedConversation.unread_count ?? 0) > 0;
+        const loadedMessages = await loadMessages(selectedConversation);
+
+        if (cancelled) return;
+
+        if (hadUnread) {
+          const firstUnread =
+            loadedMessages[loadedMessages.length - (selectedConversation.unread_count ?? 0)];
+
+          setFirstUnreadMessageId(firstUnread?.id ?? null);
+        } else {
+          setFirstUnreadMessageId(null);
+        }
+
+        await markSelectedConversationRead(selectedConversation.id);
+      } finally {
+        if (!cancelled) {
+          setTimeout(() => {
+            setLoadingConversation(false);
+          }, 400)
+        }
+      }
+    }
+
+    openConversation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selected]);
 
   const markSelectedConversationRead = useCallback(
     async (conversationId: string) => {
@@ -118,17 +181,17 @@ export default function MessagesPage() {
     [supabase]
   );
 
-  // Load messages and clear unread count whenever the selected conversation changes.
-  useEffect(() => {
-    if (!selected) return;
-    loadMessages(selected);
-    markSelectedConversationRead(selected.id);
-  }, [loadMessages, markSelectedConversationRead, selected]);
+  // useEffect(() => {
+  //   if (!selected) return;
+  //   loadMessages(selected);
+  //   markSelectedConversationRead(selected.id);
+  // }, [loadMessages, markSelectedConversationRead, selected]);
 
   function handleSelect(conversation: Conversation) {
     // Clear immediately so switching threads doesn't flash the previous
-    // conversation's messages while the new ones are still loading.
-    setMessages([]);
+    // conversation's messages while the new ones are still loadingMessages.
+    // setMessages([]);
+    setLoadingConversation(true);
     setSelected(conversation);
   }
 
@@ -312,15 +375,23 @@ export default function MessagesPage() {
 
       {selected ? (
         <MessageScrollerProvider autoScroll defaultScrollPosition="last-anchor">
-          <main className="absolute inset-0 flex-col flex-1 min-w-0 min-h-0 bg-background pb-4 md:static md:flex md:bg-transparent">
-            <ChatHeader conversation={selected} onCloseConversation={handleCloseConversation} />
-            <ChatBox
+          {!loadingConversation ? (
+            <main className="absolute inset-0 flex flex-col min-w-0 min-h-0 bg-background md:flex-1 md:static md:bg-transparent">
+              <ChatHeader conversation={selected} onCloseConversation={handleCloseConversation} />
+              <ChatBox
                 messages={messages}
+                isGroupRoom={selected.is_group}
+                firstUnreadMessageId={firstUnreadMessageId}
                 currentFursonaId={currentFursona.id}
                 otherFursona={selected.other_fursona}
               />
-            <ChatInput onSend={handleSend} disabled={loading || startingConversation} />
-          </main>
+              <ChatInput onSend={handleSend} disabled={loadingMessages || startingConversation} />
+            </main>
+          ) : (
+            <div className="grid place-content-center h-full w-full">
+              <TypographyH2>Loading...</TypographyH2>
+            </div>
+          )}
         </MessageScrollerProvider>
       ) : (
         <div className="hidden flex-1 items-center justify-center text-sm text-muted-foreground md:flex">

@@ -133,7 +133,7 @@ export default function SearchDialog({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed inset-0 top-16 bg-black/40 backdrop-blur-sm z-40"
+            className="fixed inset-0 top-16 bg-black/40 backdrop-blur-xs z-40"
             onClick={handleClose}
           />
 
@@ -146,9 +146,9 @@ export default function SearchDialog({
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="fixed inset-0 flex justify-center z-50 pointer-events-none"
           >
-            <div className="flex flex-col h-[75svh] w-full overflow-hidden shadow-lg md:h-[320px] md:rounded-xl pointer-events-auto">
+            <div className="flex flex-col h-[75svh] w-full overflow-hidden shadow-lg md:h-80 md:rounded-xl pointer-events-auto">
               {/* Input */}
-              <div className="flex items-center h-16 px-2 gap-2 bg-background flex-shrink-0 md:px-6 md:bg-transparent">
+              <div className="flex items-center h-16 px-2 gap-2 bg-background shrink-0 md:px-6 md:bg-transparent">
                 <Field className="md:fixed md:right-16 md:w-72">
                   <FieldLabel htmlFor="header-search" className="sr-only">
                     Search

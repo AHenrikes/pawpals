@@ -2,7 +2,7 @@
 
 import { Card, CardHeader } from "@repo/ui/card";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
-import { FormError } from "@repo/ui/form-error";
+import { FormError } from "@/components/ui/form-error";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
@@ -31,7 +31,7 @@ export default function SignIn() {
 
   return (
     <section className="flex items-center justify-center px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
-      <Card className="w-full max-w-[640px]">
+      <Card className="w-full max-w-160">
         <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
           <Link
             href={AUTH_ROUTES.SIGN_UP}

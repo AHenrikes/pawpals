@@ -120,14 +120,14 @@ export default function ProfilePage() {
           <motion.section
             key="banner-skeleton"
             exit={{ opacity: 0 }}
-            className="relative w-full h-64 sm:h-96 md:h-[500px]"
+            className="relative w-full h-64 sm:h-96 md:h-125"
           >
             <Skeleton className="h-full" />
           </motion.section>
         ) : (
           <motion.section
             key="banner-content"
-            className="relative w-full h-64 sm:h-96 md:h-[500px]"
+            className="relative w-full h-64 sm:h-96 md:h-125"
             initial={{ opacity: 0, scale: 0.99 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -154,7 +154,7 @@ export default function ProfilePage() {
               />
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none z-20" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black pointer-events-none z-20" />
           </motion.section>
         )}
       </AnimatePresence>
@@ -169,7 +169,7 @@ export default function ProfilePage() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-4"
               >
-                <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
+                <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg shrink-0" />
                 <div className="min-w-0 mb-4 space-y-2">
                   <Skeleton className="h-9 w-52 animate-none border-2 border-background" />
                   <Skeleton className="h-4 w-40 animate-none border-2 border-background" />
@@ -187,7 +187,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2">
                     <Avatar
                       size="lg"
-                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0"
+                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg shrink-0"
                     >
                       <AvatarImage
                         src={viewedFursona.avatar_url ?? undefined}
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                         ease: "easeOut",
                       }}
                     >
-                      <TypographyXSmall className="text-muted-foreground break-words">
+                      <TypographyXSmall className="text-muted-foreground wrap-break-word">
                         {viewedFursona.bio}
                       </TypographyXSmall>
                     </motion.div>
@@ -382,7 +382,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <aside className="hidden sticky top-20 flex-col w-[500px] h-[calc(100svh-96px)] gap-5 md:flex">
+                <aside className="hidden sticky top-20 flex-col w-125 h-[calc(100svh-96px)] gap-5 md:flex">
                   <div className="bg-surface-low animate-pulse w-full h-96 rounded-md shadow-lg" />
 
                   <div className="bg-surface-low animate-pulse w-full h-full rounded-md shadow-lg" />

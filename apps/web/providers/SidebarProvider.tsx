@@ -183,10 +183,10 @@ export function Sidebar({
         data-side={side}
         data-variant={variant}
         data-state={openMobile ? "expanded" : "collapsed"}
-        animate={{ width: isCollapsed ? "w-[--sidebar-width-mobile]" : "" }}
+        animate={{ width: isCollapsed ? "w-(--sidebar-width-mobile)" : "" }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "group/sidebar fixed top-16 py-4 px-2 h-[calc(100svh-64px)] z-40 w-[--sidebar-width-mobile] border-r border-border bg-background transition-transform md:hidden",
+          "group/sidebar fixed top-16 py-4 px-2 h-[calc(100svh-64px)] z-40 w-(--sidebar-width-mobile) border-r border-border bg-background transition-transform md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -321,7 +321,7 @@ export function SidebarMenuButton({
   const sharedClassName = cn(
     "group/menu-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] transition",
     "text-muted-foreground hover:bg-sidebar-accent/30 hover:text-foreground",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
     isActive && "bg-surface-container-highest text-foreground",
     className,
   );

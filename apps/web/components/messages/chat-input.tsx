@@ -15,9 +15,11 @@ export function ChatInput({ onSend, disabled }: Readonly<ChatInputProps>) {
 
   async function handleSend() {
     const content = value.trim();
+
     if (!content || disabled) return;
-    setValue("");
+
     await onSend(content);
+    setValue("");
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
@@ -39,20 +41,20 @@ export function ChatInput({ onSend, disabled }: Readonly<ChatInputProps>) {
     textarea.style.height = "0px";
     textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`;
   }, [value]);
-3
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="px-4"
+      className="shrink-0 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]"
     >
       <InputGroup className="px-3 space-x-2">
         <InputGroupAddon>
           <InputGroupButton>
-            <PlusIcon size={20} />
+            <PlusIcon />
           </InputGroupButton>
 
           <InputGroupButton>
-            <PawPrintIcon size={20} />
+            <PawPrintIcon />
           </InputGroupButton>
         </InputGroupAddon>
 
@@ -63,18 +65,19 @@ export function ChatInput({ onSend, disabled }: Readonly<ChatInputProps>) {
           onKeyDown={handleKeyDown}
           placeholder="Write a message..."
           rows={1}
-          className="min-h-5 max-h-32 p-0 my-1 border-none rounded-none resize-none focus-visible:ring-0"
+          className="min-h-5 max-h-32 p-0 my-3"
           disabled={disabled}
         />
 
         <InputGroupAddon align={"inline-end"}>
           <InputGroupButton
-            type="submit" disabled={disabled || !value.trim()} 
-            aria-label="Send message">
-            <Send size={20} />
+            type="submit"
+            aria-label="Send message"
+            disabled={disabled || !value.trim()} 
+          >
+            <Send />
           </InputGroupButton>
         </InputGroupAddon>
-
       </InputGroup>
     </form>
   );

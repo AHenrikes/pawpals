@@ -18,7 +18,7 @@ export default function ProfileDropdown() {
         {profileActions.map(({ label, key }) => (
           <DropdownMenuItem key={key} asChild className="flex flex-col">
             <Button
-              size={"iconPair"}
+              size={"icon"}
               variant={"ghost"}
               className="w-full rounded-none"
             >

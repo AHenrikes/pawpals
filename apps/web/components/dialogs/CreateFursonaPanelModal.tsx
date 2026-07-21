@@ -119,9 +119,9 @@ export function CreateFursonaPanelModal({
       transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
       className="flex items-center justify-center h-full bg-black/50"
     >
-      <div className="relative w-full max-w-[640px] mx-4 rounded-lg bg-background p-6 shadow-lg max-h-[90vh]">
+      <div className="relative w-full max-w-160 mx-4 rounded-lg bg-background p-6 shadow-lg max-h-[90vh]">
         <Button
-          variant={"none"}
+          variant="ghost"
           onClick={handleClose}
           disabled={loading}
           className="absolute right-4 top-4 p-2 rounded-full hover:bg-popover disabled:opacity-50"

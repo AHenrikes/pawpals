@@ -73,7 +73,7 @@ const PostCard = memo(function PostCard({
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Avatar className="h-12 w-12 flex-shrink-0">
+            <Avatar className="h-12 w-12 shrink-0">
               <AvatarImage
                 src={user?.avatar_url ?? undefined}
                 alt={user?.display_name}
@@ -120,7 +120,7 @@ const PostCard = memo(function PostCard({
               }}
               className="px-3 overflow-hidden"
             >
-              <TypographySmall className="text-foreground break-words break-all whitespace-pre-wrap">
+              <TypographySmall className="text-foreground wrap-break-word break-all whitespace-pre-wrap">
                 {post.content}
               </TypographySmall>
             </motion.div>
@@ -147,7 +147,7 @@ const PostCard = memo(function PostCard({
       {/* Actions */}
       <div className="flex gap-2 max-w-xs text-muted-foreground">
         <Button
-          size="iconPair"
+          size="icon"
           variant="ghost"
           className={ACTION_BUTTON_CLASSES.comment}
         >
@@ -156,7 +156,7 @@ const PostCard = memo(function PostCard({
         </Button>
 
         <Button
-          size="iconPair"
+          size="icon"
           variant="ghost"
           className={ACTION_BUTTON_CLASSES.share}
         >
@@ -165,7 +165,7 @@ const PostCard = memo(function PostCard({
         </Button>
 
         <Button
-          size="iconPair"
+          size="icon"
           variant="ghost"
           className={ACTION_BUTTON_CLASSES.like}
         >

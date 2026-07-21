@@ -38,7 +38,7 @@ export default function PostModal({
           role="dialog"
           aria-modal="true"
           aria-label="Create post"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs bg-black/50"
         >
           <motion.div
             initial={{ scale: 0.96, opacity: 0, y: 8 }}

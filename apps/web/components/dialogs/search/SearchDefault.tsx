@@ -25,7 +25,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
               </TypographyMuted>
 
               <Button
-                size={"iconPair"}
+                size={"icon"}
                 variant={"ghost"}
                 className="py-1 px-2 text-muted-foreground"
               >
@@ -53,7 +53,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
 
           <Separator
             orientation="horizontal"
-            className="hidden w-[1px] md:block"
+            className="hidden w-px md:block"
           />
 
           {/* Users Section */}
@@ -78,7 +78,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
                     key={`user-col1-${i}`}
                     className="flex gap-2 animate-pulse"
                   >
-                    <div className="h-14 w-14 md:h-12 md:w-12 bg-muted rounded-full flex-shrink-0" />
+                    <div className="h-14 w-14 md:h-12 md:w-12 bg-muted rounded-full shrink-0" />
 
                     <div className="space-y-2 flex-1">
                       <div className="h-5 w-3/4 md:h-4 bg-muted rounded" />
@@ -94,7 +94,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
                     key={`user-col2-${i}`}
                     className="flex gap-2 animate-pulse"
                   >
-                    <div className="h-14 w-14 md:h-12 md:w-12 bg-muted rounded-full flex-shrink-0" />
+                    <div className="h-14 w-14 md:h-12 md:w-12 bg-muted rounded-full shrink-0" />
 
                     <div className="space-y-2 flex-1">
                       <div className="h-5 w-3/4 md:h-4 bg-muted rounded" />
@@ -108,7 +108,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
 
           <Separator
             orientation="horizontal"
-            className="hidden w-[1px] lg:block"
+            className="hidden w-px lg:block"
           />
 
           {/* Tags Section */}
@@ -126,7 +126,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
 
           <Separator
             orientation="horizontal"
-            className="hidden w-[1px] xl:block"
+            className="hidden w-px xl:block"
           />
 
           {/* How to Search */}

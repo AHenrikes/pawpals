@@ -22,7 +22,7 @@ export default function PostDropdown() {
           return (
             <DropdownMenuItem key={key} asChild>
               <Button
-                size={"iconPair"}
+                size={"icon"}
                 variant={"ghost"}
                 className="w-full justify-start px-2 rounded-none"
               >

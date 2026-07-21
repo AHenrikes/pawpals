@@ -22,11 +22,9 @@ import {
 interface MessageBubbleProps {
   message: MessageType;
   isOwn: boolean;
-  /** Only the last message in a consecutive group should show an avatar. */
+  isGroupMessage: boolean;
   showAvatar?: boolean;
-  /** Only the first message in a consecutive group should show the sender name. */
   showHeader?: boolean;
-  /** Only the last message in a consecutive group should show the timestamp. */
   showFooter?: boolean;
   senderName?: string;
   senderAvatarUrl?: string | null;
@@ -51,6 +49,7 @@ function getInitials(name: string) {
 export function MessageBubble({
   message,
   isOwn,
+  isGroupMessage,
   showAvatar = true,
   showHeader = false,
   showFooter = true,
@@ -64,9 +63,7 @@ export function MessageBubble({
 
   return (
     <Message align={isOwn ? "end" : "start"}>
-      {!isOwn && (
-        // Render an empty MessageAvatar on non-last rows so the group stays
-        // aligned with the avatar that appears on the final message.
+      {isGroupMessage && !isOwn && (
         <MessageAvatar>
           {showAvatar ? (
             <Avatar className="h-7 w-7">
@@ -78,18 +75,20 @@ export function MessageBubble({
       )}
 
       <MessageContent>
-        {!isOwn && showHeader && (
-          <MessageHeader className="text-xs text-muted-foreground">{senderName}</MessageHeader>
-        )}
-
-        <Bubble
-          variant={isOwn ? "default" : "muted"}
-          className={cn("rounded-2xl", isOwn ? "rounded-br-sm" : "rounded-bl-sm")}
-        >
+        <Bubble variant={isOwn ? undefined : "muted"}>
           {
             (() => {
               if (!message.attachment_url) return (
-                <BubbleContent className="whitespace-pre-wrap break-words text-sm">
+                <BubbleContent
+                  className={
+                    `whitespace-pre-wrap wrap-break-word text-sm
+                    ${isOwn ? "rounded-br-none" : "rounded-bl-none"}`
+                  }
+                >
+                  {isGroupMessage &&  showHeader && !isOwn && (
+                    <MessageHeader className="text-xs text-muted-foreground p-0">{senderName}</MessageHeader>
+                  )}
+
                   {message.content}
                 </BubbleContent>
               );
@@ -97,10 +96,14 @@ export function MessageBubble({
               if (isImageUrl(message.attachment_url)) {
                 return (
                   <BubbleContent className="flex flex-col gap-2 p-1">
+                    {!isOwn && showHeader && (
+                      <MessageHeader className="text-xs text-muted-foreground">{senderName}</MessageHeader>
+                    )}
+
                     <img
                       src={message.attachment_url}
                       alt={message.content || "Attachment"}
-                      className="max-w-[240px] rounded-[calc(var(--radius)-2px)] sm:max-w-xs"
+                      className="max-w-60 rounded-[calc(var(--radius)-2px)] sm:max-w-xs"
                     />
                     {message.content && <p className="px-2 pb-1 text-sm">{message.content}</p>}
                   </BubbleContent>
@@ -109,6 +112,10 @@ export function MessageBubble({
 
               return (
                 <BubbleContent className="flex flex-col gap-2">
+                  {!isOwn && showHeader && (
+                    <MessageHeader className="text-xs text-muted-foreground">{senderName}</MessageHeader>
+                  )}
+
                   <Attachment size="sm">
                     <AttachmentMedia>
                       <FileIcon />
@@ -123,7 +130,6 @@ export function MessageBubble({
             })()
           }
         </Bubble>
-
         {showFooter && (
           <MessageFooter
             className={cn("text-[11px] text-muted-foreground", isOwn ? "text-end" : "text-start")}

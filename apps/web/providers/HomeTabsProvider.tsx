@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react";
 
 const homeTabs = [
   { label: "Posts", key: "posts" },
@@ -24,15 +24,20 @@ export function HomeTabsProvider({
   const [content, setContent] = useState<ContentKey>("posts");
   const [direction, setDirection] = useState(0);
 
-  const navContent = (key: ContentKey) => {
+  const navContent = useCallback((key: ContentKey) => {
     const oldIndex = homeTabs.findIndex((n) => n.key === content);
     const newIndex = homeTabs.findIndex((n) => n.key === key);
     setDirection(newIndex > oldIndex ? 1 : -1);
     setContent(key);
-  };
+  }, [content]);
+
+  const value = useMemo(
+    () => ({ content, direction, navContent }),
+    [content, direction, navContent]
+  );
 
   return (
-    <HomeTabsContext.Provider value={{ content, direction, navContent }}>
+    <HomeTabsContext.Provider value={value}>
       {children}
     </HomeTabsContext.Provider>
   );

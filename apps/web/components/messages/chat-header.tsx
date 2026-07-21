@@ -59,15 +59,15 @@ export function ChatHeader({
     "Unknown";
 
   return (
-    <header className="flex items-center justify-between h-16 px-2 py-4 border-b border-border md:px-4">
+    <header className="flex shrink-0 items-center justify-between h-16 px-2 py-4 border-b border-border md:px-4">
       <div className="flex items-center gap-2">
         <Button
-          size={"icon"}
+          size={"icon-lg"}
           variant={"ghost"}
           onClick={onCloseConversation}
           className="p-2 md:hidden"
         >
-          <ArrowLeftIcon size={16} />
+          <ArrowLeftIcon />
         </Button>
 
         <Avatar className="h-9 w-9">
@@ -81,34 +81,40 @@ export function ChatHeader({
         </div>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Button
-          size={"icon"}
-          variant={"ghost"}
-          className="p-2"
-        >
-          <VideoIcon size={16} />
-        </Button>
+      <div className="flex items-center">
+        <div className="flex items-center">
+          <Button
+            size={"icon-lg"}
+            variant={"ghost"}
+          >
+            <VideoIcon />
+          </Button>
 
-        <Button
-          size={"icon"}
-          variant={"ghost"}
-          className="p-2"
-        >
-          <PhoneIcon size={16} />
-        </Button>
+          <Button
+            size={"icon"}
+            variant={"ghost"}
+          >
+            <PhoneIcon />
+          </Button>
 
-        <Button
-          size={"icon"}
-          variant={"ghost"}
-          className="hidden p-2 md:block"
-        >
-          <SearchIcon size={16} />
-        </Button>
+          <Button
+            size={"icon"}
+            variant={"ghost"}
+            className="hidden md:block"
+          >
+            <SearchIcon />
+          </Button>
+        </div>
 
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <MoreVertical className="h-4 w-4" />
+          <DropdownMenuTrigger asChild>
+            <Button
+              size={"icon-lg"}
+              variant={"ghost"}
+              className="p-2"
+            >
+            <MoreVertical />
+            </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">

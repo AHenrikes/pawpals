@@ -109,7 +109,7 @@ function MediaItem({
         />
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <Button
         type="button"
@@ -144,7 +144,7 @@ function MediaGrid({
   return (
     <div className="flex items-center h-full overflow-hidden">
       <div
-        className={`relative ${container} w-full max-w-[1440px] max-h-[60svh] bg-black/50 overflow-hidden`}
+        className={`relative ${container} w-full max-w-360 max-h-[60svh] bg-black/50 overflow-hidden`}
       >
         {visible.map((item, index) => (
           <MediaItem
@@ -175,7 +175,7 @@ function MobileMediaStrip({
       {previews.map((p, i) => (
         <div
           key={p.url}
-          className="group relative flex-shrink-0 overflow-hidden rounded-xl bg-black"
+          className="group relative shrink-0 overflow-hidden rounded-xl bg-black"
           style={{ width: 72, height: 72 }}
         >
           {p.type === "video" ? (
@@ -212,10 +212,10 @@ function MobileMediaStrip({
         <Button
           type="button"
           size={"icon"}
-          variant={"none"}
+          variant={"ghost"}
           onClick={onAdd}
           style={{ width: 72, height: 72 }}
-          className="flex-shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5 text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5 text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
         >
           <PlusIcon className="h-4 w-4" />
           <span>Add</span>
@@ -281,7 +281,7 @@ export default function PostForm({
       style={{ gridTemplateColumns: "1fr 400px" }}
     >
       {/* ── LEFT: media panel (desktop) ── */}
-      <div className="hidden lg:flex relative flex-col h-[70svh] border-r border-border bg-black/[0.02]">
+      <div className="hidden lg:flex relative flex-col h-[70svh] border-r border-border bg-black/2">
         {mediaPreviews.length === 0 ? (
           <motion.button
             type="button"
@@ -360,7 +360,7 @@ export default function PostForm({
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
           <div className="flex items-center gap-2.5">
             {currentFursona?.avatar_url && (
-              <div className="relative h-9 w-9 overflow-hidden rounded-full flex-shrink-0">
+              <div className="relative h-9 w-9 overflow-hidden rounded-full shrink-0">
                 <Image
                   src={currentFursona.avatar_url}
                   alt={currentFursona.username ?? ""}
@@ -428,7 +428,7 @@ export default function PostForm({
           ) : (
             <Button
               type="button"
-              size={"iconPair"}
+              size={"icon"}
               variant={"ghost"}
               onClick={openFilePicker}
               className="w-full h-full gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -459,7 +459,7 @@ export default function PostForm({
             placeholder={placeholder}
             maxLength={POST_MAX_CHARS}
             rows={4}
-            className="w-full flex-1 px-4 py-2 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground outline-none"
+            className="w-full flex-1 px-4 py-2 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground outline-hidden"
             style={{
               caretColor: "hsl(var(--primary))",
               fontFamily: "var(--font-body)",
@@ -482,7 +482,7 @@ export default function PostForm({
               <Button
                 type="button"
                 key={label}
-                size={"iconPair"}
+                size={"icon"}
                 variant={"ghost"}
                 className="w-full text-muted-foreground hover:opacity-70 transition-opacity"
               >
@@ -508,7 +508,7 @@ export default function PostForm({
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
-                  size={"iconPair"}
+                  size={"icon"}
                   variant={"outline"}
                   onClick={() => setVisOpen((v) => !v)}
                   aria-expanded={visOpen}
@@ -535,7 +535,7 @@ export default function PostForm({
                       >
                         <Button
                           type="button"
-                          size={"iconPair"}
+                          size={"icon"}
                           variant={"ghost"}
                           onClick={() => {
                             setVisibility(value);
@@ -580,7 +580,7 @@ export default function PostForm({
 
           <Button
             type="submit"
-            size={"iconPair"}
+            size={"icon"}
             disabled={
               loading || (!content.trim() && mediaPreviews.length === 0)
             }

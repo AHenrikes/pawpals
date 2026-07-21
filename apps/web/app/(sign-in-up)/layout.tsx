@@ -33,8 +33,8 @@ export default async function AuthLayout({
               <span className="text-primary">global pack.</span>
             </TypographyH2>
 
-            <Card className="h-3/6 w-full max-w-[620px] -rotate-6 rounded-[2rem] border border-white/5 bg-background p-5 shadow-[0_28px_80px_rgba(0,0,0,0.52)]">
-              <CardContent className="relative h-full overflow-hidden rounded-[2rem] border-border bg-background p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)] rotate-3">
+            <Card className="h-3/6 w-full max-w-[620px] -rotate-6 rounded-4xl border border-white/5 bg-background p-5 shadow-[0_28px_80px_rgba(0,0,0,0.52)]">
+              <CardContent className="relative h-full overflow-hidden rounded-4xl border-border bg-background p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)] rotate-3">
                 <div
                   className="absolute inset-0 opacity-90"
                   style={{

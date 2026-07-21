@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "./lib/utils";
 
 const itemVariants = cva(
-  "group/item relative flex w-full items-center gap-3 rounded-xl text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+  "group/item relative flex w-full items-center gap-3 rounded-xl text-left transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring",
   {
     variants: {
       variant: {
