@@ -8,9 +8,7 @@ export default async function DashboardLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div id="DashboardLayout">
-      <UserProvider>
-        {children}
-      </UserProvider>
+      <UserProvider>{children}</UserProvider>
     </div>
   );
 }

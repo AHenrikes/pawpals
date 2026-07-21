@@ -10,7 +10,13 @@ import {
   MessageScrollerItem,
   MessageScrollerViewport,
 } from "@repo/ui/message-scroller";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@repo/ui/Empty";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@repo/ui/Empty";
 import { MessageBubble } from "./message-bubble";
 import { type MessageType } from "@/types/messages";
 import { Marker, MarkerContent } from "@repo/ui/marker";
@@ -44,12 +50,13 @@ function groupConsecutiveMessages(messages: MessageType[]) {
     const lastGroup = groups[groups.length - 1];
     const lastMessage = lastGroup?.[lastGroup.length - 1];
 
-    const sameSender = lastMessage?.sender_fursona_id === message.sender_fursona_id;
+    const sameSender =
+      lastMessage?.sender_fursona_id === message.sender_fursona_id;
     const withinGap =
       !!lastMessage &&
       new Date(message.created_at).getTime() -
-      new Date(lastMessage.created_at).getTime()
-    <= GROUP_GAP_MS;
+        new Date(lastMessage.created_at).getTime() <=
+        GROUP_GAP_MS;
 
     if (lastGroup && sameSender && withinGap) {
       lastGroup.push(message);
@@ -72,7 +79,8 @@ export function ChatBox({
 }: Readonly<ChatBoxProps>) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const groups = useMemo(() => groupConsecutiveMessages(messages), [messages]);
-  const otherName = otherFursona?.display_name ?? otherFursona?.username ?? "Unknown";
+  const otherName =
+    otherFursona?.display_name ?? otherFursona?.username ?? "Unknown";
 
   const handleScroll = useCallback(() => {
     if (!viewportRef.current || !onLoadMore || !hasMore) return;
@@ -101,13 +109,14 @@ export function ChatBox({
             const isOwn = group[0]?.sender_fursona_id === currentFursonaId;
 
             return (
-              <MessageScrollerItem key={group[0]?.id} messageId={group[0]?.id} scrollAnchor={isOwn}>
+              <MessageScrollerItem
+                key={group[0]?.id}
+                messageId={group[0]?.id}
+                scrollAnchor={isOwn}
+              >
                 <MessageGroup>
                   {group.map((message, i) => (
-                    <div 
-                    key={message.id}
-                      className="space-y-5"
-                    >
+                    <div key={message.id} className="space-y-5">
                       {message.id === firstUnreadMessageId && (
                         <Marker variant="separator">
                           <MarkerContent>New messages</MarkerContent>
@@ -124,7 +133,7 @@ export function ChatBox({
                         senderName={otherName}
                         senderAvatarUrl={otherFursona?.avatar_url}
                       />
-                    </div>                    
+                    </div>
                   ))}
                 </MessageGroup>
               </MessageScrollerItem>

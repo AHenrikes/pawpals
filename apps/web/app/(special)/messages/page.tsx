@@ -17,9 +17,9 @@ import { ChatHeader } from "@/components/messages/chat-header";
 import { useUser } from "@/providers/UserProvider";
 import { api } from "@/lib/api/api-client";
 import { MessageScrollerProvider } from "@repo/ui/message-scroller";
+import { TypographyH2 } from "@repo/ui/typography";
 import { type FursonaProfile } from "@/types/fursona";
 import type { Conversation, MessageType } from "@/types/messages";
-import { TypographyH1, TypographyH2 } from "@repo/ui/typography";
 
 let optimisticCounter = 0;
 
@@ -27,7 +27,7 @@ function sortConversationsNewestFirst(conversations: Conversation[]) {
   return [...conversations].sort(
     (a, b) =>
       new Date(b.last_message_at).getTime() -
-      new Date(a.last_message_at).getTime()
+      new Date(a.last_message_at).getTime(),
   );
 }
 
@@ -52,7 +52,9 @@ function makeOptimisticId() {
   if (typeof fillRandom === "function") {
     const bytes = new Uint8Array(16);
     fillRandom.call(globalThis.crypto, bytes);
-    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(
+      "",
+    );
     return `tmp-${hex}`;
   }
 
@@ -66,7 +68,9 @@ export default function MessagesPage() {
   const [selected, setSelected] = useState<Conversation | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [startingConversation, setStartingConversation] = useState(false);
-  const [firstUnreadMessageId, setFirstUnreadMessageId] = useState<string | null>(null);
+  const [firstUnreadMessageId, setFirstUnreadMessageId] = useState<
+    string | null
+  >(null);
   const [loadingConversation, setLoadingConversation] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -101,29 +105,30 @@ export default function MessagesPage() {
         setLoadingMessages(false);
       }
     },
-    [supabase]
+    [supabase],
   );
 
-  // Load messages and clear unread count whenever the selected conversation changes.
-  // useEffect(() => {
-  //   if (!selected) return;
-  //   const hadUnread = (selected.unread_count ?? 0) > 0;
-
-  //   loadMessages(selected).then((loadedMessages) => {
-  //     if (hadUnread) {
-  //       const firstUnread = loadedMessages[loadedMessages.length - (selected.unread_count ?? 0)];
-  //       setFirstUnreadMessageId(firstUnread?.id ?? null);
-  //     } else {
-  //       setFirstUnreadMessageId(null);
-  //     }
-  //   });
-
-  //   markSelectedConversationRead(selected.id);
-  // }, [selected]);
+  const markSelectedConversationRead = useCallback(
+    async (conversationId: string) => {
+      try {
+        await markConversationRead(supabase, conversationId);
+        setConversations((prev) =>
+          prev.map((conversation) =>
+            conversation.id === conversationId
+              ? { ...conversation, unread_count: 0 }
+              : conversation,
+          ),
+        );
+      } catch (err) {
+        console.error("Failed to mark conversation as read", err);
+      }
+    },
+    [supabase],
+  );
 
   useEffect(() => {
     if (!selected) return;
-    
+
     let cancelled = false;
 
     const selectedConversation = selected;
@@ -139,7 +144,9 @@ export default function MessagesPage() {
 
         if (hadUnread) {
           const firstUnread =
-            loadedMessages[loadedMessages.length - (selectedConversation.unread_count ?? 0)];
+            loadedMessages[
+              loadedMessages.length - (selectedConversation.unread_count ?? 0)
+            ];
 
           setFirstUnreadMessageId(firstUnread?.id ?? null);
         } else {
@@ -151,7 +158,7 @@ export default function MessagesPage() {
         if (!cancelled) {
           setTimeout(() => {
             setLoadingConversation(false);
-          }, 400)
+          }, 400);
         }
       }
     }
@@ -161,31 +168,7 @@ export default function MessagesPage() {
     return () => {
       cancelled = true;
     };
-  }, [selected]);
-
-  const markSelectedConversationRead = useCallback(
-    async (conversationId: string) => {
-      try {
-        await markConversationRead(supabase, conversationId);
-        setConversations((prev) =>
-          prev.map((conversation) =>
-            conversation.id === conversationId
-              ? { ...conversation, unread_count: 0 }
-              : conversation
-          )
-        );
-      } catch (err) {
-        console.error("Failed to mark conversation as read", err);
-      }
-    },
-    [supabase]
-  );
-
-  // useEffect(() => {
-  //   if (!selected) return;
-  //   loadMessages(selected);
-  //   markSelectedConversationRead(selected.id);
-  // }, [loadMessages, markSelectedConversationRead, selected]);
+  }, [selected, loadMessages, markSelectedConversationRead]);
 
   function handleSelect(conversation: Conversation) {
     // Clear immediately so switching threads doesn't flash the previous
@@ -206,7 +189,9 @@ export default function MessagesPage() {
       const isOwnMessage = currentFursona?.id === message.sender_fursona_id;
 
       setConversations((prev) => {
-        const existing = prev.find((conversation) => conversation.id === message.conversation_id);
+        const existing = prev.find(
+          (conversation) => conversation.id === message.conversation_id,
+        );
         if (!existing) return prev;
 
         const updated: Conversation = {
@@ -219,7 +204,9 @@ export default function MessagesPage() {
               : (existing.unread_count ?? 0) + 1,
         };
 
-        const rest = prev.filter((conversation) => conversation.id !== message.conversation_id);
+        const rest = prev.filter(
+          (conversation) => conversation.id !== message.conversation_id,
+        );
         return [updated, ...rest];
       });
 
@@ -234,7 +221,7 @@ export default function MessagesPage() {
               m.id.startsWith("tmp-") &&
               m.conversation_id === message.conversation_id &&
               m.sender_fursona_id === message.sender_fursona_id &&
-              m.content === message.content
+              m.content === message.content,
           );
 
           if (optimisticIndex === -1) return [...prev, message];
@@ -252,7 +239,7 @@ export default function MessagesPage() {
         markSelectedConversationRead(selected.id);
       }
     },
-    [selected, currentFursona?.id, markSelectedConversationRead]
+    [selected, currentFursona?.id, markSelectedConversationRead],
   );
 
   useRealtimeMessages(handleNewMessage);
@@ -264,11 +251,12 @@ export default function MessagesPage() {
     }
 
     const normalized = username.trim().toLowerCase();
-    if (!normalized || normalized === currentFursona.username.toLowerCase()) return;
+    if (!normalized || normalized === currentFursona.username.toLowerCase())
+      return;
 
     const existing = conversations.find(
       (conversation) =>
-        conversation.other_fursona?.username?.toLowerCase() === normalized
+        conversation.other_fursona?.username?.toLowerCase() === normalized,
     );
 
     if (existing) {
@@ -288,7 +276,7 @@ export default function MessagesPage() {
       setConversations(sortConversationsNewestFirst(latestConversations));
 
       const matchedConversation = latestConversations.find(
-        (conversation) => conversation.id === conversationId
+        (conversation) => conversation.id === conversationId,
       );
 
       if (matchedConversation) {
@@ -335,7 +323,9 @@ export default function MessagesPage() {
 
     setMessages((prev) => [...prev, optimistic]);
     setConversations((prev) => {
-      const existing = prev.find((conversation) => conversation.id === selected.id);
+      const existing = prev.find(
+        (conversation) => conversation.id === selected.id,
+      );
       if (!existing) return prev;
 
       const updated: Conversation = {
@@ -344,12 +334,19 @@ export default function MessagesPage() {
         last_message_at: optimistic.created_at,
       };
 
-      const rest = prev.filter((conversation) => conversation.id !== selected.id);
+      const rest = prev.filter(
+        (conversation) => conversation.id !== selected.id,
+      );
       return [updated, ...rest];
     });
 
     try {
-      const saved = await sendMessage(supabase, selected.id, currentFursona.id, content);
+      const saved = await sendMessage(
+        supabase,
+        selected.id,
+        currentFursona.id,
+        content,
+      );
       setMessages((prev) => {
         const next = prev.map((m) => (m.id === optimisticId ? saved : m));
         return dedupeMessagesById(next);
@@ -377,7 +374,10 @@ export default function MessagesPage() {
         <MessageScrollerProvider autoScroll defaultScrollPosition="last-anchor">
           {!loadingConversation ? (
             <main className="absolute inset-0 flex flex-col min-w-0 min-h-0 bg-background md:flex-1 md:static md:bg-transparent">
-              <ChatHeader conversation={selected} onCloseConversation={handleCloseConversation} />
+              <ChatHeader
+                conversation={selected}
+                onCloseConversation={handleCloseConversation}
+              />
               <ChatBox
                 messages={messages}
                 isGroupRoom={selected.is_group}
@@ -385,7 +385,10 @@ export default function MessagesPage() {
                 currentFursonaId={currentFursona.id}
                 otherFursona={selected.other_fursona}
               />
-              <ChatInput onSend={handleSend} disabled={loadingMessages || startingConversation} />
+              <ChatInput
+                onSend={handleSend}
+                disabled={loadingMessages || startingConversation}
+              />
             </main>
           ) : (
             <div className="grid place-content-center h-full w-full">

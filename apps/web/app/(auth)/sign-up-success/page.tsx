@@ -26,7 +26,8 @@ const secureRandom = () => {
   return Math.random();
 };
 
-const randRange = (min: number, max: number) => min + secureRandom() * (max - min);
+const randRange = (min: number, max: number) =>
+  min + secureRandom() * (max - min);
 
 const confettiPieces = Array.from({ length: 20 }, (_, i) => ({
   id: i,

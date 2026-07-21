@@ -130,7 +130,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
           />
 
           {/* How to Search */}
-          <div className="space-y-3 md:hidden xl:block xl:w-[340px]">
+          <div className="space-y-3 md:hidden xl:block xl:w-85">
             <TypographyMuted className="text-xs md:text-sm">
               How to search:
             </TypographyMuted>

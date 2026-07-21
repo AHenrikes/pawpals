@@ -47,8 +47,6 @@ export default function Settings() {
     { label: "Canada", value: "ca" },
   ];
 
-  console.log(typeof globalThis.crypto.randomUUID());
-
   return (
     <main className="space-y-10 bg-background p-5">
       <div className="space-y-5 border-l rounded-t-md">

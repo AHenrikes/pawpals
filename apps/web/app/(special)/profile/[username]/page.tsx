@@ -14,7 +14,7 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { ArrowLeftIcon, EllipsisVerticalIcon, Icon, MailIcon } from "lucide-react";
+import { ArrowLeftIcon, EllipsisVerticalIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
@@ -23,11 +23,11 @@ import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProfilePostCards } from "@/components/cards/PostCards";
-import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
-import Image from "next/image";
 import { getInitials } from "@/utils/getInitials";
 import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
 import ProfileDropdown from "@/components/dropdowns/Profile";
+import Image from "next/image";
 
 function formatNumbers(count: number): string {
   if (count < 1000) return `${count}`;
@@ -132,7 +132,7 @@ export default function ProfilePage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-                        <div className="w-full h-16 p-1 lg:p-4 z-30">
+            <div className="w-full h-16 p-1 lg:p-4 z-30">
               <Button
                 size={"icon"}
                 variant={"outline"}

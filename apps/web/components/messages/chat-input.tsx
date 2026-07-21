@@ -2,7 +2,12 @@
 
 import { useState, useRef, type KeyboardEvent, useLayoutEffect } from "react";
 import { PawPrintIcon, PlusIcon, Send } from "lucide-react";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from "@repo/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "@repo/ui/input-group";
 
 interface ChatInputProps {
   onSend: (content: string) => void | Promise<void>;
@@ -73,7 +78,7 @@ export function ChatInput({ onSend, disabled }: Readonly<ChatInputProps>) {
           <InputGroupButton
             type="submit"
             aria-label="Send message"
-            disabled={disabled || !value.trim()} 
+            disabled={disabled || !value.trim()}
           >
             <Send />
           </InputGroupButton>

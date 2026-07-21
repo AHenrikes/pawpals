@@ -1,6 +1,27 @@
 "use client";
 
-import { MoreVertical, Info, X, SearchIcon, VideoIcon, PhoneIcon, ArrowLeftIcon, ContactIcon, PlusIcon, LucideIcon, BanIcon, ThumbsDownIcon, UserRoundPenIcon, SquareMousePointerIcon, BellOffIcon, ClockFading, UsersRoundIcon, ClockFadingIcon, StarIcon, HeartPlusIcon, XIcon, LinkIcon, PhoneForwardedIcon, TrashIcon, BrushCleaningIcon } from "lucide-react";
+import {
+  MoreVertical,
+  SearchIcon,
+  VideoIcon,
+  PhoneIcon,
+  ArrowLeftIcon,
+  PlusIcon,
+  LucideIcon,
+  BanIcon,
+  ThumbsDownIcon,
+  UserRoundPenIcon,
+  SquareMousePointerIcon,
+  BellOffIcon,
+  UsersRoundIcon,
+  ClockFadingIcon,
+  HeartPlusIcon,
+  XIcon,
+  LinkIcon,
+  PhoneForwardedIcon,
+  TrashIcon,
+  BrushCleaningIcon,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Button } from "@repo/ui/button";
 import {
@@ -25,7 +46,7 @@ interface ChatHeaderProps {
 
 type HeaderCTAProps = {
   label: string;
-  action?: () => void; 
+  action?: () => void;
   icon?: LucideIcon;
   subactions?: HeaderCTAProps[];
 };
@@ -36,21 +57,27 @@ export function ChatHeader({
   onCloseConversation,
 }: Readonly<ChatHeaderProps>) {
   const headerCTA: HeaderCTAProps[] = [
-    {label: "Contact info", action: onViewProfile, icon: UserRoundPenIcon},
-    {label: "Search", icon: SearchIcon},
-    {label: "Select messages", icon: SquareMousePointerIcon},
-    {label: "Mute notifications", icon: BellOffIcon, subactions: [
-      {label: "1 hour"},
-      {label: "1 Day"},
-      {label: "1 Week"},
-    ]},
-    {label: "Disapearing messages", icon: ClockFadingIcon},
-    {label: "Add to favourites", icon: HeartPlusIcon},
-    {label: "Add to group", icon: UsersRoundIcon, subactions: [
-      {label: "New Group", icon: PlusIcon}
-    ]},
-    {label: "Close chat", action: onCloseConversation, icon: XIcon},
-  ]  
+    { label: "Contact info", action: onViewProfile, icon: UserRoundPenIcon },
+    { label: "Search", icon: SearchIcon },
+    { label: "Select messages", icon: SquareMousePointerIcon },
+    {
+      label: "Mute notifications",
+      icon: BellOffIcon,
+      subactions: [
+        { label: "1 hour" },
+        { label: "1 Day" },
+        { label: "1 Week" },
+      ],
+    },
+    { label: "Disapearing messages", icon: ClockFadingIcon },
+    { label: "Add to favourites", icon: HeartPlusIcon },
+    {
+      label: "Add to group",
+      icon: UsersRoundIcon,
+      subactions: [{ label: "New Group", icon: PlusIcon }],
+    },
+    { label: "Close chat", action: onCloseConversation, icon: XIcon },
+  ];
 
   const name =
     conversation.other_fursona?.display_name ??
@@ -71,54 +98,44 @@ export function ChatHeader({
         </Button>
 
         <Avatar className="h-9 w-9">
-          <AvatarImage src={conversation.other_fursona?.avatar_url ?? undefined} />
+          <AvatarImage
+            src={conversation.other_fursona?.avatar_url ?? undefined}
+          />
           <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
 
         <div>
           <TypographyP className="leading-3">{name}</TypographyP>
-          <TypographyXSmall className="text-muted-foreground">last seen 2 hours ago</TypographyXSmall>
+          <TypographyXSmall className="text-muted-foreground">
+            last seen 2 hours ago
+          </TypographyXSmall>
         </div>
       </div>
 
       <div className="flex items-center">
         <div className="flex items-center">
-          <Button
-            size={"icon-lg"}
-            variant={"ghost"}
-          >
+          <Button size={"icon-lg"} variant={"ghost"}>
             <VideoIcon />
           </Button>
 
-          <Button
-            size={"icon"}
-            variant={"ghost"}
-          >
+          <Button size={"icon"} variant={"ghost"}>
             <PhoneIcon />
           </Button>
 
-          <Button
-            size={"icon"}
-            variant={"ghost"}
-            className="hidden md:block"
-          >
+          <Button size={"icon"} variant={"ghost"} className="hidden md:block">
             <SearchIcon />
           </Button>
         </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              size={"icon-lg"}
-              variant={"ghost"}
-              className="p-2"
-            >
-            <MoreVertical />
+            <Button size={"icon-lg"} variant={"ghost"} className="p-2">
+              <MoreVertical />
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-            {headerCTA.map(item => {
+            {headerCTA.map((item) => {
               const Icon = item.icon;
 
               if (item.subactions) {
@@ -130,7 +147,7 @@ export function ChatHeader({
                     </DropdownMenuSubTrigger>
 
                     <DropdownMenuSubContent>
-                      {item.subactions.map(sub => {
+                      {item.subactions.map((sub) => {
                         const SubIcon = sub.icon;
 
                         return (
@@ -143,14 +160,11 @@ export function ChatHeader({
                       })}
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
-                )
+                );
               }
 
               return (
-                <DropdownMenuItem
-                  key={item.label}
-                  onClick={item.action}
-                >
+                <DropdownMenuItem key={item.label} onClick={item.action}>
                   {Icon && <Icon className="mr-2 h-4 w-4" />}
                   {item.label}
                 </DropdownMenuItem>

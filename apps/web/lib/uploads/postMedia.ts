@@ -21,7 +21,9 @@ function makeOptimisticId() {
   if (typeof fillRandom === "function") {
     const bytes = new Uint8Array(16);
     fillRandom.call(globalThis.crypto, bytes);
-    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(
+      "",
+    );
     return `tmp-${hex}`;
   }
 

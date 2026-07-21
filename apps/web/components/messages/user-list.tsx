@@ -2,17 +2,52 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/helpers/utils";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Input } from "@repo/ui/input";
 import { Button } from "@repo/ui/button";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useProfileSearch } from "@/hooks/core/fursonas/useProfileSearch";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { TypographyH1, TypographyLarge, TypographyP, TypographyXSmall } from "@repo/ui/typography";
-import { LucideIcon, EllipsisVerticalIcon, Loader2, MessageCirclePlusIcon, PlusIcon, SearchIcon, UsersIcon, ArchiveIcon, BellOffIcon, PinIcon, LoaderCircleIcon, MessageSquareDotIcon, HeartPlusIcon, UserRoundIcon, UsersRoundIcon, BanIcon, BrushCleaningIcon, Trash2Icon, StarIcon, SquareMousePointerIcon, LockIcon, LogOutIcon } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import {
+  TypographyH1,
+  TypographyLarge,
+  TypographyP,
+  TypographyXSmall,
+} from "@repo/ui/typography";
+import {
+  LucideIcon,
+  EllipsisVerticalIcon,
+  Loader2,
+  MessageCirclePlusIcon,
+  SearchIcon,
+  UsersIcon,
+  ArchiveIcon,
+  MessageSquareDotIcon,
+  StarIcon,
+  SquareMousePointerIcon,
+  LockIcon,
+  LogOutIcon,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@repo/ui/dropdown-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@repo/ui/context-menu";
 import { type Conversation } from "@/types/messages";
-import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSeparator, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from "@repo/ui/context-menu";
 
 interface UserListProps {
   conversations: Conversation[];
@@ -34,58 +69,56 @@ type ConversationCTAType = {
   icon?: LucideIcon;
   subactions?: CTAItem[];
   variant?: "destructive" | "default";
-}
+};
 
-const filterButtons = [
-  "All", "Unread", "Groups", "Favorites"
-]
+const filterButtons = ["All", "Unread", "Groups", "Favorites"];
 
 const menuCTA: CTAItem[] = [
-  {label: "New Group", icon: UsersIcon},
-  {label: "Archived", icon: ArchiveIcon},
-  {label: "Starred Messages", icon: StarIcon},
-  {label: "Select chats", icon: SquareMousePointerIcon},
-  {label: "Mark all as read", icon: MessageSquareDotIcon},
-]
+  { label: "New Group", icon: UsersIcon },
+  { label: "Archived", icon: ArchiveIcon },
+  { label: "Starred Messages", icon: StarIcon },
+  { label: "Select chats", icon: SquareMousePointerIcon },
+  { label: "Mark all as read", icon: MessageSquareDotIcon },
+];
 
 const conversationCTA: ConversationCTAType[][] = [
-  [{label: "Mark as read"}],
+  [{ label: "Mark as read" }],
 
   [
-    {label: "Profile"},
-    {label: "Start a call"},
-    {label: "Add note"},
-    {label: "Add nickname"},
-    {label: "Close DM"}
+    { label: "Profile" },
+    { label: "Start a call" },
+    { label: "Add note" },
+    { label: "Add nickname" },
+    { label: "Close DM" },
   ],
 
   [
-    {label: "Apps", subactions: [{label: "No Commands Available"}]},
-    {label: "Invite to server", subactions: [{label: "No Commands Available"}]}
+    { label: "Apps", subactions: [{ label: "No Commands Available" }] },
+    {
+      label: "Invite to server",
+      subactions: [{ label: "No Commands Available" }],
+    },
   ],
 
   [
-    {label: "Mute", variant: "destructive"},
-    {label: "Remove friend", variant: "destructive"},
-    {label: "Clear chat", variant: "destructive"},
-    {label: "Block", variant: "destructive"},
-    {label: "Report conversation", variant: "destructive"}
+    { label: "Mute", variant: "destructive" },
+    { label: "Remove friend", variant: "destructive" },
+    { label: "Clear chat", variant: "destructive" },
+    { label: "Block", variant: "destructive" },
+    { label: "Report conversation", variant: "destructive" },
   ],
 
-  [
-    {label: "Share profile"},
-    {label: "Copy channel ID"}
-  ]
-]
+  [{ label: "Share profile" }, { label: "Copy channel ID" }],
+];
 
-  // {label: "Archive Chat", icon: ArchiveIcon},
-  // {label: "Mute Notification", icon: BellOffIcon, subactions: [
-  //   { label: "1 Hour", }, { label: "1 day" }, { label: "Forever" }
-  // ]},
-  // {label: "Pin chat", icon: PinIcon},
-  // {label: "Mark as unread", icon: MessageSquareDotIcon},
-  // {label: "Add to favourites", icon: HeartPlusIcon },
-  // {label: "Add to group", icon: UsersRoundIcon, subactions: [{label: "New group", icon: PlusIcon}]},
+// {label: "Archive Chat", icon: ArchiveIcon},
+// {label: "Mute Notification", icon: BellOffIcon, subactions: [
+//   { label: "1 Hour", }, { label: "1 day" }, { label: "Forever" }
+// ]},
+// {label: "Pin chat", icon: PinIcon},
+// {label: "Mark as unread", icon: MessageSquareDotIcon},
+// {label: "Add to favourites", icon: HeartPlusIcon },
+// {label: "Add to group", icon: UsersRoundIcon, subactions: [{label: "New group", icon: PlusIcon}]},
 // ]
 
 export function UserList({
@@ -123,8 +156,10 @@ export function UserList({
 
     const conversationUsernames = new Set(
       conversations
-        .map((conversation) => conversation.other_fursona?.username?.toLowerCase())
-        .filter(Boolean)
+        .map((conversation) =>
+          conversation.other_fursona?.username?.toLowerCase(),
+        )
+        .filter(Boolean),
     );
 
     const currentUsernameLower = currentUsername.toLowerCase();
@@ -146,26 +181,20 @@ export function UserList({
         </Link>
 
         <div className="flex items-center">
-          <Button
-            size={"icon"}
-            variant={"ghost"}
-          >
+          <Button size={"icon"} variant={"ghost"}>
             <MessageCirclePlusIcon />
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                size={"icon"}
-                variant={"ghost"}
-              >
+              <Button size={"icon"} variant={"ghost"}>
                 <EllipsisVerticalIcon />
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                {menuCTA.map(elem => {
+                {menuCTA.map((elem) => {
                   const Icon = elem.icon;
 
                   return (
@@ -173,7 +202,7 @@ export function UserList({
                       {Icon && <Icon size={32} />}
                       {elem.label}
                     </DropdownMenuItem>
-                  )
+                  );
                 })}
               </DropdownMenuGroup>
 
@@ -209,7 +238,7 @@ export function UserList({
           </div>
 
           <div className="space-x-1">
-            {filterButtons.map(elem => (
+            {filterButtons.map((elem) => (
               <Button
                 key={elem}
                 size={"default"}
@@ -257,17 +286,25 @@ export function UserList({
                     onClick={() => onSelect(conversation)}
                     className={cn(
                       "group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors cursor-pointer md:px-2 md:rounded-md hover:bg-muted focus-visible:bg-muted focus-visible:outline-hidden",
-                      selectedId === conversation.id && "bg-muted"
+                      selectedId === conversation.id && "bg-muted",
                     )}
                   >
                     <Avatar className="h-11 w-11">
-                      <AvatarImage src={conversation.other_fursona?.avatar_url ?? undefined} />
-                      <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarImage
+                        src={
+                          conversation.other_fursona?.avatar_url ?? undefined
+                        }
+                      />
+                      <AvatarFallback>
+                        {name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <TypographyLarge className="flex-1 truncate md:text-sm font-medium">{name}</TypographyLarge>
+                        <TypographyLarge className="flex-1 truncate md:text-sm font-medium">
+                          {name}
+                        </TypographyLarge>
 
                         {!!conversation.unread_count && (
                           <TypographyP className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-dim px-1.5 text-[11px] font-semibold text-primary-foreground">
@@ -289,48 +326,45 @@ export function UserList({
                   </button>
                 </ContextMenuTrigger>
 
-                <ContextMenuContent
-                  side="left"
-                  className="rounded-md"
-                >
+                <ContextMenuContent side="left" className="rounded-md">
                   {conversationCTA.map((group, groupIndex) => (
                     <Fragment key={groupIndex}>
-                        {group.map((item) => {
-                          const Icon = item.icon;
+                      {group.map((item) => {
+                        const Icon = item.icon;
 
-                          if (item.subactions) {
-                            return (
-                              <ContextMenuSub key={item.label}>
-                                <ContextMenuSubTrigger>
-                                  {Icon && <Icon />}
-                                  {item.label}
-                                </ContextMenuSubTrigger>
-
-                                <ContextMenuSubContent>
-                                  {item.subactions.map((sub) => {
-                                    const SubIcon = sub.icon;
-
-                                    return (
-                                      <ContextMenuItem key={sub.label}>
-                                        {SubIcon && <SubIcon />}
-                                        {sub.label}
-                                      </ContextMenuItem>
-                                    );
-                                  })}
-                                </ContextMenuSubContent>
-                              </ContextMenuSub>
-                            );
-                          }
-
+                        if (item.subactions) {
                           return (
-                            <ContextMenuGroup key={item.label}>
-                              <ContextMenuItem variant={item.variant}>
+                            <ContextMenuSub key={item.label}>
+                              <ContextMenuSubTrigger>
                                 {Icon && <Icon />}
                                 {item.label}
-                              </ContextMenuItem>
-                            </ContextMenuGroup>
+                              </ContextMenuSubTrigger>
+
+                              <ContextMenuSubContent>
+                                {item.subactions.map((sub) => {
+                                  const SubIcon = sub.icon;
+
+                                  return (
+                                    <ContextMenuItem key={sub.label}>
+                                      {SubIcon && <SubIcon />}
+                                      {sub.label}
+                                    </ContextMenuItem>
+                                  );
+                                })}
+                              </ContextMenuSubContent>
+                            </ContextMenuSub>
                           );
-                        })}
+                        }
+
+                        return (
+                          <ContextMenuGroup key={item.label}>
+                            <ContextMenuItem variant={item.variant}>
+                              {Icon && <Icon />}
+                              {item.label}
+                            </ContextMenuItem>
+                          </ContextMenuGroup>
+                        );
+                      })}
                       {groupIndex < conversationCTA.length - 1 && (
                         <ContextMenuSeparator />
                       )}
@@ -338,7 +372,7 @@ export function UserList({
                   ))}
                 </ContextMenuContent>
               </ContextMenu>
-            )
+            );
           })}
 
           {search.trim() && (
@@ -356,9 +390,13 @@ export function UserList({
                 </div>
               )}
 
-              {!searchingUsers && suggestedUsers.length === 0 && filtered.length === 0 && (
-                <p className="px-4 pb-4 text-sm text-muted-foreground">No users found.</p>
-              )}
+              {!searchingUsers &&
+                suggestedUsers.length === 0 &&
+                filtered.length === 0 && (
+                  <p className="px-4 pb-4 text-sm text-muted-foreground">
+                    No users found.
+                  </p>
+                )}
 
               {suggestedUsers.map((user) => {
                 const name = user.display_name || user.username;
@@ -370,17 +408,23 @@ export function UserList({
                     disabled={creatingConversation}
                     className={cn(
                       "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-hidden",
-                      creatingConversation && "cursor-not-allowed opacity-70"
+                      creatingConversation && "cursor-not-allowed opacity-70",
                     )}
                   >
                     <Avatar className="h-11 w-11">
                       <AvatarImage src={user.avatar_url ?? undefined} />
-                      <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>
+                        {name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
 
                     <div className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{name}</span>
-                      <p className="truncate text-xs text-muted-foreground">@{user.username}</p>
+                      <span className="block truncate text-sm font-medium">
+                        {name}
+                      </span>
+                      <p className="truncate text-xs text-muted-foreground">
+                        @{user.username}
+                      </p>
                     </div>
                   </button>
                 );

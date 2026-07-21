@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
-import type { Message } from "@/types/messages";
+import type { MessageType } from "@/types/messages";
 
 /**
  * Subscribes to all message INSERT events visible to the signed-in user.
@@ -14,9 +14,7 @@ import type { Message } from "@/types/messages";
  * function identity every render would tear the channel down and
  * resubscribe on every render.
  */
-export function useRealtimeMessages(
-  onMessage: (message: Message) => void
-) {
+export function useRealtimeMessages(onMessage: (message: MessageType) => void) {
   const supabase = useSupabaseClient();
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export function useRealtimeMessages(
           schema: "public",
           table: "messages",
         },
-        (payload) => onMessage(payload.new as Message)
+        (payload) => onMessage(payload.new as MessageType),
       )
       .subscribe((_status, err) => {
         if (err) console.error("Realtime subscribe error", err);

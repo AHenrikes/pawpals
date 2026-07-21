@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useMemo, useTransition } from "react";
-import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Skeleton } from "@repo/ui/skeleton";
@@ -31,7 +30,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
 import {
@@ -74,7 +72,6 @@ export default function Header() {
     startTransition(async () => {
       try {
         await switchCurrentFursona(id);
-
         const newCurrentFursona = fursonas.find((f) => f.id === id);
         toast(`Switched to ${newCurrentFursona?.display_name ?? "fursona"}`);
       } catch (err: unknown) {
@@ -85,8 +82,7 @@ export default function Header() {
         setSwitchingId(null);
         setIsMenuOpen(false);
 
-        // Wait for menu to close
-        setTimeout(() => {
+        window.setTimeout(() => {
           setIsFursonaListOpen(false);
         }, 350);
       }
@@ -162,9 +158,7 @@ export default function Header() {
                       alt={displayName}
                     />
 
-                    <AvatarFallback>
-                      {getInitials(displayName)}
-                    </AvatarFallback>
+                    <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
               )}
@@ -188,8 +182,12 @@ export default function Header() {
                       </Avatar>
 
                       <div className="flex flex-col">
-                        <TypographySmall className="leading-none">{displayName}</TypographySmall>
-                        <TypographyXSmall className="text-muted-foreground">{username}</TypographyXSmall>
+                        <TypographySmall className="leading-none">
+                          {displayName}
+                        </TypographySmall>
+                        <TypographyXSmall className="text-muted-foreground">
+                          {username}
+                        </TypographyXSmall>
                       </div>
                     </Link>
                   </DropdownMenuItem>
@@ -205,7 +203,10 @@ export default function Header() {
 
                     return (
                       <DropdownMenuItem key={li.label}>
-                        <Link href={li.href} className="flex items-center w-full gap-2">
+                        <Link
+                          href={li.href}
+                          className="flex items-center w-full gap-2"
+                        >
                           <Icon className="h-4 w-4" />
                           {li.label}
                         </Link>
@@ -272,7 +273,10 @@ export default function Header() {
                       })}
 
                       {!loading && count < 3 ? (
-                        <DropdownMenuItem className="mt-2" onClick={() => setCreateFursonaOpen(true)}>
+                        <DropdownMenuItem
+                          className="mt-2"
+                          onClick={() => setCreateFursonaOpen(true)}
+                        >
                           <PlusIcon className="h-4 w-4" />
                           Create Fursona
                         </DropdownMenuItem>
@@ -284,7 +288,10 @@ export default function Header() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                  <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => signOut()}
+                  >
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
