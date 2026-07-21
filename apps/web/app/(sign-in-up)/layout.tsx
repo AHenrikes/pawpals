@@ -27,14 +27,14 @@ export default async function AuthLayout({
 
       <div className="container grid grid-cols-1 flex-1 py-16 mx-auto md:min-h-[calc(100svh-144px)] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="hidden w-full sm:px-8 lg:flex">
-          <div className="flex flex-col justify-center w-full h-full max-w-[720px] mx-auto gap-4">
+          <div className="flex flex-col justify-center w-full h-full max-w-180 mx-auto gap-4">
             <TypographyH2 className="flex flex-col text-5xl leading-[0.92]">
               Connect with the{" "}
               <span className="text-primary">global pack.</span>
             </TypographyH2>
 
-            <Card className="h-3/6 w-full max-w-[620px] -rotate-6 rounded-[2rem] border border-white/5 bg-background p-5 shadow-[0_28px_80px_rgba(0,0,0,0.52)]">
-              <CardContent className="relative h-full overflow-hidden rounded-[2rem] border-border bg-background p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)] rotate-3">
+            <Card className="h-3/6 w-full max-w-155 -rotate-6 rounded-4xl border border-white/5 bg-background p-5 shadow-[0_28px_80px_rgba(0,0,0,0.52)]">
+              <CardContent className="relative h-full overflow-hidden rounded-4xl border-border bg-background p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)] rotate-3">
                 <div
                   className="absolute inset-0 opacity-90"
                   style={{

@@ -28,10 +28,10 @@ export async function GET(
     .select(
       "follower_count, following_count, post_count, like_count, reputation",
     )
-    .eq("id", id)
+    .eq("fursona_id", id)
     .single();
 
-  if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (error) return serverError(error.message);
   if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
   return Response.json({

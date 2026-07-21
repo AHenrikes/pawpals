@@ -13,7 +13,7 @@ import {
 } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { FormError } from "@repo/ui/form-error";
+import { FormError } from "@/components/ui/form-error";
 import { useRouter } from "next/navigation";
 
 export default function UpdatePassword() {

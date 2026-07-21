@@ -200,7 +200,7 @@ export function EditProfileModal({
       >
         <Button
           type="button"
-          variant={"none"}
+          variant={"ghost"}
           onClick={() => bannerInputRef.current?.click()}
           className="relative h-28 w-full overflow-hidden rounded-md bg-muted"
           disabled={loading}
@@ -210,7 +210,7 @@ export function EditProfileModal({
               src={bannerPreview}
               alt="Banner"
               fill
-              quality={100}
+              quality={85}
               sizes="(max-width: 768px) 100vw, 448px"
               className="object-cover"
             />
@@ -232,7 +232,7 @@ export function EditProfileModal({
         <div className="-mt-10 ml-4">
           <Button
             type="button"
-            variant={"none"}
+            variant={"ghost"}
             onClick={() => avatarInputRef.current?.click()}
             className="relative h-16 w-16 overflow-hidden rounded-full border-2 border-background bg-muted"
             disabled={loading}
@@ -242,7 +242,7 @@ export function EditProfileModal({
                 src={avatarPreview}
                 alt="Avatar"
                 fill
-                quality={100}
+                quality={85}
                 sizes="64px"
                 className="object-cover"
               />

@@ -63,10 +63,7 @@ export default function MainNav() {
   LockScreen(isMobile && openMobile);
 
   return (
-    <Sidebar
-      collapsible="icon"
-      className="group/sidebar shrink-0"
-    >
+    <Sidebar collapsible="icon" className="group/sidebar shrink-0">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -76,7 +73,7 @@ export default function MainNav() {
 
                 return (
                   <SidebarMenuItem key={label}>
-                    <SidebarMenuButton asChild isActive={isActive} className="">
+                    <SidebarMenuButton asChild isActive={isActive}>
                       <Link
                         href={href}
                         className="hover:bg-surface-highest p-3"
@@ -144,7 +141,7 @@ export default function MainNav() {
           onClick={() => signOut()}
           className={cn("mt-3 h-10 rounded-full", !isCollapsed && "w-full")}
         >
-          <LogOutIcon className="h-6 w-6 p-[2px] shrink-0" />
+          <LogOutIcon className="h-6 w-6 p-0.5 shrink-0" />
 
           <AnimatePresence initial={false} mode="wait">
             {!isCollapsed && (

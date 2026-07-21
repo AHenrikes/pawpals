@@ -10,7 +10,7 @@ import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { toast } from "@repo/ui/sonner";
-import { FormError } from "@repo/ui/form-error";
+import { FormError } from "@/components/ui/form-error";
 import { Card, CardHeader } from "@repo/ui/card";
 import { TypographyP } from "@repo/ui/typography";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
@@ -126,10 +126,12 @@ export default function SignUpForm() {
         return;
       }
 
-      // TODO:
-      // Temporary local development testing - remove before production
-      const origin =
-        globalThis.window?.location?.origin ?? "http://192.168.1.219:3000";
+      const origin = globalThis.window?.location?.origin;
+
+      if (!origin) {
+        toast.error(ERROR_MESSAGES.SERVER_ERROR);
+        return;
+      }
 
       const { error } = await supabase.auth.signUp({
         email: formValues.email,
@@ -145,7 +147,6 @@ export default function SignUpForm() {
         },
       });
 
-      // TODO: email validation error display
       if (error) {
         toast.error(ERROR_MESSAGES.SERVER_ERROR);
         return;
@@ -179,7 +180,7 @@ export default function SignUpForm() {
 
   return (
     <section className="flex items-center justify-center px-5 sm:px-8 lg:px-10">
-      <Card className="w-full max-w-[640px]">
+      <Card className="w-full max-w-160">
         <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
           <Link
             href={AUTH_ROUTES.SIGN_UP}
@@ -217,45 +218,6 @@ export default function SignUpForm() {
                   transition={stepTransition}
                   className="space-y-5"
                 >
-                  {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="space-y-2.5">
-                      <Label htmlFor="firstname" variant={"auth"}>
-                        Firstname
-                      </Label>
-
-                      <Input
-                        id="firstname"
-                        type="text"
-                        placeholder="Jhon"
-                        value={values.firstname}
-                        onChange={(e) =>
-                          handleChange("firstname", e.target.value)
-                        }
-                        variant={"auth"}
-                        autoFocus={step === "account"}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2.5">
-                      <Label htmlFor="lastname" variant={"auth"}>
-                        Lastname
-                      </Label>
-
-                      <Input
-                        id="lastname"
-                        type="text"
-                        placeholder="Doe"
-                        value={values.lastname}
-                        onChange={(e) =>
-                          handleChange("lastname", e.target.value)
-                        }
-                        variant={"auth"}
-                        required
-                      />
-                    </div>
-                  </div> */}
-
                   <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <Field>
                       <FieldLabel htmlFor="first-name">First Name</FieldLabel>
@@ -293,21 +255,6 @@ export default function SignUpForm() {
                     </Field>
                   </FieldGroup>
 
-                  {/* <div className="space-y-2.5">
-                    <Label htmlFor="email" variant={"auth"}>
-                      Email
-                    </Label>
-
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="example@pawpals.com"
-                      value={values.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      variant={"auth"}
-                      required
-                    />
-                  </div> */}
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
 
@@ -402,7 +349,9 @@ export default function SignUpForm() {
                     </Field>
 
                     <Field>
-                      <FieldLabel htmlFor="confirmfname">Confirm Password</FieldLabel>
+                      <FieldLabel htmlFor="confirmfname">
+                        Confirm Password
+                      </FieldLabel>
 
                       <Input
                         id="confirmfname"

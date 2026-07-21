@@ -3,10 +3,15 @@
 import React, { useState, useCallback } from "react";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
 
-interface UseFormOptions {
+interface ValidationErrors {
+  [key: string]: string;
+}
+
+interface UseFormOptions<T extends Record<string, unknown>> {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
   resetOnSuccess?: boolean;
+  validate?: (values: T) => ValidationErrors;
 }
 
 interface UseFormReturn<T> {
@@ -38,7 +43,7 @@ interface UseFormReturn<T> {
 export function useForm<T extends Record<string, unknown>>(
   initialValues: T,
   onSubmit: (values: T) => Promise<void>,
-  options?: UseFormOptions,
+  options?: UseFormOptions<T>,
 ): UseFormReturn<T> {
   const [values, setValues] = useState<T>(initialValues);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +61,13 @@ export function useForm<T extends Record<string, unknown>>(
       e.preventDefault();
       setIsLoading(true);
       setError(null);
+
+      const validationErrors = options?.validate?.(values);
+      if (validationErrors && Object.keys(validationErrors).length > 0) {
+        setError(Object.values(validationErrors)[0] ?? "Please fix the form.");
+        setIsLoading(false);
+        return;
+      }
 
       try {
         await onSubmit(values);

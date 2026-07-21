@@ -1,12 +1,8 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth/requireUser";
-import {
-  ok,
-  serverError,
-  unauthorized,
-} from "@/lib/api/responses";
+import { okNoStore, serverError, unauthorized } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { type PostWithId } from "@/types/post";
+import { type PostType } from "@/types/post";
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -54,14 +50,14 @@ export async function GET(req: NextRequest) {
   if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
   const hasMore = data.length > limit;
-  const posts = (hasMore ? data.slice(0, limit) : data) as PostWithId[];
+  const posts = (hasMore ? data.slice(0, limit) : data) as PostType[];
   const nextCursor = hasMore
     ? posts.at(-1)?.created_at
       ? new Date(posts.at(-1)!.created_at).toISOString()
       : null
     : null;
 
-  return ok<{ posts: PostWithId[]; nextCursor: string | null }>({
+  return okNoStore<{ posts: PostType[]; nextCursor: string | null }>({
     posts,
     nextCursor,
   });

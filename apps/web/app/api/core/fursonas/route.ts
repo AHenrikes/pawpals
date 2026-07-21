@@ -6,7 +6,13 @@ import {
   normalizeOptionalText,
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
-import { unauthorized, badRequest, serverError, ok } from "@/lib/api/responses";
+import {
+  unauthorized,
+  badRequest,
+  serverError,
+  ok,
+  okNoStore,
+} from "@/lib/api/responses";
 
 export async function GET() {
   const { supabase, account, response } = await requireUser();
@@ -25,7 +31,9 @@ export async function GET() {
   if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   if (!fursonas) return badRequest(ERROR_MESSAGES.FURSONAS_NOT_FOUND);
 
-  return ok<{ fursonas: FursonaWithBoolean[] }>({ fursonas: fursonas ?? [] });
+  return okNoStore<{ fursonas: FursonaWithBoolean[] }>({
+    fursonas: fursonas ?? [],
+  });
 }
 
 export async function POST(req: NextRequest) {

@@ -14,21 +14,20 @@ import {
   TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { EllipsisVerticalIcon, MailIcon } from "lucide-react";
+import { ArrowLeftIcon, EllipsisVerticalIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProfilePostCards } from "@/components/cards/PostCards";
-import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
-import ProfileRepost from "@/components/ProfileRepost";
-import Image from "next/image";
 import { getInitials } from "@/utils/getInitials";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
 import ProfileDropdown from "@/components/dropdowns/Profile";
+import Image from "next/image";
 
 function formatNumbers(count: number): string {
   if (count < 1000) return `${count}`;
@@ -42,7 +41,6 @@ function formatNumbers(count: number): string {
 const profileNav = [
   { label: "POST", key: "post" },
   { label: "GALLERY", key: "gallery" },
-  { label: "REPOST", key: "repost" },
   { label: "ARCHIVE", key: "archive" },
   { label: "LIKE", key: "likes" },
 ] as const;
@@ -65,6 +63,8 @@ export default function ProfilePage() {
 
   const { following, follower, refetch, like } = useProfileCounts(id);
   const { isFollowing, toggle: follow, loading: followLoading } = useFollow(id);
+
+  const router = useRouter();
 
   const isLoading = isOwnProfile
     ? userLoading || !currentFursona
@@ -113,43 +113,54 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
+    <div className="flex-1 w-full">
       {/* Banner */}
       <AnimatePresence mode="wait">
         {isLoading ? (
           <motion.section
             key="banner-skeleton"
             exit={{ opacity: 0 }}
-            className="relative w-full h-64 sm:h-96 md:h-[500px]"
+            className="relative w-full h-64 sm:h-96 md:h-125"
           >
             <Skeleton className="h-full" />
           </motion.section>
         ) : (
           <motion.section
             key="banner-content"
-            className="relative w-full h-64 sm:h-96 md:h-[500px]"
+            className="relative w-full h-64 sm:h-96 md:h-125"
             initial={{ opacity: 0, scale: 0.99 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
+            <div className="w-full h-16 p-1 lg:p-4 z-30">
+              <Button
+                size={"icon"}
+                variant={"outline"}
+                onClick={() => router.back()}
+                className="p-1 text-primary backdrop-blur-blur"
+              >
+                <ArrowLeftIcon size={24} />
+              </Button>
+            </div>
+
             {viewedFursona.banner_url && (
               <Image
                 src={viewedFursona.banner_url}
                 alt={`${viewedFursona.display_name}'s banner`}
-                quality={100}
                 fill
-                className="object-cover z-10"
-                priority
+                quality={85}
+                loading="lazy"
+                className="object-cover pointer-events-none z-10"
               />
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black z-20" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black pointer-events-none z-20" />
           </motion.section>
         )}
       </AnimatePresence>
 
       {/* Profile header */}
-      <section className="px-2 py-4 mb-4 sm:container sm:mx-auto md:px-4">
+      <section className="px-2 py-4 sm:container sm:mx-auto md:px-4">
         <div className="relative -mt-16 space-y-6 sm:-mt-20 md:-mt-24 z-20">
           <AnimatePresence mode="wait">
             {isLoading ? (
@@ -158,7 +169,7 @@ export default function ProfilePage() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-4"
               >
-                <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0" />
+                <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg shrink-0" />
                 <div className="min-w-0 mb-4 space-y-2">
                   <Skeleton className="h-9 w-52 animate-none border-2 border-background" />
                   <Skeleton className="h-4 w-40 animate-none border-2 border-background" />
@@ -176,7 +187,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2">
                     <Avatar
                       size="lg"
-                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg flex-shrink-0"
+                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg shrink-0"
                     >
                       <AvatarImage
                         src={viewedFursona.avatar_url ?? undefined}
@@ -227,7 +238,7 @@ export default function ProfilePage() {
                         >
                           {followLoading ? "..." : followLabel}
                         </Button>
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -238,7 +249,7 @@ export default function ProfilePage() {
                               <EllipsisVerticalIcon className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          
+
                           <ProfileDropdown />
                         </DropdownMenu>
                       </>
@@ -279,79 +290,108 @@ export default function ProfilePage() {
                 </div>
               </motion.div>
             ) : (
-              <motion.div
-                key="info-content"
-                className="flex-1 w-full pb-0 space-y-6"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
-              >
-                <TypographyXSmall className="block max-w-xl text-muted-foreground break-words">
-                  {viewedFursona?.bio}
-                </TypographyXSmall>
-
-                <div className="flex gap-3 sm:gap-6 justify-start">
-                  {[
-                    { count: follower, label: "Followers" },
-                    { count: following, label: "Following" },
-                    { count: like, label: "Likes" },
-                  ].map(({ count, label }) => (
-                    <div key={label} className="text-center">
-                      <TypographyLead className="font-bold text-lg sm:text-xl">
-                        {formatNumbers(count)}
-                      </TypographyLead>
-
-                      <TypographyXSmall className="text-muted-foreground text-xs">
-                        {label}
+              <div className="flex gap-4">
+                <div className="flex-1 space-y-4 w-full">
+                  {viewedFursona.bio && (
+                    <motion.div
+                      key="about-content"
+                      className="w-full h-fit p-4 bg-surface-low border border-border rounded-base"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: 0.35,
+                        ease: "easeOut",
+                      }}
+                    >
+                      <TypographyXSmall className="text-muted-foreground wrap-break-word">
+                        {viewedFursona.bio}
                       </TypographyXSmall>
+                    </motion.div>
+                  )}
+
+                  <motion.div
+                    key="counts"
+                    className="flex-1 w-full pb-0 space-y-6"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
+                  >
+                    <div className="flex gap-3 sm:gap-6 justify-start">
+                      {[
+                        { count: follower, label: "Followers" },
+                        { count: following, label: "Following" },
+                        { count: like, label: "Likes" },
+                      ].map(({ count, label }) => (
+                        <div key={label} className="text-center">
+                          <TypographyLead className="font-bold text-lg sm:text-xl">
+                            {formatNumbers(count)}
+                          </TypographyLead>
+
+                          <TypographyXSmall className="text-muted-foreground text-xs">
+                            {label}
+                          </TypographyXSmall>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </motion.div>
+
+                  {/*  Profile content */}
+                  <div className="container flex flex-col mx-auto">
+                    {/* Nav */}
+                    <nav className="space-y-2">
+                      <ul className="flex gap-2 overflow-x-auto scrollbar-hide">
+                        {profileNav.map(({ label, key }) => (
+                          <Button
+                            key={label}
+                            size="sm"
+                            variant="ghost"
+                            className={`justify-start rounded-none text-xs sm:text-sm ${content === key ? "bg-surface-container-highest" : ""}`}
+                            onClick={() => handleNavClick(key)}
+                          >
+                            {label}
+                          </Button>
+                        ))}
+                      </ul>
+                      <Separator className="h-[.5px]" />
+                    </nav>
+
+                    <AnimatePresence mode="popLayout" custom={direction}>
+                      <motion.section
+                        key={content}
+                        custom={direction}
+                        variants={slideVariants}
+                        initial="enter"
+                        animate="center"
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                        className="grow space-y-4 min-h-[calc(100svh-64px)] py-2 lg:overflow-y-auto scrollbar-hide md:py-4"
+                      >
+                        {content === "post" && (
+                          <ProfilePostCards username={viewedFursona.id} />
+                        )}
+                        {content === "gallery" && (
+                          <div>Gallery coming soon</div>
+                        )}
+                        {content === "archive" && (
+                          <div>Archive coming soon</div>
+                        )}
+                        {content === "likes" && <div>Likes coming soon</div>}
+                      </motion.section>
+                    </AnimatePresence>
+                  </div>
                 </div>
-              </motion.div>
+
+                <aside className="hidden sticky top-20 flex-col w-125 h-[calc(100svh-96px)] gap-5 md:flex">
+                  <div className="bg-surface-low animate-pulse w-full h-96 rounded-md shadow-lg" />
+
+                  <div className="bg-surface-low animate-pulse w-full h-full rounded-md shadow-lg" />
+                </aside>
+              </div>
             )}
           </AnimatePresence>
         </div>
       </section>
-
-      {/*  Profile content */}
-      <div className="container flex flex-col mx-auto">
-        {/* Nav */}
-        <nav className="space-y-2">
-          <ul className="flex gap-2 overflow-x-auto">
-            {profileNav.map(({ label, key }) => (
-              <Button
-                key={label}
-                size="sm"
-                variant="ghost"
-                className={`justify-start rounded-none text-xs sm:text-sm ${content === key ? "bg-surface-container-highest" : ""}`}
-                onClick={() => handleNavClick(key)}
-              >
-                {label}
-              </Button>
-            ))}
-          </ul>
-          <Separator className="h-[.5px]" />
-        </nav>
-
-        <AnimatePresence mode="popLayout" custom={direction}>
-          <motion.section
-            key={content}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="grow space-y-4 w-full min-h-[calc(100svh-64px)] lg:overflow-y-auto scrollbar-hide"
-          >
-            {content === "post" && <ProfilePostCards username={viewedFursona.id} />}
-            {content === "gallery" && <div>Gallery coming soon</div> }
-            {content === "repost" && <ProfileRepost username={viewedFursona?.username} />}
-            {content === "archive" && <div>Archive coming soon</div>}
-            {content === "likes" && <div>Likes coming soon</div>}
-          </motion.section>
-        </AnimatePresence>
-      </div>
 
       {/* Modals */}
       {isOwnProfile && viewedFursona && (
@@ -362,6 +402,6 @@ export default function ProfilePage() {
           onSave={handleEditSave}
         />
       )}
-    </>
+    </div>
   );
 }

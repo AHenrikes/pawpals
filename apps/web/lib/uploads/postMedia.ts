@@ -11,6 +11,27 @@ const ALLOWED_TYPES = [
 ];
 const MAX_SIZE = 20 * 1024 * 1024;
 
+let optimisticCounter = 0;
+
+function makeOptimisticId() {
+  const random = globalThis.crypto?.randomUUID;
+  if (typeof random === "function") return random.call(globalThis.crypto);
+
+  const fillRandom = globalThis.crypto?.getRandomValues;
+  if (typeof fillRandom === "function") {
+    const bytes = new Uint8Array(16);
+    fillRandom.call(globalThis.crypto, bytes);
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(
+      "",
+    );
+    return `tmp-${hex}`;
+  }
+
+  // Last-resort fallback for very old browsers with no Web Crypto API.
+  optimisticCounter += 1;
+  return `tmp-${Date.now()}-${optimisticCounter}`;
+}
+
 async function getImageDimensions(
   file: File,
 ): Promise<{ width: number; height: number }> {
@@ -66,7 +87,7 @@ export async function uploadPostMedia(
 
   const supabase = createClient();
   const ext = file.name.split(".").pop()?.toLowerCase();
-  const fileId = crypto.randomUUID();
+  const fileId = makeOptimisticId();
   const path = `${accountId}/${fursonaId}/${fileId}.${ext}`;
 
   const { error } = await supabase.storage

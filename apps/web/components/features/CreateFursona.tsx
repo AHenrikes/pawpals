@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
 import { useEffect, useState } from "react";
 import { Textarea } from "@repo/ui/textarea";
 import { useDebouncedCallback } from "use-debounce";

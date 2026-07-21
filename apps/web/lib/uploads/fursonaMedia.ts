@@ -2,6 +2,27 @@ import { createClient } from "@repo/supabase/client";
 
 type Bucket = "fursona-avatars" | "fursona-banners";
 
+let optimisticCounter = 0;
+
+function makeOptimisticId() {
+  const random = globalThis.crypto?.randomUUID;
+  if (typeof random === "function") return random.call(globalThis.crypto);
+
+  const fillRandom = globalThis.crypto?.getRandomValues;
+  if (typeof fillRandom === "function") {
+    const bytes = new Uint8Array(16);
+    fillRandom.call(globalThis.crypto, bytes);
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(
+      "",
+    );
+    return `tmp-${hex}`;
+  }
+
+  // Last-resort fallback for very old browsers with no Web Crypto API.
+  optimisticCounter += 1;
+  return `tmp-${Date.now()}-${optimisticCounter}`;
+}
+
 const BUCKET_CONFIG: Record<Bucket, { maxSize: number; mimeTypes: string[] }> =
   {
     "fursona-avatars": {
@@ -37,7 +58,7 @@ export async function uploadFursonaImage(
   }
 
   const supabase = createClient();
-  const fileId = crypto.randomUUID();
+  const fileId = makeOptimisticId();
   const ext = file.name.split(".").pop()?.toLowerCase();
 
   if (!ext || !ALL_EXTENSIONS.includes(ext)) {

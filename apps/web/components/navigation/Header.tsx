@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useMemo, useTransition } from "react";
-import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Skeleton } from "@repo/ui/skeleton";
@@ -31,17 +30,18 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
 import {
   TypographyH4,
   TypographyP,
   TypographySmall,
+  TypographyXSmall,
 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/dialogs/search/Searchbar";
 import { useIsCurrentPath, useCurrentPath } from "@/hooks/useCurrentPath";
 import { getInitials } from "@/utils/getInitials";
+import HomeTabs from "./HomeTabs";
 
 export default function Header() {
   const {
@@ -72,7 +72,6 @@ export default function Header() {
     startTransition(async () => {
       try {
         await switchCurrentFursona(id);
-
         const newCurrentFursona = fursonas.find((f) => f.id === id);
         toast(`Switched to ${newCurrentFursona?.display_name ?? "fursona"}`);
       } catch (err: unknown) {
@@ -83,8 +82,7 @@ export default function Header() {
         setSwitchingId(null);
         setIsMenuOpen(false);
 
-        // Wait for menu to close
-        setTimeout(() => {
+        window.setTimeout(() => {
           setIsFursonaListOpen(false);
         }, 350);
       }
@@ -98,6 +96,14 @@ export default function Header() {
 
     return "Account";
   }, [currentFursona?.display_name]);
+
+  const username = useMemo(() => {
+    if (currentFursona?.username) {
+      return currentFursona.username;
+    }
+
+    return "Username";
+  }, [currentFursona?.username]);
 
   function handleMenuOpenChange(nextOpen: boolean) {
     setIsMenuOpen(nextOpen);
@@ -122,7 +128,7 @@ export default function Header() {
   const count = fursonas.length;
 
   return (
-    <header className="sticky top-0 w-full h-16 border-b border-border bg-background backdrop-blur z-40">
+    <header className="sticky top-0 w-full h-16 border-b border-border backdrop-blur-sm z-40">
       <div className="flex h-full w-full items-center justify-between px-2 mx-auto md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
@@ -131,6 +137,8 @@ export default function Header() {
             <TypographyH4 className="text-primary">PAWPALS</TypographyH4>
           </Link>
         </div>
+
+        <HomeTabs />
 
         <div className="flex items-center gap-2">
           <Searchbar />
@@ -143,29 +151,25 @@ export default function Header() {
               {loading ? (
                 <Skeleton className="h-8 w-8 rounded-full" />
               ) : (
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"ghost"} className="p-0 focus-visible:ring-0">
-                    <Avatar size="sm">
-                      <AvatarImage
-                        src={`${currentFursona?.avatar_url}`}
-                        alt={displayName}
-                      />
+                <DropdownMenuTrigger>
+                  <Avatar size="sm">
+                    <AvatarImage
+                      src={`${currentFursona?.avatar_url}`}
+                      alt={displayName}
+                    />
 
-                      <AvatarFallback>
-                        {getInitials(displayName)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
+                    <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
               )}
 
               <DropdownMenuContent align="end" className="w-60 select-none">
                 <DropdownMenuGroup className="flex items-center gap-1">
-                  <DropdownMenuItem
-                    asChild
-                    className="flex w-full rounded-none"
-                  >
-                    <Link href={`/@${currentFursona?.username}`}>
+                  <DropdownMenuItem className="w-full">
+                    <Link
+                      href={`/@${currentFursona?.username}`}
+                      className="flex items-center w-full gap-2"
+                    >
                       <Avatar size="default">
                         <AvatarImage
                           src={`${currentFursona?.avatar_url}`}
@@ -177,7 +181,14 @@ export default function Header() {
                         </AvatarFallback>
                       </Avatar>
 
-                      <TypographySmall>{displayName}</TypographySmall>
+                      <div className="flex flex-col">
+                        <TypographySmall className="leading-none">
+                          {displayName}
+                        </TypographySmall>
+                        <TypographyXSmall className="text-muted-foreground">
+                          {username}
+                        </TypographyXSmall>
+                      </div>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
@@ -191,8 +202,11 @@ export default function Header() {
                     const Icon = li.icon;
 
                     return (
-                      <DropdownMenuItem key={li.label} asChild>
-                        <Link href={li.href}>
+                      <DropdownMenuItem key={li.label}>
+                        <Link
+                          href={li.href}
+                          className="flex items-center w-full gap-2"
+                        >
                           <Icon className="h-4 w-4" />
                           {li.label}
                         </Link>
@@ -258,35 +272,29 @@ export default function Header() {
                         );
                       })}
 
-                      { !loading && count < 3 ? (
-                          <DropdownMenuItem asChild className="mt-2">
-                            <Button
-                              variant={"outline"}
-                              onClick={() => setCreateFursonaOpen(true)}
-                              className="h-8 w-full my-2 rounded-full"
-                            >
-                              <PlusIcon className="h-4 w-4" />
-                              Create Fursona
-                            </Button>
-                          </DropdownMenuItem>
-                      ) : null }
+                      {!loading && count < 3 ? (
+                        <DropdownMenuItem
+                          className="mt-2"
+                          onClick={() => setCreateFursonaOpen(true)}
+                        >
+                          <PlusIcon className="h-4 w-4" />
+                          Create Fursona
+                        </DropdownMenuItem>
+                      ) : null}
                     </DropdownMenuGroup>
                   </CollapsibleContent>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuSub>
-                  <Button
-                    variant="outline"
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    variant="destructive"
                     onClick={() => signOut()}
-                    className="h-8 w-full my-2 rounded-full"
                   >
-                    <div>
-                      <span>Sign out</span>
-                    </div>
-                  </Button>
-                </DropdownMenuSub>
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </Collapsible>
           </DropdownMenu>

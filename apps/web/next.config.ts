@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
+const devImageHost = process.env.NEXT_PUBLIC_DEV_IMAGE_HOST;
+
 const nextConfig: NextConfig = {
+  allowedDevOrigins: [`${devImageHost}`],
+
   devIndicators: {
     position: "bottom-right",
   },
@@ -11,10 +15,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "external-content.duckduckgo.com",
       },
-      {
-        protocol: "http",
-        hostname: "192.168.1.219",
-      },
+      ...(devImageHost
+        ? [
+            {
+              protocol: "http" as const,
+              hostname: devImageHost,
+            },
+          ]
+        : []),
     ],
     qualities: [75, 85],
   },

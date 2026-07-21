@@ -56,7 +56,7 @@ export default function ForgotPasswordForm() {
       <main className="relative flex min-h-[calc(100svh-144px)] items-center justify-center overflow-hidden p-6 md:p-10 select-none">
         {/* Background Glow */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-24 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute left-1/2 top-24 h-125 w-125 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
         </div>
 
         <div className="w-full max-w-md">

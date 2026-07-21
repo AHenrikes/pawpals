@@ -3,7 +3,7 @@ import { UserProvider } from "@/providers/UserProvider";
 import { type Metadata } from "next";
 import Header from "@/components/navigation/Header";
 import MainNav from "@/components/navigation/MainNav";
-import Footer from "@/components/footer/Footer";
+import { HomeTabsProvider } from "@/providers/HomeTabsProvider";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -13,19 +13,15 @@ export default async function DashboardLayout({
   return (
     <div id="DashboardLayout">
       <UserProvider>
-        <SidebarProvider className="flex flex-col">
-          <Header />
-
-          <SidebarInset>
-            <MainNav />
-
-            <div className="w-full">
+        <HomeTabsProvider>
+          <SidebarProvider className="flex flex-col">
+            <Header />
+            <SidebarInset>
+              <MainNav />
               {children}
-
-              <Footer />
-            </div>
-          </SidebarInset>
-        </SidebarProvider>
+            </SidebarInset>
+          </SidebarProvider>
+        </HomeTabsProvider>
       </UserProvider>
     </div>
   );

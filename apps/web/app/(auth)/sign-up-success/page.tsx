@@ -11,16 +11,34 @@ import {
 import { TypographyH2, TypographyP } from "@repo/ui/typography";
 import Image from "next/image";
 
+// Use crypto-secure randomness when available; fall back to Math.random.
+const secureRandom = () => {
+  try {
+    if (typeof globalThis.crypto?.getRandomValues === "function") {
+      const arr = new Uint32Array(1);
+      globalThis.crypto.getRandomValues(arr);
+      // Divide by max uint32 to get [0, 1)
+      return (arr[0] ?? 0) / 0xffffffff;
+    }
+  } catch {
+    // Fall through to Math.random()
+  }
+  return Math.random();
+};
+
+const randRange = (min: number, max: number) =>
+  min + secureRandom() * (max - min);
+
 const confettiPieces = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  x: Math.random() * 100,
-  delay: Math.random() * 0.6,
-  duration: 1.2 + Math.random() * 0.8,
-  rotate: Math.random() * 360,
+  x: randRange(0, 100),
+  delay: randRange(0, 0.6),
+  duration: randRange(1.2, 2.0),
+  rotate: randRange(0, 360),
   color: ["#7C6FFF", "#4FFFA4", "#FF6B9D", "#FFD166", "#4FC3F7"][
-    Math.floor(Math.random() * 5)
+    Math.floor(randRange(0, 5))
   ],
-  size: 6 + Math.random() * 8,
+  size: randRange(6, 14),
 }));
 
 export default function SignUpSuccess() {

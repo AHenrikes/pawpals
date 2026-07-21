@@ -35,10 +35,7 @@ export function Searchbar() {
         <Kbd>Ctl+k</Kbd>
       </Button>
 
-      <SearchDialog
-        open={open}
-        onClose={() => setOpen(false)}
-      />
+      <SearchDialog open={open} onClose={() => setOpen(false)} />
     </>
   );
 }

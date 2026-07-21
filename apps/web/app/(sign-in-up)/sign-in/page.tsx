@@ -2,7 +2,7 @@
 
 import { Card, CardHeader } from "@repo/ui/card";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
-import { FormError } from "@repo/ui/form-error";
+import { FormError } from "@/components/ui/form-error";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { Circle, MessagesSquare } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
 import Link from "next/link";
+import { validateSignIn } from "@/lib/validation/auth";
 
 export default function SignIn() {
   const router = useRouter();
@@ -27,11 +28,12 @@ export default function SignIn() {
 
       router.replace(AUTH_ROUTES.HOME);
     },
+    { validate: validateSignIn },
   );
 
   return (
     <section className="flex items-center justify-center px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
-      <Card className="w-full max-w-[640px]">
+      <Card className="w-full max-w-160">
         <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
           <Link
             href={AUTH_ROUTES.SIGN_UP}
@@ -92,10 +94,7 @@ export default function SignIn() {
 
             <FormError message={error} className="pb-4" />
 
-            <Button
-              type="submit"
-              className="h-10 rounded-full"
-            >
+            <Button type="submit" className="h-10 rounded-full">
               <span>Sign in</span>
             </Button>
           </FieldGroup>

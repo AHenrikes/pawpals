@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+const NO_STORE_HEADERS = {
+  "Cache-Control": "private, no-store, max-age=0, must-revalidate",
+};
+
 /**
  * Centralized API response utilities for consistent error handling.
  * Prevents duplication and ensures uniform status codes across routes.
@@ -31,4 +35,11 @@ export function created<T>(data: T) {
 
 export function ok<T>(data: T) {
   return NextResponse.json(data, { status: 200 });
+}
+
+export function okNoStore<T>(data: T) {
+  return NextResponse.json(data, {
+    status: 200,
+    headers: NO_STORE_HEADERS,
+  });
 }

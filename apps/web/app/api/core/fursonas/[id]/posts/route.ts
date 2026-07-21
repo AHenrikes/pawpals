@@ -4,6 +4,7 @@ import {
   badRequest,
   notFound,
   ok,
+  okNoStore,
   serverError,
   unauthorized,
 } from "@/lib/api/responses";
@@ -84,14 +85,14 @@ export async function GET(
 
   const hasMore = data.length > limit;
   const posts = (hasMore ? data.slice(0, limit) : data) as PostType[];
-  
+
   const lastPostCreatedAt = posts.at(-1)?.created_at
     ? new Date(posts.at(-1)!.created_at).toISOString()
     : null;
 
   const nextCursor = hasMore ? lastPostCreatedAt : null;
 
-  return ok<{ posts: PostType[]; nextCursor: string | null }>({
+  return okNoStore<{ posts: PostType[]; nextCursor: string | null }>({
     posts,
     nextCursor,
   });

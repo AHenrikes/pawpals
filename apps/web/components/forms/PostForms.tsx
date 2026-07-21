@@ -35,7 +35,15 @@ import { type MediaItem } from "@/types/post";
 import { Button } from "@repo/ui/button";
 import { TypographyP, TypographySmall } from "@repo/ui/typography";
 import { Input } from "@repo/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/dropdown-menu";
+import { getOrderedVisible } from "@/lib/mediaLayout";
+import { type MediaWithOrientation } from "@/lib/mediaLayout";
 
 const VISIBILITY_OPTIONS: {
   value: Visibility;
@@ -70,29 +78,17 @@ function getCharClass(used: number) {
 // ─── Shared media item renderer ───────────────────────────────────────────────
 function MediaItem({
   preview,
-  index,
-  single,
+  displayIndex,
   onRemove,
   className,
 }: Readonly<{
-  preview: MediaItem;
-  index: number;
-  single?: boolean;
+  preview: MediaWithOrientation;
+  displayIndex: number;
   onRemove: (i: number) => void;
   className?: string;
 }>) {
   return (
-    <div
-      className={cn("group relative overflow-hidden bg-black", className)}
-      style={
-        single
-          ? {
-              aspectRatio: `${preview.width}/${preview.height}`,
-              maxHeight: "60svh",
-            }
-          : undefined
-      }
-    >
+    <div className={cn("group relative overflow-hidden bg-black", className)}>
       {preview.type === "video" ? (
         <video
           src={preview.url}
@@ -105,22 +101,24 @@ function MediaItem({
       ) : (
         <Image
           src={preview.url}
-          alt={`Media ${index + 1}`}
-          fill
-          quality={100}
-          className="object-cover"
+          alt={`Media ${displayIndex + 1}`}
+          width={preview.width}
+          height={preview.height}
+          quality={85}
+          className="object-cover w-full h-full"
         />
       )}
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <Button
         type="button"
         variant={"destructive"}
         size={"icon"}
-        onClick={() => onRemove(index)}
-        aria-label={`Remove media ${index + 1}`}
+        // preview.originalIndex, not displayIndex — removeMedia needs the index
+        // in the *original* mediaPreviews array, since layout reorders items.
+        onClick={() => onRemove(preview.originalIndex)}
+        aria-label={`Remove media ${displayIndex + 1}`}
         className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-black hover:scale-110"
       >
         <XIcon className="h-3 w-3" />
@@ -133,82 +131,31 @@ function MediaItem({
 function MediaGrid({
   previews,
   onRemove,
-  // onAdd,
 }: Readonly<{
   previews: MediaItem[];
   onRemove: (i: number) => void;
   onAdd: () => void;
 }>) {
-  const count = previews.length;
+  const { visible, container, img } = getOrderedVisible(
+    previews,
+    POST_MAX_MEDIA,
+  );
 
-  if (count === 1) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-4 bg-black/5 overflow-hidden">
-        <MediaItem
-          preview={previews[0]!}
-          index={0}
-          single
-          onRemove={onRemove}
-          className="w-full"
-        />
-      </div>
-    );
-  }
-
-  if (count === 2) {
-    return (
-      <div className="flex-1 grid grid-cols-2 gap-1 p-4">
-        {previews.map((p, i) => (
+  return (
+    <div className="flex items-center h-full overflow-hidden">
+      <div
+        className={`relative ${container} w-full max-w-360 max-h-[60svh] bg-black/50 overflow-hidden`}
+      >
+        {visible.map((item, index) => (
           <MediaItem
-            key={p.url}
-            preview={p}
-            index={i}
+            key={`${item.type}-${item.originalIndex}`}
+            preview={item}
+            displayIndex={index}
             onRemove={onRemove}
+            className={img[index] ?? ""}
           />
         ))}
       </div>
-    );
-  }
-
-  if (count === 3) {
-    return (
-      <div
-        className="flex-1 grid grid-cols-2 gap-1 p-4"
-        style={{ gridTemplateRows: "1fr 1fr" }}
-      >
-        <MediaItem
-          key={previews[0]!.url}
-          preview={previews[0]!}
-          index={0}
-          onRemove={onRemove}
-          className="row-span-2"
-        />
-        <MediaItem
-          key={previews[1]!.url}
-          preview={previews[1]!}
-          index={1}
-          onRemove={onRemove}
-        />
-        <MediaItem
-          key={previews[2]!.url}
-          preview={previews[2]!}
-          index={2}
-          onRemove={onRemove}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-1 grid grid-cols-2 gap-1 p-4">
-      {previews.map((p, i) => (
-        <MediaItem
-          key={p.url}
-          preview={p}
-          index={i}
-          onRemove={onRemove}
-        />
-      ))}
     </div>
   );
 }
@@ -228,7 +175,7 @@ function MobileMediaStrip({
       {previews.map((p, i) => (
         <div
           key={p.url}
-          className="group relative flex-shrink-0 overflow-hidden rounded-xl bg-black"
+          className="group relative shrink-0 overflow-hidden rounded-xl bg-black"
           style={{ width: 72, height: 72 }}
         >
           {p.type === "video" ? (
@@ -243,6 +190,7 @@ function MobileMediaStrip({
               src={p.url}
               alt={`Media ${i + 1}`}
               fill
+              sizes="72px"
               quality={90}
               className="object-cover"
             />
@@ -264,10 +212,10 @@ function MobileMediaStrip({
         <Button
           type="button"
           size={"icon"}
-          variant={"none"}
+          variant={"ghost"}
           onClick={onAdd}
           style={{ width: 72, height: 72 }}
-          className="flex-shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5 text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5 text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
         >
           <PlusIcon className="h-4 w-4" />
           <span>Add</span>
@@ -333,7 +281,7 @@ export default function PostForm({
       style={{ gridTemplateColumns: "1fr 400px" }}
     >
       {/* ── LEFT: media panel (desktop) ── */}
-      <div className="hidden lg:flex relative flex-col h-[70svh] border-r border-border bg-black/[0.02]">
+      <div className="hidden lg:flex relative flex-col h-[70svh] border-r border-border bg-black/2">
         {mediaPreviews.length === 0 ? (
           <motion.button
             type="button"
@@ -412,11 +360,12 @@ export default function PostForm({
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-border">
           <div className="flex items-center gap-2.5">
             {currentFursona?.avatar_url && (
-              <div className="relative h-9 w-9 overflow-hidden rounded-full flex-shrink-0">
+              <div className="relative h-9 w-9 overflow-hidden rounded-full shrink-0">
                 <Image
                   src={currentFursona.avatar_url}
                   alt={currentFursona.username ?? ""}
                   fill
+                  sizes="36px"
                   className="object-cover"
                 />
               </div>
@@ -479,7 +428,7 @@ export default function PostForm({
           ) : (
             <Button
               type="button"
-              size={"iconPair"}
+              size={"icon"}
               variant={"ghost"}
               onClick={openFilePicker}
               className="w-full h-full gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -510,7 +459,7 @@ export default function PostForm({
             placeholder={placeholder}
             maxLength={POST_MAX_CHARS}
             rows={4}
-            className="w-full flex-1 px-4 py-2 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground outline-none"
+            className="w-full flex-1 px-4 py-2 resize-none bg-transparent text-sm leading-relaxed text-foreground placeholder:text-muted-foreground outline-hidden"
             style={{
               caretColor: "hsl(var(--primary))",
               fontFamily: "var(--font-body)",
@@ -533,7 +482,7 @@ export default function PostForm({
               <Button
                 type="button"
                 key={label}
-                size={"iconPair"}
+                size={"icon"}
                 variant={"ghost"}
                 className="w-full text-muted-foreground hover:opacity-70 transition-opacity"
               >
@@ -559,7 +508,7 @@ export default function PostForm({
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
-                  size={"iconPair"}
+                  size={"icon"}
                   variant={"outline"}
                   onClick={() => setVisOpen((v) => !v)}
                   aria-expanded={visOpen}
@@ -586,7 +535,7 @@ export default function PostForm({
                       >
                         <Button
                           type="button"
-                          size={"iconPair"}
+                          size={"icon"}
                           variant={"ghost"}
                           onClick={() => {
                             setVisibility(value);
@@ -631,7 +580,7 @@ export default function PostForm({
 
           <Button
             type="submit"
-            size={"iconPair"}
+            size={"icon"}
             disabled={
               loading || (!content.trim() && mediaPreviews.length === 0)
             }
