@@ -20,6 +20,7 @@ import { createPortal } from "react-dom";
 import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
 
 import { cn } from "./lib/utils";
+import { toast } from "sonner";
 
 const defaultStyles = {
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
@@ -770,7 +771,7 @@ function MarkerLabel({
   children,
   className,
   position = "top",
-}: MarkerLabelProps) {
+}: Readonly<MarkerLabelProps>) {
   const positionClasses = {
     top: "bottom-full mb-1",
     bottom: "top-full mt-1",
@@ -814,7 +815,7 @@ const positionClasses = {
   "bottom-right": "bottom-10 right-2",
 };
 
-function ControlGroup({ children }: { children: React.ReactNode }) {
+function ControlGroup({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="border-border bg-background [&>button:not(:last-child)]:border-border flex flex-col overflow-hidden rounded-md border shadow-sm [&>button:not(:last-child)]:border-b">
       {children}
@@ -827,12 +828,12 @@ function ControlButton({
   label,
   children,
   disabled = false,
-}: {
+}: Readonly<{
   onClick: () => void;
   label: string;
   children: React.ReactNode;
   disabled?: boolean;
-}) {
+}>) {
   return (
     <button
       onClick={onClick}
@@ -860,7 +861,7 @@ function MapControls({
   showFullscreen = false,
   className,
   onLocate,
-}: MapControlsProps) {
+}: Readonly<MapControlsProps>) {
   const { map } = useMap();
   const [waitingForLocation, setWaitingForLocation] = useState(false);
 
@@ -894,12 +895,17 @@ function MapControls({
         setWaitingForLocation(false);
       },
       (error) => {
-        console.error("Error getting location:", error);
+        if (error.code === error.PERMISSION_DENIED) {
+          toast.error("Location access denied — you can search for your area instead.");
+        } else {
+          toast.error("Could not pin point your location. Try again later!")
+          console.error("Error getting location:", error);
+        }
         setWaitingForLocation(false);
       },
       // Without a timeout the spec default is Infinity: a dismissed permission
       // prompt would leave the button disabled forever.
-      { timeout: 10000 },
+      { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 },
     );
   }, [map, onLocate]);
 
@@ -962,7 +968,7 @@ function MapControls({
   );
 }
 
-function CompassButton({ onClick }: { onClick: () => void }) {
+function CompassButton({ onClick }: Readonly<{ onClick: () => void }>) {
   const { map } = useMap();
   const compassRef = useRef<SVGSVGElement>(null);
 

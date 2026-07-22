@@ -10,8 +10,8 @@ import { Input } from "@repo/ui/input";
 import { useRouter } from "next/navigation";
 import { Circle, MessagesSquare } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
-import Link from "next/link";
 import { validateSignIn } from "@/lib/validation/auth";
+import Link from "next/link";
 
 export default function SignIn() {
   const router = useRouter();
