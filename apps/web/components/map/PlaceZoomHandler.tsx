@@ -5,7 +5,7 @@ import { useMap } from "@repo/ui/map";
 import type maplibregl from "maplibre-gl";
 
 interface PlaceZoomHandlerProps {
-  currenPos: [lng: number, lat: number]
+  currentPos: [lng: number, lat: number];
 }
 
 // Reasonable zoom targets per OpenMapTiles place "class"
@@ -24,7 +24,9 @@ const ZOOM_BY_CLASS: Record<string, number> = {
   isolated_dwelling: 13,
 };
 
-export function PlaceZoomHandler({currenPos} : Readonly<PlaceZoomHandlerProps>) {
+export function PlaceZoomHandler({
+  currentPos,
+}: Readonly<PlaceZoomHandlerProps>) {
   const { map, isLoaded } = useMap();
 
   useEffect(() => {
@@ -39,9 +41,13 @@ export function PlaceZoomHandler({currenPos} : Readonly<PlaceZoomHandlerProps>) 
       const placeClass = placeFeature.properties?.class as string | undefined;
       const targetZoom = placeClass ? (ZOOM_BY_CLASS[placeClass] ?? 12) : 12;
 
-      if (currenPos[0] === lng && currenPos[1] === lat) return;
+      if (currentPos[0] === lng && currentPos[1] === lat) return;
 
-      map.flyTo({ center: [lng ?? 0, lat ?? 0], zoom: targetZoom, duration: 1200 });
+      map.flyTo({
+        center: [lng ?? 0, lat ?? 0],
+        zoom: targetZoom,
+        duration: 1200,
+      });
     };
 
     const handleMouseMove = (e: maplibregl.MapMouseEvent) => {
@@ -58,7 +64,7 @@ export function PlaceZoomHandler({currenPos} : Readonly<PlaceZoomHandlerProps>) 
       map.off("click", handleClick);
       map.off("mousemove", handleMouseMove);
     };
-  }, [map, isLoaded]);
+  }, [map, isLoaded, currentPos]);
 
   return null;
 }

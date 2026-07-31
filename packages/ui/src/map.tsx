@@ -896,9 +896,11 @@ function MapControls({
       },
       (error) => {
         if (error.code === error.PERMISSION_DENIED) {
-          toast.error("Location access denied — you can search for your area instead.");
+          toast.error(
+            "Location access denied — you can search for your area instead.",
+          );
         } else {
-          toast.error("Could not pin point your location. Try again later!")
+          toast.error("Could not pin point your location. Try again later!");
           console.error("Error getting location:", error);
         }
         setWaitingForLocation(false);

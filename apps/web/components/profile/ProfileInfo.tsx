@@ -2,7 +2,11 @@ import { FursonaProfile } from "@/types/fursona";
 import { getInitials } from "@/utils/getInitials";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { TypographyH1, TypographyP, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
+import {
+  TypographyH1,
+  TypographyP,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 import { Skeleton } from "@repo/ui/skeleton";
 
 interface ProfileInfoProps {
@@ -10,7 +14,10 @@ interface ProfileInfoProps {
   loading: boolean;
 }
 
-export default function ProfileInfo({ fursona, loading } : Readonly<ProfileInfoProps> ) {
+export default function ProfileInfo({
+  fursona,
+  loading,
+}: Readonly<ProfileInfoProps>) {
   return (
     <AnimatePresence mode="wait">
       {loading ? (
@@ -41,9 +48,7 @@ export default function ProfileInfo({ fursona, loading } : Readonly<ProfileInfoP
               src={fursona.avatar_url ?? undefined}
               alt={fursona.display_name}
             />
-            <AvatarFallback>
-              {getInitials(fursona.display_name)}
-            </AvatarFallback>
+            <AvatarFallback>{getInitials(fursona.display_name)}</AvatarFallback>
           </Avatar>
 
           <div className="space-y-1 px-2 md:mt-10">
@@ -58,9 +63,7 @@ export default function ProfileInfo({ fursona, loading } : Readonly<ProfileInfoP
             </div>
 
             <div className="flex items-center space-x-2">
-              <TypographyXSmall
-                className="text-muted-foreground/50"
-              >
+              <TypographyXSmall className="text-muted-foreground/50">
                 {new Date(fursona.created_at).toLocaleDateString()}
               </TypographyXSmall>
 
@@ -72,10 +75,9 @@ export default function ProfileInfo({ fursona, loading } : Readonly<ProfileInfoP
             </div>
           </div>
 
-          <div>
-          </div>
+          <div></div>
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

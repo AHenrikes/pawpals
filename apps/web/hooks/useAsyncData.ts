@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toError } from "@/lib/helpers/error-utils";
 
 /**
@@ -27,13 +27,16 @@ export function useAsyncData<T>(
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    fetcher()
+    fetcherRef
+      .current()
       .then((result) => {
         if (!cancelled) setData(result);
       })
@@ -81,13 +84,18 @@ export function useAsyncDataWithCache<T>(
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const fetcherRef = useRef(fetcher);
+  const cacheGetterRef = useRef(cacheGetter);
+  fetcherRef.current = fetcher;
+  cacheGetterRef.current = cacheGetter;
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    cacheGetter(fetcher)
+    cacheGetterRef
+      .current(fetcherRef.current)
       .then((result) => {
         if (!cancelled) setData(result);
       })

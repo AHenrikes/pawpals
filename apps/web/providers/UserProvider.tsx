@@ -11,7 +11,7 @@ import React, {
 } from "react";
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
-import { createClient } from "@repo/supabase/client";
+import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { makeCache } from "@/lib/helpers/profile-cache";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useRouter } from "next/navigation";
@@ -35,7 +35,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const supabase = createClient();
+  const supabase = useSupabaseClient();
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
   const fursonasCacheRef = useRef(makeCache<FursonaTypes[]>());

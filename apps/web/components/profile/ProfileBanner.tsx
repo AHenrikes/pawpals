@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@repo/ui/skeleton";
 import { Button } from "@repo/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
@@ -12,7 +12,10 @@ interface ProfileBannerProps {
   loading: boolean;
 }
 
-export default function Banner({ fursona, loading } : Readonly<ProfileBannerProps>) {
+export default function Banner({
+  fursona,
+  loading,
+}: Readonly<ProfileBannerProps>) {
   const router = useRouter();
 
   return (
@@ -64,5 +67,5 @@ export default function Banner({ fursona, loading } : Readonly<ProfileBannerProp
         )}
       </AnimatePresence>
     </>
-  )
+  );
 }

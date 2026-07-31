@@ -7,6 +7,7 @@ interface CacheEntry<T> {
 
 export function makeCache<T>(ttl = 10 * 60 * 1000) {
   const map = new Map<string, CacheEntry<T>>();
+  const inFlight = new Map<string, Promise<T>>();
 
   function isExpired(entry: CacheEntry<T>): boolean {
     return Date.now() - entry.timestamp >= ttl;
@@ -14,12 +15,27 @@ export function makeCache<T>(ttl = 10 * 60 * 1000) {
 
   return {
     async get(key: string, fetcher: Fetcher<T>): Promise<T> {
+      this.prune();
       const entry = map.get(key);
-      if (entry && !isExpired(entry)) return entry.value;
+      if (entry) {
+        if (!isExpired(entry)) return entry.value;
+        map.delete(key);
+      }
 
-      const value = await fetcher();
-      map.set(key, { value, timestamp: Date.now() });
-      return value;
+      const pending = inFlight.get(key);
+      if (pending) return pending;
+
+      const request = fetcher().then((value) => {
+        map.set(key, { value, timestamp: Date.now() });
+        return value;
+      });
+      inFlight.set(key, request);
+
+      try {
+        return await request;
+      } finally {
+        inFlight.delete(key);
+      }
     },
 
     set(key: string, value: T): void {
@@ -51,6 +67,7 @@ export function makeCache<T>(ttl = 10 * 60 * 1000) {
 
     clear(): void {
       map.clear();
+      inFlight.clear();
     },
 
     get size(): number {
@@ -58,3 +75,7 @@ export function makeCache<T>(ttl = 10 * 60 * 1000) {
     },
   };
 }
+
+export const fursonaCache = makeCache<
+  import("@/types/fursona").FursonaTypes | null
+>();

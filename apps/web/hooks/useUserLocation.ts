@@ -14,7 +14,8 @@ async function getIpFallbackLocation(): Promise<UserLocation | null> {
     const res = await fetch("https://ipapi.co/json/");
     if (!res.ok) return null;
     const data = await res.json();
-    if (typeof data.latitude !== "number" || typeof data.longitude !== "number") return null;
+    if (typeof data.latitude !== "number" || typeof data.longitude !== "number")
+      return null;
     return { lng: data.longitude, lat: data.latitude };
   } catch {
     return null;
@@ -58,34 +59,43 @@ export function useUserLocation() {
     writeCached(loc);
   }, []);
 
-  const locate = useCallback((opts?: { highAccuracy?: boolean }) => {
-    if (!("geolocation" in navigator)) {
-      setError("Geolocation isn't supported in this browser.");
-      return;
-    }
-    setIsLocating(true);
-    setError(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (cancelledRef.current) return;
-        setLocation({ lng: pos.coords.longitude, lat: pos.coords.latitude });
-        setIsLocating(false);
-      },
-      async (err) => {
-        if (cancelledRef.current) return;
-        setIsLocating(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          setError("Location access was denied — showing an approximate location instead.");
-        }
-        const ipLoc = await getIpFallbackLocation();
-        if (!cancelledRef.current && ipLoc) {
-          setLocationState(ipLoc);
-          setSource("ip");
-        }
-      },
-      { timeout: 10000, enableHighAccuracy: opts?.highAccuracy ?? true, maximumAge: 0 },
-    );
-  }, [setLocation]);
+  const locate = useCallback(
+    (opts?: { highAccuracy?: boolean }) => {
+      if (!("geolocation" in navigator)) {
+        setError("Geolocation isn't supported in this browser.");
+        return;
+      }
+      setIsLocating(true);
+      setError(null);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (cancelledRef.current) return;
+          setLocation({ lng: pos.coords.longitude, lat: pos.coords.latitude });
+          setIsLocating(false);
+        },
+        async (err) => {
+          if (cancelledRef.current) return;
+          setIsLocating(false);
+          if (err.code === err.PERMISSION_DENIED) {
+            setError(
+              "Location access was denied — showing an approximate location instead.",
+            );
+          }
+          const ipLoc = await getIpFallbackLocation();
+          if (!cancelledRef.current && ipLoc) {
+            setLocationState(ipLoc);
+            setSource("ip");
+          }
+        },
+        {
+          timeout: 10000,
+          enableHighAccuracy: opts?.highAccuracy ?? true,
+          maximumAge: 0,
+        },
+      );
+    },
+    [setLocation],
+  );
 
   useEffect(() => {
     cancelledRef.current = false;
@@ -101,5 +111,12 @@ export function useUserLocation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { location: locationState, source, error, isLocating, locate, setLocation };
+  return {
+    location: locationState,
+    source,
+    error,
+    isLocating,
+    locate,
+    setLocation,
+  };
 }

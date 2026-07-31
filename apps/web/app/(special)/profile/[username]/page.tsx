@@ -7,10 +7,7 @@ import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { useFollow } from "@/hooks/social/followers/useFollow";
-import {
-  TypographyLead,
-  TypographyXSmall,
-} from "@repo/ui/typography";
+import { TypographyLead, TypographyXSmall } from "@repo/ui/typography";
 import { EllipsisVerticalIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
