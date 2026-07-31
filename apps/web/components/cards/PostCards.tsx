@@ -55,7 +55,7 @@ const PostCard = memo(function PostCard({
   return (
     <article
       className={`
-      flex flex-col max-h-[90svh] max-w-360 py-3 gap-3 transition-colors
+      flex flex-col max-h-[90svh] py-3 gap-3 transition-colors
       md:border md:border-border md:rounded-md md:shadow-md hover:bg-muted/30
       ${isLast ? "" : "border-b border-border"}
     `}
@@ -242,7 +242,7 @@ export default function ProfileLists({
         {skeletonItems.map((skeletonId) => (
           <div
             key={skeletonId}
-            className="flex flex-col max-h-[90svh] max-w-360 py-3 gap-3 animate-pulse"
+            className="flex flex-col max-h-[90svh] py-3 gap-3 animate-pulse"
           >
             <div className="flex justify-between items-center px-3">
               <div className="flex items-center gap-2">

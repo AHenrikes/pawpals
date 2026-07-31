@@ -6,28 +6,25 @@ import { useUser } from "@/providers/UserProvider";
 import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { useFollow } from "@/hooks/social/followers/useFollow";
 import {
-  TypographyH2,
   TypographyLead,
-  TypographySmall,
   TypographyXSmall,
 } from "@repo/ui/typography";
-import { ArrowLeftIcon, EllipsisVerticalIcon, MailIcon } from "lucide-react";
+import { EllipsisVerticalIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { Skeleton } from "@repo/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProfilePostCards } from "@/components/cards/PostCards";
-import { getInitials } from "@/utils/getInitials";
-import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
 import { type FursonaProfile, FursonaTypes } from "@/types/fursona";
+import Banner from "@/components/profile/ProfileBanner";
+import ProfileInfo from "@/components/profile/ProfileInfo";
+import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
 import ProfileDropdown from "@/components/dropdowns/Profile";
-import Image from "next/image";
 
 function formatNumbers(count: number): string {
   if (count < 1000) return `${count}`;
@@ -63,8 +60,6 @@ export default function ProfilePage() {
 
   const { following, follower, refetch, like } = useProfileCounts(id);
   const { isFollowing, toggle: follow, loading: followLoading } = useFollow(id);
-
-  const router = useRouter();
 
   const isLoading = isOwnProfile
     ? userLoading || !currentFursona
@@ -113,161 +108,63 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex-1 w-full">
+    <div className="flex-1 w-full bg-background">
       {/* Banner */}
-      <AnimatePresence mode="wait">
-        {isLoading ? (
-          <motion.section
-            key="banner-skeleton"
-            exit={{ opacity: 0 }}
-            className="relative w-full h-64 sm:h-96 md:h-125"
-          >
-            <Skeleton className="h-full" />
-          </motion.section>
-        ) : (
-          <motion.section
-            key="banner-content"
-            className="relative w-full h-64 sm:h-96 md:h-125"
-            initial={{ opacity: 0, scale: 0.99 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <div className="w-full h-16 p-1 lg:p-4 z-30">
-              <Button
-                size={"icon"}
-                variant={"outline"}
-                onClick={() => router.back()}
-                className="p-1 text-primary backdrop-blur-blur"
-              >
-                <ArrowLeftIcon size={24} />
-              </Button>
-            </div>
-
-            {viewedFursona.banner_url && (
-              <Image
-                src={viewedFursona.banner_url}
-                alt={`${viewedFursona.display_name}'s banner`}
-                fill
-                quality={85}
-                loading="lazy"
-                className="object-cover pointer-events-none z-10"
-              />
-            )}
-
-            <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black pointer-events-none z-20" />
-          </motion.section>
-        )}
-      </AnimatePresence>
+      <Banner fursona={viewedFursona} loading={isLoading} />
 
       {/* Profile header */}
       <section className="px-2 py-4 sm:container sm:mx-auto md:px-4">
         <div className="relative -mt-16 space-y-6 sm:-mt-20 md:-mt-24 z-20">
-          <AnimatePresence mode="wait">
-            {isLoading ? (
-              <motion.div
-                key="avatar-skeleton"
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-4"
-              >
-                <Skeleton className="animate-none h-32 w-32 rounded-full sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg shrink-0" />
-                <div className="min-w-0 mb-4 space-y-2">
-                  <Skeleton className="h-9 w-52 animate-none border-2 border-background" />
-                  <Skeleton className="h-4 w-40 animate-none border-2 border-background" />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="avatar-content"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-                className="flex flex-col"
-              >
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-2">
-                    <Avatar
-                      size="lg"
-                      className="h-32 w-32 sm:h-36 sm:w-36 md:h-44 md:w-44 lg:h-48 lg:w-48 border-4 border-background shadow-lg shrink-0"
+          <div className="flex justify-between">
+            <ProfileInfo fursona={viewedFursona} loading={isLoading} />
+
+            <div className="relative top-4 flex items-center gap-4">
+              {isOwnProfile ? (
+                <Button onClick={() => setIsEditOpen(true)}>
+                  <p>Edit Profile</p>
+                </Button>
+              ) : (
+                <>
+                  {isFollowing && (
+                    <Button
+                      size={"icon"}
+                      variant={"secondary"}
+                      className="p-2.5"
                     >
-                      <AvatarImage
-                        src={viewedFursona.avatar_url ?? undefined}
-                        alt={viewedFursona.display_name}
-                      />
-                      <AvatarFallback>
-                        {getInitials(viewedFursona.display_name)}
-                      </AvatarFallback>
-                    </Avatar>
+                      <MailIcon size={18} />
+                    </Button>
+                  )}
 
-                    <div className="hidden relative px-2 top-5 sm:flex flex-1 flex-col sm:max-w-52 xl:max-w-full">
-                      <TypographyH2 className="truncate text-xl sm:text-2xl">
-                        {viewedFursona.display_name}
-                      </TypographyH2>
+                  <Button
+                    onClick={() => {
+                      follow();
 
-                      <TypographySmall className="text-muted-foreground truncate">
-                        @{viewedFursona.username}
-                      </TypographySmall>
-                    </div>
-                  </div>
+                      setTimeout(() => {
+                        refetch();
+                      }, 350);
+                    }}
+                    disabled={followLoading}
+                  >
+                    {followLoading ? "..." : followLabel}
+                  </Button>
 
-                  <div className="relative top-4 flex items-center gap-4">
-                    {isOwnProfile ? (
-                      <Button onClick={() => setIsEditOpen(true)}>
-                        <p>Edit Profile</p>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size={"icon"}
+                        variant={"outline"}
+                        className="p-2.5"
+                      >
+                        <EllipsisVerticalIcon className="size-4" />
                       </Button>
-                    ) : (
-                      <>
-                        {isFollowing && (
-                          <Button
-                            size={"icon"}
-                            variant={"secondary"}
-                            className="p-2.5"
-                          >
-                            <MailIcon size={18} />
-                          </Button>
-                        )}
+                    </DropdownMenuTrigger>
 
-                        <Button
-                          onClick={() => {
-                            follow();
-
-                            setTimeout(() => {
-                              refetch();
-                            }, 350);
-                          }}
-                          disabled={followLoading}
-                        >
-                          {followLoading ? "..." : followLabel}
-                        </Button>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              size={"icon"}
-                              variant={"outline"}
-                              className="p-2.5"
-                            >
-                              <EllipsisVerticalIcon className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-
-                          <ProfileDropdown />
-                        </DropdownMenu>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="px-2 sm:hidden">
-                  <TypographyH2 className="text-xl sm:text-2xl truncate">
-                    {viewedFursona.display_name}
-                  </TypographyH2>
-                  <TypographySmall className="text-muted-foreground">
-                    @{viewedFursona.username}
-                  </TypographySmall>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    <ProfileDropdown />
+                  </DropdownMenu>
+                </>
+              )}
+            </div>
+          </div>
 
           <AnimatePresence mode="wait">
             {isLoading ? (

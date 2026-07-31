@@ -32,7 +32,7 @@ export function Searchbar() {
         className={`p-1.5 ${open ? "hidden" : ""}`}
       >
         <SearchIcon size={18} />
-        <Kbd>Ctl+k</Kbd>
+        <Kbd className="hidden md:block">Ctl+k</Kbd>
       </Button>
 
       <SearchDialog open={open} onClose={() => setOpen(false)} />

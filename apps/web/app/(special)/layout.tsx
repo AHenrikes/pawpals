@@ -7,8 +7,8 @@ export default async function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div id="DashboardLayout">
-      <UserProvider>{children}</UserProvider>
-    </div>
+      <UserProvider>
+        {children}
+      </UserProvider>
   );
 }

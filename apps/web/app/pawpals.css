@@ -270,6 +270,8 @@
     --blur: 6rem;
 
     --background: 260, 45%, 7%;
+    /* --background: 280, 36%, 10%; */
+
     --foreground: 265, 75%, 95%;
 
     --surface: 264, 30%, 10%;
@@ -277,15 +279,29 @@
     --surface-container-highest: 264, 30%, 20%;
     --surface-variant: 265, 25%, 20%;
 
-    --primary: 270, 100%, 80%;
-    --primary-dim: 273, 80%, 60%;
+    /* --primary: 270, 100%, 80%; */
+    --primary: 277, 79%, 43%;
+
+    /* --primary-dim: 273, 80%, 60%; */
+    --primary-dim: 280, 85%, 31%;
+
     --primary-foreground: 266, 40%, 90%;
-    --secondary: 282, 40%, 55%;
+
+    /* --secondary: 282, 40%, 55%; */
+    --secondary: 280, 32%, 15%;
+
+    --secondary-dim: 280, 33%, 12%;
+    
     --secondary-foreground: 266, 35%, 80%;
-    --accent: 351, 50%, 55%;
+
+    /* --accent: 351, 50%, 55%; */
+    --accent: 280, 61%, 15%;
     --accent-foreground: 278, 25%, 65%;
 
-    --destructive: 357, 65%, 50%;
+    /* --destructive: 357, 65%, 50%; */
+    --destructive: 356, 90%, 30%;
+
+    --confirmative: 100, 66%, 24%;
 
     --card: var(--surface);
     --card-foreground: var(--foreground);
@@ -313,6 +329,7 @@
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
     --font-label: ;
 
+    --gradient-background: linear-gradient(135deg, hsl(var(--background)), hsl(var(--accent)));
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary-dim)), hsl(var(--primary-foreground)));
     --ambient-shadow: 0 10px 20px hsl(var(--primary-dim)), 0 5px 15px hsl(var(--primary-foreground));
   }

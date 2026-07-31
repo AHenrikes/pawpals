@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
   devIndicators: {
     position: "bottom-right",
   },
-
   images: {
     remotePatterns: [
       {
@@ -25,6 +24,7 @@ const nextConfig: NextConfig = {
         : []),
     ],
     qualities: [75, 85],
+    unoptimized: true,
   },
 };
 
