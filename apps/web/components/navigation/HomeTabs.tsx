@@ -23,8 +23,8 @@ export default function HomeTabs() {
             key={label}
             size="sm"
             variant="ghost"
-            className={`justify-start py-7.75 text-muted-foreground text-base border-b border-transparent rounded-none hover:bg-transparent ${
-              content === key ? "border-b border-primary" : "hover:text-text"
+            className={`justify-start py-7.5 text-muted-foreground text-base border-transparent rounded-none hover:bg-transparent ${
+              content === key ? "border-b-primary" : "hover:text-text"
             }`}
             onClick={() => navContent(key)}
           >

@@ -36,6 +36,7 @@ export function usePaginatedPosts({
   });
 
   const fetchingRef = useRef(false);
+  const fetchingMoreRef = useRef(false);
 
   const fetchPosts = useCallback(async () => {
     if (fetchingRef.current) return;
@@ -59,7 +60,8 @@ export function usePaginatedPosts({
   }, [endpoint]);
 
   const fetchMore = useCallback(async () => {
-    if (!state.nextCursor || state.loadingMore) return;
+    if (!state.nextCursor || fetchingMoreRef.current) return;
+    fetchingMoreRef.current = true;
     setState((s) => ({ ...s, loadingMore: true }));
 
     try {
@@ -76,8 +78,9 @@ export function usePaginatedPosts({
       setState((s) => ({ ...s, error: "Failed to load more posts." }));
     } finally {
       setState((s) => ({ ...s, loadingMore: false }));
+      fetchingMoreRef.current = false;
     }
-  }, [endpoint, state.nextCursor, state.loadingMore]);
+  }, [endpoint, state.nextCursor]);
 
   return {
     ...state,

@@ -14,13 +14,13 @@ export async function createServer() {
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
           try {
             for (const { name, value, options } of cookiesToSet) {
-              cookieStore.set(name, value, options)
-            };
+              cookieStore.set(name, value, options);
+            }
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have proxy refreshing user sessions.

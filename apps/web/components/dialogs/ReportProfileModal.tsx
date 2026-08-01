@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
+import { TypographyLead, TypographySmall } from "@repo/ui/typography";
 import { X } from "lucide-react";
 import { type FursonaTypes } from "@/types/fursona";
+import { Dialog, DialogContent } from "@repo/ui/dialog";
 
 interface ReportProfileModalProps {
   fursona: FursonaTypes;
@@ -59,10 +61,10 @@ export function ReportProfileModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md space-y-4 rounded-lg bg-background p-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md space-y-4 p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Report Fursona</h2>
+          <TypographyLead>Report Fursona</TypographyLead>
           <Button
             variant="ghost"
             size="icon"
@@ -73,13 +75,13 @@ export function ReportProfileModal({
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground">
+        <TypographySmall className="text-muted-foreground">
           Reporting: {fursona.display_name}
-        </p>
+        </TypographySmall>
 
         <div className="space-y-4">
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
               {error}
             </div>
           )}
@@ -133,7 +135,7 @@ export function ReportProfileModal({
             {loading ? "Submitting..." : "Submit Report"}
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

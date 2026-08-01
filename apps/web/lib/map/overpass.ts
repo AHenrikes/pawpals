@@ -29,7 +29,10 @@ interface OverpassResponse {
 }
 
 class OverpassError extends Error {
-  constructor(message: string, public status?: number) {
+  constructor(
+    message: string,
+    public status?: number,
+  ) {
     super(message);
     this.name = "OverpassError";
   }
@@ -64,7 +67,10 @@ let inFlight: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(fn: () => Promise<T>): Promise<T> {
   const run = inFlight.then(fn, fn);
-  inFlight = run.then(() => undefined, () => undefined);
+  inFlight = run.then(
+    () => undefined,
+    () => undefined,
+  );
   return run;
 }
 
@@ -72,43 +78,64 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function queryOverpass(query: string, signal?: AbortSignal): Promise<OverpassResponse> {
+async function queryEndpoint(
+  url: string,
+  query: string,
+  signal?: AbortSignal,
+): Promise<OverpassResponse> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+          "User-Agent":
+            "Pawpals/1.0 (POI lookup; contact: support@pawpals.app)",
+        },
+        body: query,
+        signal,
+      });
+
+      if (res.status === 429 || res.status === 504) {
+        const retryAfter = Number(res.headers.get("Retry-After")) || 0;
+        const backoff = retryAfter * 1000 || 500 * 2 ** attempt + attempt * 125;
+        await sleep(backoff);
+        continue;
+      }
+
+      if (!res.ok) {
+        throw new OverpassError(`Overpass responded ${res.status}`, res.status);
+      }
+
+      const data: OverpassResponse = await res.json();
+      if (data.remark && /timeout|too many/i.test(data.remark)) {
+        throw new OverpassError(data.remark);
+      }
+      return data;
+    } catch (err) {
+      if (signal?.aborted) throw err;
+      lastError = err;
+      await sleep(300 * 2 ** attempt);
+    }
+  }
+
+  throw lastError ?? new OverpassError("All Overpass mirrors failed");
+}
+
+async function queryOverpass(
+  query: string,
+  signal?: AbortSignal,
+): Promise<OverpassResponse> {
   let lastError: unknown;
 
   for (const url of OVERPASS_ENDPOINTS) {
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain",
-            // Overpass's usage policy asks for an identifiable client —
-            // an anonymous default UA is one of the first things throttled.
-            "User-Agent": "Pawpals/1.0 (POI lookup; contact: support@pawpals.app)",
-          },
-          body: query,
-          signal,
-        });
-
-        if (res.status === 429 || res.status === 504) {
-          const retryAfter = Number(res.headers.get("Retry-After")) || 0;
-          const backoff = retryAfter * 1000 || 500 * 2 ** attempt + Math.random() * 250;
-          await sleep(backoff);
-          continue; // retry same mirror before giving up on it
-        }
-
-        if (!res.ok) throw new OverpassError(`Overpass responded ${res.status}`, res.status);
-
-        const data: OverpassResponse = await res.json();
-        if (data.remark && /timeout|too many/i.test(data.remark)) {
-          throw new OverpassError(data.remark);
-        }
-        return data;
-      } catch (err) {
-        if (signal?.aborted) throw err; // don't retry a deliberate cancellation
-        lastError = err;
-        await sleep(300 * 2 ** attempt);
-      }
+    try {
+      return await queryEndpoint(url, query, signal);
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      lastError = error;
     }
   }
 

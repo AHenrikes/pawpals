@@ -9,16 +9,19 @@ interface MediaTilesProps {
   className?: string;
 }
 
-export default function MediaTiles({ media }: Readonly<MediaTilesProps>) {
+export default function MediaTiles({
+  media,
+  className,
+}: Readonly<MediaTilesProps>) {
   if (!media || media.length === 0) {
-    return <div className="text-gray-400">No media to display</div>;
+    return <div className="text-muted-foreground">No media to display</div>;
   }
 
   const { visible, container, img } = getOrderedVisible(media);
 
   return (
     <div
-      className={`relative ${container} max-w-360 max-h-[60svh] bg-black/50 overflow-hidden`}
+      className={`relative ${container} max-w-360 max-h-[60svh] overflow-hidden bg-black/50 ${className ?? ""}`}
     >
       {visible.map((item, index) => (
         <Image

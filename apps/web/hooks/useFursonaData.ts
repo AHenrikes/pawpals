@@ -3,84 +3,67 @@
 import { FursonaTypes } from "@/types/fursona";
 import { useEffect, useState } from "react";
 import { toast } from "@repo/ui/sonner";
-
-const fursonaDataCache = new Map<string, Promise<FursonaTypes | null>>();
-const fursonaDataStore = new Map<string, FursonaTypes | null>();
+import { fursonaCache } from "@/lib/helpers/profile-cache";
 
 export const useFursonaData = (fursonaId: string | undefined) => {
   const [user, setUser] = useState<FursonaTypes | null>(() => {
     if (!fursonaId) return null;
-    return fursonaDataStore.get(fursonaId) ?? null;
+    return fursonaCache.peek(fursonaId) ?? null;
   });
   const [loading, setLoading] = useState(() => {
     if (!fursonaId) return false;
-    return !fursonaDataStore.has(fursonaId);
+    return !fursonaCache.has(fursonaId);
   });
 
   useEffect(() => {
+    let active = true;
+
     if (!fursonaId) {
       setUser(null);
       setLoading(false);
-      return;
+      return () => {
+        active = false;
+      };
     }
 
-    const cachedUser = fursonaDataStore.get(fursonaId);
+    const cachedUser = fursonaCache.peek(fursonaId);
     if (cachedUser !== undefined) {
       setUser(cachedUser);
       setLoading(false);
-      return;
-    }
-
-    const pendingRequest = fursonaDataCache.get(fursonaId);
-    if (pendingRequest) {
-      setLoading(true);
-      pendingRequest
-        .then((result) => {
-          setUser(result);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-      return;
+      return () => {
+        active = false;
+      };
     }
 
     setLoading(true);
 
-    const fetchUser = async () => {
-      try {
+    fursonaCache
+      .get(fursonaId, async () => {
         const res = await fetch(
           `/api/core/fursonas/${encodeURIComponent(fursonaId)}`,
         );
 
-        if (res.status === 404) {
-          fursonaDataStore.set(fursonaId, null);
-          return null;
-        }
+        if (res.status === 404) return null;
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           throw new Error(body?.error ?? `Request failed (${res.status})`);
         }
 
-        const nextUser = (await res.json()) as FursonaTypes;
-        fursonaDataStore.set(fursonaId, nextUser);
-        return nextUser;
-      } catch {
+        return (await res.json()) as FursonaTypes;
+      })
+      .then((result) => {
+        if (active) setUser(result);
+      })
+      .catch(() => {
         toast.error("Could not fetch users");
-        return null;
-      } finally {
-        setLoading(false);
-      }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
     };
-
-    const request = fetchUser().then((result) => {
-      setUser(result);
-      return result;
-    });
-
-    fursonaDataCache.set(fursonaId, request);
-    request.finally(() => {
-      fursonaDataCache.delete(fursonaId);
-    });
   }, [fursonaId]);
 
   return { user, loading };

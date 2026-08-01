@@ -9,6 +9,7 @@
 ## 📁 Files Created
 
 ### Migration Files (5)
+
 ```
 supabase/migrations/
 ├── 20260606000001_init_accounts_and_fursonas.sql      (210+ lines)
@@ -21,6 +22,7 @@ supabase/migrations/
 ```
 
 ### Additional Files
+
 - `supabase/SCHEMA_DIAGRAM.sql` - ASCII schema with full documentation
 
 ---
@@ -30,20 +32,24 @@ supabase/migrations/
 ### Tables Created (13 total)
 
 **Core Schema** (2 tables):
+
 - `core.accounts` - User accounts linked to Supabase auth
 - `core.fursonas` - Fursona profiles (1-3 per account)
 
 **Social Schema** (4 tables):
+
 - `social.followers` - Follow relationships
 - `social.likes` - Likes on fursonas
 - `social.posts` - User posts/content
 - `social.reports` - Moderation reports
 
 **Media Schema** (2 tables):
+
 - `media.fursona_media` - Media file tracking
 - `media.media_processing_queue` - Async processing jobs
 
 **Storage** (3 buckets):
+
 - `fursona-avatars` - Public, 5MB max
 - `fursona-banners` - Public, 10MB max
 - `fursona-gallery` - Private, 20MB max
@@ -53,12 +59,14 @@ supabase/migrations/
 ## 🔐 Security Features
 
 ### Row-Level Security (RLS)
+
 - ✅ All tables have RLS enabled
 - ✅ Users see only their own data
 - ✅ Public content visible to all
 - ✅ Storage policies enforce user boundaries
 
 ### Constraints Enforced
+
 - ✅ **Max 3 fursonas per account** (CHECK constraint)
 - ✅ **Min 1 fursona per account** (TRIGGER enforced)
 - ✅ **No self-follows or self-likes** (CONSTRAINT)
@@ -71,26 +79,31 @@ supabase/migrations/
 ## ⚙️ Functions & Triggers (15 total)
 
 ### Account Management
+
 - `create_initial_fursona()` - Auto-creates default fursona on signup
 - `ensure_minimum_fursona()` - Prevents deletion of last fursona
 - `update_account_timestamp()` - Auto-timestamps on changes
 
 ### Fursona Management
+
 - `handle_fursona_update()` - Auto-switches to default if current deactivated
 - `switch_current_fursona()` - Switch active fursona with validation
 
 ### Social Operations
+
 - `update_follower_count()` - Updates reputation on follow/unfollow
 - `update_post_like_count()` - Tracks post likes
 - `get_follow_status()` - Check follow relationship
 
 ### Media Management
+
 - `set_media_as_primary()` - Ensures one primary per type
 - `update_fursona_media_url()` - Updates fursona URLs on media change
 - `update_queue_timestamp()` - Auto-timestamps processing queue
 - `handle_failed_media_processing()` - Retry logic for failures
 
 ### Query Helpers
+
 - `get_user_profile()` - Current user + active fursona
 - `get_fursona_profile()` - Full profile with stats
 - `search_fursonas()` - Search by username/name
@@ -110,6 +123,7 @@ supabase/migrations/
 ## 🎯 Business Logic
 
 ### Account Lifecycle
+
 1. User signs up (Supabase auth)
 2. Account created automatically
 3. **Trigger**: Default fursona auto-created
@@ -119,6 +133,7 @@ supabase/migrations/
 4. User sees active fursona immediately
 
 ### Fursona Management
+
 - Create up to 3 fursonas total
 - Can't delete if only 1 remains
 - Switch active fursona with `switch_current_fursona()`
@@ -126,6 +141,7 @@ supabase/migrations/
 - Deactivation auto-switches to default
 
 ### Social Features
+
 - Follow other fursonas
 - Reputation updated automatically (±1)
 - Like other fursonas
@@ -133,6 +149,7 @@ supabase/migrations/
 - Report inappropriate content
 
 ### Media Handling
+
 - Default avatar/banner auto-assigned
 - Upload custom avatar/banner to Supabase Storage
 - Gallery for multiple media
@@ -145,19 +162,22 @@ supabase/migrations/
 ## 🚀 Quick Start
 
 ### 1. Start Local Supabase
+
 ```bash
 cd /home/shin/Documents/code/work/pawpals
 supabase start
 ```
 
 ### 2. Access Supabase Studio
+
 ```
 http://localhost:54323
 ```
 
 ### 3. Test Account Creation
+
 ```sql
-INSERT INTO core.accounts (user_id, email) 
+INSERT INTO core.accounts (user_id, email)
 VALUES ('123e4567-e89b-12d3-a456-426614174000', 'test@example.com');
 
 -- Should auto-create default fursona
@@ -167,14 +187,15 @@ SELECT * FROM core.fursonas WHERE account_id = (
 ```
 
 ### 4. Verify Constraints
+
 ```sql
 -- Try to create 4th fursona (should fail)
-INSERT INTO core.fursonas (account_id, display_name, username) 
+INSERT INTO core.fursonas (account_id, display_name, username)
 VALUES ('{account_id}', 'Fursona4', 'fursona4');
 
 -- Try to delete last fursona (should fail)
-DELETE FROM core.fursonas 
-WHERE account_id = '{account_id}' 
+DELETE FROM core.fursonas
+WHERE account_id = '{account_id}'
 AND is_default = true;
 ```
 
@@ -182,17 +203,17 @@ AND is_default = true;
 
 ## 📋 Key Defaults
 
-| Setting | Value |
-|---------|-------|
-| Max fursonas | 3 |
-| Min fursonas | 1 |
-| Avatar size limit | 5MB |
-| Banner size limit | 10MB |
-| Gallery size limit | 20MB |
-| Default avatar | DiceBear API (seed = fursona_id) |
-| Default banner | Unsplash landscape |
-| Default bio | "Welcome to Pawpals!" |
-| Storage path | `{account_id}/{fursona_id}/{file_id}` |
+| Setting            | Value                                 |
+| ------------------ | ------------------------------------- |
+| Max fursonas       | 3                                     |
+| Min fursonas       | 1                                     |
+| Avatar size limit  | 5MB                                   |
+| Banner size limit  | 10MB                                  |
+| Gallery size limit | 20MB                                  |
+| Default avatar     | DiceBear API (seed = fursona_id)      |
+| Default banner     | Unsplash landscape                    |
+| Default bio        | "Welcome to Pawpals!"                 |
+| Storage path       | `{account_id}/{fursona_id}/{file_id}` |
 
 ---
 
@@ -237,6 +258,7 @@ AND is_default = true;
 ## 🔧 Deployment
 
 ### Local Testing
+
 ```bash
 supabase start           # Start local environment
 supabase db reset        # Reset to clean state
@@ -244,6 +266,7 @@ supabase migration up    # Apply pending migrations
 ```
 
 ### Production Deployment
+
 ```bash
 supabase link --project-ref {project-ref}
 supabase db push         # Deploy to production
@@ -266,6 +289,7 @@ supabase migration list --linked  # Verify
 ## 📞 Support
 
 For detailed information on:
+
 - **Migrations**: See `supabase/migrations/README.md`
 - **Schema**: See `supabase/SCHEMA_DIAGRAM.sql`
 - **Setup**: Run `supabase/setup-local.sh`
@@ -277,6 +301,7 @@ For detailed information on:
 **All database infrastructure ready for local development!**
 
 Next steps:
+
 1. Run `supabase start`
 2. Test signup flow
 3. Verify fursona auto-creation

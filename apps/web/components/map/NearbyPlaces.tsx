@@ -55,7 +55,12 @@ export function NearbyPlaces({
     setErrorMsg(null);
     try {
       const places = await fetchInBounds({
-        bounds: { south: b.getSouth(), west: b.getWest(), north: b.getNorth(), east: b.getEast() },
+        bounds: {
+          south: b.getSouth(),
+          west: b.getWest(),
+          north: b.getNorth(),
+          east: b.getEast(),
+        },
         tag,
         value,
         limit,
@@ -71,13 +76,13 @@ export function NearbyPlaces({
     } finally {
       setIsSearching(false);
     }
-  }, [map, tag, value, onPlacesChange]);
+  }, [map, tag, value, onPlacesChange, limit]);
 
   // Initial fetch once the map is ready.
   useEffect(() => {
     if (!map || !isLoaded || lastFetchCenterRef.current) return;
     search();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, isLoaded]);
 
   // We never auto-fetch on pan — Overpass's usage policy explicitly
@@ -87,8 +92,14 @@ export function NearbyPlaces({
     if (!map || !isLoaded) return;
     const handleMoveEnd = () => {
       if (!lastFetchCenterRef.current) return;
-      const center: [number, number] = [map.getCenter().lng, map.getCenter().lat];
-      if (haversineMeters(lastFetchCenterRef.current, center) > moveThresholdMeters) {
+      const center: [number, number] = [
+        map.getCenter().lng,
+        map.getCenter().lat,
+      ];
+      if (
+        haversineMeters(lastFetchCenterRef.current, center) >
+        moveThresholdMeters
+      ) {
         setCanSearchArea(true);
       }
     };
@@ -116,14 +127,20 @@ export function NearbyPlaces({
   if (!canSearchArea && !errorMsg) return null;
 
   return (
-    <div className={`absolute top-20 left-1/2 -translate-x-1/2 z-10 ${zoom < 11.9 ? "hidden" : null}`}>
+    <div
+      className={`absolute top-20 left-1/2 -translate-x-1/2 z-10 ${zoom < 11.9 ? "hidden" : null}`}
+    >
       <Button
         size="sm"
         variant={"outline"}
         onClick={search}
         disabled={zoom < 11.9}
       >
-        {isSearching ? <LoaderCircleIcon className="animate-spin size-4" /> : <SearchIcon className="size-4" />}
+        {isSearching ? (
+          <LoaderCircleIcon className="animate-spin size-4" />
+        ) : (
+          <SearchIcon className="size-4" />
+        )}
         {errorMsg ?? "Search this area"}
       </Button>
     </div>

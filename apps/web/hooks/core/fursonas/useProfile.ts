@@ -1,10 +1,8 @@
 "use client";
 
-import { makeCache } from "@/lib/helpers/profile-cache";
+import { fursonaCache } from "@/lib/helpers/profile-cache";
 import { useAsyncDataWithCache } from "@/hooks/useAsyncData";
 import { type FursonaTypes } from "@/types/fursona";
-
-const profileCache = makeCache<FursonaTypes | null>(10 * 60 * 1000);
 
 export function useProfile(id: string) {
   const {
@@ -23,7 +21,7 @@ export function useProfile(id: string) {
 
       return res.json() as Promise<FursonaTypes>;
     },
-    (fetcher) => profileCache.get(id, fetcher),
+    (fetcher) => fursonaCache.get(id, fetcher),
     [id],
   );
 

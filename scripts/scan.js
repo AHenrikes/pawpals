@@ -185,8 +185,8 @@ function checkUnnecessaryCode() {
   }
 
   // Check for unused modals
-  const modalFiles = getFilesRecursive(WEB_DIR, /modals\//);
-  const modalImports = countImports(WEB_DIR, 'modals/');
+  const modalFiles = getFilesRecursive(WEB_DIR, /components\/dialogs\/.*\.tsx$/);
+  const modalImports = countImports(WEB_DIR, 'components/dialogs/');
   if (modalFiles.length > modalImports) {
     warnings++;
     log.warn(`Found ${modalFiles.length - modalImports} potentially unused modal components`);
@@ -268,7 +268,7 @@ function checkPerformance() {
   const webDeps = { ...webPkgJson.dependencies, ...webPkgJson.devDependencies };
   
   // Read actual file contents
-  const allFiles = getFilesRecursive(WEB_DIR, /\.(ts|tsx|js|jsx)$/);
+  const allFiles = getFilesRecursive(WEB_DIR, /\.(ts|tsx|js|jsx|css|mjs)$/);
   const allContent = allFiles.map(f => {
     try {
       return fs.readFileSync(f, 'utf8');
@@ -392,7 +392,7 @@ function getFilesRecursive(dir, pattern = /.*/) {
         const stat = fs.statSync(fullPath);
         if (stat.isDirectory()) {
           walk(fullPath);
-        } else if (pattern.test(file)) {
+        } else if (pattern.test(path.relative(ROOT, fullPath).split(path.sep).join('/'))) {
           results.push(fullPath);
         }
       });

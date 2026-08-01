@@ -27,7 +27,7 @@ export default function Dashboard() {
           className="relative flex grow w-full min-h-[calc(100svh-96px)] lg:overflow-y-auto scrollbar-hide"
         >
           {content === "posts" && (
-            <div className="flex flex-col mx-auto gap-8">
+            <div className="flex flex-col w-full max-w-220 mx-auto gap-8">
               <PostCards />
             </div>
           )}
