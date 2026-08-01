@@ -16,7 +16,7 @@ import {
 } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import AuthHeader from "@/components/navigation/AuthHeader";
+import AuthHeader from "@/components/navigation/SignHeader";
 import AuthFooter from "@/components/footer/AuthFooter";
 import Link from "next/link";
 import {

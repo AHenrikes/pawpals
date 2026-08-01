@@ -5,7 +5,7 @@ import { TypographyH2, TypographyH3, TypographyP } from "@repo/ui/typography";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import AuthFooter from "@/components/footer/AuthFooter";
-import AuthHeader from "@/components/navigation/AuthHeader";
+import AuthHeader from "@/components/navigation/SignHeader";
 
 export const metadata: Metadata = { title: "Register || Login" };
 

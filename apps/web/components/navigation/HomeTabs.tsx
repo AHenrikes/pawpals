@@ -3,6 +3,7 @@
 import { useIsCurrentPath } from "@/hooks/useCurrentPath";
 import { Button } from "@repo/ui/button";
 import { useHomeTabs } from "@/providers/HomeTabsProvider";
+import { cn } from "@/lib/helpers/utils";
 
 const homeTabs = [
   { label: "Posts", key: "posts" },
@@ -23,9 +24,10 @@ export default function HomeTabs() {
             key={label}
             size="sm"
             variant="ghost"
-            className={`justify-start py-7.5 text-muted-foreground text-base border-transparent rounded-none hover:bg-transparent ${
-              content === key ? "border-b-primary" : "hover:text-text"
-            }`}
+            className={cn(
+              "justify-start py-7.5 text-text/40 text-base border-transparent rounded-none hover:bg-transparent",
+              `${content === key ? "text-text-primary border-b-primary hover:text-text-primary" : "hover:text-text/80"}`
+            )}
             onClick={() => navContent(key)}
           >
             {label}

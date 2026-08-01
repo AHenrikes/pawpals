@@ -27,10 +27,10 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
               <Button
                 size={"icon"}
                 variant={"ghost"}
-                className="py-1 px-2 text-muted-foreground"
+                className="py-1 px-2 space-x-1.5 text-text-muted hover:text-text"
               >
                 <TypographyXSmall>Clear</TypographyXSmall>
-                <HistoryIcon size={14} />
+                <HistoryIcon size={16} />
               </Button>
             </div>
 
@@ -65,7 +65,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
               <Button
                 size={"icon"}
                 variant={"ghost"}
-                className="p-1 text-muted-foreground"
+                className="py-1 px-2 text-text-muted hover:text-text"
               >
                 <ArrowRightIcon size={16} />
               </Button>
@@ -135,7 +135,7 @@ export default function SearchDefault({ searchQuery }: Readonly<Props>) {
               How to search:
             </TypographyMuted>
 
-            <div className="text-muted-foreground space-y-2">
+            <div className="space-y-2">
               <TypographyP className="text-xs md:text-sm">
                 <Kbd className="text-xs">@</Kbd> search for username
               </TypographyP>
