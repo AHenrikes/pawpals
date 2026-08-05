@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { type MediaItem } from "@/types/post";
 import { getOrderedVisible } from "@/lib/mediaLayout";
+import { cn } from "@repo/ui/lib/utils";
 
 interface MediaTilesProps {
   media: MediaItem[];
@@ -21,21 +22,33 @@ export default function MediaTiles({
 
   return (
     <div
-      className={`relative ${container} max-w-360 max-h-[60svh] overflow-hidden bg-black/50 ${className ?? ""}`}
+      className={cn(
+        "relative overflow-hidden bg-black/50 min-h-0 h-full",
+        className ?? "",
+        container
+      )}
     >
-      {visible.map((item, index) => (
-        <Image
-          key={`${item.type}-${item.originalIndex}`}
-          src={item.url}
-          alt={`Media ${index + 1}`}
-          width={item.width}
-          height={item.height}
-          className={`object-cover ${img[index] ?? ""}`}
-          sizes="(max-width: 800px) 100vw, (max-width: 1440px) 50vw, 33vw"
-          quality={85}
-          loading="lazy"
-        />
-      ))}
+      {visible.map((item, index) => {
+        // const isLandscape = item.width / item.height > 1.1;
+        // const aspectClass = isLandscape ? "aspect-[16/9]" : "aspect-[3/4]";
+
+        return (
+          <Image
+            key={`${item.type}-${item.originalIndex}`}
+            src={item.url}
+            alt={`Media ${index + 1}`}
+            width={item.width}
+            height={item.height}
+            className={cn(
+              "object-cover w-full h-full rounded-[inherit]",
+              img[index] ?? "",
+              // aspectClass
+            )}
+            quality={85}
+            loading="lazy"
+          />
+        );
+      })}
     </div>
   );
 }

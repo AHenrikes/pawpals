@@ -37,7 +37,6 @@ import { CardContent } from "@repo/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { toast } from "@repo/ui/sonner";
 import { getInitials } from "@/utils/getInitials";
-import { DropdownMenuGroup } from "@repo/ui/dropdown-menu";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@repo/ui/collapsible";
 import { CreateFursonaPanelModal } from "../dialogs/CreateFursonaPanelModal";
 import { createPortal } from "react-dom";
@@ -112,7 +111,14 @@ export default function MainNav() {
 
           return (
             <SidebarMenuItem key={label}>
-              <SidebarMenuButton asChild isActive={isActive}>
+              <SidebarMenuButton 
+                asChild
+                isActive={isActive}
+                className={cn(
+                  "text-text-muted",
+                  isActive && "text-text"
+                )}
+              >
                 <Link
                   href={href}
                   className="p-3"
@@ -130,11 +136,13 @@ export default function MainNav() {
                       <div className="flex justify-between items-center w-full">
                         <motion.span
                           key="label"
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: "auto" }}
-                          exit={{ opacity: 0, width: 0 }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
                           transition={{ duration: 0.15, ease: "easeInOut" }}
-                          className="truncate overflow-hidden whitespace-nowrap"
+                          className={cn(
+                            "truncate overflow-hidden whitespace-nowrap",
+                          )}
                         >
                           {label}
                         </motion.span>
@@ -152,18 +160,23 @@ export default function MainNav() {
 
       <SidebarFooter className="flex flex-col gap-4">
         <Collapsible open={isFursonasOpen} onOpenChange={setFursonasOpen}>
-          <CollapsibleTrigger
-            onClick={fetchFursonas}
-            disabled={isCollapsed}
-            aria-label={isCollapsed ? "My fursonas" : undefined}
-            className={cn(
-              "w-full p-3 mt-0 rounded-sm",
-              !isCollapsed ? "cursor-pointer hover:bg-secondary" : null
-            )}
-          >
-            {isCollapsed ? (
+          {isCollapsed ? (
+            <SidebarMenuButton 
+              disabled
+              className="p-3 cursor-default hover:bg-transparent"
+            >
               <PawPrintIcon className="h-6 w-6 shrink-0 text-text-muted" />
-            ) : (
+            </SidebarMenuButton>
+          ) : (
+            <CollapsibleTrigger
+              onClick={fetchFursonas}
+              disabled={isCollapsed}
+              aria-label={isCollapsed ? "My fursonas" : undefined}
+              className={cn(
+                "w-full p-3 mt-0 rounded-sm",
+                !isCollapsed ? "cursor-pointer hover:bg-secondary" : null
+              )}
+            >
               <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key="fursonas-trigger"
@@ -186,8 +199,8 @@ export default function MainNav() {
                   )}
                 </motion.div>
               </AnimatePresence>
-            )}
-          </CollapsibleTrigger>
+            </CollapsibleTrigger>
+          )}
 
           <CollapsibleContent className="max-h-55 mt-3 overflow-auto scrollbar-hide">
             <CardContent className="grid grid-cols-2 auto-rows-fr p-0 gap-2.5">
@@ -202,16 +215,19 @@ export default function MainNav() {
                     onClick={() => handleSwitchFursona(elem.id)}
                     className={cn(
                       "flex flex-col items-center w-full h-auto p-2.5 gap-2 rounded-sm",
-                      `${isActive ? "bg-secondary border-2 border-accent" : "bg-secondary-dim text-text-muted-foreground cursor-pointer"}`
+                      `${isActive 
+                        ? "bg-secondary border-2 border-accent"
+                        : "bg-secondary-dim border-2 border-transparent text-text-muted cursor-pointer"
+                      }`
                     )}
                   >
                     <Avatar size="lg">
                       <AvatarImage
-                        src={`${currentFursona?.avatar_url}`}
-                        alt={currentFursona?.display_name}
+                        src={`${elem?.avatar_url}`}
+                        alt={elem?.display_name}
                       />
 
-                      <AvatarFallback>{getInitials(currentFursona?.display_name)}</AvatarFallback>
+                      <AvatarFallback>{getInitials(elem?.display_name)}</AvatarFallback>
                     </Avatar>
 
                     <TypographySmall>
@@ -226,7 +242,10 @@ export default function MainNav() {
                   size={"icon-lg"}
                   variant={"ghost"}
                   onClick={() => setCreateFursonaOpen(true)}
-                  className="flex flex-col items-center w-full h-auto p-2.5 gap-2.5 bg-secondary-dim text-text-muted-foreground rounded-sm"
+                  className={cn(
+                    "flex flex-col items-center w-full h-auto p-2.5 gap-2.5",
+                    "bg-secondary-dim text-text-muted rounded-sm"
+                  )}
                 >
                   <PlusIcon />
                 </Button>
@@ -238,15 +257,10 @@ export default function MainNav() {
         <Separator className="h-px" />
 
         <SidebarGroup className="flex flex-col">
-          <Button
-            size={"icon"}
+          <SidebarMenuButton
             onClick={() => setPostOpen(true)}
-            className={cn(
-              "h-11 space-x-1 rounded-sm",
-              !isCollapsed && "w-full",
-            )}
-          >
-            <PlusIcon />
+            className="bg-primary rounded-sm hover:bg-primary-dim">
+            <PlusIcon className="w-6 h-6 shrink-0" />
 
             <AnimatePresence initial={false} mode="wait">
               {!isCollapsed && (
@@ -262,18 +276,12 @@ export default function MainNav() {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Button>
+          </SidebarMenuButton>
 
-          <Button
-            size={"icon"}
-            variant="destructive"
+          <SidebarMenuButton
             onClick={() => signOut()}
-            className={cn(
-              "h-11 space-x-1 rounded-sm",
-              !isCollapsed && "w-full"
-            )}
-          >
-            <LogOutIcon className="p-0.5" />
+            className="bg-destructive/40 rounded-sm hover:bg-destructive">
+            <LogOutIcon className="w-6 h-6 p-0.5 shrink-0" />
 
             <AnimatePresence initial={false} mode="wait">
               {!isCollapsed && (
@@ -289,7 +297,7 @@ export default function MainNav() {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Button>
+          </SidebarMenuButton>
         </SidebarGroup>
       </SidebarFooter>
 

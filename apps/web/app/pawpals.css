@@ -190,7 +190,7 @@
     --font-display: "Manrope", "Segoe UI", sans-serif;
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
 
-    --gradient-background: linear-gradient(45deg, hsl(var(--background)) 65%, hsl(var(--accent)));
+    --gradient-background: linear-gradient(45deg, hsl(var(--background)) 50%, hsl(var(--accent)));
   }
 
   * {

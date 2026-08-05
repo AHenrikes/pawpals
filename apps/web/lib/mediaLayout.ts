@@ -56,145 +56,147 @@ export function getOrderedVisible(media: MediaItem[], maxVisible = 4) {
   return { visible, remaining, ...layout };
 }
 
-export function getLayout(count: number, landscapeCount: number): LayoutConfig {
-  const MAX_H = "max-h-[60svh]";
-  const HALF_H = "max-h-[30svh]";
-  const MAX_W = "max-w-[1440px]";
+const TILE = "w-full h-full min-h-[10rem] sm:min-h-[12rem]";
+const PORTRAIT_TILE = `${TILE} aspect-[3/4]`;
+const LANDSCAPE_TILE = `${TILE} aspect-[16/9]`;
 
-  if (count === 4) {
-    const isLandscape = landscapeCount === 4;
+function layoutForFour(landscapeCount: number): LayoutConfig {
+  const isLandscape = landscapeCount === 4;
 
-    if (landscapeCount === 3) {
+  switch (landscapeCount) {
+    case 3:
       return {
-        container: "grid grid-cols-3 grid-rows-3 gap-1",
+        container: "grid grid-cols-2 gap-1",
         img: [
-          `col-start-1 col-span-1 row-start-1 row-span-3 w-auto h-full ${MAX_H}`,
-          "col-start-2 col-span-3 row-start-1 w-full h-full",
-          "col-start-2 col-span-3 row-start-2 w-full h-full",
-          "col-start-2 col-span-3 row-start-3 w-full h-full",
+          PORTRAIT_TILE,
+          LANDSCAPE_TILE,
+          LANDSCAPE_TILE,
+          LANDSCAPE_TILE,
         ],
       };
-    }
 
-    if (landscapeCount === 2) {
+    case 2:
       return {
-        container: "grid grid-cols-3 grid-rows-2 gap-1",
+        container: "grid grid-cols-2 gap-1",
         img: [
-          `col-start-1 col-span-1 row-start-1 w-auto h-full ${HALF_H}`,
-          `col-start-1 col-span-1 row-start-2 w-auto h-full ${HALF_H}`,
-          "col-start-2 col-span-3 row-start-1 w-auto h-full",
-          "col-start-2 col-span-3 row-start-2 w-full h-auto",
+          PORTRAIT_TILE,
+          PORTRAIT_TILE,
+          LANDSCAPE_TILE,
+          LANDSCAPE_TILE,
         ],
       };
-    }
 
-    if (landscapeCount === 1) {
+    case 1:
       return {
-        container: "grid grid-cols-3 grid-rows-2 gap-1 md:grid-rows-3",
+        container: "grid grid-cols-2 gap-1",
         img: [
-          "col-start-1 col-span-1 row-start-1 w-auto h-full",
-          "col-start-2 col-span-2 row-start-1 w-auto h-full",
-          "col-start-3 col-span-3 row-start-1 w-auto h-full",
-          "col-start-1 col-span-3 row-start-2 w-full h-auto md:row-span-2",
+          PORTRAIT_TILE,
+          PORTRAIT_TILE,
+          PORTRAIT_TILE,
+          LANDSCAPE_TILE,
         ],
       };
-    }
 
-    return {
-      container: "grid grid-cols-2 grid-rows-2 gap-1",
-      img: isLandscape
-        ? ["w-full h-full", "w-full h-full", "w-full h-full", "w-full h-full"]
-        : [
-            "w-auto h-full justify-self-end",
-            "w-auto h-full justify-self-start",
-            "w-auto h-full justify-self-end",
-            "w-auto h-full justify-self-start",
-          ],
-    };
+    default:
+      return {
+        container: "grid grid-cols-2 gap-1",
+        img: isLandscape
+          ? [ LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE ]
+          : [ PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE ]
+      };
   }
+}
 
-  if (count === 3) {
-    if (landscapeCount === 3) {
+function layoutForThree(landscapeCount: number): LayoutConfig {
+  switch (landscapeCount) {
+    case 3:
       return {
-        container: "grid grid-cols-2 grid-rows-2 gap-1",
+        container: "grid grid-cols-2 gap-1",
         img: [
-          "col-start-1 col-span-2 row-start-1 row-span-1 w-full h-auto",
-          "w-full h-auto",
-          "w-full h-auto",
+          `col-span-2 ${LANDSCAPE_TILE}`,
+          LANDSCAPE_TILE,
+          LANDSCAPE_TILE,
         ],
       };
-    }
 
-    if (landscapeCount === 2) {
+    case 2:
       return {
-        container: "grid grid-cols-3 grid-rows-2 gap-1",
+        container: "grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-1",
         img: [
-          `col-start-1 col-span-1 row-start-1 row-span-2 w-auto h-full ${MAX_H}`,
-          "col-start-2 col-span-3 row-start-1 w-full h-full",
-          "col-start-2 col-span-3 row-start-2 w-full h-full",
+          `row-span-2 ${PORTRAIT_TILE}`,
+          LANDSCAPE_TILE,
+          LANDSCAPE_TILE,
         ],
       };
-    }
 
-    if (landscapeCount === 1) {
+    case 1:
       return {
-        container: "grid grid-cols-2 grid-rows-2 gap-1",
+        container: "grid  gap-1 grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]",
         img: [
-          `col-start-1 col-span-1 row-start-1 w-auto h-full ${MAX_H}`,
-          `col-start-2 col-span-1 row-start-1 w-auto h-full ${MAX_H}`,
-          "col-start-1 col-span-2 row-start-2 w-full h-auto",
+          PORTRAIT_TILE,
+          PORTRAIT_TILE,
+          `w-full ${LANDSCAPE_TILE} col-span-2`,
         ],
       };
-    }
 
-    return {
-      container: "grid grid-cols-2 grid-rows-2 gap-1",
-      img: [
-        `row-span-2 w-auto h-full ${MAX_H}`,
-        `w-auto ${HALF_H}`,
-        `w-auto ${HALF_H}`,
-      ],
-    };
+    default:
+      return {
+        container: "grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-1",
+        img: [
+          `row-span-2 ${PORTRAIT_TILE}`,
+          PORTRAIT_TILE,
+          PORTRAIT_TILE,
+        ],
+      };
   }
+}
 
-  if (count === 2) {
-    if (landscapeCount === 2) {
+function layoutForTwo(landscapeCount: number): LayoutConfig {
+  switch (landscapeCount) {
+    case 2:
       return {
-        container: "grid grid-rows-2 gap-1 lg:grid-cols-2 lg:grid-rows-1",
-        img: [
-          `row-start-1 w-full h-auto ${MAX_W} ${HALF_H} lg:col-start-1`,
-          `row-start-2 w-full h-auto ${MAX_W} ${HALF_H} lg:row-start-1 lg:col-start-2`,
-        ],
+        container: "grid gap-1 grid-cols-1",
+        img: [LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
-    }
 
-    if (landscapeCount === 1) {
+    case 1:
       return {
         container:
-          "grid grid-rows-[auto_auto] gap-1 lg:grid-rows-1 lg:grid-cols-[auto_1fr]",
-        img: [
-          `row-start-1 w-auto h-full ${HALF_H}`,
-          `row-start-2 w-full h-auto ${HALF_H} lg:row-start-1 lg:col-start-2`,
-        ],
+          "grid gap-1 grid-cols-1 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]",
+        img: [PORTRAIT_TILE, LANDSCAPE_TILE],
       };
-    }
 
-    return {
-      container: "grid grid-cols-[auto_1fr] gap-1",
-      img: [
-        `col-start-1 w-auto h-full ${HALF_H}`,
-        `col-start-2 w-auto h-full ${HALF_H}`,
-      ],
-    };
+    default:
+      return {
+        container: "grid grid-cols-2 gap-1",
+        img: [PORTRAIT_TILE, PORTRAIT_TILE],
+      };
   }
+}
 
-  const isLandscape = landscapeCount === 1;
+function layoutForOne(landscapeCount: number): LayoutConfig {
   return {
-    container: "grid",
+    container: "flex justify-center items-center",
     img: [
-      isLandscape
-        ? `w-full h-auto ${MAX_W}`
-        : `justify-self-center w-full h-full ${MAX_H} lg:w-auto`,
+      landscapeCount === 1
+        ? "w-full h-auto min-h-[25dvh]"
+        : "w-auto h-full",
     ],
   };
+}
+
+export function getLayout(count: number, landscapeCount: number): LayoutConfig {
+  switch (count) {
+    case 4:
+      return layoutForFour(landscapeCount);
+
+    case 3:
+      return layoutForThree(landscapeCount);
+
+    case 2:
+      return layoutForTwo(landscapeCount);
+
+    default:
+      return layoutForOne(landscapeCount);
+  }
 }

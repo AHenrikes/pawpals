@@ -27,7 +27,7 @@ export default function Dashboard() {
           className="relative flex grow w-full min-h-[calc(100svh-96px)] lg:overflow-y-auto scrollbar-hide"
         >
           {content === "posts" && (
-            <div className="flex flex-col w-full max-w-220 mx-auto gap-8">
+            <div className="flex flex-col w-full mx-auto gap-8">
               <PostCards />
             </div>
           )}
@@ -45,9 +45,9 @@ export default function Dashboard() {
       </AnimatePresence>
 
       <aside className="hidden sticky top-20 flex-col w-125 h-[calc(100svh-96px)] gap-5 md:flex">
-        <div className="bg-surface-low animate-pulse w-full h-96 rounded-md shadow-lg" />
+        <div className="bg-secondary animate-pulse w-full h-96 rounded-md shadow-lg" />
 
-        <div className="bg-surface-low animate-pulse w-full h-full rounded-md shadow-lg" />
+        <div className="bg-secondary animate-pulse w-full h-full rounded-md shadow-lg" />
       </aside>
     </div>
   );

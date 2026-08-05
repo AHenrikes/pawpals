@@ -2,7 +2,7 @@
 
 import { useProfilePosts } from "@/hooks/core/fursonas/useProfilePosts";
 import { usePosts } from "@/hooks/social/posts/usePosts";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, Fragment } from "react";
 import { motion } from "framer-motion";
 import {
   HeartIcon,
@@ -22,6 +22,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { getInitials } from "@/utils/getInitials";
 import { useFursonaData } from "@/hooks/useFursonaData";
 import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import { Separator } from "@repo/ui/separator";
+import { cn } from "@repo/ui/lib/utils";
 import { type PostType } from "@/types/post";
 import PostDropdown from "../dropdowns/Post";
 import MediaTiles from "../mediaTiles";
@@ -54,11 +56,10 @@ const PostCard = memo(function PostCard({
 
   return (
     <article
-      className={`
-      flex flex-col max-h-[90svh] py-3 gap-3 transition-colors
-      md:border md:border-border md:rounded-md md:shadow-md hover:bg-muted/30
-      ${isLast ? "" : "border-b border-border"}
-    `}
+      className={cn(
+        "flex flex-col w-full max-h-[80dvh] min-h-0 py-3 gap-3",
+        "overflow-hidden transition-colors",
+      )}
     >
       {/* Header: Name, Username, Timestamp */}
       <div className="flex justify-between items-center px-3">
@@ -105,7 +106,8 @@ const PostCard = memo(function PostCard({
         </DropdownMenu>
       </div>
 
-      <div className="space-y-3">
+      {/* Content */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
         {/* Caption */}
         {post.content && (
           <>
@@ -118,7 +120,7 @@ const PostCard = memo(function PostCard({
                 duration: 0.3,
                 ease: "easeInOut",
               }}
-              className="px-3 overflow-hidden"
+              className="px-3 overflow-hidden shrink-0"
             >
               <TypographySmall className="text-foreground wrap-break-word break-all whitespace-pre-wrap">
                 {post.content}
@@ -132,7 +134,7 @@ const PostCard = memo(function PostCard({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="px-3 my-2 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                className="px-3 text-xs font-medium text-primary hover:text-primary/80 transition-colors shrink-0"
               >
                 {isExpanded ? "Show less" : "Show more"}
               </motion.button>
@@ -141,11 +143,15 @@ const PostCard = memo(function PostCard({
         )}
 
         {/* Media */}
-        {media.length > 0 && <MediaTiles media={media} />}
+        {media.length > 0 && (
+          <div className="flex-1 min-h-0 px-3">
+            <MediaTiles media={media} className="w-auto h-full rounded-2xl" />
+          </div>
+        )}
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 max-w-xs text-muted-foreground">
+      <div className="flex gap-2 max-w-xs text-muted-foreground shrink-0 px-3">
         <Button
           size="icon"
           variant="ghost"
@@ -279,11 +285,14 @@ export default function ProfileLists({
     return (
       <>
         {posts.map((post, idx) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            isLast={idx === posts.length - 1}
-          />
+          <Fragment key={post.id}>
+            <PostCard
+              post={post}
+              isLast={idx === posts.length - 1}
+            />
+
+            <Separator className="h-0.5" />
+          </Fragment>
         ))}
 
         {hasMore && (
