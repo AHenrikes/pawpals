@@ -8,65 +8,44 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --radius-xs: calc(var(--radius) - 12px);
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-base: var(--radius);
+  --radius-lg: calc(var(--radius) + 14px);
+  --radius-full: 9999px;
+
+  --backdrop-blur-blur: hsl(var(--blur));
+
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-
-  --color-surface: hsl(var(--surface));
-  --color-surface-low: hsl(var(--surface-container-low));
-  --color-surface-highest: hsl(var(--surface-container-highest));
-  --color-surface-variant: hsl(var(--surface-variant));
+  --color-accent: hsl(var(--accent));
 
   --color-primary: hsl(var(--primary));
   --color-primary-dim: hsl(var(--primary-dim));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-
   --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-secondary-dim: hsl(var(--secondary-dim));
 
   --color-destructive: hsl(var(--destructive));
+  --color-confirmative: hsl(var(--confirmative));
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-
+  --color-surface: hsl(var(--surface));
   --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-
-  --color-outline: hsl(var(--outline));
   --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --color-headline: hsl(var(--headline));
 
+  --color-headline: hsl(var(--headline));
   --color-text: hsl(var(--text));
-  --color-text-foreground: hsl(var(--text-foreground));
   --color-text-primary: hsl(var(--text-primary));
   --color-text-secondary: hsl(var(--text-secondary));
   --color-text-destructive: hsl(var(--text-destructive));
+  --color-text-confirmative: hsl(var(--text-confirmative));
   --color-text-muted: hsl(var(--text-muted));
 
-  --radius-sm: calc(var(--radius) - 8px);
-  --radius-md: calc(var(--radius) - 4px);
-  --radius-base: var(--radius);
-  --radius-lg: calc(var(--radius) + 4px);
-  --radius-xl: calc(var(--radius) - 8px);
-  --radius-full: 9999px;
-
-  --background-image-pawpals-primary: var(--gradient-primary);
-
-  --shadow-ambient: var(--ambient-shadow);
-
-  --tracking-display: -0.02em;
-
-  --backdrop-blur-blur: hsl(var(--blur));
+  --color-gradient-background: hsl(var(--gradient))
 }
 
 /*
@@ -85,7 +64,7 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
-  .maplibregl-popup-content {
+  /* .maplibregl-popup-content {
     @apply bg-transparent! shadow-none! p-0! rounded-none!;
   }
   .maplibregl-popup-tip {
@@ -102,7 +81,7 @@
   }
   .maplibregl-ctrl-attrib-button {
     @apply bg-transparent! dark:invert;
-  }
+  } */
 }
 
 @utility text-display-lg {
@@ -144,117 +123,74 @@
 
 @layer base {
   :root {
-    --radius: 1.5rem;
+    --radius: 1;
     --blur: 6rem;
 
     --background: 265, 75%, 90%;
     --foreground: 260, 45%, 8%;
-
-    --surface: 262, 35%, 95%;
-    --surface-container-low: 263, 30%, 90%;
-    --surface-container-highest: 262, 20%, 75%;
-    --surface-variant: 264, 30%, 60%;
+    --accent: 350, 50%, 55%;
 
     --primary: 270, 100%, 60%;
     --primary-dim: 272, 80%, 45%;
-    --primary-foreground: 266, 40%, 10%;
     --secondary: 283, 40%, 55%;
-    --secondary-foreground: 267, 35%, 15%;
-    --accent: 350, 50%, 55%;
-    --accent-foreground: 278, 25%, 95%;
+    --secondary-dim: 267, 35%, 15%;
 
     --destructive: 357, 65%, 50%;
+    --confirmative: 101, 52%, 31%;
 
-    --card: var(--surface);
-    --card-foreground: var(--foreground);
-    --popover: var(--surface-container-highest);
-    --popover-foreground: var(--foreground);
-    --muted: 264, 20%, 80%;
-    --muted-foreground: 262, 10%, 25%;
+    --surface: var(--secondary);
+    --popover: var(--secondary);
+    --border: var(--foreground);
+    --ring: 260, 45%, 8%;
 
-    --border: 264, 15%, 75%;
-    --input: 264, 20%, 80%;
-    --ring: var(--primary);
-
-    --headline: 261, 20%, 20%;
-    --text: 262 0% 10%;
-    --text-foreground: 275, 100%, 95%;
+    --headline: var(--foreground);
+    --text: var(--foreground);
     --text-primary: var(--primary);
     --text-secondary: var(--secondary);
     --text-destructive: var(--destructive);
-    --text-muted: var(--muted);
+    --text-confirmative: var(--confirmative);
+    --text-muted: 260, 45%, 8%;
 
     --font-display: "Manrope", "Segoe UI", sans-serif;
-    --font-headline: ;
-    --font-title: ;
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
-    --font-label: ;
 
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)));
-    --ambient-shadow: 0 20px 40px hsl(var(--primary)), 0 10px 30px hsl(var(--primary-foreground));
+    --gradient-background: linear-gradient(135deg, hsl(var(--background)), hsl(var(--accent)));
   }
 
   .dark {
     --radius: 1rem;
     --blur: 6rem;
 
-    --background: 260, 45%, 7%;
-
-    --foreground: 265, 75%, 95%;
-
-    --surface: 264, 30%, 10%;
-    --surface-container-low: 260, 35%, 10%;
-    --surface-container-highest: 264, 30%, 20%;
-    --surface-variant: 265, 25%, 20%;
-
-    --primary: 277, 79%, 43%;
-
-    --primary-dim: 280, 85%, 31%;
-
-    --primary-foreground: 266, 40%, 90%;
-
-    --secondary: 280, 32%, 15%;
-
-    --secondary-dim: 280, 33%, 12%;
-    
-    --secondary-foreground: 266, 35%, 80%;
-
+    --background: 262, 44%, 5%;
+    --foreground: 265, 76%, 95%;
     --accent: 280, 61%, 15%;
-    --accent-foreground: 278, 25%, 65%;
 
-    --destructive: 356, 90%, 30%;
+    --primary: 277, 74%, 53%;
+    --primary-dim: 277, 79%, 43%;
 
-    --confirmative: 100, 66%, 24%;
+    --secondary: 270, 36%, 11%;
+    --secondary-dim: 265, 41%, 8%;
 
-    --card: var(--surface);
-    --card-foreground: var(--foreground);
-    --popover: var(--surface-container-highest);
-    --popover-foreground: var(--foreground);
-    --muted: 261, 20%, 20%;
-    --muted-foreground: 262, 15%, 65%;
+    --destructive: 356, 64%, 47%;
+    --confirmative: 101, 52%, 31%;
 
-    --outline: 261, 10%, 50%;
-    --border: 264, 15%, 30%;
-    --input: 264, 20%, 25%;
-    --ring: var(--primary);
+    --surface: var(--secondary);
+    --popover: var(--secondary);
+    --border: var(--foreground);
+    --ring: 0, 0%, 62%;
 
-    --headline: 265, 80%, 95%;
-    --text: 262, 10% 90%;
-    --text-foreground: 273, 100%, 0%;
+    --headline: var(--foreground);
+    --text: var(--foreground);
     --text-primary: var(--primary);
     --text-secondary: var(--secondary);
     --text-destructive: var(--destructive);
-    --text-muted: var(--muted);
+    --text-confirmative: var(--confirmative);
+    --text-muted: 0, 0%, 62%;
 
     --font-display: "Manrope", "Segoe UI", sans-serif;
-    --font-headline: ;
-    --font-title: ;
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
-    --font-label: ;
 
-    --gradient-background: linear-gradient(135deg, hsl(var(--background)), hsl(var(--accent)));
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary-dim)), hsl(var(--primary-foreground)));
-    --ambient-shadow: 0 10px 20px hsl(var(--primary-dim)), 0 5px 15px hsl(var(--primary-foreground));
+    --gradient-background: linear-gradient(45deg, hsl(var(--background)) 50%, hsl(var(--accent)));
   }
 
   * {
@@ -292,10 +228,10 @@
 }
 
 #DashboardLayout {
-  background-image: linear-gradient(
-    -135deg,
-    hsl(273, 75%, 20%) 0%,
-    hsl(var(--background)) 50%
-  );
+  background: var(--gradient-background);
   background-attachment: fixed;
+}
+
+.gradientBG {
+  background: var(--gradient-background);
 }

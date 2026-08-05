@@ -33,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/dropdown-menu";
 import {
-  TypographyH4,
+  TypographyH3,
   TypographyP,
   TypographySmall,
   TypographyXSmall,
@@ -128,13 +128,13 @@ export default function Header() {
   const count = fursonas.length;
 
   return (
-    <header className="sticky top-0 w-full h-16 border-b border-border backdrop-blur-sm z-40">
+    <header className="sticky top-0 w-full h-16 backdrop-blur-sm z-40">
       <div className="flex h-full w-full items-center justify-between px-2 mx-auto md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
 
           <Link href={AUTH_ROUTES.HOME}>
-            <TypographyH4 className="text-primary">PAWPALS</TypographyH4>
+            <TypographyH3 className="text-text">PAWPALS</TypographyH3>
           </Link>
         </div>
 
@@ -147,6 +147,7 @@ export default function Header() {
             <Collapsible
               open={isFursonaListOpen}
               onOpenChange={handleFursonaListOpen}
+              className="flex"
             >
               {loading ? (
                 <Skeleton className="h-8 w-8 rounded-full" />

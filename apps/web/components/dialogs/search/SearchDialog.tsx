@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Loader2, SearchIcon, XIcon } from "lucide-react";
+import { Loader2, PawPrintIcon, SearchIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useProfileSearch } from "@/hooks/core/fursonas/useProfileSearch";
 import type { FursonaSearch } from "@/types/fursona";
@@ -18,6 +18,7 @@ import SearchDefault from "./SearchDefault";
 import { createPortal } from "react-dom";
 import { Field, FieldLabel } from "@repo/ui/field";
 import { Button } from "@repo/ui/button";
+import { TypographyH3 } from "@repo/ui/typography";
 
 type SearchType = "fursona" | "nav" | null;
 
@@ -146,48 +147,56 @@ export default function SearchDialog({
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="fixed inset-0 flex justify-center z-50 pointer-events-none"
           >
-            <div className="flex flex-col h-[75svh] w-full overflow-hidden shadow-lg md:h-80 md:rounded-xl pointer-events-auto">
+            <div className="flex flex-col w-full overflow-hidden shadow-lg md:h-80 md:rounded-xl pointer-events-auto">
               {/* Input */}
-              <div className="flex items-center h-16 px-2 gap-2 bg-background shrink-0 md:px-6 md:bg-transparent">
-                <Field className="md:fixed md:right-16 md:w-72">
-                  <FieldLabel htmlFor="header-search" className="sr-only">
-                    Search
-                  </FieldLabel>
+              <div className="flex items-center justify-between h-16 px-2 gap-2 shrink-0 gradientBG md:px-6">
+                <div className="flex gap-3 items-center px-2">
+                  <PawPrintIcon className="h-6 w-6 text-primary" />
 
-                  <InputGroup>
-                    <InputGroupAddon align="inline-start">
-                      <SearchIcon className="w-4 h-4" />
-                    </InputGroupAddon>
+                  <TypographyH3 className="text-text">PAWPALS</TypographyH3>
+                </div>
 
-                    <InputGroupInput
-                      ref={inputRef}
-                      id="header-search"
-                      type="text"
-                      value={searchQuery}
-                      placeholder="Search... @users, #tags.."
-                      onKeyDown={handleKeyDown}
-                      onChange={handleInputChange}
-                      error={!!error}
-                      className="text-base md:text-sm"
-                    />
+                <div className="flex items-center gap-2">
+                  <Field>
+                    <FieldLabel htmlFor="header-search" className="sr-only">
+                      Search
+                    </FieldLabel>
 
-                    <InputGroupAddon
-                      align="inline-end"
-                      className="hidden md:flex"
-                    >
-                      <Kbd>Esc</Kbd>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Field>
+                    <InputGroup>
+                      <InputGroupAddon align="inline-start">
+                        <SearchIcon className="w-4 h-4" />
+                      </InputGroupAddon>
 
-                <Button
-                  size={"icon"}
-                  variant={"destructive"}
-                  onClick={handleClose}
-                  className="p-1 md:hidden"
-                >
-                  <XIcon />
-                </Button>
+                      <InputGroupInput
+                        ref={inputRef}
+                        id="header-search"
+                        type="text"
+                        value={searchQuery}
+                        placeholder="Search... @users, #tags.."
+                        onKeyDown={handleKeyDown}
+                        onChange={handleInputChange}
+                        error={!!error}
+                        className="text-base md:text-sm"
+                      />
+
+                      <InputGroupAddon
+                        align="inline-end"
+                        className="hidden md:flex"
+                      >
+                        <Kbd>Esc</Kbd>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </Field>
+
+                  <Button
+                    size={"icon-lg"}
+                    variant={"destructive"}
+                    onClick={handleClose}
+                    className="p-1"
+                  >
+                    <XIcon />
+                  </Button>
+                </div>
               </div>
 
               {/* Results Container */}
@@ -196,14 +205,14 @@ export default function SearchDialog({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="flex-1 px-2 py-4 border-t bg-background overflow-y-auto md:px-6 md:py-4"
+                className="gradientBG flex-1 px-2 py-4 border-t overflow-y-auto md:px-6 md:py-4"
               >
                 {/* Searching */}
                 {loading && (
                   <div className="flex items-center justify-center h-full gap-2 p-4">
                     <Loader2 size={16} className="animate-spin" />
 
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-text-muted">
                       Searching...
                     </span>
                   </div>
@@ -231,7 +240,7 @@ export default function SearchDialog({
                     !error &&
                     results.length === 0 &&
                     searchQuery && (
-                      <div className="flex items-center justify-center h-full p-4 text-sm text-muted-foreground text-center">
+                      <div className="flex items-center justify-center h-full p-4 text-sm text-text-muted text-center">
                         No results found
                       </div>
                     )}

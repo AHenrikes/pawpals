@@ -16,6 +16,7 @@ export const AUTH_ROUTES = {
   COMMUNITY: "/community",
   NOTIFICATION: "/notifications",
   MESSAGES: "/messages",
+  REELS: "/reels",
   ABOUT: "/about",
   STORE: "/store",
   ERROR: "/error",

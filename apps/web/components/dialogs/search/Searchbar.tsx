@@ -4,6 +4,7 @@ import { Button } from "@repo/ui/button";
 import { SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import SearchDialog from "./SearchDialog";
+import { cn } from "@/lib/helpers/utils";
 import { Kbd } from "@repo/ui/kbd";
 
 export function Searchbar() {
@@ -26,12 +27,15 @@ export function Searchbar() {
   return (
     <>
       <Button
-        size="icon"
-        variant="outline"
+        size="icon-lg"
+        variant="ghost"
         onClick={() => setOpen(true)}
-        className={`p-1.5 ${open ? "hidden" : ""}`}
+        className={cn(
+          "gradientBG px-2 py-1 space-x-2",
+          `${open ? "hidden" : ""}`
+        )}
       >
-        <SearchIcon size={18} />
+        <SearchIcon />
         <Kbd className="hidden md:block">Ctl+k</Kbd>
       </Button>
 

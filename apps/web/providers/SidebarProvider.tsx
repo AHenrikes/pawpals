@@ -26,7 +26,7 @@ type SidebarContextValue = {
 
 const SidebarContext = createContext<SidebarContextValue | null>(null);
 
-const SIDEBAR_WIDTH = "20rem";
+const SIDEBAR_WIDTH = "25rem";
 const SIDEBAR_WIDTH_ICON = "6rem";
 const SIDEBAR_WIDTH_MOBILE = "20rem";
 
@@ -157,7 +157,7 @@ export function Sidebar({
         data-variant={variant}
         data-state={state}
         data-collapsible={isCollapsed ? collapsible : ""}
-        animate={{ width: isCollapsed ? "6rem" : "20rem" }}
+        animate={{ width: isCollapsed ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
           "sticky top-16 hidden pl-5 pr-6 py-4 h-[calc(100svh-64px)] shrink-0 bg-surface-container-low/80 overflow-hidden md:flex",
@@ -319,10 +319,10 @@ export function SidebarMenuButton({
   ...props
 }: SidebarMenuButtonProps) {
   const sharedClassName = cn(
-    "group/menu-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] transition",
-    "text-muted-foreground hover:bg-sidebar-accent/30 hover:text-foreground",
+    "group/menu-button flex w-full items-center gap-3 px-3 py-2.5 text-left text-[15px] rounded-xl transition",
+    "cursor-pointer hover:bg-secondary",
     "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
-    isActive && "bg-surface-container-highest text-foreground",
+    isActive && "bg-accent hover:bg-accent",
     className,
   );
 
@@ -373,7 +373,7 @@ export function SidebarTrigger({
     <button
       type="button"
       className={cn(
-        "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-surface-container-highest text-foreground transition hover:bg-surface-variant",
+        "inline-flex h-10 w-10 items-center justify-center rounded-full text-text cursor-pointer",
         className,
       )}
       onClick={toggleSidebar}
