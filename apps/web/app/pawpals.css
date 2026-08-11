@@ -34,6 +34,7 @@
 
   --color-surface: hsl(var(--surface));
   --color-popover: hsl(var(--popover));
+  --color-muted: hsl(var(--muted));
   --color-border: hsl(var(--border));
   --color-ring: hsl(var(--ring));
 
@@ -64,24 +65,6 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
-  /* .maplibregl-popup-content {
-    @apply bg-transparent! shadow-none! p-0! rounded-none!;
-  }
-  .maplibregl-popup-tip {
-    @apply hidden!;
-  }
-  .maplibregl-ctrl-attrib {
-    @apply bg-background! text-muted-foreground! border-border! rounded-md! border! shadow-sm!;
-  }
-  .maplibregl-ctrl-attrib a {
-    @apply text-muted-foreground!;
-  }
-  .maplibregl-ctrl-attrib a:hover {
-    @apply text-foreground!;
-  }
-  .maplibregl-ctrl-attrib-button {
-    @apply bg-transparent! dark:invert;
-  } */
 }
 
 @utility text-display-lg {
@@ -176,8 +159,9 @@
 
     --surface: var(--secondary);
     --popover: var(--secondary);
-    --border: var(--foreground);
-    --ring: 0, 0%, 62%;
+    --muted: 0, 0%, 25%;
+    --border: 0, 0%, 40%;
+    --ring: var(--border);
 
     --headline: var(--foreground);
     --text: var(--foreground);
@@ -185,7 +169,7 @@
     --text-secondary: var(--secondary);
     --text-destructive: var(--destructive);
     --text-confirmative: var(--confirmative);
-    --text-muted: 0, 0%, 62%;
+    --text-muted: 0, 0%, 61%;
 
     --font-display: "Manrope", "Segoe UI", sans-serif;
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;

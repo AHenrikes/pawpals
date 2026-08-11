@@ -125,7 +125,7 @@ export function TypographyLead({
 }: React.ComponentProps<"p">) {
   return (
     <p
-      className={cn("text-lg text-text-muted md:text-xl", className)}
+      className={cn("text-lg text-foreground/80 md:text-xl", className)}
       {...props}
     />
   );

@@ -6,6 +6,8 @@ import { toError } from "@/lib/helpers/error-utils";
 
 interface UseFollowReturn {
   isFollowing: boolean;
+  isMutual: boolean;
+  mutualSince: string | null;
   loading: boolean;
   error: Error | null;
   toggle: () => Promise<void>;
@@ -14,10 +16,12 @@ interface UseFollowReturn {
 /**
  * Hook for managing follow/unfollow state for a fursona
  *
- * @param fursonaUsername - Username of the fursona to follow/unfollow
+ * @param fursonaId - id of the fursona to follow/unfollow
  */
 export function useFollow(id?: string): UseFollowReturn {
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isMutual, setIsMutual] = useState(false);
+  const [mutualSince, setMutualSince] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -31,11 +35,19 @@ export function useFollow(id?: string): UseFollowReturn {
       setError(null);
 
       try {
-        const res = await api.get<{ isFollowing: boolean }>(
+        const res = await api.get<{
+          isFollowing: boolean;
+          isMutual: boolean;
+          mutualSince: string | null;
+        }>(
           `/api/core/fursonas/${id}/follow`,
         );
 
-        if (!cancelled) setIsFollowing(res.isFollowing);
+        if (!cancelled) {
+          setIsFollowing(res.isFollowing);
+          setIsMutual(res.isMutual);
+          setMutualSince(res.mutualSince);
+        }
       } catch (err) {
         if (!cancelled) setError(toError(err));
       } finally {
@@ -67,5 +79,5 @@ export function useFollow(id?: string): UseFollowReturn {
     }
   }, [id, isFollowing]);
 
-  return { isFollowing, loading, error, toggle };
+  return { isFollowing, isMutual, mutualSince, loading, error, toggle };
 }

@@ -1,24 +1,13 @@
+import { useFollow } from "@/hooks/social/followers/useFollow";
 import { Button } from "@repo/ui/button";
 
-interface FollowButtonProps {
-  isOwnProfile: boolean;
-  isFollowing: boolean;
-  loading: boolean;
-  onToggle: () => Promise<void>;
-}
-
-export function FollowButton({
-  isOwnProfile,
-  isFollowing,
-  loading,
-  onToggle,
-}: Readonly<FollowButtonProps>) {
-  if (isOwnProfile) return null;
+export function FollowButton({ id }: Readonly<{id: string}>) {
+  const { isFollowing, toggle, loading } = useFollow(id);
 
   return (
     <Button
       variant={isFollowing ? "outline" : "default"}
-      onClick={onToggle}
+      onClick={() => toggle()}
       disabled={loading}
       className="rounded-full px-6"
     >

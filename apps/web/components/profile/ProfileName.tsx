@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import {
   TypographyH1,
   TypographyP,
-  TypographyXSmall,
 } from "@repo/ui/typography";
 import { Skeleton } from "@repo/ui/skeleton";
 
@@ -14,7 +13,7 @@ interface ProfileInfoProps {
   loading: boolean;
 }
 
-export default function ProfileInfo({
+export default function ProfileName({
   fursona,
   loading,
 }: Readonly<ProfileInfoProps>) {
@@ -57,21 +56,9 @@ export default function ProfileInfo({
                 {fursona.display_name}
               </TypographyH1>
 
-              <TypographyP className="text-muted-foreground truncate">
+              <TypographyP className="text-text-muted truncate">
                 @{fursona.username}
               </TypographyP>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <TypographyXSmall className="text-muted-foreground/50">
-                {new Date(fursona.created_at).toLocaleDateString()}
-              </TypographyXSmall>
-
-              <TypographyXSmall className="text-muted-foreground">
-                <p className="p-1 border border-foreground/20">
-                  {fursona.species}
-                </p>
-              </TypographyXSmall>
             </div>
           </div>
 
