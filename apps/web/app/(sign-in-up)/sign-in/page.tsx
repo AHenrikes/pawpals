@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardHeader } from "@repo/ui/card";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { FormError } from "@/components/ui/form-error";
 import { useAuthForm } from "@/hooks/useAuthForm";
@@ -8,14 +7,20 @@ import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { useRouter } from "next/navigation";
-import { Circle, MessagesSquare } from "lucide-react";
+import { Circle, EyeIcon, EyeOffIcon, MessagesSquare } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
 import { validateSignIn } from "@/lib/validation/auth";
 import Link from "next/link";
+import AuthCardHeader from "@/components/authentication/AuthCardHeader";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@repo/ui/input-group";
+import { useState } from "react";
+import { TypographyH2, TypographyP } from "@repo/ui/typography";
 
 export default function SignIn() {
   const router = useRouter();
   const supabase = useSupabaseClient();
+
+  const [showPassword, setShowPassword] = useState(false)
 
   const { values, error, handleChange, handleSubmit } = useAuthForm(
     { email: "", password: "" },
@@ -32,100 +37,119 @@ export default function SignIn() {
   );
 
   return (
-    <section className="flex items-center justify-center px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
-      <Card className="w-full max-w-160">
-        <CardHeader className="mb-8 flex items-center gap-8 text-2xl font-medium">
-          <Link
-            href={AUTH_ROUTES.SIGN_UP}
-            className="text-muted transition hover:text-text"
-          >
-            Create Account
-          </Link>
+    <>
+      <AuthCardHeader activePath={AUTH_ROUTES.SIGN_IN} />
 
-          <Link
-            href={AUTH_ROUTES.SIGN_IN}
-            className="border-b-4 border-primary pb-2 text-headline"
-          >
-            Sign in
-          </Link>
-        </CardHeader>
+      <div className="my-8">
+        <TypographyH2>
+          Welcome back
+        </TypographyH2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+        <TypographyP>
+          Stay connected with your community
+        </TypographyP>
+      </div>
 
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@pawpals.com"
-                value={values.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                variant={"popover"}
-                className="h-12"
-                autoFocus
-                required
-              />
-            </Field>
+      <form 
+        onSubmit={handleSubmit}
+        className="space-y-5"
+        autoComplete="off"
+      >
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
 
-            <Field>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Example@pawpals.com"
+              value={values.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              variant={"variant"}
+              className="h-12"
+              autoFocus
+              required
+            />
+          </Field>
 
-                <Link
-                  href={AUTH_ROUTES.FORGOT_PASSWORD}
-                  className="ml-auto inline-block text-sm text-muted-foreground underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
+          <Field>
+            <div className="flex items-center">
+              <FieldLabel htmlFor="password">Password</FieldLabel>
 
-              <Input
+              <Link
+                href={AUTH_ROUTES.FORGOT_PASSWORD}
+                className="ml-auto inline-block text-sm text-text-muted underline-offset-4 hover:underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
+            <InputGroup className="h-12 pr-2 bg-secondary border-none rounded-sm has-[[data-slot=input-group-control]:focus-visible]:ring-foreground/10 has-[[data-slot=input-group-control]:focus-visible]:ring-1">
+              <InputGroupInput
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={values.password}
                 onChange={(e) => handleChange("password", e.target.value)}
-                variant={"popover"}
+                variant={"variant"}
                 className="h-12"
                 required
               />
-            </Field>
 
-            <FormError message={error} className="pb-4" />
+              <InputGroupAddon  
+                align={"inline-end"}
+                onMouseDown={() => setShowPassword(true)}
+                onMouseUp={() => setShowPassword(false)}
+                onMouseLeave={() => setShowPassword(false)}
+                onTouchStart={() => setShowPassword(true)}
+                onTouchEnd={() => setShowPassword(false)}
+                className="cursor-pointer text-text-muted hover:text-text"
+              >
+                {!showPassword ? (
+                  <EyeOffIcon />
+                ) : (
+                  <EyeIcon />
+                )}
+              </InputGroupAddon>
+            </InputGroup >
+          </Field>
 
-            <Button type="submit" className="h-10 rounded-full">
-              <span>Sign in</span>
-            </Button>
-          </FieldGroup>
+          <FormError message={error} className="pb-4" />
 
-          <div className="flex items-center gap-4 pt-2 text-[0.65rem] uppercase tracking-[0.34em] text-text-muted">
-            <span className="h-px flex-1 bg-white/10" />
-            <span>Or continue with</span>
-            <span className="h-px flex-1 bg-white/10" />
-          </div>
+          <Button
+            type="submit"
+            className="h-12 rounded-sm"
+          >
+            <span>Sign in</span>
+          </Button>
+        </FieldGroup>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-12 rounded-full border-0 bg-popover text-headline shadow-none hover:bg-input"
-            >
-              <MessagesSquare className="h-4 w-4 text-[#5f7cff]" />
-              Discord
-            </Button>
+        <div className="flex items-center gap-4 pt-2 text-[0.65rem] uppercase tracking-[0.34em] text-text-muted">
+          <span className="h-px flex-1 bg-white/10" />
+          <span>Or continue with</span>
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="h-12 rounded-full border-0 bg-surface-highest text-headline shadow-none hover:bg-input"
-            >
-              <Circle className="h-4 w-4 text-primary" />
-              Google
-            </Button>
-          </div>
-        </form>
-      </Card>
-    </section>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            type="button"
+            variant={"outline"}
+            className="h-12 rounded-full bg-popover text-headline"
+          >
+            <MessagesSquare className="h-4 w-4 text-[#5f7cff]" />
+            Discord
+          </Button>
+
+          <Button
+            type="button"
+            variant={"outline"}
+            className="h-12 rounded-full bg-popover text-headline"
+          >
+            <Circle className="h-4 w-4 text-primary" />
+            Google
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }
