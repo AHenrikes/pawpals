@@ -213,7 +213,7 @@ export default function SignUpForm({
                     <InputGroupInput
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder={showPassword ? "password" : "••••••••"}
                       value={values.password}
                       onChange={(e) =>
                         handleChange("password", e.target.value)

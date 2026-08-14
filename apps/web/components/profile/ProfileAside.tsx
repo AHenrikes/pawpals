@@ -33,7 +33,7 @@ export default function ProfileAside({
             </span>
 
             <span className="flex flex-col items-center gap-2">
-              <TypographyXSmall className="text-text-muted">Verified</TypographyXSmall>
+              <TypographyXSmall className="text-text">Verified</TypographyXSmall>
               <div className="h-3 w-20 bg-primary-dim rounded-base" />
             </span>
 
@@ -76,26 +76,12 @@ export default function ProfileAside({
         </div>
       </section>
 
-      <section className="h-full space-y-6 overflow-hidden">
-        <div className="space-y-6 p-4 gap-6 max-h-85 w-full bg-secondary-dim border border-muted/30 overflow-y-scroll scrollbar-hide">
+      <section className="h-full space-y-6">
+        {/* <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">
           <TypographyLead>Whishlist</TypographyLead>
 
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={`user-col1-${i}`}
-              className="flex items-center gap-2 animate-pulse"
-            >
-              <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
-              <div className="h-4 w-full md:h-10 bg-muted rounded" />
-            </div>
-          ))}
-        </div>
-
-        { !isFollowing && (
-          <div className="space-y-6 p-4 gap-6 w-full bg-secondary-dim border border-muted/30">
-            <TypographyLead>Upcoming events</TypographyLead>
-
-            {[1, 2, 3].map((i) => (
+          <div className="space-y-6 max-h-56 overflow-auto scrollbar-hide">
+            {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={`user-col1-${i}`}
                 className="flex items-center gap-2 animate-pulse"
@@ -105,24 +91,44 @@ export default function ProfileAside({
               </div>
             ))}
           </div>
+        </div> */}
+
+        { !isFollowing && (
+          <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">
+            <TypographyLead>Upcoming events</TypographyLead>
+
+            <div className="space-y-6 max-h-56 overflow-y-scroll scrollbar-hide">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={`user-col1-${i}`}
+                  className="flex items-center gap-2 animate-pulse"
+                >
+                  <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
+                  <div className="h-4 w-full md:h-10 bg-muted rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
-        <div className="space-y-6 p-4 gap-6 max-h-85 w-full bg-secondary-dim border border-muted/30 overflow-y-scroll scrollbar-hide">
+        <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">
           <TypographyLead>Communities</TypographyLead>
 
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={`user-col1-${i}`}
-              className="flex items-center gap-2 animate-pulse"
-            >
-              <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
+          <div className="space-y-6 max-h-56 overflow-y-scroll scrollbar-hide">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={`user-col1-${i}`}
+                className="flex items-center gap-2 animate-pulse"
+              >
+                <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
 
-              <div className="space-y-2 flex-1">
-                <div className="h-6 w-full md:h-6 bg-muted rounded" />
-                <div className="h-5 w-2/3 md:h-5 bg-muted rounded" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-6 w-full md:h-6 bg-muted rounded" />
+                  <div className="h-5 w-2/3 md:h-5 bg-muted rounded" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
     </aside>
