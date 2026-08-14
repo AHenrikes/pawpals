@@ -22,7 +22,9 @@ const profileNav = [
 
 type ContentKey = (typeof profileNav)[number]["key"];
 
-export default function ProfileContent({ fursona } : Readonly<{ fursona: FursonaProfile }>) {
+export default function ProfileContent({
+  fursona,
+}: Readonly<{ fursona: FursonaProfile }>) {
   const [content, setContent] = useState<ContentKey>("gallery");
   const [direction, setDirection] = useState(0);
 
@@ -51,13 +53,13 @@ export default function ProfileContent({ fursona } : Readonly<{ fursona: Fursona
               className={cn(
                 "p-4 rounded-sm",
                 content === key ? "bg-primary hover:bg-primary-dim" : null,
-                special ? "lg:hidden" : null
+                special ? "lg:hidden" : null,
               )}
               onClick={() => handleNavClick(key)}
             >
               {label}
             </Button>
-          ))}          
+          ))}
         </ul>
       </nav>
 
@@ -72,17 +74,11 @@ export default function ProfileContent({ fursona } : Readonly<{ fursona: Fursona
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="grow space-y-4 min-h-[calc(100dvh-80px)] py-2 lg:overflow-y-auto scrollbar-hide md:py-4"
         >
-          {content === "gallery" && (
-            <div>Gallery coming soon</div>
-          )}
+          {content === "gallery" && <div>Gallery coming soon</div>}
 
-          {content === "post" && (
-            <ProfilePostCards username={fursona.id} />
-          )}
+          {content === "post" && <ProfilePostCards username={fursona.id} />}
 
-          {content === "archive" && (
-            <div>Archive coming soon</div>
-          )}
+          {content === "archive" && <div>Archive coming soon</div>}
 
           {content === "likes" && <div>Likes coming soon</div>}
 
@@ -90,5 +86,5 @@ export default function ProfileContent({ fursona } : Readonly<{ fursona: Fursona
         </motion.section>
       </AnimatePresence>
     </div>
-  )
+  );
 }

@@ -4,7 +4,11 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FormError } from "../ui/form-error";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useRef, useState } from "react";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@repo/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@repo/ui/input-group";
 import { type FursonaCreate } from "@/types/fursona";
 import CreateFursona from "../features/CreateFursona";
 import AuthCardFooter from "./AuthCardFooter";
@@ -41,8 +45,8 @@ export default function SignUpForm({
   setError,
   handleChange,
   handleSubmit,
-  setIsUsernameAvailable
-} : Readonly<SignUpFormProp>) {
+  setIsUsernameAvailable,
+}: Readonly<SignUpFormProp>) {
   const formRef = useRef<HTMLFormElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const stepTransition = prefersReducedMotion
@@ -105,9 +109,7 @@ export default function SignUpForm({
                     type="text"
                     placeholder="Jhon"
                     value={values.firstname}
-                    onChange={(e) =>
-                      handleChange("firstname", e.target.value)
-                    }
+                    onChange={(e) => handleChange("firstname", e.target.value)}
                     variant={"variant"}
                     autoFocus={step === "account"}
                     className="h-12"
@@ -123,9 +125,7 @@ export default function SignUpForm({
                     type="text"
                     placeholder="Doe"
                     value={values.lastname}
-                    onChange={(e) =>
-                      handleChange("lastname", e.target.value)
-                    }
+                    onChange={(e) => handleChange("lastname", e.target.value)}
                     variant={"variant"}
                     className="h-12"
                     required
@@ -215,14 +215,12 @@ export default function SignUpForm({
                       type={showPassword ? "text" : "password"}
                       placeholder={showPassword ? "password" : "••••••••"}
                       value={values.password}
-                      onChange={(e) =>
-                        handleChange("password", e.target.value)
-                      }
+                      onChange={(e) => handleChange("password", e.target.value)}
                       className="focus-visible:ring-foreground/10"
                       required
                     />
 
-                    <InputGroupAddon  
+                    <InputGroupAddon
                       align={"inline-end"}
                       onMouseDown={() => setShowPassword(true)}
                       onMouseUp={() => setShowPassword(false)}
@@ -231,11 +229,7 @@ export default function SignUpForm({
                       onTouchEnd={() => setShowPassword(false)}
                       className="cursor-pointer text-text-muted hover:text-text"
                     >
-                      {!showPassword ? (
-                        <EyeOffIcon />
-                      ) : (
-                        <EyeIcon />
-                      )}
+                      {!showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </InputGroupAddon>
                   </InputGroup>
                 </Field>
@@ -290,5 +284,5 @@ export default function SignUpForm({
         goToFursonaStep={goToFursonaStep}
       />
     </form>
-  )
+  );
 }

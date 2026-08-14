@@ -9,7 +9,10 @@ interface ProfileBannerProps {
   loading: boolean;
 }
 
-export default function Banner({ fursona, loading }: Readonly<ProfileBannerProps>) {
+export default function Banner({
+  fursona,
+  loading,
+}: Readonly<ProfileBannerProps>) {
   return (
     <AnimatePresence mode="wait">
       {loading ? (

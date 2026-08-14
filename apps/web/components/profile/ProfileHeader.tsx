@@ -7,7 +7,7 @@ import { DropdownMenu } from "@repo/ui/dropdown-menu";
 
 export default function ProfileHeader() {
   const router = useRouter();
-  
+
   return (
     <div className="absolute top-0 left-0 flex justify-between items-center w-full h-16 px-2 bg-linear-to-t from-transparent via-transparent to-background backdrop-blur-blur z-30 md:px-6">
       <Button
@@ -22,10 +22,10 @@ export default function ProfileHeader() {
       <div className="flex items-center gap-2">
         <Searchbar />
 
-          <DropdownMenu>
-            <HeaderAvatar />
-          </DropdownMenu>
+        <DropdownMenu>
+          <HeaderAvatar />
+        </DropdownMenu>
       </div>
     </div>
-  )
+  );
 }

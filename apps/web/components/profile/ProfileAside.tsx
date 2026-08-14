@@ -1,22 +1,8 @@
-import { FursonaProfile } from "@/types/fursona";
 import { TypographyLead, TypographyXSmall } from "@repo/ui/typography";
 
-interface ProfileProp {
-  fursona: FursonaProfile;
-  isMutual: boolean;
-  mutualSince: string | null;
-  isOwn: boolean;
-  isFollowing: boolean;
-}
-
-export default function ProfileAside({ 
-  fursona,
-  isMutual,
-  mutualSince,
-  isOwn,
-  isFollowing
-} : Readonly<ProfileProp>) {
-
+export default function ProfileAside({
+  isFollowing,
+}: Readonly<{ isFollowing: boolean }>) {
   return (
     <aside className="sticky top-6 hidden h-full max-h-[clac(100dvh-64px)] max-w-[320px] space-y-6 lg:block xl:max-w-full">
       <section className="flex flex-col gap-16 xl:gap-6">
@@ -28,17 +14,23 @@ export default function ProfileAside({
 
           <div className="relative bottom-2.5 flex items-center gap-6">
             <span className="flex flex-col items-center gap-2">
-              <TypographyXSmall className="text-text-muted">New User</TypographyXSmall>
+              <TypographyXSmall className="text-text-muted">
+                New User
+              </TypographyXSmall>
               <div className="h-3 w-20 bg-accent rounded-base" />
             </span>
 
             <span className="flex flex-col items-center gap-2">
-              <TypographyXSmall className="text-text">Verified</TypographyXSmall>
+              <TypographyXSmall className="text-text">
+                Verified
+              </TypographyXSmall>
               <div className="h-3 w-20 bg-primary-dim rounded-base" />
             </span>
 
             <span className="flex flex-col items-center gap-2">
-              <TypographyXSmall className="text-text-muted">Trusted</TypographyXSmall>
+              <TypographyXSmall className="text-text-muted">
+                Trusted
+              </TypographyXSmall>
               <div className="h-3 w-20 bg-secondary-dim rounded-base" />
             </span>
           </div>
@@ -52,7 +44,7 @@ export default function ProfileAside({
 
           <TypographySmall className="text-text-muted">{new Date(fursona.created_at).toLocaleDateString()}</TypographySmall>
         </div> */}
-        
+
         {/* {!isOwn && isMutual && isFollowing && mutualSince && (
           <div className="flex h-10 items-center gap-10">
             <span className="flex items-center gap-2">
@@ -66,7 +58,7 @@ export default function ProfileAside({
 
         <div className="space-y-6 p-4 w-full border border-muted/30">
           <TypographyLead>Achievements</TypographyLead>
-          
+
           <div className="flex max-w-md overflow-x-scroll gap-6 scrollbar-hide">
             <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
             <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
@@ -93,7 +85,7 @@ export default function ProfileAside({
           </div>
         </div> */}
 
-        { !isFollowing && (
+        {!isFollowing && (
           <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">
             <TypographyLead>Upcoming events</TypographyLead>
 
@@ -132,5 +124,5 @@ export default function ProfileAside({
         </div>
       </section>
     </aside>
-  )
+  );
 }

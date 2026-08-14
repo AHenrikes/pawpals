@@ -67,42 +67,27 @@ function layoutForFour(landscapeCount: number): LayoutConfig {
     case 3:
       return {
         container: "grid grid-cols-2 gap-1",
-        img: [
-          PORTRAIT_TILE,
-          LANDSCAPE_TILE,
-          LANDSCAPE_TILE,
-          LANDSCAPE_TILE,
-        ],
+        img: [PORTRAIT_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 2:
       return {
         container: "grid grid-cols-2 gap-1",
-        img: [
-          PORTRAIT_TILE,
-          PORTRAIT_TILE,
-          LANDSCAPE_TILE,
-          LANDSCAPE_TILE,
-        ],
+        img: [PORTRAIT_TILE, PORTRAIT_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 1:
       return {
         container: "grid grid-cols-2 gap-1",
-        img: [
-          PORTRAIT_TILE,
-          PORTRAIT_TILE,
-          PORTRAIT_TILE,
-          LANDSCAPE_TILE,
-        ],
+        img: [PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, LANDSCAPE_TILE],
       };
 
     default:
       return {
         container: "grid grid-cols-2 gap-1",
         img: isLandscape
-          ? [ LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE ]
-          : [ PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE ]
+          ? [LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE]
+          : [PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE],
       };
   }
 }
@@ -112,21 +97,13 @@ function layoutForThree(landscapeCount: number): LayoutConfig {
     case 3:
       return {
         container: "grid grid-cols-2 gap-1",
-        img: [
-          `col-span-2 ${LANDSCAPE_TILE}`,
-          LANDSCAPE_TILE,
-          LANDSCAPE_TILE,
-        ],
+        img: [`col-span-2 ${LANDSCAPE_TILE}`, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 2:
       return {
         container: "grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-1",
-        img: [
-          `row-span-2 ${PORTRAIT_TILE}`,
-          LANDSCAPE_TILE,
-          LANDSCAPE_TILE,
-        ],
+        img: [`row-span-2 ${PORTRAIT_TILE}`, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 1:
@@ -142,11 +119,7 @@ function layoutForThree(landscapeCount: number): LayoutConfig {
     default:
       return {
         container: "grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-1",
-        img: [
-          `row-span-2 ${PORTRAIT_TILE}`,
-          PORTRAIT_TILE,
-          PORTRAIT_TILE,
-        ],
+        img: [`row-span-2 ${PORTRAIT_TILE}`, PORTRAIT_TILE, PORTRAIT_TILE],
       };
   }
 }
@@ -178,9 +151,7 @@ function layoutForOne(landscapeCount: number): LayoutConfig {
   return {
     container: "flex justify-center items-center",
     img: [
-      landscapeCount === 1
-        ? "w-full h-auto min-h-[25dvh]"
-        : "w-auto h-full",
+      landscapeCount === 1 ? "w-full h-auto min-h-[25dvh]" : "w-auto h-full",
     ],
   };
 }

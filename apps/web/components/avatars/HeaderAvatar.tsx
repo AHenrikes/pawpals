@@ -3,21 +3,28 @@
 import { getInitials } from "@/utils/getInitials";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Collapsible } from "@repo/ui/collapsible";
-import { DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
+import {
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@repo/ui/dropdown-menu";
 import { Skeleton } from "@repo/ui/skeleton";
 import { TypographySmall, TypographyXSmall } from "@repo/ui/typography";
-import { SettingsIcon, ShoppingCartIcon, WalletMinimalIcon } from "lucide-react";
+import {
+  SettingsIcon,
+  ShoppingCartIcon,
+  WalletMinimalIcon,
+} from "lucide-react";
 import { useMemo } from "react";
 import { useUser } from "@/providers/UserProvider";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import Link from "next/link";
 
 export default function HeaderAvatar() {
-  const {
-    currentFursona,
-    loading,
-    signOut,
-  } = useUser();
+  const { currentFursona, loading, signOut } = useUser();
 
   const displayName = useMemo(() => {
     if (currentFursona?.display_name) {
@@ -71,9 +78,7 @@ export default function HeaderAvatar() {
                   alt={displayName}
                 />
 
-                <AvatarFallback>
-                  {getInitials(displayName)}
-                </AvatarFallback>
+                <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col">
@@ -98,10 +103,7 @@ export default function HeaderAvatar() {
 
             return (
               <DropdownMenuItem key={li.label}>
-                <Link
-                  href={li.href}
-                  className="flex items-center w-full gap-2"
-                >
+                <Link href={li.href} className="flex items-center w-full gap-2">
                   <Icon className="h-4 w-4" />
                   {li.label}
                 </Link>
@@ -113,14 +115,11 @@ export default function HeaderAvatar() {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => signOut()}
-          >
+          <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </Collapsible>
-  )
+  );
 }

@@ -19,7 +19,7 @@ export default function AuthCardFooter({
   isLoading,
   step,
   setStep,
-  goToFursonaStep
+  goToFursonaStep,
 }: Readonly<AuthCardFooterProps>) {
   return (
     <>
@@ -45,7 +45,9 @@ export default function AuthCardFooter({
             disabled={isLoading}
             className="h-12 w-full rounded-sm"
           >
-            <TypographyP className="text-text">{isLoading ? "Creating account..." : "Sign up"}</TypographyP>
+            <TypographyP className="text-text">
+              {isLoading ? "Creating account..." : "Sign up"}
+            </TypographyP>
           </Button>
         </div>
       )}
@@ -59,14 +61,12 @@ export default function AuthCardFooter({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-
             <Button
               type="button"
               variant="outline"
               className="h-12 rounded-full bg-popover text-headline"
             >
               <MessagesSquareIcon className="h-4 w-4 text-[#5f7cff]" />
-
               Discord
             </Button>
 
@@ -88,9 +88,7 @@ export default function AuthCardFooter({
             >
               Terms of Service
             </Link>{" "}
-
             and{" "}
-
             <Link
               href={AUTH_ROUTES.PRIVACY_POLICY}
               className="text-primary-dim hover:text-primary"
@@ -101,5 +99,5 @@ export default function AuthCardFooter({
         </>
       )}
     </>
-  )
+  );
 }

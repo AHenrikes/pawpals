@@ -32,7 +32,7 @@ export function Searchbar() {
         onClick={() => setOpen(true)}
         className={cn(
           "gradientBG px-2 py-1 space-x-2",
-          `${open ? "hidden" : ""}`
+          `${open ? "hidden" : ""}`,
         )}
       >
         <SearchIcon />

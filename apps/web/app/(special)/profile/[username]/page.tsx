@@ -12,8 +12,12 @@ import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
-import { TypographyLead, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
-import { AnimatePresence, motion } from "framer-motion"
+import {
+  TypographyLead,
+  TypographySmall,
+  TypographyXSmall,
+} from "@repo/ui/typography";
+import { AnimatePresence, motion } from "framer-motion";
 import { Skeleton } from "@repo/ui/skeleton";
 import type { FursonaProfile, FursonaTypes } from "@/types/fursona";
 import Banner from "@/components/profile/ProfileBanner";
@@ -42,7 +46,7 @@ export default function ProfilePage() {
   const isOwnProfile = currentFursona?.id === id;
   const viewedFursona: FursonaProfile | null = profile || currentFursona;
 
-  const { isFollowing, isMutual, mutualSince, toggle, loading } = useFollow(id);
+  const { isFollowing, isMutual, toggle, loading } = useFollow(id);
   const { following, follower, likes, refetch } = useProfileCounts(id);
 
   const isLoading = isOwnProfile
@@ -67,7 +71,7 @@ export default function ProfilePage() {
   };
 
   if (isLoading || !viewedFursona) return null;
-  console.log(isMutual)
+  console.log(isMutual);
 
   return (
     <div className="flex-1 w-full bg-background">
@@ -83,10 +87,7 @@ export default function ProfilePage() {
             {/* Action button */}
             <div className="pt-16 md:flex md:items-center gap-4">
               {isOwnProfile ? (
-                <Button
-                  size={"lg"}
-                  onClick={() => setIsEditOpen(true)}
-                >
+                <Button size={"lg"} onClick={() => setIsEditOpen(true)}>
                   <p>Edit Profile</p>
                 </Button>
               ) : (
@@ -105,12 +106,16 @@ export default function ProfilePage() {
                     variant={isFollowing ? "outline" : "default"}
                     onClick={async () => {
                       await toggle();
-                      refetch()
+                      refetch();
                     }}
                     disabled={loading}
                     className="rounded-full px-6"
                   >
-                    {!isFollowing && isMutual ? "Follow back" : isFollowing ? "Unfollow" : "Follow"}
+                    {!isFollowing && isMutual
+                      ? "Follow back"
+                      : isFollowing
+                        ? "Unfollow"
+                        : "Follow"}
                   </Button>
 
                   <ProfileCTA />
@@ -157,7 +162,6 @@ export default function ProfilePage() {
             ) : (
               <div className="flex gap-10">
                 <div className="flex-1 space-y-4 w-full">
-
                   {/* Bio */}
                   {viewedFursona.bio && (
                     <motion.div
@@ -178,7 +182,9 @@ export default function ProfilePage() {
 
                         <DotIcon />
 
-                        <TypographySmall className="text-text-muted">{viewedFursona.pronouns}</TypographySmall>
+                        <TypographySmall className="text-text-muted">
+                          {viewedFursona.pronouns}
+                        </TypographySmall>
                       </span>
 
                       <TypographyXSmall className="text-text-muted wrap-break-word">
@@ -202,8 +208,7 @@ export default function ProfilePage() {
                         { count: likes, label: "Likes" },
                       ].map(({ count, label }) => (
                         <div key={label} className="text-center">
-                          <TypographyLead 
-                            className="text-text-muted font-bold text-lg sm:text-xl">
+                          <TypographyLead className="text-text-muted font-bold text-lg sm:text-xl">
                             {formatNumbers(count)}
                           </TypographyLead>
 
@@ -219,13 +224,7 @@ export default function ProfilePage() {
                   <ProfileContent fursona={viewedFursona} />
                 </div>
 
-                <ProfileAside
-                  fursona={viewedFursona}
-                  isMutual={isMutual}
-                  isOwn={isOwnProfile}
-                  isFollowing={isFollowing}
-                  mutualSince={mutualSince}
-                />
+                <ProfileAside isFollowing={isFollowing} />
               </div>
             )}
           </AnimatePresence>

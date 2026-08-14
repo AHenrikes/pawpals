@@ -39,9 +39,7 @@ export function useFollow(id?: string): UseFollowReturn {
           isFollowing: boolean;
           isMutual: boolean;
           mutualSince: string | null;
-        }>(
-          `/api/core/fursonas/${id}/follow`,
-        );
+        }>(`/api/core/fursonas/${id}/follow`);
 
         if (!cancelled) {
           setIsFollowing(res.isFollowing);

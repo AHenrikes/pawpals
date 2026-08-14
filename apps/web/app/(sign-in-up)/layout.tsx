@@ -7,7 +7,6 @@ import type { Metadata } from "next";
 import AuthFooter from "@/components/footer/AuthFooter";
 import AuthHeader from "@/components/navigation/SignHeader";
 
-
 export const metadata: Metadata = { title: "Register || Login" };
 
 export default async function AuthLayout({
@@ -63,9 +62,7 @@ export default async function AuthLayout({
         </section>
 
         <section className="place-self-center w-full max-w-160 px-8 py-4 bg-secondary-dim rounded-base shadow-2xl">
-          <Card className="space-y-8">
-            {children}
-          </Card>
+          <Card className="space-y-8">{children}</Card>
         </section>
       </div>
 

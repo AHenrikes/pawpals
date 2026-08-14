@@ -44,8 +44,7 @@ const ACTION_BUTTON_CLASSES = {
 
 const PostCard = memo(function PostCard({
   post,
-  isLast = false,
-}: Readonly<{ post: PostType; isLast?: boolean }>) {
+}: Readonly<{ post: PostType }>) {
   const { user, loading } = useFursonaData(post.fursona_id);
   const media = post.media_urls ?? [];
   const [isExpanded, setIsExpanded] = useState(false);
@@ -284,12 +283,9 @@ export default function ProfileLists({
   } else {
     return (
       <>
-        {posts.map((post, idx) => (
+        {posts.map((post) => (
           <Fragment key={post.id}>
-            <PostCard
-              post={post}
-              isLast={idx === posts.length - 1}
-            />
+            <PostCard post={post} />
 
             <Separator className="h-0.5" />
           </Fragment>

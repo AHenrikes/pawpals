@@ -1,7 +1,7 @@
 import { useFollow } from "@/hooks/social/followers/useFollow";
 import { Button } from "@repo/ui/button";
 
-export function FollowButton({ id }: Readonly<{id: string}>) {
+export function FollowButton({ id }: Readonly<{ id: string }>) {
   const { isFollowing, toggle, loading } = useFollow(id);
 
   return (

@@ -28,7 +28,8 @@ export default function SignUp() {
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean>(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] =
+    useState<boolean>(false);
 
   const {
     values,
@@ -49,7 +50,7 @@ export default function SignUp() {
         display_name: "",
         username: "",
         species: "",
-        pronouns: ""
+        pronouns: "",
       },
     },
 
@@ -144,13 +145,9 @@ export default function SignUp() {
       <AuthCardHeader activePath={AUTH_ROUTES.SIGN_UP} />
 
       <div className="my-8">
-        <TypographyH2>
-          Start Yout Journey
-        </TypographyH2>
+        <TypographyH2>Start Yout Journey</TypographyH2>
 
-        <TypographyP>
-          Join the pack and explore the community
-        </TypographyP>
+        <TypographyP>Join the pack and explore the community</TypographyP>
       </div>
 
       <SignUpForm

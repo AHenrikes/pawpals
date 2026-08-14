@@ -25,7 +25,7 @@ export default function MediaTiles({
       className={cn(
         "relative overflow-hidden bg-black/50 min-h-0 h-full",
         className ?? "",
-        container
+        container,
       )}
     >
       {visible.map((item, index) => {

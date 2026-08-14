@@ -25,7 +25,7 @@ export default function Header() {
           <Searchbar />
 
           <DropdownMenu>
-            <HeaderAvatar  />
+            <HeaderAvatar />
           </DropdownMenu>
         </div>
       </div>

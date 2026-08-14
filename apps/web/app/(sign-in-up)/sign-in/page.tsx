@@ -12,7 +12,11 @@ import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
 import { validateSignIn } from "@/lib/validation/auth";
 import Link from "next/link";
 import AuthCardHeader from "@/components/authentication/AuthCardHeader";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@repo/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@repo/ui/input-group";
 import { useState } from "react";
 import { TypographyH2, TypographyP } from "@repo/ui/typography";
 
@@ -20,7 +24,7 @@ export default function SignIn() {
   const router = useRouter();
   const supabase = useSupabaseClient();
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const { values, error, handleChange, handleSubmit } = useAuthForm(
     { email: "", password: "" },
@@ -41,20 +45,12 @@ export default function SignIn() {
       <AuthCardHeader activePath={AUTH_ROUTES.SIGN_IN} />
 
       <div className="my-8">
-        <TypographyH2>
-          Welcome back
-        </TypographyH2>
+        <TypographyH2>Welcome back</TypographyH2>
 
-        <TypographyP>
-          Stay connected with your community
-        </TypographyP>
+        <TypographyP>Stay connected with your community</TypographyP>
       </div>
 
-      <form 
-        onSubmit={handleSubmit}
-        className="space-y-5"
-        autoComplete="off"
-      >
+      <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -96,7 +92,7 @@ export default function SignIn() {
                 required
               />
 
-              <InputGroupAddon  
+              <InputGroupAddon
                 align={"inline-end"}
                 onMouseDown={() => setShowPassword(true)}
                 onMouseUp={() => setShowPassword(false)}
@@ -105,21 +101,14 @@ export default function SignIn() {
                 onTouchEnd={() => setShowPassword(false)}
                 className="cursor-pointer text-text-muted hover:text-text"
               >
-                {!showPassword ? (
-                  <EyeOffIcon />
-                ) : (
-                  <EyeIcon />
-                )}
+                {!showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </InputGroupAddon>
-            </InputGroup >
+            </InputGroup>
           </Field>
 
           <FormError message={error} className="pb-4" />
 
-          <Button
-            type="submit"
-            className="h-12 rounded-sm"
-          >
+          <Button type="submit" className="h-12 rounded-sm">
             <span>Sign in</span>
           </Button>
         </FieldGroup>

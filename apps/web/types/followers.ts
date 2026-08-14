@@ -3,4 +3,4 @@ export type followersType = {
   follower_fursona_id: string;
   following_fursona_id: string;
   created_at: Date;
-}
+};

@@ -37,7 +37,11 @@ import { CardContent } from "@repo/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { toast } from "@repo/ui/sonner";
 import { getInitials } from "@/utils/getInitials";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@repo/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@repo/ui/collapsible";
 import { CreateFursonaPanelModal } from "../dialogs/CreateFursonaPanelModal";
 import { createPortal } from "react-dom";
 import { Separator } from "@repo/ui/separator";
@@ -63,7 +67,13 @@ export default function MainNav() {
   const pathname = usePathname();
 
   const { signOut } = useUser();
-  const { currentFursona, switchCurrentFursona, fursonas, fetchFursonas, refresh } = useUser();
+  const {
+    currentFursona,
+    switchCurrentFursona,
+    fursonas,
+    fetchFursonas,
+    refresh,
+  } = useUser();
   const { state, openMobile, isMobile } = useSidebar();
 
   const [, startTransition] = useTransition();
@@ -88,7 +98,8 @@ export default function MainNav() {
         const newCurrentFursona = fursonas.find((f) => f.id === id);
         toast(`Switched to ${newCurrentFursona?.display_name ?? "fursona"}`);
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Failed to switch fursona";
+        const msg =
+          err instanceof Error ? err.message : "Failed to switch fursona";
         toast(msg);
       }
     });
@@ -101,7 +112,7 @@ export default function MainNav() {
   const MAX_COUNT = 4;
   const fursonaCount = fursonas.length;
 
-  LockScreen(isMobile && openMobile || isCreateFursonaOpen);
+  LockScreen((isMobile && openMobile) || isCreateFursonaOpen);
 
   return (
     <Sidebar collapsible="icon" className="group/sidebar shrink-0">
@@ -111,19 +122,12 @@ export default function MainNav() {
 
           return (
             <SidebarMenuItem key={label}>
-              <SidebarMenuButton 
+              <SidebarMenuButton
                 asChild
                 isActive={isActive}
-                className={cn(
-                  "text-text-muted",
-                  isActive && "text-text"
-                )}
+                className={cn("text-text-muted", isActive && "text-text")}
               >
-                <Link
-                  href={href}
-                  className="p-3"
-                  draggable="false"
-                >
+                <Link href={href} className="p-3" draggable="false">
                   <Icon
                     className={cn(
                       "h-6 w-6 shrink-0",
@@ -161,7 +165,7 @@ export default function MainNav() {
       <SidebarFooter className="flex flex-col gap-4">
         <Collapsible open={isFursonasOpen} onOpenChange={setFursonasOpen}>
           {isCollapsed ? (
-            <SidebarMenuButton 
+            <SidebarMenuButton
               disabled
               className="p-3 cursor-default hover:bg-transparent"
             >
@@ -174,7 +178,7 @@ export default function MainNav() {
               aria-label={isCollapsed ? "My fursonas" : undefined}
               className={cn(
                 "w-full p-3 mt-0 rounded-sm",
-                !isCollapsed ? "cursor-pointer hover:bg-secondary" : null
+                !isCollapsed ? "cursor-pointer hover:bg-secondary" : null,
               )}
             >
               <AnimatePresence initial={false} mode="wait">
@@ -215,10 +219,11 @@ export default function MainNav() {
                     onClick={() => handleSwitchFursona(elem.id)}
                     className={cn(
                       "flex flex-col items-center w-full h-auto p-2.5 gap-2 rounded-sm",
-                      `${isActive 
-                        ? "bg-secondary border-2 border-accent"
-                        : "bg-secondary-dim border-2 border-transparent text-text-muted cursor-pointer"
-                      }`
+                      `${
+                        isActive
+                          ? "bg-secondary border-2 border-accent"
+                          : "bg-secondary-dim border-2 border-transparent text-text-muted cursor-pointer"
+                      }`,
                     )}
                   >
                     <Avatar size="lg">
@@ -227,12 +232,12 @@ export default function MainNav() {
                         alt={elem?.display_name}
                       />
 
-                      <AvatarFallback>{getInitials(elem?.display_name)}</AvatarFallback>
+                      <AvatarFallback>
+                        {getInitials(elem?.display_name)}
+                      </AvatarFallback>
                     </Avatar>
 
-                    <TypographySmall>
-                      {elem.display_name}
-                    </TypographySmall>
+                    <TypographySmall>{elem.display_name}</TypographySmall>
                   </Button>
                 );
               })}
@@ -244,7 +249,7 @@ export default function MainNav() {
                   onClick={() => setCreateFursonaOpen(true)}
                   className={cn(
                     "flex flex-col items-center w-full h-auto p-2.5 gap-2.5",
-                    "bg-secondary-dim text-text-muted rounded-sm"
+                    "bg-secondary-dim text-text-muted rounded-sm",
                   )}
                 >
                   <PlusIcon />
@@ -259,7 +264,8 @@ export default function MainNav() {
         <SidebarGroup className="flex flex-col">
           <SidebarMenuButton
             onClick={() => setPostOpen(true)}
-            className="bg-primary rounded-sm hover:bg-primary-dim">
+            className="bg-primary rounded-sm hover:bg-primary-dim"
+          >
             <PlusIcon className="w-6 h-6 shrink-0" />
 
             <AnimatePresence initial={false} mode="wait">
@@ -280,7 +286,8 @@ export default function MainNav() {
 
           <SidebarMenuButton
             onClick={() => signOut()}
-            className="bg-destructive/40 rounded-sm hover:bg-destructive">
+            className="bg-destructive/40 rounded-sm hover:bg-destructive"
+          >
             <LogOutIcon className="w-6 h-6 p-0.5 shrink-0" />
 
             <AnimatePresence initial={false} mode="wait">
@@ -321,8 +328,7 @@ export default function MainNav() {
             </motion.div>
           </AnimatePresence>,
           document.body,
-        )
-      }
+        )}
     </Sidebar>
   );
 }

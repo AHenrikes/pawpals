@@ -4,7 +4,7 @@ import { cn } from "@repo/ui/lib/utils";
 type ScrollToButtonProps = {
   className?: string;
   children?: React.ReactNode;
-}
+};
 
 export default function ScrollToButton({
   className,
@@ -15,15 +15,12 @@ export default function ScrollToButton({
       onClick={() => {
         window.scrollTo({
           top: 0,
-          behavior: "smooth"
-        })
+          behavior: "smooth",
+        });
       }}
-      className={cn(
-        "fixed bottom-6 right-6 shadow-lg",
-        className,
-      )}
+      className={cn("fixed bottom-6 right-6 shadow-lg", className)}
     >
       {children}
     </Button>
-  )
+  );
 }

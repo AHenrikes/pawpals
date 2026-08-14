@@ -7,9 +7,9 @@ export const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "h-9 bg-secondary-dim border border-secondary rounded-sm focus-visible:ring-foreground/10",
-        secondary:
-          "h-9 bg-accent rounded-base focus-visible:ring-primary/60",
+        default:
+          "h-9 bg-secondary-dim border border-secondary rounded-sm focus-visible:ring-foreground/10",
+        secondary: "h-9 bg-accent rounded-base focus-visible:ring-primary/60",
         variant: "h-9 bg-secondary rounded-sm focus-visible:ring-foreground/10",
         none: "",
       },
