@@ -25,7 +25,7 @@ export default async function AuthLayout({
     <>
       <AuthHeader />
 
-      <div className="container grid grid-cols-1 flex-1 py-16 mx-auto md:min-h-[calc(100svh-144px)] lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="container grid grid-cols-1 flex-1 h-[calc(100svh-144px)] gap-4 p-2 mx-auto lg:grid-cols-[1.05fr_0.95fr]">
         <section className="hidden w-full sm:px-8 lg:flex">
           <div className="flex flex-col justify-center w-full h-full max-w-180 mx-auto gap-4">
             <TypographyH2 className="flex flex-col text-5xl leading-[0.92]">
@@ -61,7 +61,9 @@ export default async function AuthLayout({
           </div>
         </section>
 
-        {children}
+        <section className="place-self-center w-full max-w-160 px-8 py-4 bg-secondary-dim rounded-base shadow-2xl">
+          <Card className="space-y-8">{children}</Card>
+        </section>
       </div>
 
       <AuthFooter />

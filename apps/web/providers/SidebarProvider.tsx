@@ -320,7 +320,7 @@ export function SidebarMenuButton({
 }: SidebarMenuButtonProps) {
   const sharedClassName = cn(
     "group/menu-button flex w-full items-center gap-3 px-3 py-2.5 text-left text-[15px] rounded-xl transition",
-    "cursor-pointer hover:bg-secondary",
+    "cursor-pointer hover:bg-secondary hover:text-text",
     "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
     isActive && "bg-accent hover:bg-accent",
     className,

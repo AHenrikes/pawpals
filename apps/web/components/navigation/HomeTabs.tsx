@@ -26,7 +26,7 @@ export default function HomeTabs() {
             variant="ghost"
             className={cn(
               "justify-start py-7.5 text-text/40 text-base border-transparent rounded-none hover:bg-transparent",
-              `${content === key ? "text-text-primary border-b-primary hover:text-text-primary" : "hover:text-text/80"}`
+              `${content === key ? "text-text-primary border-b-primary hover:text-text-primary" : "hover:text-text/80"}`,
             )}
             onClick={() => navContent(key)}
           >

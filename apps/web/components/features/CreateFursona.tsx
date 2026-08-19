@@ -2,7 +2,6 @@
 
 import { Input } from "@repo/ui/input";
 import { useEffect, useState } from "react";
-import { Textarea } from "@repo/ui/textarea";
 import { useDebouncedCallback } from "use-debounce";
 import { AtSign, Check, X, Loader2 } from "lucide-react";
 import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
@@ -12,7 +11,7 @@ import { type FursonaCreate } from "@/types/fursona";
 type CreateFursonaProps = {
   fursona: FursonaCreate;
   onFursonaChange: (
-    field: "display_name" | "username" | "species" | "pronouns" | "bio",
+    field: "display_name" | "username" | "species" | "pronouns",
     value: string,
   ) => void;
   isActive: boolean;
@@ -56,7 +55,7 @@ export default function CreateFursona({
   return (
     <FieldGroup>
       <Field>
-        <FieldLabel htmlFor="fursona-name">Displayname</FieldLabel>
+        <FieldLabel htmlFor="fursona-name">Display name</FieldLabel>
 
         <Input
           id="fursona-name"
@@ -65,7 +64,7 @@ export default function CreateFursona({
           value={fursona.display_name}
           onChange={(e) => onFursonaChange("display_name", e.target.value)}
           onClick={() => onFursonaChange("username", "")}
-          variant={"popover"}
+          variant={"variant"}
           className="h-12"
           autoFocus={isActive}
           required
@@ -85,7 +84,7 @@ export default function CreateFursona({
             value={fursona.username}
             onChange={(e) => onFursonaChange("username", e.target.value)}
             onFocus={seedUsernameSuggestion}
-            variant={"popover"}
+            variant={"variant"}
             className="h-12 pl-8 pr-8"
             error={isAvailable === false}
             required
@@ -115,7 +114,7 @@ export default function CreateFursona({
             placeholder="Wolf"
             value={fursona.species ?? ""}
             onChange={(e) => onFursonaChange("species", e.target.value)}
-            variant={"popover"}
+            variant={"variant"}
             className="h-12"
           />
         </Field>
@@ -129,13 +128,13 @@ export default function CreateFursona({
             placeholder="he/him"
             value={fursona.pronouns ?? ""}
             onChange={(e) => onFursonaChange("pronouns", e.target.value)}
-            variant={"popover"}
+            variant={"variant"}
             className="h-12"
           />
         </Field>
       </div>
 
-      <Field>
+      {/* <Field className="hidden">
         <FieldLabel htmlFor="fursona-bio">Bio</FieldLabel>
 
         <Textarea
@@ -144,9 +143,9 @@ export default function CreateFursona({
           value={fursona.bio ?? ""}
           onChange={(e) => onFursonaChange("bio", e.target.value)}
           rows={4}
-          className="h-12"
+          className="h-12 bg-secondary border-0 focus-visible:ring-foreground/10"
         />
-      </Field>
+      </Field> */}
     </FieldGroup>
   );
 }

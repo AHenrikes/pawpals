@@ -77,7 +77,12 @@ export function TypographyP({
   className,
   ...props
 }: React.ComponentProps<"p">) {
-  return <p className={cn("text-base text-text/40 leading-7", className)} {...props} />;
+  return (
+    <p
+      className={cn("text-base text-text/40 leading-7", className)}
+      {...props}
+    />
+  );
 }
 
 export function TypographyBlockquote({
@@ -125,7 +130,7 @@ export function TypographyLead({
 }: React.ComponentProps<"p">) {
   return (
     <p
-      className={cn("text-lg text-text-muted md:text-xl", className)}
+      className={cn("text-lg text-foreground/80 md:text-xl", className)}
       {...props}
     />
   );

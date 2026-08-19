@@ -148,7 +148,6 @@ export default function SearchDialog({
             className="fixed inset-0 flex justify-center z-50 pointer-events-none"
           >
             <div className="flex flex-col w-full overflow-hidden shadow-lg md:h-80 md:rounded-xl pointer-events-auto">
-              {/* Input */}
               <div className="flex items-center justify-between h-16 px-2 gap-2 shrink-0 gradientBG md:px-6">
                 <div className="flex gap-3 items-center px-2">
                   <PawPrintIcon className="h-6 w-6 text-primary" />
@@ -156,6 +155,7 @@ export default function SearchDialog({
                   <TypographyH3 className="text-text">PAWPALS</TypographyH3>
                 </div>
 
+                {/* Input */}
                 <div className="flex items-center gap-2">
                   <Field>
                     <FieldLabel htmlFor="header-search" className="sr-only">
@@ -225,14 +225,15 @@ export default function SearchDialog({
                   </div>
                 )}
 
-                {/* Results or Default View */}
                 <>
+                  {/* Results */}
                   <SearchResults
                     loading={loading}
                     results={results}
                     error={error}
                     handleClose={handleClose}
                   />
+                  {/* Default */}
                   <SearchDefault searchQuery={searchQuery} />
 
                   {/* No results */}

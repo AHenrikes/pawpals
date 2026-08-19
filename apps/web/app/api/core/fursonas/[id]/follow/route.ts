@@ -30,17 +30,33 @@ export async function GET(
     .single();
 
   if (selfError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if (!self) return ok({ isFollowing: false });
+  if (!self) {
+    return ok({ isFollowing: false, isMutual: false, mutualSince: null });
+  }
 
-  const { data } = await supabase
-    .schema("social")
-    .from("followers")
-    .select("id")
-    .eq("follower_fursona_id", self.id)
-    .eq("following_fursona_id", id)
-    .single();
+  const [{ data: following }, { data: followedBy }] = await Promise.all([
+    supabase
+      .schema("social")
+      .from("followers")
+      .select("id")
+      .eq("follower_fursona_id", self.id)
+      .eq("following_fursona_id", id)
+      .maybeSingle(),
 
-  return ok({ isFollowing: !!data });
+    supabase
+      .schema("social")
+      .from("followers")
+      .select("id, created_at")
+      .eq("follower_fursona_id", id)
+      .eq("following_fursona_id", self.id)
+      .maybeSingle(),
+  ]);
+
+  return ok({
+    isFollowing: !!following,
+    isMutual: !!followedBy,
+    mutualSince: followedBy?.created_at ?? null,
+  });
 }
 
 export async function POST(

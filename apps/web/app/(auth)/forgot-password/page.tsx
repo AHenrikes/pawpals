@@ -153,7 +153,7 @@ export default function ForgotPasswordForm() {
                           <Input
                             id="email"
                             type="email"
-                            variant={"popover"}
+                            variant={"variant"}
                             placeholder="example@pawpals.com"
                             value={values.email}
                             onChange={(e) =>

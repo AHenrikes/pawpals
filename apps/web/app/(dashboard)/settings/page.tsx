@@ -260,13 +260,13 @@ export default function Settings() {
 
         <div className="flex pl-10 gap-5">
           <Input className="w-96" placeholder="Default" variant={"default"} />
+          <Input className="w-96" placeholder="default" />
           <Input
             className="w-96"
-            placeholder="Secondary"
+            placeholder="secondary"
             variant={"secondary"}
           />
-          <Input className="w-96" placeholder="Surface" variant={"input"} />
-          <Input className="w-96" placeholder="Popover" variant={"popover"} />
+          <Input className="w-96" placeholder="variant" variant={"variant"} />
         </div>
       </div>
 

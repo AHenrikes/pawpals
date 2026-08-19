@@ -10,7 +10,7 @@ type SocialStats = {
   follower: number;
   reputation: number;
   post: number;
-  like: number;
+  likes: number;
 };
 
 type SocialData = SocialStats & {
@@ -22,11 +22,16 @@ type SocialData = SocialStats & {
 const initialState: SocialStats = {
   following: 0,
   follower: 0,
-  like: 0,
+  likes: 0,
   post: 0,
   reputation: 0,
 };
 
+/**
+ * Hook for fetching social stats
+ *
+ * @param fursonaId - id of the fursona to get social stats
+ */
 export function useProfileCounts(id?: string): SocialData {
   const [social, setSocial] = useState<SocialStats>(initialState);
   const [error, setError] = useState<Error | null>(null);
@@ -51,7 +56,7 @@ export function useProfileCounts(id?: string): SocialData {
       setSocial({
         follower: data.follower_count ?? 0,
         following: data.following_count ?? 0,
-        like: data.like_count ?? 0,
+        likes: data.like_count ?? 0,
         post: data.post_count ?? 0,
         reputation: data.reputation_count ?? 0,
       });

@@ -7,12 +7,10 @@ export const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "h-9 rounded-base border border-input",
-        secondary:
-          "h-9 bg-foreground text-text-foreground rounded-base shadow-md focus-visible:ring-border",
-        input: "h-9 bg-input rounded-base shadow-md focus-visible:ring-2",
-        popover:
-          "h-9 rounded-full border-popover bg-popover px-4 shadow-ambient focus-visible:ring-2 focus-visible:ring-secondary",
+        default:
+          "h-9 bg-secondary-dim border border-secondary rounded-sm focus-visible:ring-foreground/10",
+        secondary: "h-9 bg-accent rounded-base focus-visible:ring-primary/60",
+        variant: "h-9 bg-secondary rounded-sm focus-visible:ring-foreground/10",
         none: "",
       },
 
