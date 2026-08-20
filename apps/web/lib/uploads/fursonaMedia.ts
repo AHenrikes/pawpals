@@ -69,7 +69,10 @@ export async function uploadFursonaImage(
 
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(path, file, { contentType: file.type });
+    .upload(path, file, {
+      cacheControl: "31536000",
+      contentType: file.type
+    });
 
   if (error) throw error;
 

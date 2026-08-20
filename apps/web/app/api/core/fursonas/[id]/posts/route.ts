@@ -4,7 +4,7 @@ import {
   badRequest,
   notFound,
   ok,
-  okNoStore,
+  okPrivateRead,
   serverError,
   unauthorized,
 } from "@/lib/api/responses";
@@ -92,9 +92,9 @@ export async function GET(
 
   const nextCursor = hasMore ? lastPostCreatedAt : null;
 
-  return okNoStore<{ posts: PostType[]; nextCursor: string | null }>({
+  return okPrivateRead<{ posts: PostType[]; nextCursor: string | null }>({
     posts,
-    nextCursor,
+    nextCursor
   });
 }
 

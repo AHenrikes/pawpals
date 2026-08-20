@@ -4,6 +4,11 @@ const NO_STORE_HEADERS = {
   "Cache-Control": "private, no-store, max-age=0, must-revalidate",
 };
 
+const PRIVATE_READ_HEADERS = {
+  "Cache-Control": "private, max-age=15, stale-while-revalidate=30",
+  Vary: "Cookie",
+};
+
 /**
  * Centralized API response utilities for consistent error handling.
  * Prevents duplication and ensures uniform status codes across routes.
@@ -41,5 +46,12 @@ export function okNoStore<T>(data: T) {
   return NextResponse.json(data, {
     status: 200,
     headers: NO_STORE_HEADERS,
+  });
+}
+
+export function okPrivateRead<T>(data: T) {
+  return NextResponse.json(data, {
+    status: 200,
+    headers: PRIVATE_READ_HEADERS,
   });
 }

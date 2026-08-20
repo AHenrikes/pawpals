@@ -10,6 +10,7 @@ import {
   badRequest,
   notFound,
   ok,
+  okPrivateRead,
   serverError,
   unauthorized,
 } from "@/lib/api/responses";
@@ -90,7 +91,7 @@ export async function GET(
   if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  return ok<FursonaProfile>(data);
+  return okPrivateRead<FursonaProfile>(data);
 }
 
 export async function PATCH(

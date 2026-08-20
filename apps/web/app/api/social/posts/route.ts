@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth/requireUser";
-import { okNoStore, serverError, unauthorized } from "@/lib/api/responses";
+import {
+  okPrivateRead,
+  serverError,
+  unauthorized
+} from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { type PostType } from "@/types/post";
 
@@ -57,8 +61,8 @@ export async function GET(req: NextRequest) {
       : null
     : null;
 
-  return okNoStore<{ posts: PostType[]; nextCursor: string | null }>({
+  return okPrivateRead<{ posts: PostType[]; nextCursor: string | null }>({
     posts,
-    nextCursor,
+    nextCursor
   });
 }

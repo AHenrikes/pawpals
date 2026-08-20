@@ -1,4 +1,9 @@
-import { badRequest, notFound, serverError } from "@/lib/api/responses";
+import {
+  badRequest,
+  notFound,
+  okPrivateRead,
+  serverError
+} from "@/lib/api/responses";
 import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { NextRequest } from "next/server";
@@ -34,7 +39,7 @@ export async function GET(
   if (error) return serverError(error.message);
   if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  return Response.json({
+  return okPrivateRead({
     follower_count: data.follower_count,
     following_count: data.following_count,
     post_count: data.post_count,
