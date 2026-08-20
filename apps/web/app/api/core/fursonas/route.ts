@@ -1,24 +1,19 @@
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { type NextRequest } from "next/server";
 import type { FursonaWithBoolean, FursonaInput } from "@/types/fursona";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
 import {
-  unauthorized,
   badRequest,
   serverError,
   ok,
   okNoStore,
 } from "@/lib/api/responses";
+import { type NextRequest } from "next/server";
 
-export async function GET() {
-  const { supabase, account, response } = await requireUser();
-  if (account === null) return unauthorized();
-  if (response) return response;
-
+export const GET = withUser(async ({ supabase, account }) => {
   const { data: fursonas, error } = await supabase
     .schema("core")
     .from("fursonas")
@@ -34,13 +29,9 @@ export async function GET() {
   return okNoStore<{ fursonas: FursonaWithBoolean[] }>({
     fursonas: fursonas ?? [],
   });
-}
+});
 
-export async function POST(req: NextRequest) {
-  const { supabase, account, response } = await requireUser();
-  if (account === null) return unauthorized();
-  if (response) return response;
-
+export const POST = withUser(async ({ supabase, account }, req: NextRequest) => {
   const body = (await req.json().catch(() => ({}))) as FursonaWithBoolean;
   const display_name = normalizeRequiredName(body.display_name);
   const username = normalizeOptionalText(body.username);
@@ -88,4 +79,4 @@ export async function POST(req: NextRequest) {
   if (switchError) return badRequest(ERROR_MESSAGES.FURSONA_SWITCH_FAILED);
 
   return ok<{ fursona: FursonaInput }>({ fursona: inserted });
-}
+});

@@ -1,19 +1,13 @@
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import {
-  unauthorized,
   notFound,
   serverError,
   badRequest,
 } from "@/lib/api/responses";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const { supabase, account, response } = await requireUser();
-
-  if (response) return response;
-  if (account === null) return unauthorized();
-
-  const { searchParams } = new URL(request.url);
+export const GET = withUser(async ({ supabase, account }, req: NextRequest) => {
+  const { searchParams } = new URL(req.url);
   const username = searchParams.get("username");
 
   let fursonaId: string;
@@ -78,14 +72,10 @@ export async function GET(request: Request) {
     // likes_given: (stats?.likes_given ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
     is_liked: isLiked,
   });
-}
+});
 
-export async function POST(request: Request) {
-  const { supabase, account, response } = await requireUser();
-  if (response) return response;
-  if (!account) return unauthorized();
-
-  const { username } = await request.json();
+export const POST = withUser(async ({ supabase, account }, req: NextRequest) => {
+  const { username } = await req.json();
   if (!username) return badRequest("Username required");
 
   // GET current active fursona
@@ -128,14 +118,10 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ success: true });
-}
+});
 
-export async function DELETE(request: Request) {
-  const { account, supabase, response } = await requireUser();
-  if (response) return response;
-  if (!account) return unauthorized();
-
-  const { username } = await request.json();
+export const DELETE = withUser(async ({ supabase, account }, req: NextRequest) =>{
+  const { username } = await req.json();
   if (!username) return badRequest("Username required");
 
   // GET current active fursona
@@ -171,4 +157,4 @@ export async function DELETE(request: Request) {
   if (error) return serverError(error.message);
 
   return NextResponse.json({ success: true });
-}
+});

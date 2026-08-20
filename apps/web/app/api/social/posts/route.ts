@@ -1,9 +1,8 @@
 import { NextRequest } from "next/server";
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import {
   okPrivateRead,
   serverError,
-  unauthorized
 } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { type PostType } from "@/types/post";
@@ -11,11 +10,7 @@ import { type PostType } from "@/types/post";
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
-export async function GET(req: NextRequest) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const GET = withUser(async ({ supabase }, req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   const cursor = params.get("cursor");
   const limit = Math.min(
@@ -65,4 +60,4 @@ export async function GET(req: NextRequest) {
     posts,
     nextCursor
   });
-}
+});

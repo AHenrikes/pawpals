@@ -1,12 +1,11 @@
+import { withUser } from "@/lib/auth/withUser";
 import {
   serverError,
   badRequest,
-  unauthorized,
   notFound,
   ok,
 } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
-import { requireUser } from "@/lib/auth/requireUser";
 import { type NextRequest } from "next/server";
 
 interface ChangeUsernameRequest {
@@ -27,15 +26,8 @@ interface ChangeUsernameResponse {
  * GET /api/core/fursonas/[id]/change-username
  * Get cooldown information for username change
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const GET = withUser(async ({ supabase, account }, _req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { supabase, account, response } = await requireUser();
-    if (response) return response;
-    if (account === null) return unauthorized();
-
     const { id } = await params;
 
     // Verify fursona belongs to user
@@ -88,7 +80,7 @@ export async function GET(
   } catch (error) {
     return serverError((error as Error).message);
   }
-}
+});
 
 /**
  * POST /api/core/fursonas/[id]/change-username
@@ -103,15 +95,8 @@ export async function GET(
  * - success: true → username changed
  * - success: false → includes error and optionally cooldown_until date
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const POST = withUser(async ({ supabase, account }, req: NextRequest, { params }: { params: Promise<{ id: string }> }) =>{
   try {
-    const { supabase, account, response } = await requireUser();
-    if (response) return response;
-    if (account === null) return unauthorized();
-
     const { id } = await params;
 
     // Verify fursona belongs to user
@@ -127,7 +112,7 @@ export async function POST(
     if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
     // Parse request body
-    const body = (await request
+    const body = (await req
       .json()
       .catch(() => ({}))) as ChangeUsernameRequest;
 
@@ -153,4 +138,4 @@ export async function POST(
   } catch (error) {
     return serverError((error as Error).message);
   }
-}
+});

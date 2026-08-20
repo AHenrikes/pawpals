@@ -4,7 +4,7 @@ import {
   okPrivateRead,
   serverError
 } from "@/lib/api/responses";
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { NextRequest } from "next/server";
 
@@ -16,13 +16,10 @@ export type ProfileCounts = {
   reputation_count: number;
 };
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, response } = await requireUser();
-  if (response) return response;
-
+export const GET = withUser(
+  async ({ supabase }, _req: NextRequest, {
+    params,
+  }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
@@ -46,4 +43,5 @@ export async function GET(
     like_count: data.like_count,
     reputation_count: data.reputation,
   } satisfies ProfileCounts);
-}
+  },
+);

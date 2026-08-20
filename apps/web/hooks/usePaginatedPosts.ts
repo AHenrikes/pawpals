@@ -26,6 +26,10 @@ interface UsePaginatedPostsOptions {
 
 const postsCache = makeCache<PostsFeed>(15 * 1000);
 
+export function clearPostsCache() {
+  postsCache.clear();
+}
+
 export function usePaginatedPosts({
   endpoint,
   initialLoading = false,

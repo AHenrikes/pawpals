@@ -38,6 +38,10 @@ type ProfileCountsResponse = {
 
 const profileCountsCache = makeCache<ProfileCountsResponse>(10 * 1000);
 
+export function clearProfileCountsCache() {
+  profileCountsCache.clear();
+}
+
 /**
  * Hook for fetching social stats
  *

@@ -1,12 +1,11 @@
 import { NextRequest } from "next/server";
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import {
   badRequest,
   notFound,
   ok,
   okPrivateRead,
   serverError,
-  unauthorized,
 } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { normalizeOptionalText } from "@/lib/helpers/normalizeInput";
@@ -15,14 +14,7 @@ import type { PostType, PostCreate } from "@/types/post";
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const GET = withUser(async ({ supabase }, req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   const searchParams = req.nextUrl.searchParams;
@@ -96,13 +88,9 @@ export async function GET(
     posts,
     nextCursor
   });
-}
+});
 
-export async function POST(req: NextRequest) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const POST = withUser(async ({ supabase }, req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const body = (await req.json().catch(() => ({}))) as PostCreate;
   const content = normalizeOptionalText(body.content);
   const media = Array.isArray(body.media_urls) ? body.media_urls : [];
@@ -121,4 +109,4 @@ export async function POST(req: NextRequest) {
   if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
   return ok<{ post: PostCreate }>({ post: data });
-}
+});

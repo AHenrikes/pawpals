@@ -1,19 +1,14 @@
 import { NextRequest } from "next/server";
-import { requireUser } from "@/lib/auth/requireUser";
 import {
   badRequest,
   notFound,
   ok,
-  serverError,
-  unauthorized,
+  serverError
 } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import { withUser } from "@/lib/auth/withUser";
 
-export async function GET(req: NextRequest) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const GET = withUser(async ({ supabase }, req: NextRequest) => {
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
@@ -45,4 +40,4 @@ export async function GET(req: NextRequest) {
   }
 
   return ok({ post: data });
-}
+});

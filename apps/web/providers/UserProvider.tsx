@@ -15,6 +15,9 @@ import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { makeCache } from "@/lib/helpers/profile-cache";
 import { AUTH_ROUTES } from "@/lib/auth/routes";
 import { useRouter } from "next/navigation";
+import { clearPostsCache } from "@/hooks/usePaginatedPosts";
+import { clearProfileCountsCache } from "@/hooks/core/views/useProfileCounts";
+import { clearProfileSearchCache } from "@/hooks/core/fursonas/useProfileSearch";
 import { type AccountTypes } from "@/types/account";
 import { type FursonaTypes } from "@/types/fursona";
 
@@ -61,6 +64,9 @@ export function UserProvider({
 
   const clearAuthState = useCallback(() => {
     fursonasCacheRef.current.clear();
+    clearPostsCache();
+    clearProfileCountsCache();
+    clearProfileSearchCache();
     setState({
       account: null,
       fursonas: [],

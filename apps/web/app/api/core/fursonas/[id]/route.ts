@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import {
   FursonaCreate,
@@ -11,13 +11,13 @@ import {
   notFound,
   ok,
   okPrivateRead,
-  serverError,
-  unauthorized,
+  serverError
 } from "@/lib/api/responses";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function buildPatchUpdates(body: FursonaWithBoolean) {
   const updates: Record<string, unknown> = {};
@@ -60,14 +60,41 @@ function buildPatchUpdates(body: FursonaWithBoolean) {
   return { updates, error: null };
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+async function applyFursonaPatch(
+  supabase: SupabaseClient,
+  fursonaId: string,
+  accountId: string,
+  body: FursonaWithBoolean,
+  updates: Record<string, unknown>,
 ) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
+  if (Object.keys(updates).length > 0) {
+    if (body.is_current === true) {
+      const { error } = await supabase.rpc("switch_current_fursona", {
+        p_fursona_id: fursonaId,
+      });
+      if (error) return error;
+    } else {
+      const { error } = await supabase
+        .schema("core")
+        .from("fursonas")
+        .update(updates)
+        .eq("id", fursonaId)
+        .eq("account_id", accountId);
+      if (error) return error;
+    }
+  }
 
+  if (body.is_default === true) {
+    const { error } = await supabase.rpc("set_default_fursona", {
+      p_fursona_id: fursonaId,
+    });
+    if (error) return error;
+  }
+
+  return null;
+}
+
+export const GET = withUser(async ({ supabase }, _req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
@@ -92,16 +119,9 @@ export async function GET(
   if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
   return okPrivateRead<FursonaProfile>(data);
-}
+});
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (account === null) return unauthorized();
-  if (response) return response;
-
+export const PATCH = withUser(async ({ supabase, account }, request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
@@ -112,43 +132,20 @@ export async function PATCH(
   if (error) return badRequest(error);
 
   const hasUpdates = Object.keys(updates).length > 0;
-  const isSettingCurrent = body.is_current === true;
   const isSettingDefault = body.is_default === true;
 
   if (!hasUpdates && !isSettingDefault)
     return badRequest("No valid fields to update.");
 
-  if (hasUpdates) {
-    if (isSettingCurrent) {
-      const { error: switchError } = await supabase.rpc(
-        "switch_current_fursona",
-        {
-          p_fursona_id: id,
-        },
-      );
-      if (switchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    } else {
-      const { error: updateError } = await supabase
-        .schema("core")
-        .from("fursonas")
-        .update(updates)
-        .eq("id", id)
-        .eq("account_id", account.id);
+  const patchError = await applyFursonaPatch(
+    supabase,
+    id,
+    account.id,
+    body,
+    updates,
+  );
 
-      if (updateError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    }
-  }
-
-  if (isSettingDefault) {
-    const { error: setDefaultError } = await supabase.rpc(
-      "set_default_fursona",
-      {
-        p_fursona_id: id,
-      },
-    );
-
-    if (setDefaultError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-  }
+  if (patchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
   const { data: fursona, error: fetchError } = await supabase
     .schema("core")
@@ -164,16 +161,9 @@ export async function PATCH(
   if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
   return ok<{ fursona: FursonaCreate }>({ fursona });
-}
+});
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (response) return response;
-  if (account === null) return unauthorized();
-
+export const DELETE = withUser(async ({ supabase, account }, _req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
@@ -199,4 +189,4 @@ export async function DELETE(
   if (deleteError) return badRequest(deleteError.message);
 
   return ok({ ok: true });
-}
+});

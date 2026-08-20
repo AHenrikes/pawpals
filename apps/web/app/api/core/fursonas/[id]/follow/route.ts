@@ -1,4 +1,3 @@
-import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { NextRequest } from "next/server";
 import {
@@ -7,17 +6,10 @@ import {
   notFound,
   ok,
   serverError,
-  unauthorized,
 } from "@/lib/api/responses";
+import { withUser } from "@/lib/auth/withUser";
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const GET = withUser(async ({ supabase, account }, _req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
@@ -57,16 +49,9 @@ export async function GET(
     isMutual: !!followedBy,
     mutualSince: followedBy?.created_at ?? null,
   });
-}
+});
 
-export async function POST(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const POST = withUser(async ({ supabase, account }, _req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
@@ -91,17 +76,10 @@ export async function POST(
   if (error) return serverError(error.message);
 
   return ok({ following: true });
-}
+});
 
 // follow -> unfollow
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
+export const DELETE = withUser(async ({ supabase, account }, _req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
@@ -126,4 +104,4 @@ export async function DELETE(
   if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 
   return ok({ following: false });
-}
+});
