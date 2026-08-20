@@ -71,7 +71,6 @@ export default function ProfilePage() {
   };
 
   if (isLoading || !viewedFursona) return null;
-  console.log(isMutual);
 
   return (
     <div className="flex-1 w-full bg-background">

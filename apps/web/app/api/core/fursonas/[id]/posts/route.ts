@@ -14,41 +14,46 @@ import type { PostType, PostCreate } from "@/types/post";
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
-export const GET = withUser(async ({ supabase }, req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  const { id } = await params;
+export const GET = withUser(
+  async (
+    { supabase },
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
 
-  const searchParams = req.nextUrl.searchParams;
-  const cursor = searchParams.get("cursor");
-  const limit = Math.min(
-    Number.parseInt(searchParams.get("limit") ?? String(DEFAULT_LIMIT), 10),
-    MAX_LIMIT,
-  );
+    const searchParams = req.nextUrl.searchParams;
+    const cursor = searchParams.get("cursor");
+    const limit = Math.min(
+      Number.parseInt(searchParams.get("limit") ?? String(DEFAULT_LIMIT), 10),
+      MAX_LIMIT,
+    );
 
-  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  // Verify the fursona exists and is active
-  const { data: fursona, error: fursonaError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("id", id)
-    .eq("is_active", true)
-    .single();
+    // Verify the fursona exists and is active
+    const { data: fursona, error: fursonaError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select("id")
+      .eq("id", id)
+      .eq("is_active", true)
+      .single();
 
-  if (fursonaError) {
-    if (fursonaError.code === "PGRST116") {
-      return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (fursonaError) {
+      if (fursonaError.code === "PGRST116") {
+        return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+      }
+      return serverError(ERROR_MESSAGES.SERVER_ERROR);
     }
-    return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  }
 
-  if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  let query = supabase
-    .schema("social")
-    .from("posts")
-    .select(
-      `
+    let query = supabase
+      .schema("social")
+      .from("posts")
+      .select(
+        `
       id,
       fursona_id,
       content,
@@ -61,36 +66,37 @@ export const GET = withUser(async ({ supabase }, req: NextRequest, { params }: {
       is_published,
       created_at
     `,
-    )
-    .eq("fursona_id", fursona.id)
-    .eq("is_published", true)
-    .order("created_at", { ascending: false })
-    .limit(limit + 1); // fetch one extra to determine if there's a next page
+      )
+      .eq("fursona_id", fursona.id)
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+      .limit(limit + 1); // fetch one extra to determine if there's a next page
 
-  if (cursor) {
-    query = query.lt("created_at", cursor);
-  }
+    if (cursor) {
+      query = query.lt("created_at", cursor);
+    }
 
-  const { data, error } = await query;
+    const { data, error } = await query;
 
-  if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+    if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
-  const hasMore = data.length > limit;
-  const posts = (hasMore ? data.slice(0, limit) : data) as PostType[];
+    const hasMore = data.length > limit;
+    const posts = (hasMore ? data.slice(0, limit) : data) as PostType[];
 
-  const lastPostCreatedAt = posts.at(-1)?.created_at
-    ? new Date(posts.at(-1)!.created_at).toISOString()
-    : null;
+    const lastPostCreatedAt = posts.at(-1)?.created_at
+      ? new Date(posts.at(-1)!.created_at).toISOString()
+      : null;
 
-  const nextCursor = hasMore ? lastPostCreatedAt : null;
+    const nextCursor = hasMore ? lastPostCreatedAt : null;
 
-  return okPrivateRead<{ posts: PostType[]; nextCursor: string | null }>({
-    posts,
-    nextCursor
-  });
-});
+    return okPrivateRead<{ posts: PostType[]; nextCursor: string | null }>({
+      posts,
+      nextCursor,
+    });
+  },
+);
 
-export const POST = withUser(async ({ supabase }, req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+export const POST = withUser(async ({ supabase }, req: NextRequest) => {
   const body = (await req.json().catch(() => ({}))) as PostCreate;
   const content = normalizeOptionalText(body.content);
   const media = Array.isArray(body.media_urls) ? body.media_urls : [];

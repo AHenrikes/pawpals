@@ -94,7 +94,7 @@ export async function uploadPostMedia(
     .from("post-media")
     .upload(path, file, {
       cacheControl: "31536000",
-      contentType: file.type
+      contentType: file.type,
     });
 
   if (error) throw error;

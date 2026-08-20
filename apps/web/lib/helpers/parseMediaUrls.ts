@@ -1,3 +1,4 @@
+import { toast } from "@repo/ui/sonner";
 import type { MediaItem, PostType } from "@/types/post";
 
 // Parse mixed media payloads returned by legacy rows into normalized objects.
@@ -17,7 +18,7 @@ export function parseMediaUrls(posts: PostType[]): PostType[] {
           try {
             return JSON.parse(item) as MediaItem;
           } catch {
-            console.warn("Failed to parse media URL:", item);
+            toast.warning("Failed to parse media URL:", item);
             return null;
           }
         }

@@ -1,9 +1,6 @@
 import { NextRequest } from "next/server";
 import { withUser } from "@/lib/auth/withUser";
-import {
-  okPrivateRead,
-  serverError,
-} from "@/lib/api/responses";
+import { okPrivateRead, serverError } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { type PostType } from "@/types/post";
 
@@ -58,6 +55,6 @@ export const GET = withUser(async ({ supabase }, req: NextRequest) => {
 
   return okPrivateRead<{ posts: PostType[]; nextCursor: string | null }>({
     posts,
-    nextCursor
+    nextCursor,
   });
 });

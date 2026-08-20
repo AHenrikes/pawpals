@@ -51,7 +51,9 @@ export function usePaginatedPosts({
     setState((s) => ({ ...s, loading: true, error: null }));
 
     try {
-      const data = await postsCache.get(endpoint, () => api.get<PostsFeed>(endpoint));
+      const data = await postsCache.get(endpoint, () =>
+        api.get<PostsFeed>(endpoint),
+      );
       const parsedPosts = parseMediaUrls(data.posts);
       setState((s) => ({
         ...s,

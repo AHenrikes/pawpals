@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
+import { toast } from "@repo/ui/sonner";
 import type { MessageType } from "@/types/messages";
 
 /**
@@ -31,7 +32,7 @@ export function useRealtimeMessages(onMessage: (message: MessageType) => void) {
         (payload) => onMessage(payload.new as MessageType),
       )
       .subscribe((_status, err) => {
-        if (err) console.error("Realtime subscribe error", err);
+        if (err) toast.error("Realtime subscribe error");
       });
 
     return () => {

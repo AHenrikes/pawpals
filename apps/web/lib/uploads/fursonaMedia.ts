@@ -67,12 +67,10 @@ export async function uploadFursonaImage(
   // Match migration path structure: {account_id}/{fursona_id}/{file_id}.{ext}
   const path = `${accountId}/${fursonaId}/${fileId}.${ext}`;
 
-  const { error } = await supabase.storage
-    .from(bucket)
-    .upload(path, file, {
-      cacheControl: "31536000",
-      contentType: file.type
-    });
+  const { error } = await supabase.storage.from(bucket).upload(path, file, {
+    cacheControl: "31536000",
+    contentType: file.type,
+  });
 
   if (error) throw error;
 

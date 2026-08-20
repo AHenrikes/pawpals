@@ -1,10 +1,5 @@
 import { NextRequest } from "next/server";
-import {
-  badRequest,
-  notFound,
-  ok,
-  serverError
-} from "@/lib/api/responses";
+import { badRequest, notFound, ok, serverError } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { withUser } from "@/lib/auth/withUser";
 
