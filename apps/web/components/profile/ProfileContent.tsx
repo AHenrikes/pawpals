@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { ProfilePostCards } from "../cards/PostCards";
 import { cn } from "@repo/ui/lib/utils";
 import { type FursonaProfile } from "@/types/fursona";
+import { ProfilePostCards } from "../cards/media/PostCards";
+import { ProfileGallery } from "../cards/media/Gallery";
 
 const profileNav = [
   { label: "GALLERY", key: "gallery", special: undefined },
@@ -74,7 +75,7 @@ export default function ProfileContent({
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="grow space-y-4 min-h-[calc(100dvh-80px)] py-2 lg:overflow-y-auto scrollbar-hide md:py-4"
         >
-          {content === "gallery" && <div>Gallery coming soon</div>}
+          {content === "gallery" && <ProfileGallery username={fursona.id} />}
 
           {content === "post" && <ProfilePostCards username={fursona.id} />}
 

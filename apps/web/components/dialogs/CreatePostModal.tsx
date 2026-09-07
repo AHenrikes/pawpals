@@ -6,15 +6,15 @@ import { createPortal } from "react-dom";
 import PostForm from "@/components/forms/PostForms";
 import { KeyboardEvent, LockScreen } from "@/utils/lock-body";
 
-interface PostModalProps {
+interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function PostModal({
+export default function CreatePostModal({
   isOpen,
   onClose,
-}: Readonly<PostModalProps>) {
+}: Readonly<CreatePostModalProps>) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

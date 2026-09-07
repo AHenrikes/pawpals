@@ -89,7 +89,7 @@ function MediaItem({
 }>) {
   return (
     <div className={cn("group relative overflow-hidden bg-black", className)}>
-      {preview.type === "video" ? (
+      {preview.media_type === "video" ? (
         <video
           src={preview.url}
           className="w-full h-full object-cover"
@@ -148,7 +148,7 @@ function MediaGrid({
       >
         {visible.map((item, index) => (
           <MediaItem
-            key={`${item.type}-${item.originalIndex}`}
+            key={`${item.originalIndex}`}
             preview={item}
             displayIndex={index}
             onRemove={onRemove}
@@ -178,7 +178,7 @@ function MobileMediaStrip({
           className="group relative shrink-0 overflow-hidden rounded-xl bg-black"
           style={{ width: 72, height: 72 }}
         >
-          {p.type === "video" ? (
+          {p.media_type === "video" ? (
             <video
               src={p.url}
               className="w-full h-full object-cover"

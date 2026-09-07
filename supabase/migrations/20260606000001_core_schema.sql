@@ -16,10 +16,8 @@ CREATE TABLE core.accounts (
   firstname TEXT NOT NULL,
   lastname TEXT NOT NULL,
   dob DATE NOT NULL,
-  account_role TEXT NOT NULL DEFAULT 'user',
-
-  -- Account metadata
   email TEXT NOT NULL,
+  account_role TEXT NOT NULL DEFAULT 'user',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
   
@@ -51,6 +49,7 @@ CREATE TABLE core.fursonas (
   banner_url TEXT NOT NULL DEFAULT '/images/profile/banner.png',
 
   -- Fursona status
+  is_visible TEXT[] NOT NULL '{ "everyone", "followers", "mutuals", "private" }',
   is_default BOOLEAN DEFAULT false NOT NULL,
   is_current BOOLEAN DEFAULT false NOT NULL,
   is_active BOOLEAN DEFAULT true NOT NULL,
@@ -64,6 +63,23 @@ CREATE TABLE core.fursonas (
   CONSTRAINT valid_username CHECK (username ~ '^[a-zA-Z0-9_-]{3,50}$'),
   CONSTRAINT non_negative_reputation CHECK (reputation >= 0)
 );
+
+
+-- ============================================================================
+-- VIEW: Active user accounts with fursona counts
+-- ============================================================================
+CREATE OR REPLACE VIEW core.v_accounts_with_stats WITH (security_invoker = ON) AS
+SELECT
+  a.id,
+  a.email,
+  COUNT(f.id) AS total_fursonas,
+  a.is_active,
+  a.created_at
+FROM core.accounts a
+LEFT JOIN core.fursonas f ON f.account_id = a.id
+-- WHERE a.is_active = true
+GROUP BY a.id, a.email, a.is_active, a.created_at;
+
 
 -- ============================================================================
 -- INDEXES & PARTIAL UNIQUE CONSTRAINTS
@@ -83,6 +99,8 @@ CREATE INDEX idx_accounts_email ON core.accounts(email);
 -- ============================================================================
 -- Enable RLS on accounts table
 ALTER TABLE core.accounts ENABLE ROW LEVEL SECURITY;
+
+--------------------------------------------------------------------------------
 
 -- Policy: Users can only view their own account
 CREATE POLICY accounts_select_own
@@ -146,15 +164,18 @@ CREATE POLICY fursonas_delete_own
 GRANT USAGE ON SCHEMA core TO authenticated;
 GRANT SELECT ON core.accounts TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON core.fursonas TO authenticated;
+GRANT SELECT ON core.v_accounts_with_stats TO authenticated;
 
 
 -- ============================================================================
 -- COMMENTS & DOCUMENTATION
 -- ============================================================================
 COMMENT ON TABLE core.accounts IS 'User account profiles linked to Supabase authentication';
+
 COMMENT ON TABLE core.fursonas IS 'Fursona profiles owned by accounts';
 
 COMMENT ON COLUMN core.accounts.user_id IS 'Reference to Supabase auth.users(id)';
+
 COMMENT ON COLUMN core.fursonas.account_id IS 'Foreign key to the owning account';
 COMMENT ON COLUMN core.fursonas.is_default IS 'Default fursona for account recovery';
 COMMENT ON COLUMN core.fursonas.is_current IS 'Currently active fursona';

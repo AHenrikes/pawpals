@@ -41,6 +41,13 @@ export const ERROR_MESSAGES = {
   FURSONA_SWITCH_FAILED: "Failed to switch fursona",
   MAX_FURSONAS_REACHED: "Maximum number of fursonas reached",
 
+  // Post
+  POST_NOT_FOUND: "Failed to fetch post",
+  POST_ERROR: "Failed to post content",
+  INVALID_POST_TYPE: "Invalid post type",
+  INVALID_VISIBILITY_TYPE: "Invalid visibility type",
+  MEDIA_REQUIRED: "Atleest one media is required",
+
   // Upload
   UPLOAD_FAILED: "Upload failed",
   INVALID_FILE_TYPE: "Invalid file type",

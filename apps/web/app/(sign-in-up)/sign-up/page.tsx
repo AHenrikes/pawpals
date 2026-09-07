@@ -145,7 +145,7 @@ export default function SignUp() {
       <AuthCardHeader activePath={AUTH_ROUTES.SIGN_UP} />
 
       <div className="my-8">
-        <TypographyH2>Start Yout Journey</TypographyH2>
+        <TypographyH2>Start Your Journey</TypographyH2>
 
         <TypographyP>Join the pack and explore the community</TypographyP>
       </div>

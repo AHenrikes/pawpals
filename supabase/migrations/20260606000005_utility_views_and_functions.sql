@@ -246,20 +246,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- ============================================================================
--- VIEW: Active user accounts with fursona counts
--- ============================================================================
-CREATE OR REPLACE VIEW core.v_accounts_with_stats WITH (security_invoker = ON) AS
-SELECT
-  a.id,
-  a.email,
-  a.is_active,
-  a.created_at,
-  COUNT(f.id) AS total_fursonas
-FROM core.accounts a
-LEFT JOIN core.fursonas f ON f.account_id = a.id
--- WHERE a.is_active = true
-GROUP BY a.id, a.email, a.is_active, a.created_at;
 
 -- ============================================================================
 -- VIEW: Fursona profiles with social stats
@@ -307,7 +293,6 @@ LIMIT 100;
 -- ============================================================================
 GRANT SELECT ON social.v_fursona_stats TO authenticated;
 GRANT SELECT ON social.v_top_fursonas TO authenticated;
-GRANT SELECT ON core.v_accounts_with_stats TO authenticated;
 
 -- ============================================================================
 -- COMMENTS & DOCUMENTATION

@@ -3,6 +3,34 @@
 -- Supabase RPC only exposes public schema functions, so we create wrappers
 -- ============================================================================
 
+-- PUBLIC WRAPPER: Create a social post and its media atomically
+-- Keep this invoker-security so social RLS policies apply to the caller.
+CREATE OR REPLACE FUNCTION public.create_post_with_media(
+  p_fursona_id UUID,
+  p_post_type TEXT,
+  p_content TEXT,
+  p_visibility TEXT DEFAULT 'everyone',
+  p_media JSONB DEFAULT '[]'::JSONB
+)
+RETURNS social.posts
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public, social
+AS $$
+BEGIN
+  RETURN social.create_post_with_media(
+    p_fursona_id,
+    p_post_type,
+    p_content,
+    p_visibility,
+    p_media
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_post_with_media(UUID, TEXT, TEXT, TEXT, JSONB)
+  TO authenticated;
+
 -- ============================================================================
 -- PUBLIC WRAPPER: Create account
 -- ============================================================================

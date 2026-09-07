@@ -81,7 +81,9 @@ export const GET = withUser(
     if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
     const hasMore = data.length > limit;
-    const posts = (hasMore ? data.slice(0, limit) : data) as PostType[];
+    const posts = (hasMore
+      ? data.slice(0, limit)
+      : data) as unknown as PostType[];
 
     const lastPostCreatedAt = posts.at(-1)?.created_at
       ? new Date(posts.at(-1)!.created_at).toISOString()
