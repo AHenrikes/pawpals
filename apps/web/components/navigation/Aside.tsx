@@ -30,12 +30,12 @@ import {
   useSidebar,
 } from "@/providers/SidebarProvider";
 import type { LucideIcon } from "lucide-react";
-import { LockScreen } from "@/utils/lock-body";
+import { LockScreen } from "@/lib/helpers/lockBody";
 import { TypographyLead, TypographySmall } from "@repo/ui/typography";
 import { CardContent } from "@repo/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { toast } from "@repo/ui/sonner";
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import {
   Collapsible,
   CollapsibleContent,

@@ -43,9 +43,9 @@ export default function PostLayout({
 
         return isGif ? (
           <Image
-            key={`${item.order_index}-${item.originalIndex}`}
+            key={`${item.originalIndex}`}
             src={inView ? item.url : "/images/app/party-popper.png"}
-            alt={`Giff ${index + 1}`}
+            alt={`${item.media_type}-${item.order_index}`}
             width={imageWidth}
             height={imageHeight}
             className={cn(
@@ -57,12 +57,12 @@ export default function PostLayout({
             unoptimized
           />
         ) : (
-          <div className="relative">
+          <div key={item.originalIndex} className="relative">
             <div className="absolute inset-0 hover:bg-red-500" />
             <Image
-              key={`${item.order_index}-${item.originalIndex}`}
+              key={`${item.order_index}`}
               src={item.url}
-              alt={`Media ${index + 1}`}
+              alt={`Media ${item.order_index}`}
               width={imageWidth}
               height={imageHeight}
               className={cn(

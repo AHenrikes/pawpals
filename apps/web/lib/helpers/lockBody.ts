@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 
-// Lock body scroll when open
 export function LockScreen(state: boolean) {
   useEffect(() => {
     document.body.style.overflow = state ? "hidden" : "";
@@ -13,14 +12,13 @@ export function LockScreen(state: boolean) {
   }, [state]);
 }
 
-// Close on escape
 export function KeyboardEvent(state: boolean, action: () => void) {
   useEffect(() => {
     if (!state) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
         action();
       }
     };

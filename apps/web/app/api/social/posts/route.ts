@@ -20,7 +20,7 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 const VALID_POST_TYPES = new Set<PostTypeValue>(["yap", "reel", "gallery"]);
 const VALID_VISIBILITY = new Set<PostVisibility>([
-  "everyone",
+  "public",
   "followers",
   "mutuals",
   "private",
@@ -86,7 +86,7 @@ function normalizePostRow(row: any): PostType {
     post_type: row.post_type,
     content: row.content ?? null,
     // media_urls,
-    media_urls: media_data,
+    post_media: media_data,
     views_count: row.views_count ?? 0,
     likes_count: row.likes_count ?? 0,
     comments_count: row.comments_count ?? 0,
@@ -114,7 +114,7 @@ export const GET = withUser(async ({ supabase }, req: NextRequest) => {
         fursona_id,
         post_type,
         content,
-        media_urls (
+        post_media (
           id,
           media_type,
           poster_url,
@@ -164,8 +164,8 @@ export const POST = withUser(
     const claimedFursonaId = body.fursona_id;
     const postType = body.post_type ?? "yap";
     const content = normalizeOptionalText(body.content);
-    const media = getMediaArray(body.media ?? body.media_urls ?? []);
-    const visibility = body.visibility ?? "everyone";
+    const media = getMediaArray(body.media ?? body.post_media ?? []);
+    const visibility = body.visibility ?? "public";
 
     if (!VALID_POST_TYPES.has(postType)) {
       return badRequest(ERROR_MESSAGES.INVALID_POST_TYPE);
@@ -238,7 +238,7 @@ export const POST = withUser(
       fursona_id: createdPost.fursona_id,
       post_type: createdPost.post_type,
       content: createdPost.content ?? null,
-      media_urls: (mediaRows ?? []).map((item: any) => ({
+      post_media: (mediaRows ?? []).map((item: any) => ({
         id: item.id,
         media_type: item.media_type,
         poster_url: item.poster_url,
@@ -254,17 +254,6 @@ export const POST = withUser(
       comments_count: createdPost.comments_count ?? 0,
       shares_count: createdPost.shares_count ?? 0,
       bookmarks_count: createdPost.bookmarks_count ?? 0,
-      // media: (mediaRows ?? []).map((item: any) => ({
-      //   id: item.id,
-      //   media_type: item.media_type,
-      //   poster_url: item.poster_url,
-      //   url: item.url,
-      //   width: item.width,
-      //   height: item.height,
-      //   duration_seconds: item.duration_seconds,
-      //   file_size_bytes: item.file_size_bytes,
-      //   order_index: item.order_index,
-      // })),
       visibility: createdPost.visibility,
       created_at: createdPost.created_at,
     };

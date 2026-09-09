@@ -44,7 +44,7 @@ type PostListProps = {
 const PostCard = memo(function PostCard({
   post,
 }: Readonly<{ post: PostType }>) {
-  const media = post.media_urls ?? [];
+  const media = post.post_media ?? [];
   const [isExpanded, setIsExpanded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 

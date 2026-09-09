@@ -1,6 +1,6 @@
 "use client";
 
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Collapsible } from "@repo/ui/collapsible";
 import {

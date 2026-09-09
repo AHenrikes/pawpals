@@ -20,11 +20,11 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { Skeleton } from "@repo/ui/skeleton";
 import type { FursonaProfile, FursonaTypes } from "@/types/fursona";
-import Banner from "@/components/profile/ProfileBanner";
-import ProfileName from "@/components/profile/ProfileName";
-import ProfileCTA from "@/components/profile/ProfileCTA";
-import ProfileContent from "@/components/profile/ProfileContent";
-import ProfileAside from "@/components/profile/ProfileAside";
+import Banner from "@/components/pages/profile/ProfileBanner";
+import ProfileName from "@/components/pages/profile/ProfileName";
+import ProfileCTA from "@/components/pages/profile/ProfileCTA";
+import ProfileContent from "@/components/pages/profile/ProfileContent";
+import ProfileAside from "@/components/pages/profile/ProfileAside";
 
 function formatNumbers(count: number): string {
   if (count < 1000) return `${count}`;

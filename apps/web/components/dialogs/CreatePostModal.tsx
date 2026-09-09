@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import PostForm from "@/components/forms/PostForms";
-import { KeyboardEvent, LockScreen } from "@/utils/lock-body";
+import { KeyboardEvent, LockScreen } from "@/lib/helpers/lockBody";
 
 interface CreatePostModalProps {
   isOpen: boolean;

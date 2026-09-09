@@ -106,7 +106,7 @@
 
 @layer base {
   :root {
-    --radius: 1;
+    --radius: 1rem;
     --blur: 6rem;
 
     --background: 265, 75%, 90%;

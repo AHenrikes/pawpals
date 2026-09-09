@@ -84,11 +84,28 @@ async function applyFursonaPatch(
     }
   }
 
+  // if (body.is_default === true) {
+  //   const { error } = await supabase.rpc("set_default_fursona", {
+  //     p_fursona_id: fursonaId,
+  //   });
+  //   if (error) return error;
+  // }
+
   if (body.is_default === true) {
-    const { error } = await supabase.rpc("set_default_fursona", {
-      p_fursona_id: fursonaId,
-    });
-    if (error) return error;
+    const { error: clearDefaultsError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .update({ is_default: false })
+      .eq("account_id", accountId);
+    if (clearDefaultsError) return clearDefaultsError;
+
+    const { error: setDefaultError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .update({ is_default: true })
+      .eq("id", fursonaId)
+      .eq("account_id", accountId);
+    if (setDefaultError) return setDefaultError;
   }
 
   return null;

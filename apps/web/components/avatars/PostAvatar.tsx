@@ -1,5 +1,5 @@
 import { useFursonaData } from "@/hooks/useFursonaData";
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { TypographyMuted, TypographyP } from "@repo/ui/typography";
 import { type PostType } from "@/types/post";

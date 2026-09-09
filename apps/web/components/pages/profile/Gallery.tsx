@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@repo/ui/button";
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import { useFursonaData } from "@/hooks/useFursonaData";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
@@ -25,7 +25,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { Separator } from "@repo/ui/separator";
 import { type PostType } from "@/types/post";
 import PostDropdown from "@/components/dropdowns/Post";
-import GalleryLayout from "./layout/GalleryLayout";
+import GalleryLayout from "../../cards/media/layout/GalleryLayout";
 
 type GalleryListProps = {
   galleries: PostType[];
@@ -36,7 +36,7 @@ type GalleryListProps = {
 
 export default function Gallery({ gallery }: Readonly<{ gallery: PostType }>) {
   const { user, loading } = useFursonaData(gallery.fursona_id);
-  const media = gallery.media_urls ?? [];
+  const media = gallery.post_media ?? [];
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Calculate collapsed height based on actual line count (max 3 lines)

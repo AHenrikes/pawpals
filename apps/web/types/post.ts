@@ -1,7 +1,7 @@
 export type PostTypeValue = "yap" | "reel" | "gallery";
 export type PostMediaType = "image" | "gif" | "video";
 export type PostVisibility =
-  "everyone" | "followers" | "mutuals" | "private" | "archived";
+  "public" | "followers" | "mutuals" | "private" | "archived";
 
 export interface MediaItem {
   id?: string;
@@ -22,7 +22,7 @@ export type PostType = {
   post_type: PostTypeValue;
   content?: string | null;
   // media_urls?: MediaItem["url"];
-  media_urls?: MediaItem[];
+  post_media?: MediaItem[];
   views_count: number;
   likes_count: number;
   comments_count: number;
@@ -37,7 +37,7 @@ export type PostCreate = {
   fursona_id?: string;
   post_type?: PostTypeValue;
   content?: string;
-  media_urls?: MediaItem["url"];
+  post_media?: MediaItem["url"];
   media?: MediaItem[];
   visibility?: PostVisibility;
 };

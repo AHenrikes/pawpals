@@ -13,12 +13,12 @@ export async function POST(request: NextRequest) {
     const { account_id, reason } = body;
 
     if (!account_id || !reason) {
-      badRequest("Missing required fields");
+      return badRequest("Missing required fields");
     }
 
     // Prevent self-suspension
     if (account_id === account.id) {
-      badRequest("Cannot suspend your own account");
+      return badRequest("Cannot suspend your own account");
     }
 
     // Update account status to suspended
@@ -26,23 +26,15 @@ export async function POST(request: NextRequest) {
       .schema("core")
       .from("accounts")
       .update({
-        status: "suspended",
+        is_suspended: true,
+        suspension_reason: reason,
         updated_at: new Date().toISOString(),
       })
       .eq("id", account_id);
 
     if (error) return serverError(error.message);
 
-    // Log admin action
-    await supabase.schema("core").from("admin_logs").insert({
-      admin_id: account.id,
-      action: "suspend",
-      target_account_id: account_id,
-      reason,
-      created_at: new Date().toISOString(),
-    });
-
-    ok({ status: true });
+    return ok({ status: true });
   } catch (error) {
     return serverError((error as Error).message);
   }

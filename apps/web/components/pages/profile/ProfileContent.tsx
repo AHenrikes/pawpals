@@ -5,8 +5,8 @@ import { Button } from "@repo/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@repo/ui/lib/utils";
 import { type FursonaProfile } from "@/types/fursona";
-import { ProfilePostCards } from "../cards/media/PostCards";
-import { ProfileGallery } from "../cards/media/Gallery";
+import { ProfilePostCards } from "../../cards/media/PostCards";
+import { ProfileGallery } from "./Gallery";
 
 const profileNav = [
   { label: "GALLERY", key: "gallery", special: undefined },

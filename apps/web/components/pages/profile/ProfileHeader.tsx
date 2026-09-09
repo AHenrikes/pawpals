@@ -1,8 +1,8 @@
 import { Button } from "@repo/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
-import { Searchbar } from "../dialogs/search/Searchbar";
+import { Searchbar } from "../../dialogs/search/Searchbar";
 import { useRouter } from "next/navigation";
-import HeaderAvatar from "../avatars/HeaderAvatar";
+import HeaderAvatar from "../../avatars/HeaderAvatar";
 import { DropdownMenu } from "@repo/ui/dropdown-menu";
 
 export default function ProfileHeader() {

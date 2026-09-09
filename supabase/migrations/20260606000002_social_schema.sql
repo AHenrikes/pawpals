@@ -32,10 +32,6 @@ CREATE TABLE social.posts (
   -- Content (media lives in social.post_media, not here)
   content TEXT,
 
-  -- Status. Single value per row, not an array — a post is visible to
-  -- exactly one audience at a time.
-  visibility TEXT DEFAULT 'everyone' NOT NULL,
-
   -- Metadata
   views_count INT DEFAULT 0 NOT NULL,
   likes_count INT DEFAULT 0 NOT NULL,
@@ -43,11 +39,15 @@ CREATE TABLE social.posts (
   shares_count INT DEFAULT 0 NOT NULL,
   bookmarks_count INT DEFAULT 0 NOT NULL,
 
+  -- Status. Single value per row, not an array — a post is visible to
+  -- exactly one audience at a time.
+  visibility TEXT DEFAULT 'public' NOT NULL,
+
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
 
   CONSTRAINT valid_post_type CHECK (post_type IN ('yap', 'reel', 'gallery')),
-  CONSTRAINT valid_visibility CHECK (visibility IN ('everyone', 'followers', 'mutuals', 'private', 'archived')),
+  CONSTRAINT valid_visibility CHECK (visibility IN ('public', 'followers', 'mutuals', 'private', 'archived')),
   CONSTRAINT valid_content_length CHECK (content IS NULL OR LENGTH(content) <= 5000),
   -- Media requirements are validated in the app/API transaction layer via
   -- social.create_post_with_media(). A CHECK constraint can't read from
@@ -289,7 +289,7 @@ CREATE OR REPLACE FUNCTION social.create_post_with_media(
   p_fursona_id UUID,
   p_post_type TEXT,
   p_content TEXT,
-  p_visibility TEXT DEFAULT 'everyone',
+  p_visibility TEXT DEFAULT 'public',
   p_media JSONB DEFAULT '[]'::JSONB
 )
 RETURNS social.posts AS $$
@@ -624,7 +624,7 @@ CREATE POLICY followers_delete_own
 CREATE POLICY posts_select_public
   ON social.posts FOR SELECT
   USING (
-    visibility = 'everyone' AND
+    visibility = 'public' AND
     EXISTS(
       SELECT 1 FROM core.fursonas
       WHERE id = social.posts.fursona_id AND is_active = true
@@ -706,7 +706,7 @@ CREATE POLICY post_media_select_public
   USING (
     EXISTS (
       SELECT 1 FROM social.posts
-      WHERE id = social.post_media.post_id AND visibility = 'everyone'
+      WHERE id = social.post_media.post_id AND visibility = 'public'
     )
   );
 
@@ -767,7 +767,7 @@ CREATE POLICY reyaps_select_public
   USING (
     EXISTS(
       SELECT 1 FROM social.posts
-      WHERE id = social.reyaps.post_id AND visibility = 'everyone'
+      WHERE id = social.reyaps.post_id AND visibility = 'public'
     )
   );
 
@@ -845,7 +845,7 @@ CREATE POLICY post_likes_select_public
   USING (
     EXISTS(
       SELECT 1 FROM social.posts
-      WHERE id = social.post_likes.post_id AND visibility = 'everyone'
+      WHERE id = social.post_likes.post_id AND visibility = 'public'
     )
   );
 
@@ -919,7 +919,7 @@ CREATE POLICY post_comments_select_public
   USING (
     EXISTS(
       SELECT 1 FROM social.posts
-      WHERE id = social.post_comments.post_id AND visibility = 'everyone'
+      WHERE id = social.post_comments.post_id AND visibility = 'public'
     )
   );
 
@@ -1041,7 +1041,7 @@ COMMENT ON COLUMN social.followers.follower_fursona_id IS 'Fursona doing the fol
 COMMENT ON COLUMN social.followers.following_fursona_id IS 'Fursona being followed';
 
 COMMENT ON COLUMN social.posts.post_type IS 'yap = twitter, reel = tiktok, gallery = instagram';
-COMMENT ON COLUMN social.posts.visibility IS 'everyone | followers | mutuals | private | archived';
+COMMENT ON COLUMN social.posts.visibility IS 'public | followers | mutuals | private | archived';
 
 COMMENT ON COLUMN social.post_comments.parent_id IS 'NULL = top level comment, set = reply to another comment';
 COMMENT ON COLUMN social.post_comments.is_deleted IS 'Soft delete to preserve thread structure — content cleared but record kept';

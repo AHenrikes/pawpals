@@ -39,7 +39,6 @@ CREATE OR REPLACE FUNCTION public.create_account(
   p_firstname TEXT,
   p_lastname TEXT,
   p_email TEXT,
-  p_dob DATE,
   p_display_name TEXT,
   p_username TEXT,
   p_species TEXT DEFAULT NULL,
@@ -49,14 +48,14 @@ CREATE OR REPLACE FUNCTION public.create_account(
 RETURNS JSONB AS $$
 BEGIN
   RETURN core.create_account(
-    p_user_id, p_firstname, p_lastname, p_email, p_dob,
-    p_display_name, p_username, p_species, p_pronouns, p_bio
+    p_user_id, p_firstname, p_lastname, p_email, p_display_name,
+    p_username, p_species, p_pronouns, p_bio
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER
 SET search_path = public, core;
 
-GRANT EXECUTE ON FUNCTION public.create_account(UUID, TEXT, TEXT, TEXT, DATE, TEXT, TEXT, TEXT, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_account(UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO authenticated;
 
 -- ============================================================================
 -- PUBLIC WRAPPER: Check username availability
@@ -90,8 +89,8 @@ RETURNS TABLE (
   account_lastname TEXT,
   account_email TEXT,
   account_dob DATE,
-  account_created_at DATE,
-  account_updated_at DATE,
+  account_created_at TIMESTAMPTZ,
+  account_updated_at TIMESTAMPTZ,
   is_active BOOLEAN,
   current_fursona_id UUID,
   current_fursona_username TEXT,
@@ -102,8 +101,8 @@ RETURNS TABLE (
   current_fursona_pronouns TEXT,
   current_fursona_bio TEXT,
   current_fursona_reputation INT,
-  current_fursona_created_at DATE,
-  current_fursona_updated_at DATE,
+  current_fursona_created_at TIMESTAMPTZ,
+  current_fursona_updated_at TIMESTAMPTZ,
   current_fursona_is_default BOOLEAN
 ) AS $$
   SELECT * FROM core.get_user_profile();
@@ -124,6 +123,20 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.switch_current_fursona(uuid) TO authenticated;
+
+-- PUBLIC WRAPPER: Delete the authenticated user's account
+CREATE OR REPLACE FUNCTION public.delete_user_account()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, core
+AS $$
+BEGIN
+  RETURN core.delete_user_account();
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.delete_user_account() TO authenticated;
 
 -- ============================================================================
 -- PUBLIC WRAPPER: search fursonas

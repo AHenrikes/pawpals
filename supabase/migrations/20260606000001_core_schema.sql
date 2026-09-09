@@ -15,7 +15,7 @@ CREATE TABLE core.accounts (
   -- Core account data
   firstname TEXT NOT NULL,
   lastname TEXT NOT NULL,
-  dob DATE NOT NULL,
+  dob DATE,
   email TEXT NOT NULL,
   account_role TEXT NOT NULL DEFAULT 'user',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
@@ -26,6 +26,7 @@ CREATE TABLE core.accounts (
   is_suspended BOOLEAN DEFAULT false NOT NULL,
   suspension_reason TEXT,
   
+  CONSTRAINT valid_account_role CHECK (account_role IN ('user', 'moderator')),
   CONSTRAINT valid_email CHECK (email ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$')
 );
 
@@ -49,7 +50,8 @@ CREATE TABLE core.fursonas (
   banner_url TEXT NOT NULL DEFAULT '/images/profile/banner.png',
 
   -- Fursona status
-  is_visible TEXT[] NOT NULL '{ "everyone", "followers", "mutuals", "private" }',
+  is_visible TEXT DEFAULT 'public' NOT NULL,
+  -- is_visible TEXT[] NOT NULL '{ "everyone", "followers", "mutuals", "private" }',
   is_default BOOLEAN DEFAULT false NOT NULL,
   is_current BOOLEAN DEFAULT false NOT NULL,
   is_active BOOLEAN DEFAULT true NOT NULL,
@@ -61,6 +63,7 @@ CREATE TABLE core.fursonas (
 
   CONSTRAINT valid_display_name CHECK (display_name ~ '^.{1,100}$'),
   CONSTRAINT valid_username CHECK (username ~ '^[a-zA-Z0-9_-]{3,50}$'),
+  CONSTRAINT valid_is_visibility CHECK (is_visible IN ('public', 'followers', 'mutuals', 'private')),
   CONSTRAINT non_negative_reputation CHECK (reputation >= 0)
 );
 

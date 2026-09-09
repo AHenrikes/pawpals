@@ -11,7 +11,7 @@ export const POST_WARN_CHARS = 1800;
 export const POST_DANGER_CHARS = 2100;
 
 export type Visibility =
-  "everyone" | "verified" | "followers" | "mutuals" | "mentioned";
+  "public" | "followers" | "mutuals" | "private";
 
 interface PostState {
   content: string;
@@ -73,7 +73,7 @@ const initialState: PostState = {
   mediaPreviews: [],
   postMedia: [],
   isNSFW: false,
-  visibility: "everyone",
+  visibility: "public",
   loading: false,
 };
 

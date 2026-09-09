@@ -15,7 +15,6 @@ import {
   SendIcon,
   ChevronRightIcon,
   ChevronDownIcon,
-  UsersIcon,
   HashIcon,
   ImageIcon,
 } from "lucide-react";
@@ -50,11 +49,10 @@ const VISIBILITY_OPTIONS: {
   label: string;
   Icon: React.ElementType;
 }[] = [
-  { value: "everyone", label: "Everyone", Icon: GlobeIcon },
-  { value: "verified", label: "Verified only", Icon: BadgeCheckIcon },
-  { value: "followers", label: "Followers only", Icon: UsersIcon },
-  { value: "mutuals", label: "Mutuals only", Icon: UserPlusIcon },
-  { value: "mentioned", label: "Mentioned users", Icon: AtSignIcon },
+  { value: "public", label: "Everyone", Icon: GlobeIcon },
+  { value: "followers", label: "Followers", Icon: BadgeCheckIcon },
+  { value: "mutuals", label: "Mutuals", Icon: UserPlusIcon },
+  { value: "private", label: "Private", Icon: AtSignIcon },
 ];
 
 const META_ROWS: { Icon: React.ElementType; label: string }[] = [

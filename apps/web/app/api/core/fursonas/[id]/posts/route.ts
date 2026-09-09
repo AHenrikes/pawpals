@@ -54,21 +54,33 @@ export const GET = withUser(
       .from("posts")
       .select(
         `
-      id,
-      fursona_id,
-      content,
-      media_urls,
-      likes_count,
-      comments_count,
-      views_count,
-      bookmarks_count,
-      shares_count,
-      is_published,
-      created_at
-    `,
+          id,
+          fursona_id,
+          post_type,
+          content,
+          post_media (
+            id,
+            media_type,
+            poster_url,
+            url,
+            width,
+            height,
+            duration_seconds,
+            file_size_bytes,
+            order_index,
+            created_at
+          )
+          views_count,
+          likes_count,
+          comments_count,
+          shares_count,
+          bookmarks_count,
+          visibility,
+          created_at,
+          updated_at
+      `,
       )
       .eq("fursona_id", fursona.id)
-      .eq("is_published", true)
       .order("created_at", { ascending: false })
       .limit(limit + 1); // fetch one extra to determine if there's a next page
 
@@ -78,7 +90,7 @@ export const GET = withUser(
 
     const { data, error } = await query;
 
-    if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+    if (error) return serverError(error.message);
 
     const hasMore = data.length > limit;
     const posts = (hasMore
@@ -98,23 +110,34 @@ export const GET = withUser(
   },
 );
 
-export const POST = withUser(async ({ supabase }, req: NextRequest) => {
+export const POST = withUser(async ({ supabase, account }, req: NextRequest) => {
   const body = (await req.json().catch(() => ({}))) as PostCreate;
   const content = normalizeOptionalText(body.content);
-  const media = Array.isArray(body.media_urls) ? body.media_urls : [];
+  const media = Array.isArray(body.media) ? body.media : [];
 
   if ((!content || content.length === 0) && media.length === 0) {
     return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
   }
 
-  const { data, error } = await supabase
-    .schema("social")
-    .from("posts")
-    .insert({ ...body, content, media_urls: media })
-    .select("fursona_id, content, media_urls, is_published, created_at")
+  const { data: fursona, error: fursonaError } = await supabase
+    .schema("core")
+    .from("fursonas")
+    .select("id")
+    .eq("account_id", account.id)
+    .eq("is_current", true)
     .single();
+
+  if (fursonaError || !fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+
+  const { data, error } = await supabase.rpc("create_post_with_media", {
+    p_fursona_id: fursona.id,
+    p_post_type: body.post_type,
+    p_content: content ?? null,
+    p_visibility: body.visibility ?? "public",
+    p_media: media,
+  });
 
   if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
-  return ok<{ post: PostCreate }>({ post: data });
+  return ok({ post: data });
 });
