@@ -1,4 +1,4 @@
-import { requireUser } from "@/lib/auth/requireUser";
+import { withUser } from "@/lib/auth/withUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import {
   FursonaCreate,
@@ -10,13 +10,14 @@ import {
   badRequest,
   notFound,
   ok,
+  okPrivateRead,
   serverError,
-  unauthorized,
 } from "@/lib/api/responses";
 import {
   normalizeOptionalText,
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
+import { type SupabaseClient } from "@supabase/supabase-js";
 
 function buildPatchUpdates(body: FursonaWithBoolean) {
   const updates: Record<string, unknown> = {};
@@ -59,143 +60,170 @@ function buildPatchUpdates(body: FursonaWithBoolean) {
   return { updates, error: null };
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+async function applyFursonaPatch(
+  supabase: SupabaseClient,
+  fursonaId: string,
+  accountId: string,
+  body: FursonaWithBoolean,
+  updates: Record<string, unknown>,
 ) {
-  const { supabase, account, response } = await requireUser();
-  if (!account) return unauthorized();
-  if (response) return response;
-
-  const { id } = await params;
-
-  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
-
-  // Support both UUID-based ID and username lookups
-  const isUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-  const { data, error } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select(
-      "id, username, display_name, avatar_url, banner_url, species, pronouns, bio, reputation, created_at",
-    )
-    .eq(isUuid ? "id" : "username", id)
-    .eq("is_active", true)
-    .single();
-
-  if (error?.code === "PGRST116")
-    return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-  if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-  if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-
-  return ok<FursonaProfile>(data);
-}
-
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (account === null) return unauthorized();
-  if (response) return response;
-
-  const { id } = await params;
-
-  if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-
-  const body = (await request.json().catch(() => ({}))) as FursonaWithBoolean;
-  const { updates, error } = buildPatchUpdates(body);
-
-  if (error) return badRequest(error);
-
-  const hasUpdates = Object.keys(updates).length > 0;
-  const isSettingCurrent = body.is_current === true;
-  const isSettingDefault = body.is_default === true;
-
-  if (!hasUpdates && !isSettingDefault)
-    return badRequest("No valid fields to update.");
-
-  if (hasUpdates) {
-    if (isSettingCurrent) {
-      const { error: switchError } = await supabase.rpc(
-        "switch_current_fursona",
-        {
-          p_fursona_id: id,
-        },
-      );
-      if (switchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (Object.keys(updates).length > 0) {
+    if (body.is_current === true) {
+      const { error } = await supabase.rpc("switch_current_fursona", {
+        p_fursona_id: fursonaId,
+      });
+      if (error) return error;
     } else {
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .schema("core")
         .from("fursonas")
         .update(updates)
-        .eq("id", id)
-        .eq("account_id", account.id);
-
-      if (updateError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+        .eq("id", fursonaId)
+        .eq("account_id", accountId);
+      if (error) return error;
     }
   }
 
-  if (isSettingDefault) {
-    const { error: setDefaultError } = await supabase.rpc(
-      "set_default_fursona",
-      {
-        p_fursona_id: id,
-      },
-    );
+  // if (body.is_default === true) {
+  //   const { error } = await supabase.rpc("set_default_fursona", {
+  //     p_fursona_id: fursonaId,
+  //   });
+  //   if (error) return error;
+  // }
 
-    if (setDefaultError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (body.is_default === true) {
+    const { error: clearDefaultsError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .update({ is_default: false })
+      .eq("account_id", accountId);
+    if (clearDefaultsError) return clearDefaultsError;
+
+    const { error: setDefaultError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .update({ is_default: true })
+      .eq("id", fursonaId)
+      .eq("account_id", accountId);
+    if (setDefaultError) return setDefaultError;
   }
 
-  const { data: fursona, error: fetchError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select(
-      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, updated_at",
-    )
-    .eq("id", id)
-    .eq("account_id", account.id)
-    .maybeSingle();
-
-  if (fetchError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-
-  return ok<{ fursona: FursonaCreate }>({ fursona });
+  return null;
 }
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { supabase, account, response } = await requireUser();
-  if (response) return response;
-  if (account === null) return unauthorized();
+export const GET = withUser(
+  async (
+    { supabase },
+    _req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
 
-  const { id } = await params;
+    if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
-  if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    // Support both UUID-based ID and username lookups
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        id,
+      );
 
-  // Verify user has at least one fursona after deletion
-  const { count, error: countError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id", { count: "exact", head: true })
-    .eq("account_id", account.id);
+    const { data, error } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select(
+        "id, username, display_name, avatar_url, banner_url, species, pronouns, bio, reputation, created_at",
+      )
+      .eq(isUuid ? "id" : "username", id)
+      .eq("is_active", true)
+      .single();
 
-  if (countError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-  if ((count ?? 0) <= 1) return badRequest("Cannot delete last fursona");
+    if (error?.code === "PGRST116")
+      return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  // Delete the fursona
-  const { error: deleteError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .delete()
-    .eq("id", id)
-    .eq("account_id", account.id);
+    return okPrivateRead<FursonaProfile>(data);
+  },
+);
 
-  if (deleteError) return badRequest(deleteError.message);
+export const PATCH = withUser(
+  async (
+    { supabase, account },
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
 
-  return ok({ ok: true });
-}
+    if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+
+    const body = (await request.json().catch(() => ({}))) as FursonaWithBoolean;
+    const { updates, error } = buildPatchUpdates(body);
+
+    if (error) return badRequest(error);
+
+    const hasUpdates = Object.keys(updates).length > 0;
+    const isSettingDefault = body.is_default === true;
+
+    if (!hasUpdates && !isSettingDefault)
+      return badRequest("No valid fields to update.");
+
+    const patchError = await applyFursonaPatch(
+      supabase,
+      id,
+      account.id,
+      body,
+      updates,
+    );
+
+    if (patchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+
+    const { data: fursona, error: fetchError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select(
+        "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, is_default, is_current, updated_at",
+      )
+      .eq("id", id)
+      .eq("account_id", account.id)
+      .maybeSingle();
+
+    if (fetchError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+    if (!fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+
+    return ok<{ fursona: FursonaCreate }>({ fursona });
+  },
+);
+
+export const DELETE = withUser(
+  async (
+    { supabase, account },
+    _req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
+
+    if (!id) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+
+    // Verify user has at least one fursona after deletion
+    const { count, error: countError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select("id", { count: "exact", head: true })
+      .eq("account_id", account.id);
+
+    if (countError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+    if ((count ?? 0) <= 1) return badRequest("Cannot delete last fursona");
+
+    // Delete the fursona
+    const { error: deleteError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .delete()
+      .eq("id", id)
+      .eq("account_id", account.id);
+
+    if (deleteError) return badRequest(deleteError.message);
+
+    return ok({ ok: true });
+  },
+);

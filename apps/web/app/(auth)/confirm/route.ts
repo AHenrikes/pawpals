@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
       p_firstname: metadata.firstname,
       p_lastname: metadata.lastname,
       p_email: user.email,
-      p_dob: metadata.dob,
       p_display_name: initFursona.display_name,
       p_username: initFursona.username,
       p_species: initFursona.species ?? null,

@@ -1,38 +1,15 @@
-import { requireUser } from "@/lib/auth/requireUser";
-import {
-  unauthorized,
-  notFound,
-  serverError,
-  badRequest,
-} from "@/lib/api/responses";
-import { NextResponse } from "next/server";
+import { withUser } from "@/lib/auth/withUser";
+import { notFound, serverError, badRequest, conflict, ok } from "@/lib/api/responses";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const { supabase, account, response } = await requireUser();
+type RouteContext = { params: Promise<{ id: string }> };
 
-  if (response) return response;
-  if (account === null) return unauthorized();
+export const GET = withUser(
+  async ({ supabase, account }, _req: NextRequest, { params }: RouteContext) => {
+    const { id: postId } = await params;
+    if (!postId) return badRequest("Post id required");
 
-  const { searchParams } = new URL(request.url);
-  const username = searchParams.get("username");
-
-  let fursonaId: string;
-  let isLiked = false;
-
-  if (username) {
-    // Viewing someone else's profile — look up by username
-    const { data: fursona, error } = await supabase
-      .schema("core")
-      .from("fursonas")
-      .select("id")
-      .eq("username", username)
-      .single();
-
-    if (error || !fursona) return notFound("Fursona not found");
-    fursonaId = fursona.id;
-
-    // Check if current user follows this profile
-    const { data: myFursona } = await supabase
+    const { data: currentFursona } = await supabase
       .schema("core")
       .from("fursonas")
       .select("id")
@@ -40,19 +17,24 @@ export async function GET(request: Request) {
       .eq("is_current", true)
       .single();
 
-    if (myFursona) {
-      const { data: likeRow } = await supabase
-        .schema("social")
-        .from("fursona_likes")
-        .select("id")
-        .eq("liker_fursona_id", myFursona.id)
-        .eq("liked_fursona_id", fursonaId)
-        .maybeSingle();
-      isLiked = !!likeRow;
-    }
-  } else {
-    // No username — fetch current user's active fursona
-    const { data: fursona, error } = await supabase
+    if (!currentFursona) return notFound("No current fursona found");
+
+    const [{ count, error: countError }, { data: like, error: likeError }] = await Promise.all([
+      supabase.schema("social").from("post_likes").select("id", { count: "exact", head: true }).eq("post_id", postId),
+      supabase.schema("social").from("post_likes").select("id").eq("post_id", postId).eq("liker_fursona_id", currentFursona.id).maybeSingle(),
+    ]);
+
+    if (countError || likeError) return serverError((countError ?? likeError)?.message ?? "Unable to load likes");
+    return ok({ likes_count: count ?? 0, is_liked: !!like });
+  },
+);
+
+export const POST = withUser(
+  async ({ supabase, account }, _req: NextRequest, { params }: RouteContext) => {
+    const { id: postId } = await params;
+    if (!postId) return badRequest("Post id required");
+
+    const { data: myFursona, error: myError } = await supabase
       .schema("core")
       .from("fursonas")
       .select("id")
@@ -60,115 +42,54 @@ export async function GET(request: Request) {
       .eq("is_current", true)
       .single();
 
-    if (error || !fursona) return notFound("No current fursona found");
-    fursonaId = fursona.id;
-  }
+    if (myError || !myFursona) return notFound("Couldn't find your Fursona!");
 
-  const { data: stats, error: statsError } = await supabase.rpc(
-    "get_profile_stats",
-    { p_fursona_id: fursonaId },
-  );
+    const { error } = await supabase
+      .schema("social")
+      .from("post_likes")
+      .insert({
+        liker_fursona_id: myFursona.id,
+        post_id: postId,
+      });
 
-  if (statsError) return serverError(statsError.message);
+    if (error) {
+      if (error.code === "23505") {
+        return conflict("Already liked");
+      }
 
-  return NextResponse.json({
-    likes_received_count: stats?.likes_received_count ?? 0,
-    // likes_given_count: stats?.likes_given_count ?? 0,
-    // liked_by: (stats?.liked_by ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
-    // likes_given: (stats?.likes_given ?? []).map(({ username, display_name }: { username: string; display_name: string }) => ({ username, display_name })),
-    is_liked: isLiked,
-  });
-}
-
-export async function POST(request: Request) {
-  const { supabase, account, response } = await requireUser();
-  if (response) return response;
-  if (!account) return unauthorized();
-
-  const { username } = await request.json();
-  if (!username) return badRequest("Username required");
-
-  // GET current active fursona
-  const { data: myFursona, error: myError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("account_id", account.id)
-    .eq("is_current", true)
-    .single();
-
-  if (myError || !myFursona) return notFound("Couldn't find your Fursona!");
-
-  // GET targeted fursona
-  const { data: targetFursona, error: targetError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("username", username)
-    .single();
-
-  if (targetError || !targetFursona) return notFound("Fursona not found");
-  if (myFursona.id === targetFursona.id)
-    return badRequest("Cannot follow yourself!");
-
-  const { error } = await supabase
-    .schema("social")
-    .from("fursona_likes")
-    .insert({
-      liker_fuserona_id: myFursona.id,
-      liked_fursona_id: targetFursona.id,
-    });
-
-  if (error) {
-    if (error.code === "23505") {
-      return NextResponse.json({ error: "Already liked" }, { status: 409 });
+      return serverError(error.message);
     }
 
-    return serverError(error.message);
-  }
+    return NextResponse.json({ success: true });
+  },
+);
 
-  return NextResponse.json({ success: true });
-}
+export const DELETE = withUser(
+  async ({ supabase, account }, _req: NextRequest, { params }: RouteContext) => {
+    const { id: postId } = await params;
+    if (!postId) return badRequest("Post id required");
 
-export async function DELETE(request: Request) {
-  const { account, supabase, response } = await requireUser();
-  if (response) return response;
-  if (!account) return unauthorized();
+    // GET current active fursona
+    const { data: myFursona, error: myFursonaError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select("id")
+      .eq("account_id", account.id)
+      .eq("is_current", true)
+      .single();
 
-  const { username } = await request.json();
-  if (!username) return badRequest("Username required");
+    if (myFursonaError || !myFursona)
+      return notFound("Couldn't find your fursona!");
 
-  // GET current active fursona
-  const { data: myFursona, error: myFursonaError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("account_id", account.id)
-    .eq("is_current", true)
-    .single();
+    const { error } = await supabase
+      .schema("social")
+      .from("post_likes")
+      .delete()
+      .eq("liker_fursona_id", myFursona.id)
+      .eq("post_id", postId);
 
-  if (myFursonaError || !myFursona)
-    return notFound("Couldn't find your fursona!");
+    if (error) return serverError(error.message);
 
-  // GET targeted fursona
-  const { data: targetFursona, error: targetFursonaError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("username", username)
-    .single();
-
-  if (targetFursonaError || !targetFursona)
-    return notFound("Fursona not found");
-
-  const { error } = await supabase
-    .schema("social")
-    .from("fursona_likes")
-    .delete()
-    .eq("liker_fursona_id", myFursona.id)
-    .eq("liked_fursona_id", targetFursona.id);
-
-  if (error) return serverError(error.message);
-
-  return NextResponse.json({ success: true });
-}
+    return NextResponse.json({ success: true });
+  },
+);

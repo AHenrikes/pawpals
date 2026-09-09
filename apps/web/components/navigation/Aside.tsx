@@ -30,13 +30,12 @@ import {
   useSidebar,
 } from "@/providers/SidebarProvider";
 import type { LucideIcon } from "lucide-react";
-import PostModal from "@/components/dialogs/PostModal";
-import { LockScreen } from "@/utils/lock-body";
+import { LockScreen } from "@/lib/helpers/lockBody";
 import { TypographyLead, TypographySmall } from "@repo/ui/typography";
 import { CardContent } from "@repo/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { toast } from "@repo/ui/sonner";
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import {
   Collapsible,
   CollapsibleContent,
@@ -45,6 +44,7 @@ import {
 import { CreateFursonaPanelModal } from "../dialogs/CreateFursonaPanelModal";
 import { createPortal } from "react-dom";
 import { Separator } from "@repo/ui/separator";
+import PostModal from "@/components/dialogs/CreatePostModal";
 
 type MainNavItem = {
   href: string;

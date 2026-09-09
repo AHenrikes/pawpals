@@ -15,33 +15,39 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { reported_user_id, report_type, reason, details } = body;
+    const { reported_fursona_id, reported_post_id, reason, description } = body;
 
-    if (!reported_user_id || !report_type || !reason) {
-      badRequest("Missing required fields");
+    if ((!reported_fursona_id && !reported_post_id) || (reported_fursona_id && reported_post_id) || !reason) {
+      return badRequest("Exactly one report target and a reason are required");
     }
 
-    // Prevent self-reporting
-    if (reported_user_id === account.id) {
-      badRequest("Cannot report your own profile");
+    const { data: reporter } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select("id")
+      .eq("account_id", account.id)
+      .eq("is_current", true)
+      .single();
+
+    if (!reporter) return unauthorized();
+    if (reported_fursona_id === reporter.id) {
+      return badRequest("Cannot report your own profile");
     }
 
     const { error } = await supabase
-      .schema("core")
-      .from("reports")
+      .schema("social")
+      .from("post_reports")
       .insert({
-        reporter_id: account.id,
-        reported_user_id,
-        report_type,
+        reporter_fursona_id: reporter.id,
+        reported_fursona_id: reported_fursona_id || null,
+        reported_post_id: reported_post_id || null,
         reason,
-        details: details || null,
-        status: "pending",
-        created_at: new Date().toISOString(),
+        description: description || null,
       });
 
     if (error) return serverError(error.message);
 
-    created({ success: true });
+    return created({ success: true });
   } catch (error) {
     return serverError((error as Error).message);
   }

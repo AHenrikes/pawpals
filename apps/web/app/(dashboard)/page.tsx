@@ -1,6 +1,6 @@
 "use client";
 
-import { PostCards } from "@/components/cards/PostCards";
+import { PostCards } from "@/components/cards/media/PostCards";
 import { AnimatePresence, motion } from "framer-motion";
 import { useHomeTabs } from "@/providers/HomeTabsProvider";
 

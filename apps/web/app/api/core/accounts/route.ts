@@ -1,14 +1,10 @@
-import { requireUser } from "@/lib/auth/requireUser";
-import { unauthorized, serverError, notFound, ok } from "@/lib/api/responses";
+import { withUser } from "@/lib/auth/withUser";
+import { serverError, notFound, ok } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { type AccountTypes } from "@/types/account";
 import { type FursonaTypes } from "@/types/fursona";
 
-export async function GET() {
-  const { supabase, account, response } = await requireUser();
-  if (account === null) return unauthorized();
-  if (response) return response;
-
+export const GET = withUser(async ({ supabase }) => {
   const { data: profileRows, error } = await supabase.rpc("get_user_profile");
 
   if (error) return serverError(error.message);
@@ -49,4 +45,4 @@ export async function GET() {
     account: accountData,
     currentFursona,
   });
-}
+});

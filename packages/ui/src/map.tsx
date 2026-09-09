@@ -18,7 +18,6 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
-
 import { cn } from "./lib/utils";
 import { toast } from "sonner";
 
@@ -901,7 +900,6 @@ function MapControls({
           );
         } else {
           toast.error("Could not pin point your location. Try again later!");
-          console.error("Error getting location:", error);
         }
         setWaitingForLocation(false);
       },

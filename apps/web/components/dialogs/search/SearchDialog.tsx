@@ -12,7 +12,7 @@ import {
 } from "@repo/ui/input-group";
 import { Kbd } from "@repo/ui/kbd";
 import { AnimatePresence, motion } from "framer-motion";
-import { KeyboardEvent, LockScreen } from "@/utils/lock-body";
+import { KeyboardEvent, LockScreen } from "@/lib/helpers/lockBody";
 import SearchResults from "./SearchResults";
 import SearchDefault from "./SearchDefault";
 import { createPortal } from "react-dom";

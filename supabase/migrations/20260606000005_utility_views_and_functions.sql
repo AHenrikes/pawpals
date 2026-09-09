@@ -11,7 +11,6 @@ CREATE OR REPLACE FUNCTION core.create_account(
   p_firstname TEXT,
   p_lastname TEXT,
   p_email TEXT,
-  p_dob DATE,
   p_display_name TEXT,
   p_username TEXT,
   p_species TEXT DEFAULT NULL,
@@ -35,8 +34,8 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Username already taken');
   END IF;
 
-  INSERT INTO core.accounts (user_id, firstname, lastname, email, dob)
-  VALUES (p_user_id, p_firstname, p_lastname, p_email, p_dob)
+  INSERT INTO core.accounts (user_id, firstname, lastname, email)
+  VALUES (p_user_id, p_firstname, p_lastname, p_email)
   RETURNING id INTO v_account_id;
 
   INSERT INTO core.fursonas (
@@ -246,20 +245,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- ============================================================================
--- VIEW: Active user accounts with fursona counts
--- ============================================================================
-CREATE OR REPLACE VIEW core.v_accounts_with_stats WITH (security_invoker = ON) AS
-SELECT
-  a.id,
-  a.email,
-  a.is_active,
-  a.created_at,
-  COUNT(f.id) AS total_fursonas
-FROM core.accounts a
-LEFT JOIN core.fursonas f ON f.account_id = a.id
--- WHERE a.is_active = true
-GROUP BY a.id, a.email, a.is_active, a.created_at;
 
 -- ============================================================================
 -- VIEW: Fursona profiles with social stats
@@ -273,8 +258,8 @@ SELECT
   f.reputation,
   (SELECT count(*) FROM social.followers WHERE followers.following_fursona_id = f.id) AS follower_count,
   (SELECT count(*) FROM social.followers WHERE followers.follower_fursona_id = f.id) AS following_count,
-  (SELECT count(*) FROM social.posts WHERE posts.fursona_id = f.id AND posts.is_published = true) AS post_count,
-  (SELECT count(*) FROM social.post_likes pl
+  (SELECT count(*) FROM social.posts WHERE posts.fursona_id = f.id) AS post_count,
+  (SELECT count(*) FROM social.post_likes pl 
    JOIN social.posts p ON p.id = pl.post_id
    WHERE p.fursona_id = f.id) AS like_count,
   f.created_at
@@ -307,12 +292,11 @@ LIMIT 100;
 -- ============================================================================
 GRANT SELECT ON social.v_fursona_stats TO authenticated;
 GRANT SELECT ON social.v_top_fursonas TO authenticated;
-GRANT SELECT ON core.v_accounts_with_stats TO authenticated;
 
 -- ============================================================================
 -- COMMENTS & DOCUMENTATION
 -- ============================================================================
-COMMENT ON FUNCTION core.create_account(UUID, TEXT, TEXT, TEXT, DATE, TEXT, TEXT, TEXT, TEXT, TEXT) IS 'Create account and initial fursona during sign-up';
+COMMENT ON FUNCTION core.create_account(UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) IS 'Create account and initial fursona during sign-up';
 COMMENT ON FUNCTION core.get_user_profile() IS 'Get current authenticated user profile with current fursona';
 COMMENT ON FUNCTION core.search_fursonas(TEXT) IS 'Search fursonas by username or display name';
 COMMENT ON FUNCTION core.switch_current_fursona(UUID) IS 'Switch authenticated user current fursona';

@@ -7,19 +7,18 @@ export interface MediaWithOrientation extends MediaItem {
   originalIndex: number; // index in the caller's original array — needed for remove/edit actions
 }
 
-export interface LayoutConfig {
+interface LayoutConfig {
   container: string;
   img: string[];
 }
 
-export function analyzeOrientation(
-  width: number,
-  height: number,
-): OrientationType {
-  return width / height > 1.1 ? "landscape" : "portrait";
+function analyzeOrientation(width?: number, height?: number): OrientationType {
+  const safeWidth = width ?? 1;
+  const safeHeight = height ?? 1;
+  return safeWidth / safeHeight > 1.1 ? "landscape" : "portrait";
 }
 
-export function analyzeMedia(media: MediaItem[]) {
+function analyzeMedia(media: MediaItem[]) {
   const analyzed: MediaWithOrientation[] = media.map((item, originalIndex) => ({
     ...item,
     orientation: analyzeOrientation(item.width, item.height),
@@ -156,7 +155,7 @@ function layoutForOne(landscapeCount: number): LayoutConfig {
   };
 }
 
-export function getLayout(count: number, landscapeCount: number): LayoutConfig {
+function getLayout(count: number, landscapeCount: number): LayoutConfig {
   switch (count) {
     case 4:
       return layoutForFour(landscapeCount);

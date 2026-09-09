@@ -11,7 +11,7 @@ export const POST_WARN_CHARS = 1800;
 export const POST_DANGER_CHARS = 2100;
 
 export type Visibility =
-  "everyone" | "verified" | "followers" | "mutuals" | "mentioned";
+  "public" | "followers" | "mutuals" | "private";
 
 interface PostState {
   content: string;
@@ -73,7 +73,7 @@ const initialState: PostState = {
   mediaPreviews: [],
   postMedia: [],
   isNSFW: false,
-  visibility: "everyone",
+  visibility: "public",
   loading: false,
 };
 
@@ -157,7 +157,10 @@ export function usePostForm(onClose: () => void) {
 
   const handleSubmit = useCallback(
     async (accountId: string, fursonaId: string) => {
-      if (!state.content.trim() && state.postMedia.length === 0) return;
+      const trimmedContent = state.content.trim();
+      const hasMedia = state.postMedia.length > 0;
+
+      if (!trimmedContent && !hasMedia) return;
       dispatch({ type: "SET_LOADING", payload: true });
 
       try {
@@ -167,11 +170,19 @@ export function usePostForm(onClose: () => void) {
           ),
         );
 
-        await api.post(`/api/core/fursonas/${fursonaId}/posts`, {
+        const postType =
+          hasMedia && !trimmedContent
+            ? state.postMedia.length > 1
+              ? "gallery"
+              : "reel"
+            : "yap";
+
+        await api.post("/api/social/posts", {
           fursona_id: fursonaId,
-          content: state.content,
-          media_urls: mediaItems,
-          is_published: true,
+          post_type: postType,
+          content: trimmedContent || undefined,
+          media: mediaItems,
+          visibility: state.visibility,
         });
 
         clearAll();

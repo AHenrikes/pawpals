@@ -5,7 +5,7 @@ import {
 } from "@repo/ui/typography";
 import { FursonaSearch } from "@/types/fursona";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import type { NavOption, SearchResult } from "./SearchDialog";
 import Link from "next/link";
 

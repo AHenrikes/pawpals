@@ -1,4 +1,4 @@
-import { ThemeSwitcher } from "@/components/ui/Theme-switcher";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { TypographyP } from "@repo/ui/typography";
 import Link from "next/link";
 

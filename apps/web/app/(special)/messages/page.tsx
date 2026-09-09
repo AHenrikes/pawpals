@@ -18,6 +18,7 @@ import { useUser } from "@/providers/UserProvider";
 import { api } from "@/lib/api/api-client";
 import { MessageScrollerProvider } from "@repo/ui/message-scroller";
 import { TypographyH2 } from "@repo/ui/typography";
+import { toast } from "@repo/ui/sonner";
 import { type FursonaProfile } from "@/types/fursona";
 import type { Conversation, MessageType } from "@/types/messages";
 
@@ -119,8 +120,8 @@ export default function MessagesPage() {
               : conversation,
           ),
         );
-      } catch (err) {
-        console.error("Failed to mark conversation as read", err);
+      } catch {
+        toast.error("Failed to mark conversation as read");
       }
     },
     [supabase],
@@ -246,7 +247,7 @@ export default function MessagesPage() {
 
   async function handleStartConversation(username: string) {
     if (!currentFursona?.id) {
-      console.error("No current fursona found");
+      toast.error("No current fursona found");
       return;
     }
 
@@ -301,8 +302,8 @@ export default function MessagesPage() {
 
       setConversations((prev) => [fallbackConversation, ...prev]);
       handleSelect(fallbackConversation);
-    } catch (err) {
-      console.error("Failed to start conversation", err);
+    } catch {
+      toast.error("Failed to start conversation");
     } finally {
       setStartingConversation(false);
     }
@@ -351,9 +352,9 @@ export default function MessagesPage() {
         const next = prev.map((m) => (m.id === optimisticId ? saved : m));
         return dedupeMessagesById(next);
       });
-    } catch (err) {
+    } catch {
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-      console.error("Failed to send message", err);
+      toast.error("Failed to send message");
     }
   }
 

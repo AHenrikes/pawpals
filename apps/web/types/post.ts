@@ -1,32 +1,43 @@
+export type PostTypeValue = "yap" | "reel" | "gallery";
+export type PostMediaType = "image" | "gif" | "video";
+export type PostVisibility =
+  "public" | "followers" | "mutuals" | "private" | "archived";
+
 export interface MediaItem {
+  id?: string;
+  // type?: "image" | "gif" | "video";
+  media_type?: PostMediaType;
+  poster_url?: string | null;
   url: string;
-  width: number;
-  height: number;
-  type: "image" | "video";
+  width?: number;
+  height?: number;
+  duration_seconds?: number | null;
+  file_size_bytes?: number | null;
+  order_index?: number;
 }
 
 export type PostType = {
   id: string;
   fursona_id: string;
-  title: string;
-  content?: string;
-  media_urls?: MediaItem[];
+  post_type: PostTypeValue;
+  content?: string | null;
+  // media_urls?: MediaItem["url"];
+  post_media?: MediaItem[];
+  views_count: number;
   likes_count: number;
   comments_count: number;
-  views_count: number;
-  bookmarks_count: number;
   shares_count: number;
-  is_published: boolean;
-  created_at: Date;
+  bookmarks_count: number;
+  visibility: PostVisibility;
+  created_at: string;
+  updated_at?: string;
 };
 
 export type PostCreate = {
-  fursona_id: string;
+  fursona_id?: string;
+  post_type?: PostTypeValue;
   content?: string;
-  media_urls?: MediaItem[];
-  is_published: boolean;
-};
-
-export type PostWithDetail = PostType & {
-  updated_at: Date;
+  post_media?: MediaItem["url"];
+  media?: MediaItem[];
+  visibility?: PostVisibility;
 };

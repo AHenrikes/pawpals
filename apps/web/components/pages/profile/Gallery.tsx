@@ -1,56 +1,46 @@
 "use client";
 
-import { useProfilePosts } from "@/hooks/core/fursonas/useProfilePosts";
-import { usePosts } from "@/hooks/social/posts/usePosts";
-import { memo, useEffect, useState, Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  HeartIcon,
-  MessageCircleIcon,
-  BookmarkIcon,
-  ShareIcon,
-  EllipsisVerticalIcon,
-} from "lucide-react";
+import { Button } from "@repo/ui/button";
+import { getInitials } from "@/lib/helpers/getInitials";
+import { useFursonaData } from "@/hooks/useFursonaData";
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
 import {
   TypographyH2,
   TypographyMuted,
   TypographyP,
   TypographySmall,
 } from "@repo/ui/typography";
-import { Button } from "@repo/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { getInitials } from "@/utils/getInitials";
-import { useFursonaData } from "@/hooks/useFursonaData";
-import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
-import { Separator } from "@repo/ui/separator";
+import {
+  BookmarkIcon,
+  EllipsisVerticalIcon,
+  HeartIcon,
+  MessageCircleIcon,
+  ShareIcon,
+} from "lucide-react";
+import { useProfilePosts } from "@/hooks/core/fursonas/useProfilePosts";
 import { cn } from "@repo/ui/lib/utils";
+import { Separator } from "@repo/ui/separator";
 import { type PostType } from "@/types/post";
-import PostDropdown from "../dropdowns/Post";
-import MediaTiles from "../mediaTiles";
+import PostDropdown from "@/components/dropdowns/Post";
+import GalleryLayout from "../../cards/media/layout/GalleryLayout";
 
-type PostListProps = {
-  posts: PostType[];
+type GalleryListProps = {
+  galleries: PostType[];
   hasMore: boolean;
   fetchMore: () => void;
   loading: boolean;
 };
 
-const ACTION_BUTTON_CLASSES = {
-  comment: "group p-3 text-xs hover:text-primary hover:bg-primary/10",
-  share: "group p-3 text-xs hover:text-emerald-500 hover:bg-emerald-500/10",
-  like: "group p-3 text-xs hover:text-destructive hover:bg-destructive/10",
-  bookmark: "group p-3 text-xs hover:text-primary hover:bg-primary/10",
-} as const;
-
-const PostCard = memo(function PostCard({
-  post,
-}: Readonly<{ post: PostType }>) {
-  const { user, loading } = useFursonaData(post.fursona_id);
-  const media = post.media_urls ?? [];
+export default function Gallery({ gallery }: Readonly<{ gallery: PostType }>) {
+  const { user, loading } = useFursonaData(gallery.fursona_id);
+  const media = gallery.post_media ?? [];
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Calculate collapsed height based on actual line count (max 3 lines)
-  const lineCount = post.content?.split("\n").length ?? 0;
+  const lineCount = gallery.content?.split("\n").length ?? 0;
   const collapsedHeight = `calc(1.5rem * ${Math.min(lineCount, 3)})`;
 
   return (
@@ -108,7 +98,7 @@ const PostCard = memo(function PostCard({
       {/* Content */}
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
         {/* Caption */}
-        {post.content && (
+        {gallery.content && (
           <>
             <motion.div
               initial={false}
@@ -122,7 +112,7 @@ const PostCard = memo(function PostCard({
               className="px-3 overflow-hidden shrink-0"
             >
               <TypographySmall className="text-foreground wrap-break-word break-all whitespace-pre-wrap">
-                {post.content}
+                {gallery.content}
               </TypographySmall>
             </motion.div>
 
@@ -144,55 +134,40 @@ const PostCard = memo(function PostCard({
         {/* Media */}
         {media.length > 0 && (
           <div className="flex-1 min-h-0 px-3">
-            <MediaTiles media={media} className="w-auto h-full rounded-2xl" />
+            <GalleryLayout
+              media={media}
+              className="w-auto h-full rounded-2xl"
+            />
           </div>
         )}
       </div>
 
       {/* Actions */}
       <div className="flex gap-2 max-w-xs text-muted-foreground shrink-0 px-3">
-        <Button
-          size="icon"
-          variant="ghost"
-          className={ACTION_BUTTON_CLASSES.comment}
-        >
+        <Button size="icon" variant="ghost">
           <MessageCircleIcon className="size-4" />
-          <span className="ml-1">{post.comments_count ?? 0}</span>
+          <span className="ml-1">{gallery.comments_count ?? 0}</span>
         </Button>
 
-        <Button
-          size="icon"
-          variant="ghost"
-          className={ACTION_BUTTON_CLASSES.share}
-        >
+        <Button size="icon" variant="ghost">
           <ShareIcon className="size-4" />
-          <span className="ml-1">{post.shares_count ?? 0}</span>
+          <span className="ml-1">{gallery.shares_count ?? 0}</span>
         </Button>
 
-        <Button
-          size="icon"
-          variant="ghost"
-          className={ACTION_BUTTON_CLASSES.like}
-        >
+        <Button size="icon" variant="ghost">
           <HeartIcon className="size-4" />
-          <span className="ml-1">{post.likes_count ?? 0}</span>
+          <span className="ml-1">{gallery.likes_count ?? 0}</span>
         </Button>
 
-        <Button
-          size="icon"
-          variant="ghost"
-          className={ACTION_BUTTON_CLASSES.bookmark}
-        >
+        <Button size="icon" variant="ghost">
           <BookmarkIcon className="size-4" />
         </Button>
       </div>
     </article>
   );
-});
+}
 
-PostCard.displayName = "PostCard";
-
-export function ProfilePostCards({
+export function ProfileGallery({
   username: fursonaId,
 }: Readonly<{ username: string }>) {
   const { posts, hasMore, fetchPosts, fetchMore, loading } =
@@ -203,8 +178,8 @@ export function ProfilePostCards({
   }, [fetchPosts]);
 
   return (
-    <ProfileLists
-      posts={posts}
+    <GalleryLists
+      galleries={posts}
       hasMore={hasMore}
       fetchMore={fetchMore}
       loading={loading}
@@ -212,29 +187,12 @@ export function ProfilePostCards({
   );
 }
 
-export function PostCards() {
-  const { posts, hasMore, fetchPosts, fetchMore, loading } = usePosts();
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  return (
-    <ProfileLists
-      posts={posts}
-      hasMore={hasMore}
-      fetchMore={fetchMore}
-      loading={loading}
-    />
-  );
-}
-
-export default function ProfileLists({
-  posts,
+export function GalleryLists({
+  galleries,
   hasMore,
   fetchMore,
   loading,
-}: Readonly<PostListProps>) {
+}: Readonly<GalleryListProps>) {
   if (loading) {
     const skeletonItems = [
       "post-skeleton-a",
@@ -274,7 +232,7 @@ export default function ProfileLists({
     );
   }
 
-  if (!loading && posts.length < 1) {
+  if (!loading && galleries.length < 1) {
     return (
       <div className="grid place-content-center w-full h-full">
         <TypographyH2>No posted content</TypographyH2>
@@ -282,10 +240,10 @@ export default function ProfileLists({
     );
   } else {
     return (
-      <>
-        {posts.map((post) => (
-          <Fragment key={post.id}>
-            <PostCard post={post} />
+      <Fragment>
+        {galleries.map((gallery) => (
+          <Fragment key={gallery.id}>
+            <Gallery gallery={gallery} />
 
             <Separator className="h-0.5" />
           </Fragment>
@@ -299,7 +257,7 @@ export default function ProfileLists({
             Load more
           </button>
         )}
-      </>
+      </Fragment>
     );
   }
 }

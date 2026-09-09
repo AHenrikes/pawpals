@@ -28,7 +28,7 @@ type FollowType = "followers" | "following";
  * Hook for fetching and paginating follower/following lists.
  * Implements cursor-based pagination for efficient data loading.
  *
- * @param username - The username to fetch followers/following for
+ * @param fursonaIdentifier - The fursona UUID or username to fetch for
  * @param type - 'followers' to get followers, 'following' to get following list
  * @returns Object with follows array, loading state, error, and pagination
  *
@@ -51,7 +51,7 @@ type FollowType = "followers" | "following";
  * ```
  */
 export function useFollows(
-  username: string,
+  fursonaIdentifier: string,
   type: FollowType,
 ): UseFollowsReturn {
   const [follows, setFollows] = useState<FursonaPreview[]>([]);
@@ -60,14 +60,14 @@ export function useFollows(
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
   const fetchFollows = useCallback(async () => {
-    if (!username) return;
+    if (!fursonaIdentifier) return;
     setLoading(true);
     setError(null);
     try {
       const res = await api.get<{
         follows: FursonaPreview[];
         nextCursor: string | null;
-      }>(`/api/core/fursonas/${username}/${type}`);
+      }>(`/api/core/fursonas/${encodeURIComponent(fursonaIdentifier)}/${type}`);
       setFollows(res.follows);
       setNextCursor(res.nextCursor);
     } catch (err) {
@@ -77,7 +77,7 @@ export function useFollows(
     } finally {
       setLoading(false);
     }
-  }, [username, type]);
+  }, [fursonaIdentifier, type]);
 
   const fetchMore = useCallback(async () => {
     if (!nextCursor || loading) return;
@@ -88,7 +88,7 @@ export function useFollows(
         follows: FursonaPreview[];
         nextCursor: string | null;
       }>(
-        `/api/core/fursonas/${username}/${type}?cursor=${encodeURIComponent(
+        `/api/core/fursonas/${encodeURIComponent(fursonaIdentifier)}/${type}?cursor=${encodeURIComponent(
           nextCursor,
         )}`,
       );
@@ -99,13 +99,10 @@ export function useFollows(
     } finally {
       setLoading(false);
     }
-  }, [username, type, nextCursor, loading]);
+  }, [fursonaIdentifier, type, nextCursor, loading]);
 
   useEffect(() => {
-    const controller = new AbortController();
     fetchFollows();
-
-    return () => controller.abort();
   }, [fetchFollows]);
 
   return {

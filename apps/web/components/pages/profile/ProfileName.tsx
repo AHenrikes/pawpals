@@ -1,5 +1,5 @@
 import { FursonaProfile } from "@/types/fursona";
-import { getInitials } from "@/utils/getInitials";
+import { getInitials } from "@/lib/helpers/getInitials";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { TypographyH1, TypographyP } from "@repo/ui/typography";

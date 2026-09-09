@@ -2,6 +2,7 @@
 
 import { api } from "@/lib/api/api-client";
 import { parseMediaUrls } from "@/lib/helpers/parseMediaUrls";
+import { makeCache } from "@/lib/helpers/profile-cache";
 import { useCallback, useRef, useState } from "react";
 import type { PostType } from "@/types/post";
 
@@ -21,6 +22,12 @@ interface UsePaginatedPostsState {
 interface UsePaginatedPostsOptions {
   endpoint: string;
   initialLoading?: boolean;
+}
+
+const postsCache = makeCache<PostsFeed>(15 * 1000);
+
+export function clearPostsCache() {
+  postsCache.clear();
 }
 
 export function usePaginatedPosts({
@@ -44,7 +51,9 @@ export function usePaginatedPosts({
     setState((s) => ({ ...s, loading: true, error: null }));
 
     try {
-      const data = await api.get<PostsFeed>(endpoint);
+      const data = await postsCache.get(endpoint, () =>
+        api.get<PostsFeed>(endpoint),
+      );
       const parsedPosts = parseMediaUrls(data.posts);
       setState((s) => ({
         ...s,
@@ -65,8 +74,9 @@ export function usePaginatedPosts({
     setState((s) => ({ ...s, loadingMore: true }));
 
     try {
-      const data = await api.get<PostsFeed>(
-        `${endpoint}?cursor=${encodeURIComponent(state.nextCursor)}`,
+      const cacheKey = `${endpoint}?cursor=${encodeURIComponent(state.nextCursor)}`;
+      const data = await postsCache.get(cacheKey, () =>
+        api.get<PostsFeed>(cacheKey),
       );
       const parsedPosts = parseMediaUrls(data.posts);
       setState((s) => ({

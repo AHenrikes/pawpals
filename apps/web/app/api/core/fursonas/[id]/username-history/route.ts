@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
-import { serverError, badRequest, unauthorized } from "@/lib/api/responses";
-import { requireUser } from "@/lib/auth/requireUser";
+import { serverError, badRequest } from "@/lib/api/responses";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import { withUser } from "@/lib/auth/withUser";
 
 /**
  * GET /api/core/fursonas/[id]/username-history
@@ -9,15 +9,12 @@ import { ERROR_MESSAGES } from "@/lib/constants/errors";
  *
  * Returns array of username changes in chronological order
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  try {
-    const { supabase, account, response } = await requireUser();
-    if (response) return response;
-    if (account === null) return unauthorized();
-
+export const GET = withUser(
+  async (
+    { supabase, account },
+    _req: NextRequest,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
     const { id } = await params;
 
     // Verify fursona belongs to user
@@ -47,7 +44,5 @@ export async function GET(
       history: history ?? [],
       total_changes: history?.length ?? 0,
     });
-  } catch (error) {
-    return serverError((error as Error).message);
-  }
-}
+  },
+);

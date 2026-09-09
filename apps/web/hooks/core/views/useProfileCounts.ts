@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
 import { useUser } from "@/providers/UserProvider";
+import { makeCache } from "@/lib/helpers/profile-cache";
 
 type SocialStats = {
   following: number;
@@ -27,6 +28,20 @@ const initialState: SocialStats = {
   reputation: 0,
 };
 
+type ProfileCountsResponse = {
+  follower_count: number;
+  following_count: number;
+  like_count: number;
+  post_count: number;
+  reputation_count: number;
+};
+
+const profileCountsCache = makeCache<ProfileCountsResponse>(10 * 1000);
+
+export function clearProfileCountsCache() {
+  profileCountsCache.clear();
+}
+
 /**
  * Hook for fetching social stats
  *
@@ -45,13 +60,10 @@ export function useProfileCounts(id?: string): SocialData {
       setLoading(true);
       setError(null);
 
-      const data = await api.get<{
-        follower_count: number;
-        following_count: number;
-        like_count: number;
-        post_count: number;
-        reputation_count: number;
-      }>(`/api/core/fursonas/${id}/counts`);
+      const cacheKey = `/api/core/fursonas/${id}/counts`;
+      const data = await profileCountsCache.get(cacheKey, () =>
+        api.get<ProfileCountsResponse>(cacheKey),
+      );
 
       setSocial({
         follower: data.follower_count ?? 0,

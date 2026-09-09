@@ -15,7 +15,6 @@ import {
   SendIcon,
   ChevronRightIcon,
   ChevronDownIcon,
-  UsersIcon,
   HashIcon,
   ImageIcon,
 } from "lucide-react";
@@ -50,11 +49,10 @@ const VISIBILITY_OPTIONS: {
   label: string;
   Icon: React.ElementType;
 }[] = [
-  { value: "everyone", label: "Everyone", Icon: GlobeIcon },
-  { value: "verified", label: "Verified only", Icon: BadgeCheckIcon },
-  { value: "followers", label: "Followers only", Icon: UsersIcon },
-  { value: "mutuals", label: "Mutuals only", Icon: UserPlusIcon },
-  { value: "mentioned", label: "Mentioned users", Icon: AtSignIcon },
+  { value: "public", label: "Everyone", Icon: GlobeIcon },
+  { value: "followers", label: "Followers", Icon: BadgeCheckIcon },
+  { value: "mutuals", label: "Mutuals", Icon: UserPlusIcon },
+  { value: "private", label: "Private", Icon: AtSignIcon },
 ];
 
 const META_ROWS: { Icon: React.ElementType; label: string }[] = [
@@ -89,7 +87,7 @@ function MediaItem({
 }>) {
   return (
     <div className={cn("group relative overflow-hidden bg-black", className)}>
-      {preview.type === "video" ? (
+      {preview.media_type === "video" ? (
         <video
           src={preview.url}
           className="w-full h-full object-cover"
@@ -148,7 +146,7 @@ function MediaGrid({
       >
         {visible.map((item, index) => (
           <MediaItem
-            key={`${item.type}-${item.originalIndex}`}
+            key={`${item.originalIndex}`}
             preview={item}
             displayIndex={index}
             onRemove={onRemove}
@@ -178,7 +176,7 @@ function MobileMediaStrip({
           className="group relative shrink-0 overflow-hidden rounded-xl bg-black"
           style={{ width: 72, height: 72 }}
         >
-          {p.type === "video" ? (
+          {p.media_type === "video" ? (
             <video
               src={p.url}
               className="w-full h-full object-cover"

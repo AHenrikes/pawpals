@@ -23,7 +23,7 @@ export function usePost(id: string) {
 
     try {
       const data = await api.get<{ post: PostType }>(
-        `/api/social/posts?id=${id}`,
+        `/api/social/posts/${encodeURIComponent(id)}`,
       );
       setState((s) => ({ ...s, post: data.post }));
     } catch {
