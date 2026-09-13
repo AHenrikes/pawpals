@@ -55,9 +55,10 @@ export function getOrderedVisible(media: MediaItem[], maxVisible = 4) {
   return { visible, remaining, ...layout };
 }
 
-const TILE = "w-full h-full min-h-[10rem] sm:min-h-[12rem]";
+const TILE = "w-full h-full min-h-[12rem]";
 const PORTRAIT_TILE = `${TILE} aspect-[3/4]`;
 const LANDSCAPE_TILE = `${TILE} aspect-[16/9]`;
+const MAX_H = "max-h-[53dvh]"
 
 function layoutForFour(landscapeCount: number): LayoutConfig {
   const isLandscape = landscapeCount === 4;
@@ -71,19 +72,19 @@ function layoutForFour(landscapeCount: number): LayoutConfig {
 
     case 2:
       return {
-        container: "grid grid-cols-2 gap-1",
+        container: `grid grid-cols-2 gap-1 ${MAX_H}`,
         img: [PORTRAIT_TILE, PORTRAIT_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 1:
       return {
-        container: "grid grid-cols-2 gap-1",
-        img: [PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, LANDSCAPE_TILE],
+        container: `grid grid-cols-2 gap-1 ${MAX_H} xl:grid-cols-3`,
+        img: [PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, `xl:col-span-3 ${LANDSCAPE_TILE}`],
       };
 
     default:
       return {
-        container: "grid grid-cols-2 gap-1",
+        container: `grid grid-cols-2 gap-1 ${MAX_H} ${!isLandscape ? "xl:grid-cols-4" : null}`,
         img: isLandscape
           ? [LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE, LANDSCAPE_TILE]
           : [PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE, PORTRAIT_TILE],
@@ -95,19 +96,19 @@ function layoutForThree(landscapeCount: number): LayoutConfig {
   switch (landscapeCount) {
     case 3:
       return {
-        container: "grid grid-cols-2 gap-1",
+        container: `grid grid-cols-2 gap-1 ${MAX_H}`,
         img: [`col-span-2 ${LANDSCAPE_TILE}`, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 2:
       return {
-        container: "grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-1",
+        container: `grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-1 ${MAX_H}`,
         img: [`row-span-2 ${PORTRAIT_TILE}`, LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 1:
       return {
-        container: "grid  gap-1 grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]",
+        container: `grid grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] gap-1 ${MAX_H}`,
         img: [
           PORTRAIT_TILE,
           PORTRAIT_TILE,
@@ -117,8 +118,8 @@ function layoutForThree(landscapeCount: number): LayoutConfig {
 
     default:
       return {
-        container: "grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-1",
-        img: [`row-span-2 ${PORTRAIT_TILE}`, PORTRAIT_TILE, PORTRAIT_TILE],
+        container: `grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-1 2xl:grid-cols-3 ${MAX_H}`,
+        img: [`row-span-2 ${PORTRAIT_TILE} 2xl:row-span-1`, PORTRAIT_TILE, PORTRAIT_TILE],
       };
   }
 }
@@ -127,20 +128,20 @@ function layoutForTwo(landscapeCount: number): LayoutConfig {
   switch (landscapeCount) {
     case 2:
       return {
-        container: "grid gap-1 grid-cols-1",
+        container: `grid gap-1 grid-cols-1 max-h-[53dvh] ${MAX_H}`,
         img: [LANDSCAPE_TILE, LANDSCAPE_TILE],
       };
 
     case 1:
       return {
         container:
-          "grid gap-1 grid-cols-1 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]",
+          `grid gap-1 grid-cols-1 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] ${MAX_H}`,
         img: [PORTRAIT_TILE, LANDSCAPE_TILE],
       };
 
     default:
       return {
-        container: "grid grid-cols-2 gap-1",
+        container: `grid grid-cols-2 gap-1 ${MAX_H}`,
         img: [PORTRAIT_TILE, PORTRAIT_TILE],
       };
   }
@@ -148,9 +149,9 @@ function layoutForTwo(landscapeCount: number): LayoutConfig {
 
 function layoutForOne(landscapeCount: number): LayoutConfig {
   return {
-    container: "flex justify-center items-center",
+    container: `flex justify-center items-center ${MAX_H}`,
     img: [
-      landscapeCount === 1 ? "w-full h-auto min-h-[25dvh]" : "w-auto h-full",
+      landscapeCount === 1 ? "w-full h-auto" : "w-auto h-full",
     ],
   };
 }

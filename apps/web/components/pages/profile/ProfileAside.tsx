@@ -57,6 +57,17 @@ export default function ProfileAside({
         )} */}
 
         <div className="space-y-6 p-4 w-full border border-muted/30">
+          <TypographyLead>Socials</TypographyLead>
+
+          <div className="flex max-w-md overflow-x-scroll gap-6 scrollbar-hide">
+            <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
+            <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
+            <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
+            <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
+          </div>
+        </div>
+
+        <div className="space-y-6 p-4 w-full border border-muted/30">
           <TypographyLead>Achievements</TypographyLead>
 
           <div className="flex max-w-md overflow-x-scroll gap-6 scrollbar-hide">

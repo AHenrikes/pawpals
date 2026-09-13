@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@repo/ui/sonner";
 import { type Metadata } from "next";
 import "./pawpals.css";
+import { Dialog } from "@repo/ui/dialog";
 
 // TODO remove before publishing
 const defaultUrl = process.env.VERCEL_URL

@@ -10,7 +10,7 @@ import { DotIcon, MailIcon } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
-import { EditProfileModal } from "@/components/dialogs/EditProfileModal";
+import { EditProfileModal } from "@/components/pages/profile/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import {
   TypographyLead,

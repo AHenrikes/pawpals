@@ -113,8 +113,6 @@ function MediaItem({
         type="button"
         variant={"destructive"}
         size={"icon"}
-        // preview.originalIndex, not displayIndex — removeMedia needs the index
-        // in the *original* mediaPreviews array, since layout reorders items.
         onClick={() => onRemove(preview.originalIndex)}
         aria-label={`Remove media ${displayIndex + 1}`}
         className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-black hover:scale-110"
@@ -140,20 +138,16 @@ function MediaGrid({
   );
 
   return (
-    <div className="flex items-center h-full overflow-hidden">
-      <div
-        className={`relative ${container} w-full max-w-360 max-h-[60svh] bg-black/50 overflow-hidden`}
-      >
-        {visible.map((item, index) => (
-          <MediaItem
-            key={`${item.originalIndex}`}
-            preview={item}
-            displayIndex={index}
-            onRemove={onRemove}
-            className={img[index] ?? ""}
-          />
-        ))}
-      </div>
+    <div className={`relative ${container} bg-black/50 overflow-hidden`}>
+      {visible.map((item, index) => (
+        <MediaItem
+          key={`${item.originalIndex}`}
+          preview={item}
+          displayIndex={index}
+          onRemove={onRemove}
+          className={img[index]}
+        />
+      ))}
     </div>
   );
 }
@@ -199,7 +193,10 @@ function MobileMediaStrip({
             variant={"outline"}
             onClick={() => onRemove(i)}
             aria-label={`Remove media ${i + 1}`}
-            className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
+            className={cn(
+              "absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full",
+              "bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
+            )}
           >
             <XIcon className="h-2.5 w-2.5" />
           </Button>
@@ -213,7 +210,10 @@ function MobileMediaStrip({
           variant={"ghost"}
           onClick={onAdd}
           style={{ width: 72, height: 72 }}
-          className="shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5 text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
+          className={cn(
+            "shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5",
+            "text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
+          )}
         >
           <PlusIcon className="h-4 w-4" />
           <span>Add</span>
@@ -273,13 +273,13 @@ export default function PostForm({
         handleSubmit(account.id, currentFursona.id);
       }}
       className={cn(
-        "flex flex-col lg:grid h-full w-full overflow-hidden rounded-[22px] border transition-colors duration-300",
+        "flex flex-col h-full w-full overflow-hidden rounded-[22px] border transition-colors duration-300 lg:grid",
         isNSFW ? "border-destructive" : "border-border",
       )}
       style={{ gridTemplateColumns: "1fr 400px" }}
     >
       {/* ── LEFT: media panel (desktop) ── */}
-      <div className="hidden lg:flex relative flex-col h-[70svh] border-r border-border bg-black/2">
+      <div className="hidden flex-col border-r border-border bg-black/2 lg:flex">
         {mediaPreviews.length === 0 ? (
           <motion.button
             type="button"
@@ -315,8 +315,11 @@ export default function PostForm({
           />
         )}
 
-        {mediaPreviews.length > 0 && (
-          <div className="flex items-center justify-between border-t border-border px-3 py-2">
+        {mediaPreviews.length > 0  && (
+          <div className={cn(
+            "flex items-center justify-between border-t border-border px-3 py-2",
+            mediaPreviews.length === POST_MAX_MEDIA ? "hidden" : null
+          )}>
             <span className="text-xs text-muted-foreground">
               <span className="font-semibold text-primary">
                 {mediaPreviews.length}
@@ -324,18 +327,16 @@ export default function PostForm({
               / {POST_MAX_MEDIA} files
             </span>
 
-            {mediaPreviews.length < POST_MAX_MEDIA && (
-              <Button
-                type="button"
-                size={"icon"}
-                variant={"ghost"}
-                onClick={openFilePicker}
-                className="w-fit gap-1 text-xs font-medium text-primary hover:opacity-75 transition-opacity"
-              >
-                <PlusIcon className="h-3.5 w-3.5" />
-                Add more
-              </Button>
-            )}
+            <Button
+              type="button"
+              size={"icon"}
+              variant={"ghost"}
+              onClick={openFilePicker}
+              className="w-fit gap-1 text-xs font-medium text-primary hover:opacity-75 transition-opacity"
+            >
+              <PlusIcon className="h-3.5 w-3.5" />
+              Add more
+            </Button>
           </div>
         )}
 
