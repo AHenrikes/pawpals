@@ -35,33 +35,21 @@ export default function PostLayout({
         const isGif = /\.gif(\?|$)/i.test(item.url);
         const width = item.width ?? 1;
         const height = item.height ?? 1;
-        const isLandscape = width / height > 1.1;
-        const aspectClass = isLandscape ? "aspect-[16/9]" : "aspect-[3/4]";
 
         const imageWidth = width || 1;
         const imageHeight = height || 1;
 
-        return isGif ? (
-          <Image
-            key={`${item.originalIndex}`}
-            src={inView ? item.url : "/images/app/party-popper.png"}
-            alt={`${item.media_type}-${item.order_index}`}
-            width={imageWidth}
-            height={imageHeight}
+        return (
+          <div
+            key={item.originalIndex}
             className={cn(
-              "object-cover w-full h-full rounded-[inherit]",
+              "relative",
               img[index] ?? "",
-              aspectClass,
             )}
-            quality={85}
-            unoptimized
-          />
-        ) : (
-          <div key={item.originalIndex} className="relative">
+          >
             <div className="absolute inset-0 hover:bg-red-500" />
             <Image
-              key={`${item.order_index}`}
-              src={item.url}
+              src={isGif && !inView ? "/images/app/party-popper.png" : item.url}
               alt={`Media ${item.order_index}`}
               width={imageWidth}
               height={imageHeight}
@@ -70,7 +58,8 @@ export default function PostLayout({
                 img[index] ?? "",
               )}
               quality={85}
-              loading="lazy"
+              loading={isGif ? undefined : "lazy"}
+              unoptimized={isGif}
             />
           </div>
         );

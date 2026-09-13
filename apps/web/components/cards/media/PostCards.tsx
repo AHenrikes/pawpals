@@ -25,7 +25,8 @@ import { type PostType } from "@/types/post";
 import PostLayout from "./layout/PostLayout";
 import PostDropdown from "../../dropdowns/Post";
 import PostAvatar from "@/components/avatars/PostAvatar";
-import PostModal from "@/components/dialogs/CreatePostModal";
+import { Dialog, DialogTrigger } from "@repo/ui/dialog";
+import PostModal from "@/components/dialogs/PostModal";
 
 type PostListProps = {
   posts: PostType[];
@@ -41,188 +42,131 @@ type PostListProps = {
 //   bookmark: "group p-3 text-xs hover:text-primary hover:bg-primary/10",
 // } as const;
 
-const PostCard = memo(function PostCard({
-  post,
-}: Readonly<{ post: PostType }>) {
+const PostCard = memo(function PostCard({ post }: Readonly<{ post: PostType }>) {
   const media = post.post_media ?? [];
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   // Calculate collapsed height based on actual line count (max 3 lines)
   const lineCount = post.content?.split("\n").length ?? 0;
   const collapsedHeight = `calc(1.5rem * ${Math.min(lineCount, 3)})`;
 
   return (
-    <>
-      <article
-        className={cn(
-          "flex flex-col w-full min-h-0 py-3 gap-3",
-          "rounded-base overflow-hidden transition-colors",
-          "hover:bg-accent/10 cursor-pointer",
-        )}
-      >
-        {/* Header: Name, Username, Timestamp */}
-        <div className="flex justify-between items-center px-3">
-          <PostAvatar post={post} />
+    <DialogTrigger
+      className={cn(
+        "w-full min-h-0 max-h-[65dvh] px-1 space-y-2",
+        "rounded-base overflow-hidden transition-colors",
+        "text-left hover:bg-accent/30 cursor-pointer",
+      )}
+    >
+      {/* Header: Name, Username, Timestamp */}
+      <div className="flex justify-between items-center">
+        <PostAvatar post={post} />
 
-          <div className="flex items-center gap-3">
-            <TypographyMuted className="text-xs shrink-0">
-              {timeAgo(String(post.created_at))}
-            </TypographyMuted>
+        <div className="flex items-center gap-3">
+          <TypographyMuted className="text-xs shrink-0">
+            {timeAgo(String(post.created_at))}
+          </TypographyMuted>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size={"icon"} variant={"ghost"} className="p-2">
-                  <EllipsisVerticalIcon className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size={"icon"} variant={"ghost"} className="p-2">
+                <EllipsisVerticalIcon className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
 
-              <PostDropdown />
-            </DropdownMenu>
-          </div>
+            <PostDropdown />
+          </DropdownMenu>
         </div>
+      </div>
 
-        <Button
-          variant="none"
-          onClick={() => setIsOpen((prev) => !prev)}
-          className="flex-col items-start p-0 h-full text-start"
-        >
-          {/* Content */}
-          <div className="flex w-full min-h-0 flex-1 flex-col gap-3 overflow-hidden">
-            {/* Caption */}
-            {post.content && (
-              <>
-                <motion.div
-                  initial={false}
-                  animate={{
-                    height: isExpanded ? "auto" : collapsedHeight,
-                  }}
-                  transition={{
-                    duration: 0.3,
-                    ease: "easeInOut",
-                  }}
-                  className="px-3 overflow-hidden shrink-0"
-                >
-                  <TypographySmall className="text-foreground wrap-break-word break-all whitespace-pre-wrap">
-                    {post.content}
-                  </TypographySmall>
-                </motion.div>
+      {/* Content */}
+      <div className="flex w-full min-h-0 flex-1 flex-col gap-3 px-4 overflow-hidden">
+        {/* Caption */}
+        {post.content && (
+          <>
+            <motion.div
+              initial={false}
+              animate={{
+                height: isExpanded ? "auto" : collapsedHeight,
+              }}
+              transition={{
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
+              className="overflow-hidden shrink-0"
+            >
+              <TypographySmall className="text-foreground wrap-break-word break-all whitespace-pre-wrap">
+                {post.content}
+              </TypographySmall>
+            </motion.div>
 
-                {/* Show more/less button */}
-                {lineCount > 3 && (
-                  <motion.button
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="px-3 text-xs font-medium text-primary hover:text-primary/80 transition-colors shrink-0"
-                  >
-                    {isExpanded ? "Show less" : "Show more"}
-                  </motion.button>
-                )}
-              </>
+            {/* Show more/less button */}
+            {lineCount > 3 && (
+              <motion.button
+                onClick={() => setIsExpanded(!isExpanded)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="px-3 text-xs font-medium text-primary hover:text-primary/80 transition-colors shrink-0"
+              >
+                {isExpanded ? "Show less" : "Show more"}
+              </motion.button>
             )}
+          </>
+        )}
 
-            {/* Media */}
-            {media.length > 0 && (
-              <div className="flex-1 min-h-0 px-3">
-                <PostLayout
-                  media={media}
-                  className="w-auto h-full rounded-2xl"
-                />
-              </div>
-            )}
-          </div>
-        </Button>
+        {/* Media */}
+        {media.length > 0 && (
+          <PostLayout media={media} />
+        )}
+      </div>
 
-        {/* Actions */}
-        <div className="flex justify-between gap-2 text-muted-foreground shrink-0 px-3">
-          <div>
-            <Button
-              size="icon"
-              variant="ghost"
-              // className={ACTION_BUTTON_CLASSES.comment}
-              className="group p-3 text-xs hover:text-primary hover:bg-primary/10"
-            >
-              <MessageCircleIcon className="size-4" />
-              <span className="ml-1">{post.comments_count ?? 0}</span>
-            </Button>
-
-            <Button
-              size="icon"
-              variant="ghost"
-              // className={ACTION_BUTTON_CLASSES.share}
-              className="group p-3 text-xs hover:text-primary hover:bg-primary/10"
-            >
-              <ShareIcon className="size-4" />
-              <span className="ml-1">{post.shares_count ?? 0}</span>
-            </Button>
-
-            <Button
-              size="icon"
-              variant="ghost"
-              // className={ACTION_BUTTON_CLASSES.like}
-              className="group p-3 text-xs hover:text-primary hover:bg-primary/10"
-            >
-              <HeartIcon className="size-4" />
-              <span className="ml-1">{post.likes_count ?? 0}</span>
-            </Button>
-          </div>
+      {/* Actions */}
+      <div className="flex justify-between gap-2 px-1 text-muted-foreground shrink-0">
+        <div>
+          <Button
+            size="icon"
+            variant="ghost"
+            // className={ACTION_BUTTON_CLASSES.comment}
+            className="group p-3 text-xs hover:text-primary"
+          >
+            <MessageCircleIcon className="size-4" />
+            <span className="ml-1">{post.comments_count ?? 0}</span>
+          </Button>
 
           <Button
             size="icon"
             variant="ghost"
-            // className={ACTION_BUTTON_CLASSES.bookmark}
-            className="group p-3 text-xs hover:text-primary hover:bg-primary/10"
+            // className={ACTION_BUTTON_CLASSES.share}
+            className="group p-3 text-xs hover:text-primary"
           >
-            <BookmarkIcon className="size-4" />
+            <ShareIcon className="size-4" />
+            <span className="ml-1">{post.shares_count ?? 0}</span>
+          </Button>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            // className={ACTION_BUTTON_CLASSES.like}
+            className="group p-3 text-xs hover:text-primary"
+          >
+            <HeartIcon className="size-4" />
+            <span className="ml-1">{post.likes_count ?? 0}</span>
           </Button>
         </div>
-      </article>
 
-      <PostModal isOpen={isOpen} onClose={() => setIsOpen((prev) => !prev)} />
-    </>
+        <Button
+          size="icon"
+          variant="ghost"
+          // className={ACTION_BUTTON_CLASSES.bookmark}
+          className="group p-3 text-xs hover:text-primary"
+        >
+          <BookmarkIcon className="size-4" />
+        </Button>
+      </div>
+    </DialogTrigger>
   );
 });
-
-// PostCard.displayName = "PostCard";
-
-export function ProfilePostCards({
-  username: fursonaId,
-}: Readonly<{ username: string }>) {
-  const { posts, hasMore, fetchPosts, fetchMore, loading } =
-    useProfilePosts(fursonaId);
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  return (
-    <ProfileLists
-      posts={posts}
-      hasMore={hasMore}
-      fetchMore={fetchMore}
-      loading={loading}
-    />
-  );
-}
-
-export function PostCards() {
-  const { posts, hasMore, fetchPosts, fetchMore, loading } = usePosts();
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  return (
-    <ProfileLists
-      posts={posts}
-      hasMore={hasMore}
-      fetchMore={fetchMore}
-      loading={loading}
-    />
-  );
-}
 
 export default function ProfileLists({
   posts,
@@ -279,11 +223,13 @@ export default function ProfileLists({
     return (
       <>
         {posts.map((post) => (
-          <Fragment key={post.id}>
+          <Dialog key={post.id}>
             <PostCard post={post} />
 
-            <Separator className="h-0.5" />
-          </Fragment>
+            <Separator className="h-0.5 my-4" />
+
+            <PostModal post={post} />
+          </Dialog>
         ))}
 
         {hasMore && (
@@ -297,4 +243,41 @@ export default function ProfileLists({
       </>
     );
   }
+}
+
+export function ProfilePostCards({
+  username: fursonaId,
+}: Readonly<{ username: string }>) {
+  const { posts, hasMore, fetchPosts, fetchMore, loading } =
+    useProfilePosts(fursonaId);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  return (
+    <ProfileLists
+      posts={posts}
+      hasMore={hasMore}
+      fetchMore={fetchMore}
+      loading={loading}
+    />
+  );
+}
+
+export function PostCards() {
+  const { posts, hasMore, fetchPosts, fetchMore, loading } = usePosts();
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  return (
+    <ProfileLists
+      posts={posts}
+      hasMore={hasMore}
+      fetchMore={fetchMore}
+      loading={loading}
+    />
+  );
 }

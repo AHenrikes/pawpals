@@ -14,7 +14,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-1  py-4 px-2 gap-4 md:px-4">
+    <div className="flex flex-1 py-4 md:pr-4">
       <AnimatePresence mode="popLayout" custom={direction}>
         <motion.section
           key={content}
@@ -24,18 +24,18 @@ export default function Dashboard() {
           animate="center"
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="relative flex grow w-full min-h-[calc(100svh-96px)] lg:overflow-y-auto scrollbar-hide"
+          className="w-full"
         >
           {content === "posts" && (
-            <div className="flex flex-col w-full mx-auto gap-8">
               <PostCards />
-            </div>
           )}
+
           {content === "reels" && (
             <div className="grid w-full place-content-center">
               Reels coming soon
             </div>
           )}
+
           {content === "following" && (
             <div className="grid w-full place-content-center">
               Following coming soon
