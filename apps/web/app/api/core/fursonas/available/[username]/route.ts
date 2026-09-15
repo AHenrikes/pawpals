@@ -1,6 +1,6 @@
 import { serverError, badRequest } from "@/lib/api/responses";
 import { createServer } from "@repo/supabase/server";
-import type { RouteContext } from "@/lib/types/api";
+import type { RouteContext } from "@/lib/api/api-types";
 import type { NextRequest } from "next/server";
 
 /**

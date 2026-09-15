@@ -30,42 +30,9 @@ function normalizeMediaItem(value: unknown): MediaItem | null {
   return normalized;
 }
 
-// function normalizeMediaItem(value: unknown): MediaItem[] {
-//   if (!Array.isArray(value)) return [];
-
-//   return value.flatMap((item, index) => {
-//     if (!item || typeof item !== "object") return [];
-
-//     const media = item as Record<string, unknown>;
-//     const mediaTypeValue = (media.media_type as MediaItem["media_type"]) ?? "image";
-
-//     if (typeof media.url !== "string" || !media.url) return [];
-
-//     // let mediaType: MediaItem["media_type"] = "image";
-//     // if (media.media_type === "gif" || media.media_type === "video") mediaType = media.media_type;
-
-//     return [
-//       {
-//         media_type: mediaTypeValue,
-//         poster_url: typeof media.poster_url === "string" ? media.poster_url : null,
-//         url: media.url,
-//         width: typeof media.width === "number" ? media.width : undefined,
-//         height: typeof media.height === "number" ? media.height : undefined,
-//         duration_seconds: typeof media.duration_seconds === "number"
-//           ? media.duration_seconds
-//           : null,
-//         file_size_bytes: typeof media.file_size_bytes === "number"
-//           ? media.file_size_bytes
-//           : null,
-//         order_index: typeof media.order_index === "number" ? media.order_index : index,
-//       },
-//     ];
-//   });
-// }
-
 export function parseMediaUrls(posts: PostType[]): PostType[] {
   return posts.map((post) => {
-    const rawMedia = Array.isArray(post.media_urls) ? post.media_urls : [];
+    const rawMedia = Array.isArray(post.post_media) ? post.post_media : [];
 
     if (rawMedia.length === 0) {
       return { ...post, media_urls: [] };

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Mail } from "lucide-react";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { useAuthForm } from "@/hooks/useAuthForm";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { Button } from "@repo/ui/button";
 import {
   Card,
@@ -16,8 +16,8 @@ import {
 } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import AuthHeader from "@/components/navigation/SignHeader";
-import AuthFooter from "@/components/footer/AuthFooter";
+import AuthHeader from "@/components/navigations/SignHeader";
+import AuthFooter from "@/components/pages/(sign-in-up)/AuthFooter";
 import Link from "next/link";
 import {
   TypographyH2,

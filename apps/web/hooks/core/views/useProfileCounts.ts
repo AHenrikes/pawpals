@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { api } from "@/lib/api/api-client";
-import { toError } from "@/lib/helpers/error-utils";
 import { useUser } from "@/providers/UserProvider";
-import { makeCache } from "@/lib/helpers/profile-cache";
+import { useQuery } from "@tanstack/react-query";
 
 type SocialStats = {
   following: number;
@@ -36,72 +35,56 @@ type ProfileCountsResponse = {
   reputation_count: number;
 };
 
-const profileCountsCache = makeCache<ProfileCountsResponse>(10 * 1000);
-
-export function clearProfileCountsCache() {
-  profileCountsCache.clear();
-}
-
 /**
  * Hook for fetching social stats
  *
  * @param fursonaId - id of the fursona to get social stats
  */
 export function useProfileCounts(id?: string): SocialData {
-  const [social, setSocial] = useState<SocialStats>(initialState);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(false);
   const { signOut } = useUser();
+  const query = useQuery({
+    queryKey: ["profile-counts", id],
+    enabled: !!id,
+    staleTime: 10 * 1000,
+    queryFn: async () => {
+      try {
+        return await api.get<ProfileCountsResponse>(
+          `/api/core/fursonas/${id}/counts`,
+        );
+      } catch (err) {
+        if (
+          err &&
+          typeof err === "object" &&
+          "status" in err &&
+          (err as { status: number }).status === 401
+        ) {
+          await signOut();
+        }
+        throw err;
+      }
+    },
+  });
 
-  const fetchSocialData = useCallback(async () => {
-    if (!id) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const cacheKey = `/api/core/fursonas/${id}/counts`;
-      const data = await profileCountsCache.get(cacheKey, () =>
-        api.get<ProfileCountsResponse>(cacheKey),
-      );
-
-      setSocial({
+  const data = query.data;
+  const social: SocialStats = data
+    ? {
         follower: data.follower_count ?? 0,
         following: data.following_count ?? 0,
         likes: data.like_count ?? 0,
         post: data.post_count ?? 0,
         reputation: data.reputation_count ?? 0,
-      });
-    } catch (err) {
-      const error = toError(err);
-
-      if (
-        err &&
-        typeof err === "object" &&
-        "status" in err &&
-        (err as { status: number }).status === 401
-      ) {
-        await signOut();
-        return;
       }
+    : initialState;
 
-      setError(error);
-      setSocial(initialState);
-    } finally {
-      setLoading(false);
-    }
-  }, [signOut, id]);
-
-  // Auto-fetch on mount
-  useEffect(() => {
-    fetchSocialData();
-  }, [fetchSocialData]);
+  const refetch = useCallback(async () => {
+    await query.refetch();
+  }, [query]);
 
   return {
     ...social,
-    error,
-    loading,
-    refetch: fetchSocialData,
+    error: query.error instanceof Error ? query.error : null,
+    loading: query.isLoading,
+    refetch,
   };
 }
 

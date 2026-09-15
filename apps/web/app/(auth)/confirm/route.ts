@@ -1,4 +1,4 @@
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { createServer } from "@repo/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { redirect } from "next/navigation";

@@ -1,9 +1,9 @@
 import { Be_Vietnam_Pro, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@repo/ui/sonner";
+import { QueryProvider } from "@/providers/QueryProvider";
 import { type Metadata } from "next";
 import "./pawpals.css";
-import { Dialog } from "@repo/ui/dialog";
 
 // TODO remove before publishing
 const defaultUrl = process.env.VERCEL_URL
@@ -44,9 +44,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster position="top-center" />
-
-          {children}
+          <QueryProvider>
+            <Toaster position="top-center" />
+            {children}
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

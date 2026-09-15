@@ -1,6 +1,6 @@
-import UnAuthHeader from "@/components/navigation/PublicHeader";
+import UnAuthHeader from "@/components/navigations/PublicHeader";
 import { requireUser } from "@/lib/auth/requireUser";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 

@@ -1,8 +1,6 @@
 "use client";
 
-import { useProfilePosts } from "@/hooks/core/fursonas/useProfilePosts";
-import { usePosts } from "@/hooks/social/posts/usePosts";
-import { memo, useEffect, useState, Fragment } from "react";
+import { memo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   HeartIcon,
@@ -21,12 +19,14 @@ import { DropdownMenu, DropdownMenuTrigger } from "@repo/ui/dropdown-menu";
 import { timeAgo } from "@/lib/helpers/timeAgo";
 import { Separator } from "@repo/ui/separator";
 import { cn } from "@repo/ui/lib/utils";
+import { Dialog, DialogTrigger } from "@repo/ui/dialog";
+import { useSidebar } from "@/providers/SidebarProvider";
 import { type PostType } from "@/types/post";
+import Link from "next/link";
 import PostLayout from "./layout/PostLayout";
 import PostDropdown from "../../dropdowns/Post";
-import PostAvatar from "@/components/avatars/PostAvatar";
-import { Dialog, DialogTrigger } from "@repo/ui/dialog";
-import PostModal from "@/components/dialogs/PostModal";
+import PostAvatar from "@/components/avatar-icons/PostAvatar";
+// import PostModal from "@/components/modals/PostModal";
 
 type PostListProps = {
   posts: PostType[];
@@ -45,22 +45,23 @@ type PostListProps = {
 const PostCard = memo(function PostCard({ post }: Readonly<{ post: PostType }>) {
   const media = post.post_media ?? [];
   const [isExpanded, setIsExpanded] = useState(false);
+  const { isMobile } = useSidebar();
 
   // Calculate collapsed height based on actual line count (max 3 lines)
   const lineCount = post.content?.split("\n").length ?? 0;
   const collapsedHeight = `calc(1.5rem * ${Math.min(lineCount, 3)})`;
 
-  return (
-    <DialogTrigger
+  const card = (
+    <div
       className={cn(
         "w-full min-h-0 max-h-[65dvh] px-1 space-y-2",
-        "rounded-base overflow-hidden transition-colors",
+        "overflow-hidden transition-colors",
         "text-left hover:bg-accent/30 cursor-pointer",
       )}
     >
       {/* Header: Name, Username, Timestamp */}
       <div className="flex justify-between items-center">
-        <PostAvatar post={post} />
+        <PostAvatar post={post} link={!isMobile} />
 
         <div className="flex items-center gap-3">
           <TypographyMuted className="text-xs shrink-0">
@@ -164,8 +165,14 @@ const PostCard = memo(function PostCard({ post }: Readonly<{ post: PostType }>) 
           <BookmarkIcon className="size-4" />
         </Button>
       </div>
-    </DialogTrigger>
+    </div>
   );
+
+  if (isMobile) {
+    return <Link href={`/post/${post.id}`}>{card}</Link>;
+  }
+
+  return <DialogTrigger asChild>{card}</DialogTrigger>;
 });
 
 export default function ProfileLists({
@@ -228,7 +235,7 @@ export default function ProfileLists({
 
             <Separator className="h-0.5 my-4" />
 
-            <PostModal post={post} />
+            {/* <PostModal post={post} /> */}
           </Dialog>
         ))}
 
@@ -243,41 +250,4 @@ export default function ProfileLists({
       </>
     );
   }
-}
-
-export function ProfilePostCards({
-  username: fursonaId,
-}: Readonly<{ username: string }>) {
-  const { posts, hasMore, fetchPosts, fetchMore, loading } =
-    useProfilePosts(fursonaId);
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  return (
-    <ProfileLists
-      posts={posts}
-      hasMore={hasMore}
-      fetchMore={fetchMore}
-      loading={loading}
-    />
-  );
-}
-
-export function PostCards() {
-  const { posts, hasMore, fetchPosts, fetchMore, loading } = usePosts();
-
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
-
-  return (
-    <ProfileLists
-      posts={posts}
-      hasMore={hasMore}
-      fetchMore={fetchMore}
-      loading={loading}
-    />
-  );
 }

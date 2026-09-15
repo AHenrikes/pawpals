@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
 
@@ -19,6 +20,7 @@ interface UseFollowReturn {
  * @param fursonaId - id of the fursona to follow/unfollow
  */
 export function useFollow(id?: string): UseFollowReturn {
+  const queryClient = useQueryClient();
   const [isFollowing, setIsFollowing] = useState(false);
   const [isMutual, setIsMutual] = useState(false);
   const [mutualSince, setMutualSince] = useState<string | null>(null);
@@ -70,12 +72,15 @@ export function useFollow(id?: string): UseFollowReturn {
       await api[method](endpoint);
 
       setIsFollowing((prev) => !prev);
+      await queryClient.invalidateQueries({
+        queryKey: ["profile-counts", id],
+      });
     } catch (err) {
       setError(toError(err));
     } finally {
       setLoading(false);
     }
-  }, [id, isFollowing]);
+  }, [id, isFollowing, queryClient]);
 
   return { isFollowing, isMutual, mutualSince, loading, error, toggle };
 }

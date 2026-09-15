@@ -2,7 +2,7 @@
 
 import { getOrderedVisible } from "@/lib/mediaLayout";
 import { cn } from "@repo/ui/lib/utils";
-import { useInView } from "@/lib/useInView";
+import { UseInView } from "@/lib/helpers/UseInView";
 import { type MediaItem } from "@/types/post";
 import Image from "next/image";
 
@@ -15,7 +15,7 @@ export default function PostLayout({
   media,
   className,
 }: Readonly<PostLayoutProps>) {
-  const { ref, inView } = useInView({ threshold: 0.5 });
+  const { ref, inView } = UseInView({ threshold: 0.5 });
   const { visible, container, img } = getOrderedVisible(media);
 
   if (!media || media.length === 0) {

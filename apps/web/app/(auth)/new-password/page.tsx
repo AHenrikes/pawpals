@@ -2,7 +2,7 @@
 
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { useAuthForm } from "@/hooks/useAuthForm";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { Button } from "@repo/ui/button";
 import {
   Card,
