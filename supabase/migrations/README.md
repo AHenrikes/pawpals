@@ -1,10 +1,10 @@
 # Pawpals Database Migrations
 
-Supabase migrations for the Pawpals application. These migrations set up schemas, tables, policies, functions, and triggers for user accounts, fursonas, social features, and media management.
+Supabase migrations for the Pawpals application. They set up schemas, tables, policies, functions, triggers, storage, and direct messages.
 
 ## Migration Files
 
-### 1. `20260606000001_init_accounts_and_fursonas.sql`
+### 1. `20260606000001_core_schema.sql`
 
 **Core account and fursona management**
 
@@ -35,7 +35,7 @@ Supabase migrations for the Pawpals application. These migrations set up schemas
 
 ---
 
-### 2. `20260606000002_init_social_features.sql`
+### 2. `20260606000002_social_schema.sql`
 
 **Social interactions and community features**
 
@@ -67,35 +67,13 @@ Supabase migrations for the Pawpals application. These migrations set up schemas
 
 ---
 
-### 3. `20260606000003_init_media_storage.sql`
+### 3. `20260606000003_media_schema.sql`
 
-**Media file management and Supabase Storage integration**
+Historical draft retained for migration history. Its definitions were consolidated into the social schema and storage policy migration; it intentionally performs no changes.
 
-**Tables:**
+The active media tables and policies are documented in migrations 2 and 4.
 
-- `media.fursona_media` - Track media files (avatar, banner, gallery)
-- `media.media_processing_queue` - Async jobs (resize, optimize, convert)
-
-**Features:**
-
-- Default media handling with system defaults
-- Primary media per type (avatar/banner)
-- Media processing queue with retry logic
-- Integration with Supabase Storage
-
-**Functions & Triggers:**
-
-- `set_media_as_primary()` - Ensures only one primary per type
-- `update_fursona_media_url()` - Updates fursona URLs when primary changes
-- `update_queue_timestamp()` - Auto-timestamps queue updates
-- `handle_failed_media_processing()` - Retry logic for failed jobs
-
-**RLS Policies:**
-
-- Users can manage media for their fursonas
-- Service role can manage processing queue
-
----
+-->
 
 ### 4. `20260606000004_init_storage_policies.sql`
 
@@ -111,10 +89,9 @@ Supabase migrations for the Pawpals application. These migrations set up schemas
    - JPEG, PNG, WebP, GIF
    - Public read access
 
-3. `fursona-gallery` (20MB, private)
-   - All images and videos
-   - Authenticated read access only
-   - Requires signed URLs
+3. `post-media` (20MB, public)
+   - Images and videos
+   - Public read access
 
 **Path Structure:**
 
@@ -222,7 +199,7 @@ supabase db reset
 - ✅ No self-follows or self-likes
 - ✅ Reputation updated on follow/unfollow
 - ✅ Public posts visible to all
-- ✅ Private gallery requires authentication
+- ✅ Post media is publicly readable through the `post-media` bucket
 - ✅ Report system for moderation
 
 ### Security
@@ -239,18 +216,14 @@ supabase db reset
 ```
 Schema: core
 ├── accounts (user_id from auth.users)
-│   └── fursonas (account_id FK, max 3, min 1)
-│       └── media.fursona_media (avatar_url, banner_url)
+└── fursonas (account_id FK, max 3, min 1)
 │
 Schema: social
 ├── followers (fursona → fursona)
 ├── likes (fursona → fursona)
 ├── posts (fursona → posts)
+│   └── post_media (uploaded post media)
 └── reports (fursona/post → moderation)
-
-Schema: media
-├── fursona_media (uploaded media files)
-└── media_processing_queue (async jobs)
 ```
 
 ---
