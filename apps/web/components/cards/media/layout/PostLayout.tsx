@@ -26,39 +26,61 @@ export default function PostLayout({
     <div
       ref={ref as React.RefObject<HTMLDivElement>}
       className={cn(
-        "relative overflow-hidden bg-black/50 min-h-0 h-full",
+        "relative flex overflow-x-auto bg-black/50 rounded-base",
         className ?? "",
         container,
       )}
     >
       {visible.map((item, index) => {
         const isGif = /\.gif(\?|$)/i.test(item.url);
-        const width = item.width ?? 1;
-        const height = item.height ?? 1;
+        const imageWidth = item.width || 1;
+        const imageHeight = item.height || 1;
 
-        const imageWidth = width || 1;
-        const imageHeight = height || 1;
+        if (visible.length < 2) {
+          return (
+            <Image
+              key={item.originalIndex}
+              src={isGif && !inView ? "/images/app/party-popper.png" : item.url}
+              alt={`${item.orientation}-${item.originalIndex}`}
+              width={imageWidth}
+              height={imageHeight}
+              className={cn(
+                "block w-full h-auto object-contain",
+                img[index] ?? "",
+              )}
+              quality={85}
+              loading={isGif ? undefined : "eager"}
+              unoptimized={isGif}
+            />
+          );
+        }
 
         return (
           <div
             key={item.originalIndex}
             className={cn(
-              "relative",
-              img[index] ?? "",
+              `group relative max-w-[85%] max-h-[${imageHeight}] shrink-0`,
+              item.orientation === "landscape"
+                ? "w-full h-ato"
+                : "w-auto h-full",
             )}
           >
-            <div className="absolute inset-0 hover:bg-red-500" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
             <Image
               src={isGif && !inView ? "/images/app/party-popper.png" : item.url}
-              alt={`Media ${item.order_index}`}
+              alt={`${item.orientation}-${item.originalIndex}`}
               width={imageWidth}
               height={imageHeight}
               className={cn(
-                "object-cover w-full h-full rounded-[inherit]",
+                "object-cover",
+                item.orientation === "landscape"
+                  ? "w-full h-full"
+                  : "w-full h-full max-h-[60svh]",
                 img[index] ?? "",
               )}
               quality={85}
-              loading={isGif ? undefined : "lazy"}
+              loading={isGif ? undefined : "eager"}
               unoptimized={isGif}
             />
           </div>

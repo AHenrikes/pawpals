@@ -13,8 +13,14 @@ export default function Dashboard() {
     exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
   };
 
+  // window.addEventListener("unhandledrejection", (event) => {
+  //   console.error("reason:", event.reason);
+  //   console.error("stack:", event.reason?.stack);
+  //   console.error("full:", JSON.stringify(event.reason, Object.getOwnPropertyNames(event.reason ?? {})));
+  // });
+
   return (
-    <div className="flex flex-1 py-4 md:pr-4">
+    <div className="flex flex-1 w-full py-4 md:pr-4">
       <AnimatePresence mode="popLayout" custom={direction}>
         <motion.section
           key={content}
@@ -26,9 +32,7 @@ export default function Dashboard() {
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="w-full"
         >
-          {content === "posts" && (
-              <PostCards />
-          )}
+          {content === "posts" && <PostCards />}
 
           {content === "reels" && (
             <div className="grid w-full place-content-center">
@@ -44,7 +48,7 @@ export default function Dashboard() {
         </motion.section>
       </AnimatePresence>
 
-      <aside className="hidden sticky top-20 flex-col w-125 h-[calc(100svh-96px)] gap-5 md:flex">
+      <aside className="hidden sticky top-20 flex-col w-full max-w-100 h-[calc(100svh-96px)] gap-5 xl:flex">
         <div className="bg-secondary animate-pulse w-full h-96 rounded-md shadow-lg" />
 
         <div className="bg-secondary animate-pulse w-full h-full rounded-md shadow-lg" />

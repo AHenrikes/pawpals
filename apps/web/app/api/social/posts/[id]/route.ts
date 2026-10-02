@@ -9,8 +9,6 @@ import { type SupabaseClient } from "@supabase/supabase-js";
 const VALID_POST_TYPES = new Set<PostTypeValue>(["yap", "reel", "gallery"]);
 const VALID_VISIBILITY = new Set<PostVisibility>([
   "public",
-  "followers",
-  "mutuals",
   "private",
   "archived",
 ]);

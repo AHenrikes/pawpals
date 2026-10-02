@@ -91,7 +91,7 @@ export default function Gallery({ gallery }: Readonly<{ gallery: PostType }>) {
             </Button>
           </DropdownMenuTrigger>
 
-          <PostDropdown />
+          <PostDropdown contentId={gallery.id} userId={gallery.fursona_id} />
         </DropdownMenu>
       </div>
 

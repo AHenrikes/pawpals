@@ -10,8 +10,7 @@ export const POST_MAX_CHARS = 2200;
 export const POST_WARN_CHARS = 1800;
 export const POST_DANGER_CHARS = 2100;
 
-export type Visibility =
-  "public" | "followers" | "mutuals" | "private";
+export type Visibility = "public" | "private";
 
 interface PostState {
   content: string;
@@ -170,12 +169,11 @@ export function usePostForm(onClose: () => void) {
           ),
         );
 
-        const postType =
-          hasMedia && !trimmedContent
-            ? state.postMedia.length > 1
-              ? "gallery"
-              : "reel"
-            : "yap";
+        let postType: "yap" | "reel" | "gallery" = "yap";
+
+        if (hasMedia && !trimmedContent) {
+          postType = state.postMedia.length > 1 ? "gallery" : "reel";
+        }
 
         await api.post("/api/social/posts", {
           fursona_id: fursonaId,

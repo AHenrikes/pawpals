@@ -13,7 +13,11 @@ export function useProfileSearch(term: string, debounceMs = 300) {
     return () => clearTimeout(timer);
   }, [term, debounceMs]);
 
-  const { data: results = [], isLoading, error } = useQuery({
+  const {
+    data: results = [],
+    isLoading,
+    error,
+  } = useQuery<FursonaSearch[], Error>({
     queryKey: ["fursona-search", debouncedTerm],
     enabled: !!debouncedTerm.trim(),
     staleTime: 2 * 60 * 1000,

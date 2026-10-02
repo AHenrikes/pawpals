@@ -1,4 +1,3 @@
-import { UserProvider } from "@/providers/UserProvider";
 import { requireUser } from "@/lib/auth/requireUser";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { redirect } from "next/navigation";
@@ -12,5 +11,5 @@ export default async function DashboardLayout({
   const { account } = await requireUser();
   if (!account) redirect(AUTH_ROUTES.SIGN_IN);
 
-  return <UserProvider>{children}</UserProvider>;
+  return children;
 }

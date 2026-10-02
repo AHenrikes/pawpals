@@ -17,7 +17,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { reported_fursona_id, reported_post_id, reason, description } = body;
 
-    if ((!reported_fursona_id && !reported_post_id) || (reported_fursona_id && reported_post_id) || !reason) {
+    if (
+      (!reported_fursona_id && !reported_post_id) ||
+      (reported_fursona_id && reported_post_id) ||
+      !reason
+    ) {
       return badRequest("Exactly one report target and a reason are required");
     }
 

@@ -8,6 +8,7 @@ export const ERROR_MESSAGES = {
   BIO_REQUIRED: "Bio is required",
   SPECIES_REQUIRED: "Species is required",
   PRONOUNS_REQUIRED: "Pronouns are required",
+  WEAK_PASSWORD: "Password should be at least 6 characters",
 
   // Search
   SEARCH_INVALID_INPUT: "Enter a username to search",

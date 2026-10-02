@@ -1,11 +1,21 @@
 import { withUser } from "@/lib/auth/withUser";
-import { notFound, serverError, badRequest, conflict, ok } from "@/lib/api/responses";
+import {
+  notFound,
+  serverError,
+  badRequest,
+  conflict,
+  ok,
+} from "@/lib/api/responses";
 import { NextRequest, NextResponse } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export const GET = withUser(
-  async ({ supabase, account }, _req: NextRequest, { params }: RouteContext) => {
+  async (
+    { supabase, account },
+    _req: NextRequest,
+    { params }: RouteContext,
+  ) => {
     const { id: postId } = await params;
     if (!postId) return badRequest("Post id required");
 
@@ -19,18 +29,36 @@ export const GET = withUser(
 
     if (!currentFursona) return notFound("No current fursona found");
 
-    const [{ count, error: countError }, { data: like, error: likeError }] = await Promise.all([
-      supabase.schema("social").from("post_likes").select("id", { count: "exact", head: true }).eq("post_id", postId),
-      supabase.schema("social").from("post_likes").select("id").eq("post_id", postId).eq("liker_fursona_id", currentFursona.id).maybeSingle(),
-    ]);
+    const [{ count, error: countError }, { data: like, error: likeError }] =
+      await Promise.all([
+        supabase
+          .schema("social")
+          .from("post_likes")
+          .select("id", { count: "exact", head: true })
+          .eq("post_id", postId),
+        supabase
+          .schema("social")
+          .from("post_likes")
+          .select("id")
+          .eq("post_id", postId)
+          .eq("liker_fursona_id", currentFursona.id)
+          .maybeSingle(),
+      ]);
 
-    if (countError || likeError) return serverError((countError ?? likeError)?.message ?? "Unable to load likes");
+    if (countError || likeError)
+      return serverError(
+        (countError ?? likeError)?.message ?? "Unable to load likes",
+      );
     return ok({ likes_count: count ?? 0, is_liked: !!like });
   },
 );
 
 export const POST = withUser(
-  async ({ supabase, account }, _req: NextRequest, { params }: RouteContext) => {
+  async (
+    { supabase, account },
+    _req: NextRequest,
+    { params }: RouteContext,
+  ) => {
     const { id: postId } = await params;
     if (!postId) return badRequest("Post id required");
 
@@ -65,7 +93,11 @@ export const POST = withUser(
 );
 
 export const DELETE = withUser(
-  async ({ supabase, account }, _req: NextRequest, { params }: RouteContext) => {
+  async (
+    { supabase, account },
+    _req: NextRequest,
+    { params }: RouteContext,
+  ) => {
     const { id: postId } = await params;
     if (!postId) return badRequest("Post id required");
 

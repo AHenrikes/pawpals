@@ -7,8 +7,8 @@ import { cn } from "@/lib/helpers/utils";
 
 const homeTabs = [
   { label: "Posts", key: "posts" },
-  { label: "Reels", key: "reels" },
-  { label: "Following", key: "following" },
+  // { label: "Reels", key: "reels" },
+  // { label: "Following", key: "following" },
 ] as const;
 
 export default function HomeTabs() {

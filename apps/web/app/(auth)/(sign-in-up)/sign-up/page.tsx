@@ -94,8 +94,14 @@ export default function SignUp() {
         },
       });
 
+      if (error?.code === "weak_password") {
+        toast.error(ERROR_MESSAGES.WEAK_PASSWORD);
+        return;
+      }
+
       if (error) {
         toast.error(ERROR_MESSAGES.SERVER_ERROR);
+        toast.error(error.code);
         return;
       }
 

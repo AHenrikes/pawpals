@@ -39,6 +39,7 @@ export function UserProvider({
   const queryClient = useQueryClient();
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
+  const refreshIdRef = useRef(0);
   const router = useRouter();
 
   const [account, setAccount] = useState<AccountTypes | null>(null);
@@ -70,6 +71,7 @@ export function UserProvider({
   }, [queryClient, setState]);
 
   const refresh = useCallback(async () => {
+    const id = ++refreshIdRef.current;
     setState({ loading: true, error: null });
 
     try {
@@ -77,6 +79,8 @@ export function UserProvider({
         account: AccountTypes;
         currentFursona: FursonaTypes | null;
       }>("/api/core/accounts");
+
+      if (refreshIdRef.current !== id) return;
 
       setState({
         account: {
@@ -90,6 +94,7 @@ export function UserProvider({
 
       initialLoadDone.current = true;
     } catch (err: unknown) {
+      if (refreshIdRef.current !== id) return;
       if (
         err &&
         typeof err === "object" &&
@@ -101,6 +106,7 @@ export function UserProvider({
       }
       if (isMountedRef.current) setState({ error: toError(err) });
     } finally {
+      if (refreshIdRef.current === id) setState({ loading: false });
       setState({ loading: false });
     }
   }, [supabase, setState]);
@@ -125,6 +131,8 @@ export function UserProvider({
 
   useEffect(() => {
     isMountedRef.current = true;
+    let skipNextInitialSignIn = true;
+
     refresh();
 
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -138,10 +146,15 @@ export function UserProvider({
       }
 
       // Skip the SIGNED_IN that fires on initial session restore
-      if (event === "SIGNED_IN" && !initialLoadDone.current) {
-        initialLoadDone.current = true;
+      // if (event === "SIGNED_IN" && !initialLoadDone.current) {
+      //   initialLoadDone.current = true;
+      //   return;
+      // }
+      if (event === "SIGNED_IN" && skipNextInitialSignIn) {
+        skipNextInitialSignIn = false;
         return;
       }
+      skipNextInitialSignIn = false;
 
       if (
         event === "SIGNED_IN" ||

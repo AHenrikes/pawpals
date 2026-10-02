@@ -24,7 +24,9 @@ const profileNav = [
 
 type ContentKey = (typeof profileNav)[number]["key"];
 
-export default function ProfileContent({ fursona }: Readonly<{ fursona: FursonaProfile }>) {
+export default function ProfileContent({
+  fursona,
+}: Readonly<{ fursona: FursonaProfile }>) {
   const [content, setContent] = useState<ContentKey>("gallery");
   const [direction, setDirection] = useState(0);
 

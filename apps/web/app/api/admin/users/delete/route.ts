@@ -17,7 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (account_id !== account.id) {
-      return badRequest("Account deletion is only supported for the authenticated account");
+      return badRequest(
+        "Account deletion is only supported for the authenticated account",
+      );
     }
 
     const { error } = await supabase.rpc("delete_user_account");

@@ -11,14 +11,14 @@ import { useEffect, useState, useTransition } from "react";
 import {
   PlusIcon,
   LogOutIcon,
-  FilmIcon,
+  // FilmIcon,
   HomeIcon,
-  StoreIcon,
-  InboxIcon,
-  UsersIcon,
+  // StoreIcon,
+  // InboxIcon,
+  // UsersIcon,
   PawPrintIcon,
-  BellRingIcon,
-  SettingsIcon,
+  // BellRingIcon,
+  // SettingsIcon,
   ArrowDownIcon,
 } from "lucide-react";
 import {
@@ -54,13 +54,13 @@ type MainNavItem = {
 
 const mainNavItems: MainNavItem[] = [
   { href: AUTH_ROUTES.HOME, label: "Home", Icon: HomeIcon },
-  { href: AUTH_ROUTES.REELS, label: "Reels", Icon: FilmIcon },
-  { href: AUTH_ROUTES.STORE, label: "Store", Icon: StoreIcon },
-  { href: AUTH_ROUTES.MESSAGES, label: "Inbox", Icon: InboxIcon },
-  { href: AUTH_ROUTES.COMMUNITY, label: "Community", Icon: UsersIcon },
-  { href: AUTH_ROUTES.PAWPALS_MEET, label: "Pawpals meet", Icon: PawPrintIcon },
-  { href: AUTH_ROUTES.NOTIFICATION, label: "Notification", Icon: BellRingIcon },
-  { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: SettingsIcon },
+  // { href: AUTH_ROUTES.REELS, label: "Reels", Icon: FilmIcon },
+  // { href: AUTH_ROUTES.STORE, label: "Store", Icon: StoreIcon },
+  // { href: AUTH_ROUTES.MESSAGES, label: "Inbox", Icon: InboxIcon },
+  // { href: AUTH_ROUTES.COMMUNITY, label: "Community", Icon: UsersIcon },
+  // { href: AUTH_ROUTES.PAWPALS_MEET, label: "Pawpals meet", Icon: PawPrintIcon },
+  // { href: AUTH_ROUTES.NOTIFICATION, label: "Notification", Icon: BellRingIcon },
+  // { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: SettingsIcon },
 ];
 
 export default function MainNav() {

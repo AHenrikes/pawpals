@@ -1,7 +1,6 @@
 export type PostTypeValue = "yap" | "reel" | "gallery";
 export type PostMediaType = "image" | "gif" | "video";
-export type PostVisibility =
-  "public" | "followers" | "mutuals" | "private" | "archived";
+export type PostVisibility = "public" | "private" | "archived";
 
 export interface MediaItem {
   id?: string;

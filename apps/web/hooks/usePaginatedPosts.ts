@@ -2,8 +2,8 @@
 
 import { api } from "@/lib/api/api-client";
 import { parseMediaUrls } from "@/lib/helpers/parseMediaUrls";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { CancelledError, useInfiniteQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import type { PostType } from "@/types/post";
 
 interface PostsFeed {
@@ -35,18 +35,38 @@ export function usePaginatedPosts({
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
-  const posts =
-    query.data?.pages.flatMap((page) => parseMediaUrls(page.posts)) ?? [];
-  const nextCursor = query.data?.pages.at(-1)?.nextCursor ?? null;
+  const posts = useMemo(
+    () => query.data?.pages.flatMap((page) => parseMediaUrls(page.posts)) ?? [],
+    [query.data],
+  );
+  const nextCursor = useMemo(
+    () => query.data?.pages.at(-1)?.nextCursor ?? null,
+    [query.data],
+  );
 
   const fetchPosts = useCallback(async () => {
-    await query.refetch({ throwOnError: true });
-  }, [query]);
+    try {
+      await query.refetch({ throwOnError: true });
+    } catch (err) {
+      if (err instanceof CancelledError) return;
+      throw err;
+    }
+  }, [query.refetch]);
 
   const fetchMore = useCallback(async () => {
     if (!query.hasNextPage || query.isFetchingNextPage) return;
-    await query.fetchNextPage({ throwOnError: true });
-  }, [query]);
+    try {
+      await query.fetchNextPage({ throwOnError: true });
+    } catch (err) {
+      if (err instanceof CancelledError) return;
+      throw err;
+    }
+  }, [
+    query.refetch,
+    query.fetchNextPage,
+    query.hasNextPage,
+    query.isFetchingNextPage,
+  ]);
 
   return {
     posts,

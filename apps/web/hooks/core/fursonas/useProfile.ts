@@ -4,7 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { type FursonaTypes } from "@/types/fursona";
 
 export function useProfile(id: string) {
-  const { data: profile = null, isLoading, error } = useQuery({
+  const {
+    data: profile = null,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["fursona", id],
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {

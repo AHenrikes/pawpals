@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { DropdownMenu } from "@repo/ui/dropdown-menu";
-import { TypographyH3 } from "@repo/ui/typography";
+import { TypographyH1 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/modals/search/Searchbar";
 import HomeTabs from "./HomeTabs";
 import HeaderAvatar from "../avatar-icons/HeaderAvatar";
@@ -15,7 +15,7 @@ export default function Header() {
           <SidebarTrigger className="border-none" />
 
           <Link href={AUTH_ROUTES.HOME}>
-            <TypographyH3 className="text-text">PAWPALS</TypographyH3>
+            <TypographyH1 className="text-text">PAWPALS</TypographyH1>
           </Link>
         </div>
 

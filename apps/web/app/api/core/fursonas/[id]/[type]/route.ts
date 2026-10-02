@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { withUser } from "@/lib/auth/withUser";
-import { badRequest, notFound, okPrivateRead, serverError } from "@/lib/api/responses";
+import {
+  badRequest,
+  notFound,
+  okPrivateRead,
+  serverError,
+} from "@/lib/api/responses";
 
 const PAGE_SIZE = 20;
 const FOLLOW_TYPES = new Set(["followers", "following"]);
@@ -16,9 +21,10 @@ export const GET = withUser(
       return badRequest("A fursona id and follow type are required");
     }
 
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      identifier,
-    );
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        identifier,
+      );
     const { data: target, error: targetError } = await supabase
       .schema("core")
       .from("fursonas")
@@ -31,8 +37,10 @@ export const GET = withUser(
     if (!target) return notFound("Fursona not found");
 
     const cursor = request.nextUrl.searchParams.get("cursor");
-    const relationshipColumn = type === "followers" ? "following_fursona_id" : "follower_fursona_id";
-    const resultColumn = type === "followers" ? "follower_fursona_id" : "following_fursona_id";
+    const relationshipColumn =
+      type === "followers" ? "following_fursona_id" : "follower_fursona_id";
+    const resultColumn =
+      type === "followers" ? "follower_fursona_id" : "following_fursona_id";
 
     let relationshipQuery = supabase
       .schema("social")
@@ -44,7 +52,8 @@ export const GET = withUser(
 
     if (cursor) relationshipQuery = relationshipQuery.lt("created_at", cursor);
 
-    const { data: relationships, error: relationshipError } = await relationshipQuery;
+    const { data: relationships, error: relationshipError } =
+      await relationshipQuery;
     if (relationshipError) return serverError(relationshipError.message);
 
     const hasMore = (relationships?.length ?? 0) > PAGE_SIZE;
@@ -54,7 +63,12 @@ export const GET = withUser(
       following_fursona_id?: string;
     }>;
     const ids = page
-      .map((relationship) => relationship[resultColumn as "follower_fursona_id" | "following_fursona_id"])
+      .map(
+        (relationship) =>
+          relationship[
+            resultColumn as "follower_fursona_id" | "following_fursona_id"
+          ],
+      )
       .filter((id): id is string => Boolean(id));
 
     if (ids.length === 0) {
@@ -70,9 +84,11 @@ export const GET = withUser(
 
     if (fursonaError) return serverError(fursonaError.message);
 
-    const fursonaById = new Map((fursonas ?? []).map((fursona) => [fursona.id, fursona]));
+    const fursonaById = new Map(
+      (fursonas ?? []).map((fursona) => [fursona.id, fursona]),
+    );
     const follows = ids.map((id) => fursonaById.get(id)).filter(Boolean);
-    const nextCursor = hasMore ? page.at(-1)?.created_at ?? null : null;
+    const nextCursor = hasMore ? (page.at(-1)?.created_at ?? null) : null;
 
     return okPrivateRead({ follows, nextCursor });
   },
