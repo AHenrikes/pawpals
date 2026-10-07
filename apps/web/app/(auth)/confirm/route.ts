@@ -1,4 +1,4 @@
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { createServer } from "@repo/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
 import { redirect } from "next/navigation";
@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
     const initFursona = metadata.onboarding_init_fursona;
 
     const { error } = await supabase.rpc("create_account", {
-      p_user_id: user.id,
       p_firstname: metadata.firstname,
       p_lastname: metadata.lastname,
       p_email: user.email,

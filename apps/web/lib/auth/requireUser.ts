@@ -26,7 +26,7 @@ export async function requireUser() {
   const { data: account, error: accountError } = await supabase
     .schema("core")
     .from("accounts")
-    .select("id, firstname, lastname, email, dob")
+    .select("id, firstname, lastname, email, dob, is_active, is_suspended")
     .eq("user_id", user.id)
     .single();
 
@@ -50,6 +50,18 @@ export async function requireUser() {
       response: NextResponse.json(
         { error: "Account not found" },
         { status: 404 },
+      ),
+    };
+  }
+
+  if (!account.is_active || account.is_suspended) {
+    return {
+      supabase,
+      user: null,
+      account: null,
+      response: NextResponse.json(
+        { error: "Account is inactive or suspended" },
+        { status: 403 },
       ),
     };
   }

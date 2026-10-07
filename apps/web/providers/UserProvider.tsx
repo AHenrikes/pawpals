@@ -9,15 +9,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
-import { makeCache } from "@/lib/helpers/profile-cache";
-import { AUTH_ROUTES } from "@/lib/auth/routes";
+import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { useRouter } from "next/navigation";
-import { clearPostsCache } from "@/hooks/usePaginatedPosts";
-import { clearProfileCountsCache } from "@/hooks/core/views/useProfileCounts";
-import { clearProfileSearchCache } from "@/hooks/core/fursonas/useProfileSearch";
 import { type AccountTypes } from "@/types/account";
 import { type FursonaTypes } from "@/types/fursona";
 
@@ -39,9 +36,10 @@ export function UserProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const supabase = useSupabaseClient();
+  const queryClient = useQueryClient();
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
-  const fursonasCacheRef = useRef(makeCache<FursonaTypes[]>());
+  const refreshIdRef = useRef(0);
   const router = useRouter();
 
   const [account, setAccount] = useState<AccountTypes | null>(null);
@@ -63,19 +61,17 @@ export function UserProvider({
   }, []);
 
   const clearAuthState = useCallback(() => {
-    fursonasCacheRef.current.clear();
-    clearPostsCache();
-    clearProfileCountsCache();
-    clearProfileSearchCache();
+    queryClient.clear();
     setState({
       account: null,
       fursonas: [],
       currentFursona: null,
       error: null,
     });
-  }, [setState]);
+  }, [queryClient, setState]);
 
   const refresh = useCallback(async () => {
+    const id = ++refreshIdRef.current;
     setState({ loading: true, error: null });
 
     try {
@@ -83,6 +79,8 @@ export function UserProvider({
         account: AccountTypes;
         currentFursona: FursonaTypes | null;
       }>("/api/core/accounts");
+
+      if (refreshIdRef.current !== id) return;
 
       setState({
         account: {
@@ -96,6 +94,7 @@ export function UserProvider({
 
       initialLoadDone.current = true;
     } catch (err: unknown) {
+      if (refreshIdRef.current !== id) return;
       if (
         err &&
         typeof err === "object" &&
@@ -107,29 +106,33 @@ export function UserProvider({
       }
       if (isMountedRef.current) setState({ error: toError(err) });
     } finally {
+      if (refreshIdRef.current === id) setState({ loading: false });
       setState({ loading: false });
     }
   }, [supabase, setState]);
 
   const fetchFursonas = useCallback(async () => {
     try {
-      const fursonas = await fursonasCacheRef.current.get(
-        "fursonas",
-        async () => {
+      const fursonas = await queryClient.fetchQuery({
+        queryKey: ["user-fursonas"],
+        staleTime: 10 * 60 * 1000,
+        queryFn: async () => {
           const res = await api.get<{ fursonas: FursonaTypes[] }>(
             "/api/core/fursonas",
           );
           return res.fursonas ?? [];
         },
-      );
+      });
       setState({ fursonas });
     } catch (err) {
       setState({ error: toError(err) });
     }
-  }, [setState]);
+  }, [queryClient, setState]);
 
   useEffect(() => {
     isMountedRef.current = true;
+    let skipNextInitialSignIn = true;
+
     refresh();
 
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -143,10 +146,15 @@ export function UserProvider({
       }
 
       // Skip the SIGNED_IN that fires on initial session restore
-      if (event === "SIGNED_IN" && !initialLoadDone.current) {
-        initialLoadDone.current = true;
+      // if (event === "SIGNED_IN" && !initialLoadDone.current) {
+      //   initialLoadDone.current = true;
+      //   return;
+      // }
+      if (event === "SIGNED_IN" && skipNextInitialSignIn) {
+        skipNextInitialSignIn = false;
         return;
       }
+      skipNextInitialSignIn = false;
 
       if (
         event === "SIGNED_IN" ||
@@ -189,7 +197,7 @@ export function UserProvider({
 
         setState({ fursonas: next, currentFursona: updated });
 
-        fursonasCacheRef.current.set("fursonas", next);
+        queryClient.setQueryData(["user-fursonas"], next);
       } catch (err) {
         setState({ error: toError(err) });
         throw err;
@@ -197,7 +205,7 @@ export function UserProvider({
         setState({ loading: false });
       }
     },
-    [fursonas, setState],
+    [fursonas, queryClient, setState],
   );
 
   const value: UserContextType = useMemo(

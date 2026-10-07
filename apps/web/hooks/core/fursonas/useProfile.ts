@@ -1,16 +1,17 @@
 "use client";
 
-import { fursonaCache } from "@/lib/helpers/profile-cache";
-import { useAsyncDataWithCache } from "@/hooks/useAsyncData";
+import { useQuery } from "@tanstack/react-query";
 import { type FursonaTypes } from "@/types/fursona";
 
 export function useProfile(id: string) {
   const {
-    data: profile,
-    loading,
+    data: profile = null,
+    isLoading,
     error,
-  } = useAsyncDataWithCache(
-    async () => {
+  } = useQuery({
+    queryKey: ["fursona", id],
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
       const res = await fetch(`/api/core/fursonas/${encodeURIComponent(id)}`);
 
       if (res.status === 404) return null;
@@ -21,9 +22,7 @@ export function useProfile(id: string) {
 
       return res.json() as Promise<FursonaTypes>;
     },
-    (fetcher) => fursonaCache.get(id, fetcher),
-    [id],
-  );
+  });
 
-  return { profile, loading, error };
+  return { profile, loading: isLoading, error };
 }

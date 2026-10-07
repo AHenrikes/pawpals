@@ -7,7 +7,6 @@
 -- FUNCTION: Create account with fursona
 -- ============================================================================
 CREATE OR REPLACE FUNCTION core.create_account(
-  p_user_id UUID,
   p_firstname TEXT,
   p_lastname TEXT,
   p_email TEXT,
@@ -19,9 +18,14 @@ CREATE OR REPLACE FUNCTION core.create_account(
 )
 RETURNS JSONB AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   v_account_id UUID;
   v_fursona_id UUID;
 BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Authentication required');
+  END IF;
+
   IF p_display_name IS NULL OR p_display_name = '' THEN
     RETURN jsonb_build_object('success', false, 'error', 'Display name required');
   END IF;
@@ -34,8 +38,12 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Username already taken');
   END IF;
 
+  IF EXISTS (SELECT 1 FROM core.accounts WHERE user_id = v_user_id) THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Account already exists');
+  END IF;
+
   INSERT INTO core.accounts (user_id, firstname, lastname, email)
-  VALUES (p_user_id, p_firstname, p_lastname, p_email)
+  VALUES (v_user_id, p_firstname, p_lastname, p_email)
   RETURNING id INTO v_account_id;
 
   INSERT INTO core.fursonas (
@@ -122,7 +130,14 @@ RETURNS TABLE (
   avatar_url TEXT,
   reputation INT
 ) AS $$
+DECLARE
+  v_user_account_id UUID;
 BEGIN
+  SELECT a.id INTO v_user_account_id
+  FROM core.accounts a
+  WHERE a.user_id = auth.uid()
+  LIMIT 1;
+
   RETURN QUERY
   SELECT
     f.username,
@@ -135,13 +150,27 @@ BEGIN
       f.username ILIKE '%' || search_term || '%' OR
       f.display_name ILIKE '%' || search_term || '%'
     )
+    AND (
+      f.is_visible = 'public'
+      OR f.account_id = v_user_account_id
+      OR (
+        f.is_visible = 'private' AND v_user_account_id IS NOT NULL AND EXISTS (
+          SELECT 1
+          FROM social.followers sf
+          WHERE sf.following_fursona_id = f.id
+            AND sf.follower_fursona_id IN (
+              SELECT id FROM core.fursonas WHERE account_id = v_user_account_id
+            )
+        )
+      )
+    )
   ORDER BY
     CASE WHEN f.username ILIKE search_term THEN 0 ELSE 1 END,
     f.reputation DESC
   LIMIT 50;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER
-SET search_path = core;
+SET search_path = public, core;
 
 -- ============================================================================
 -- FUNCTION: Switch current fursona
@@ -185,42 +214,6 @@ BEGIN
   RETURN true;
 END;
 $$;
-
--- TODO
--- ============================================================================
--- FUNCTION: Get follower relationship status
--- ============================================================================
--- CREATE OR REPLACE FUNCTION social.get_follow_status(
---   subject_fursona_id UUID,
---   target_fursona_id UUID
--- )
--- RETURNS TABLE (
---   is_following BOOLEAN,
---   is_followed_by BOOLEAN,
---   is_mutual BOOLEAN
--- ) AS $$
--- DECLARE
---   v_is_following BOOLEAN;
---   v_is_followed_by BOOLEAN;
--- BEGIN
---   SELECT EXISTS(
---     SELECT 1 FROM social.followers
---     WHERE follower_fursona_id = subject_fursona_id
---     AND following_fursona_id = target_fursona_id
---   ) INTO v_is_following;
-
---   SELECT EXISTS(
---     SELECT 1 FROM social.followers
---     WHERE follower_fursona_id = target_fursona_id
---     AND following_fursona_id = subject_fursona_id
---   ) INTO v_is_followed_by;
-
---   RETURN QUERY SELECT
---     v_is_following,
---     v_is_followed_by,
---     (v_is_following AND v_is_followed_by);
--- END;
--- $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
 -- FUNCTION: Delete account and cascade data
@@ -296,7 +289,7 @@ GRANT SELECT ON social.v_top_fursonas TO authenticated;
 -- ============================================================================
 -- COMMENTS & DOCUMENTATION
 -- ============================================================================
-COMMENT ON FUNCTION core.create_account(UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) IS 'Create account and initial fursona during sign-up';
+COMMENT ON FUNCTION core.create_account(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) IS 'Create account and initial fursona during sign-up';
 COMMENT ON FUNCTION core.get_user_profile() IS 'Get current authenticated user profile with current fursona';
 COMMENT ON FUNCTION core.search_fursonas(TEXT) IS 'Search fursonas by username or display name';
 COMMENT ON FUNCTION core.switch_current_fursona(UUID) IS 'Switch authenticated user current fursona';

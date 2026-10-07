@@ -110,34 +110,37 @@ export const GET = withUser(
   },
 );
 
-export const POST = withUser(async ({ supabase, account }, req: NextRequest) => {
-  const body = (await req.json().catch(() => ({}))) as PostCreate;
-  const content = normalizeOptionalText(body.content);
-  const media = Array.isArray(body.media) ? body.media : [];
+export const POST = withUser(
+  async ({ supabase, account }, req: NextRequest) => {
+    const body = (await req.json().catch(() => ({}))) as PostCreate;
+    const content = normalizeOptionalText(body.content);
+    const media = Array.isArray(body.media) ? body.media : [];
 
-  if ((!content || content.length === 0) && media.length === 0) {
-    return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-  }
+    if ((!content || content.length === 0) && media.length === 0) {
+      return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    }
 
-  const { data: fursona, error: fursonaError } = await supabase
-    .schema("core")
-    .from("fursonas")
-    .select("id")
-    .eq("account_id", account.id)
-    .eq("is_current", true)
-    .single();
+    const { data: fursona, error: fursonaError } = await supabase
+      .schema("core")
+      .from("fursonas")
+      .select("id")
+      .eq("account_id", account.id)
+      .eq("is_current", true)
+      .single();
 
-  if (fursonaError || !fursona) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (fursonaError || !fursona)
+      return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
-  const { data, error } = await supabase.rpc("create_post_with_media", {
-    p_fursona_id: fursona.id,
-    p_post_type: body.post_type,
-    p_content: content ?? null,
-    p_visibility: body.visibility ?? "public",
-    p_media: media,
-  });
+    const { data, error } = await supabase.rpc("create_post_with_media", {
+      p_fursona_id: fursona.id,
+      p_post_type: body.post_type,
+      p_content: content ?? null,
+      p_visibility: body.visibility ?? "public",
+      p_media: media,
+    });
 
-  if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
+    if (error) return serverError(ERROR_MESSAGES.SERVER_ERROR);
 
-  return ok({ post: data });
-});
+    return ok({ post: data });
+  },
+);

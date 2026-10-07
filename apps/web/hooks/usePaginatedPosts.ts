@@ -2,8 +2,8 @@
 
 import { api } from "@/lib/api/api-client";
 import { parseMediaUrls } from "@/lib/helpers/parseMediaUrls";
-import { makeCache } from "@/lib/helpers/profile-cache";
-import { useCallback, useRef, useState } from "react";
+import { CancelledError, useInfiniteQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import type { PostType } from "@/types/post";
 
 interface PostsFeed {
@@ -11,91 +11,71 @@ interface PostsFeed {
   nextCursor: string | null;
 }
 
-interface UsePaginatedPostsState {
-  posts: PostType[];
-  nextCursor: string | null;
-  loading: boolean;
-  loadingMore: boolean;
-  error: string | null;
-}
-
 interface UsePaginatedPostsOptions {
   endpoint: string;
   initialLoading?: boolean;
-}
-
-const postsCache = makeCache<PostsFeed>(15 * 1000);
-
-export function clearPostsCache() {
-  postsCache.clear();
 }
 
 export function usePaginatedPosts({
   endpoint,
   initialLoading = false,
 }: UsePaginatedPostsOptions) {
-  const [state, setState] = useState<UsePaginatedPostsState>({
-    posts: [],
-    nextCursor: null,
-    loading: initialLoading,
-    loadingMore: false,
-    error: null,
+  const query = useInfiniteQuery({
+    queryKey: ["posts", endpoint],
+    enabled: initialLoading,
+    staleTime: 15 * 1000,
+    queryFn: ({ pageParam = null }) => {
+      const cursor = pageParam as string | null;
+      const separator = endpoint.includes("?") ? "&" : "?";
+      const url = cursor
+        ? `${endpoint}${separator}cursor=${encodeURIComponent(cursor)}`
+        : endpoint;
+      return api.get<PostsFeed>(url);
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
-  const fetchingRef = useRef(false);
-  const fetchingMoreRef = useRef(false);
+  const posts = useMemo(
+    () => query.data?.pages.flatMap((page) => parseMediaUrls(page.posts)) ?? [],
+    [query.data],
+  );
+  const nextCursor = useMemo(
+    () => query.data?.pages.at(-1)?.nextCursor ?? null,
+    [query.data],
+  );
 
   const fetchPosts = useCallback(async () => {
-    if (fetchingRef.current) return;
-    fetchingRef.current = true;
-    setState((s) => ({ ...s, loading: true, error: null }));
-
     try {
-      const data = await postsCache.get(endpoint, () =>
-        api.get<PostsFeed>(endpoint),
-      );
-      const parsedPosts = parseMediaUrls(data.posts);
-      setState((s) => ({
-        ...s,
-        posts: parsedPosts,
-        nextCursor: data.nextCursor,
-      }));
-    } catch {
-      setState((s) => ({ ...s, error: "Failed to load posts." }));
-    } finally {
-      setState((s) => ({ ...s, loading: false }));
-      fetchingRef.current = false;
+      await query.refetch({ throwOnError: true });
+    } catch (err) {
+      if (err instanceof CancelledError) return;
+      throw err;
     }
-  }, [endpoint]);
+  }, [query.refetch]);
 
   const fetchMore = useCallback(async () => {
-    if (!state.nextCursor || fetchingMoreRef.current) return;
-    fetchingMoreRef.current = true;
-    setState((s) => ({ ...s, loadingMore: true }));
-
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
     try {
-      const cacheKey = `${endpoint}?cursor=${encodeURIComponent(state.nextCursor)}`;
-      const data = await postsCache.get(cacheKey, () =>
-        api.get<PostsFeed>(cacheKey),
-      );
-      const parsedPosts = parseMediaUrls(data.posts);
-      setState((s) => ({
-        ...s,
-        posts: [...s.posts, ...parsedPosts],
-        nextCursor: data.nextCursor,
-      }));
-    } catch {
-      setState((s) => ({ ...s, error: "Failed to load more posts." }));
-    } finally {
-      setState((s) => ({ ...s, loadingMore: false }));
-      fetchingMoreRef.current = false;
+      await query.fetchNextPage({ throwOnError: true });
+    } catch (err) {
+      if (err instanceof CancelledError) return;
+      throw err;
     }
-  }, [endpoint, state.nextCursor]);
+  }, [
+    query.refetch,
+    query.fetchNextPage,
+    query.hasNextPage,
+    query.isFetchingNextPage,
+  ]);
 
   return {
-    ...state,
+    posts,
+    nextCursor,
+    loading: query.isInitialLoading,
+    loadingMore: query.isFetchingNextPage,
+    error: query.error ? "Failed to load posts." : null,
     fetchPosts,
     fetchMore,
-    hasMore: !!state.nextCursor,
+    hasMore: !!query.hasNextPage,
   };
 }

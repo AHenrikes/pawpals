@@ -3,16 +3,17 @@ import type { NextConfig } from "next";
 const devImageHost = process.env.NEXT_PUBLIC_DEV_IMAGE_HOST;
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: [`${devImageHost}`, "192.168.1.219"],
+  allowedDevOrigins: [`${devImageHost}`, "192.168.1.219", "192.168.1.220"],
 
   devIndicators: {
     position: "bottom-right",
   },
+
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "192.168.1.219",
+        hostname: "192.168.1.220",
       },
       {
         protocol: "https",

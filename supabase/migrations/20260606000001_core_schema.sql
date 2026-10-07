@@ -51,7 +51,6 @@ CREATE TABLE core.fursonas (
 
   -- Fursona status
   is_visible TEXT DEFAULT 'public' NOT NULL,
-  -- is_visible TEXT[] NOT NULL '{ "everyone", "followers", "mutuals", "private" }',
   is_default BOOLEAN DEFAULT false NOT NULL,
   is_current BOOLEAN DEFAULT false NOT NULL,
   is_active BOOLEAN DEFAULT true NOT NULL,
@@ -63,7 +62,7 @@ CREATE TABLE core.fursonas (
 
   CONSTRAINT valid_display_name CHECK (display_name ~ '^.{1,100}$'),
   CONSTRAINT valid_username CHECK (username ~ '^[a-zA-Z0-9_-]{3,50}$'),
-  CONSTRAINT valid_is_visibility CHECK (is_visible IN ('public', 'followers', 'mutuals', 'private')),
+  CONSTRAINT valid_is_visibility CHECK (is_visible IN ('public', 'private')),
   CONSTRAINT non_negative_reputation CHECK (reputation >= 0)
 );
 
@@ -126,11 +125,6 @@ CREATE POLICY fursonas_select_own
     account_id = (SELECT id FROM core.accounts WHERE user_id = auth.uid())
   );
 
--- Policy: Users can view other public fursonas
-CREATE POLICY fursonas_select_view_public
-  ON core.fursonas FOR SELECT
-  USING (is_active = true);
-
 -- Policy: Users can insert fursonas for their own account
 CREATE POLICY fursonas_insert_own
   ON core.fursonas
@@ -143,7 +137,8 @@ CREATE POLICY fursonas_insert_own
     )
   );
 
--- Policy: Users can update their own fursonas
+-- Policy: Users can update their own fursonas.
+-- Reputation and system-managed fields are intentionally not mutable here.
 CREATE POLICY fursonas_update_own
   ON core.fursonas FOR UPDATE
   USING (
@@ -166,7 +161,20 @@ CREATE POLICY fursonas_delete_own
 -- ============================================================================
 GRANT USAGE ON SCHEMA core TO authenticated;
 GRANT SELECT ON core.accounts TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON core.fursonas TO authenticated;
+GRANT SELECT, INSERT, DELETE ON core.fursonas TO authenticated;
+GRANT UPDATE (
+  display_name,
+  username,
+  bio,
+  species,
+  pronouns,
+  avatar_url,
+  banner_url,
+  is_visible,
+  is_default,
+  is_current,
+  updated_at
+) ON core.fursonas TO authenticated;
 GRANT SELECT ON core.v_accounts_with_stats TO authenticated;
 
 

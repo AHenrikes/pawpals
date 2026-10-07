@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   AtSignIcon,
-  BadgeCheckIcon,
   GlobeIcon,
   MapPinIcon,
   UserPlusIcon,
@@ -50,8 +49,6 @@ const VISIBILITY_OPTIONS: {
   Icon: React.ElementType;
 }[] = [
   { value: "public", label: "Everyone", Icon: GlobeIcon },
-  { value: "followers", label: "Followers", Icon: BadgeCheckIcon },
-  { value: "mutuals", label: "Mutuals", Icon: UserPlusIcon },
   { value: "private", label: "Private", Icon: AtSignIcon },
 ];
 
@@ -195,7 +192,7 @@ function MobileMediaStrip({
             aria-label={`Remove media ${i + 1}`}
             className={cn(
               "absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full",
-              "bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100"
+              "bg-black/70 text-white opacity-0 transition-opacity group-hover:opacity-100",
             )}
           >
             <XIcon className="h-2.5 w-2.5" />
@@ -212,7 +209,7 @@ function MobileMediaStrip({
           style={{ width: 72, height: 72 }}
           className={cn(
             "shrink-0 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-0.5",
-            "text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors"
+            "text-muted-foreground text-[10px] hover:border-primary hover:text-primary transition-colors",
           )}
         >
           <PlusIcon className="h-4 w-4" />
@@ -315,11 +312,13 @@ export default function PostForm({
           />
         )}
 
-        {mediaPreviews.length > 0  && (
-          <div className={cn(
-            "flex items-center justify-between border-t border-border px-3 py-2",
-            mediaPreviews.length === POST_MAX_MEDIA ? "hidden" : null
-          )}>
+        {mediaPreviews.length > 0 && (
+          <div
+            className={cn(
+              "flex items-center justify-between border-t border-border px-3 py-2",
+              mediaPreviews.length === POST_MAX_MEDIA ? "hidden" : null,
+            )}
+          >
             <span className="text-xs text-muted-foreground">
               <span className="font-semibold text-primary">
                 {mediaPreviews.length}

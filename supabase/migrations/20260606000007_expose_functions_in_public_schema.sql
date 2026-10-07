@@ -35,7 +35,6 @@ GRANT EXECUTE ON FUNCTION public.create_post_with_media(UUID, TEXT, TEXT, TEXT, 
 -- PUBLIC WRAPPER: Create account
 -- ============================================================================
 CREATE OR REPLACE FUNCTION public.create_account(
-  p_user_id UUID,
   p_firstname TEXT,
   p_lastname TEXT,
   p_email TEXT,
@@ -48,14 +47,14 @@ CREATE OR REPLACE FUNCTION public.create_account(
 RETURNS JSONB AS $$
 BEGIN
   RETURN core.create_account(
-    p_user_id, p_firstname, p_lastname, p_email, p_display_name,
+    p_firstname, p_lastname, p_email, p_display_name,
     p_username, p_species, p_pronouns, p_bio
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER
 SET search_path = public, core;
 
-GRANT EXECUTE ON FUNCTION public.create_account(UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_account(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO authenticated;
 
 -- ============================================================================
 -- PUBLIC WRAPPER: Check username availability

@@ -21,8 +21,6 @@ const MAX_LIMIT = 50;
 const VALID_POST_TYPES = new Set<PostTypeValue>(["yap", "reel", "gallery"]);
 const VALID_VISIBILITY = new Set<PostVisibility>([
   "public",
-  "followers",
-  "mutuals",
   "private",
   "archived",
 ] as const);
@@ -124,14 +122,14 @@ export const GET = withUser(async ({ supabase }, req: NextRequest) => {
           duration_seconds,
           file_size_bytes,
           order_index
-        )
+        ),
         views_count,
         likes_count,
         comments_count,
         shares_count,
         bookmarks_count,
         visibility,
-        created_at,
+        created_at
     `,
     )
     .order("created_at", { ascending: false })

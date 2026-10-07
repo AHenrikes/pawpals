@@ -47,7 +47,7 @@ CREATE TABLE social.posts (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
 
   CONSTRAINT valid_post_type CHECK (post_type IN ('yap', 'reel', 'gallery')),
-  CONSTRAINT valid_visibility CHECK (visibility IN ('public', 'followers', 'mutuals', 'private', 'archived')),
+  CONSTRAINT valid_visibility CHECK (visibility IN ('public', 'private', 'archived')),
   CONSTRAINT valid_content_length CHECK (content IS NULL OR LENGTH(content) <= 5000),
   -- Media requirements are validated in the app/API transaction layer via
   -- social.create_post_with_media(). A CHECK constraint can't read from
@@ -279,6 +279,24 @@ CREATE INDEX idx_post_views_viewer ON social.post_views(viewer_fursona_id, creat
 -- ============================================================================
 -- FUNCTIONS & TRIGGERS
 -- ============================================================================
+CREATE OR REPLACE FUNCTION core.is_current_user_fursona_follower(p_fursona_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = pg_catalog, core, social
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM core.accounts AS account
+    JOIN core.fursonas AS viewer ON viewer.account_id = account.id
+    JOIN social.followers AS follow ON follow.follower_fursona_id = viewer.id
+    WHERE account.user_id = auth.uid()
+      AND follow.following_fursona_id = p_fursona_id
+  );
+$$;
+
+
 -- Create a post with media in a single database transaction so the app can
 -- enforce the post-type rules without leaving the DB in an invalid state.
 -- This is the correct Supabase-safe way to support:
@@ -617,6 +635,21 @@ CREATE POLICY followers_delete_own
     follower_fursona_id IN (
       SELECT id FROM core.fursonas
       WHERE account_id = (SELECT id FROM core.accounts WHERE user_id = auth.uid())
+    )
+  );
+
+CREATE POLICY fursonas_select_view_public
+  ON core.fursonas FOR SELECT
+  USING (
+    is_active = true AND (
+      is_visible = 'public'
+      OR account_id = (
+        SELECT id FROM core.accounts WHERE user_id = auth.uid()
+      )
+      OR (
+        is_visible = 'private'
+        AND core.is_current_user_fursona_follower(core.fursonas.id)
+      )
     )
   );
 
@@ -1011,7 +1044,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON social.post_comments TO authenticated;
 GRANT SELECT, INSERT, DELETE ON social.comment_likes TO authenticated;
 GRANT SELECT, INSERT, DELETE ON social.post_bookmarks TO authenticated;
 GRANT SELECT, INSERT ON social.post_reports TO authenticated;
-
+GRANT EXECUTE ON FUNCTION core.is_current_user_fursona_follower(UUID) authenticated;
 
 -- ============================================================================
 -- COMMENTS & DOCUMENTATION
