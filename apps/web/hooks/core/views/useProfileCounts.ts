@@ -1,16 +1,15 @@
 "use client";
 
-import { useCallback } from "react";
 import { api } from "@/lib/api/api-client";
 import { useUser } from "@/providers/UserProvider";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type SocialStats = {
+  posts: number;
+  followers: number;
   following: number;
-  follower: number;
-  reputation: number;
-  post: number;
   likes: number;
+  reputation: number;
 };
 
 type SocialData = SocialStats & {
@@ -20,33 +19,34 @@ type SocialData = SocialStats & {
 };
 
 const initialState: SocialStats = {
+  posts: 0,
+  followers: 0,
   following: 0,
-  follower: 0,
   likes: 0,
-  post: 0,
   reputation: 0,
 };
 
 type ProfileCountsResponse = {
+  post_count: number;
   follower_count: number;
   following_count: number;
   like_count: number;
-  post_count: number;
   reputation_count: number;
 };
 
-/**
- * Hook for fetching social stats
- *
- * @param fursonaId - id of the fursona to get social stats
- */
 export function useProfileCounts(id?: string): SocialData {
   const { signOut } = useUser();
+  const queryClient = useQueryClient();
+
   const query = useQuery({
     queryKey: ["profile-counts", id],
     enabled: !!id,
     staleTime: 10 * 1000,
     queryFn: async () => {
+      if (!id) {
+        throw new Error("Missing fursona id");
+      }
+
       try {
         return await api.get<ProfileCountsResponse>(
           `/api/core/fursonas/${id}/counts`,
@@ -60,25 +60,31 @@ export function useProfileCounts(id?: string): SocialData {
         ) {
           await signOut();
         }
+
         throw err;
       }
     },
   });
 
   const data = query.data;
+
   const social: SocialStats = data
     ? {
-        follower: data.follower_count ?? 0,
+        posts: data.post_count ?? 0,
+        followers: data.follower_count ?? 0,
         following: data.following_count ?? 0,
         likes: data.like_count ?? 0,
-        post: data.post_count ?? 0,
         reputation: data.reputation_count ?? 0,
       }
     : initialState;
 
-  const refetch = useCallback(async () => {
-    await query.refetch();
-  }, [query]);
+  const refetch = async () => {
+    if (!id) return;
+
+    await queryClient.invalidateQueries({
+      queryKey: ["profile-counts", id],
+    });
+  };
 
   return {
     ...social,

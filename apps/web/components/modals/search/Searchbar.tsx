@@ -28,15 +28,14 @@ export function Searchbar() {
     <>
       <Button
         size="icon-lg"
-        variant="ghost"
+        variant="none"
         onClick={() => setOpen(true)}
         className={cn(
-          "gradientBG px-2 py-1 space-x-2",
+          "flex justify-center items-center text-text-muted rounded-sm hover:text-text",
           `${open ? "hidden" : ""}`,
         )}
       >
         <SearchIcon />
-        <Kbd className="hidden md:block">Ctl+k</Kbd>
       </Button>
 
       <SearchDialog open={open} onClose={() => setOpen(false)} />

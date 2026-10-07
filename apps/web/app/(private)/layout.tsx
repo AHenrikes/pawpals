@@ -12,9 +12,5 @@ export default async function PrivateLayout({
   const { account } = await requireUser();
   if (!account) redirect(AUTH_ROUTES.SIGN_IN);
 
-  return (
-    <div id="PrivateLayout">
-      <UserProvider>{children}</UserProvider>
-    </div>
-  );
+  return <UserProvider>{children}</UserProvider>;
 }

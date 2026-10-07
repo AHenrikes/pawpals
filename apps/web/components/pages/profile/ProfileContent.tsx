@@ -4,23 +4,25 @@ import { useState } from "react";
 import { Button } from "@repo/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@repo/ui/lib/utils";
-import { type FursonaProfile } from "@/types/fursona";
-import { ProfileGallery } from "./Gallery";
-import ProfilePostCards from "./ProfilePostCards";
 import { SidebarProvider } from "@/providers/SidebarProvider";
+import {
+  BookmarkIcon,
+  GalleryVerticalIcon,
+  HeartIcon,
+  LayoutGridIcon,
+  Repeat2Icon,
+} from "lucide-react";
+import { ProfileGallery } from "./Gallery";
+import { type FursonaProfile } from "@/types/fursona";
+import ProfilePostCards from "./ProfilePostCards";
 
 const profileNav = [
-  { label: "GALLERY", key: "gallery", special: undefined },
-  { label: "POST", key: "post", special: undefined },
-  { label: "REPOST", key: "repost", special: undefined },
-  { label: "ARCHIVE", key: "archive", special: undefined },
-  { label: "LIKE", key: "likes", special: undefined },
-  { label: "ABOUT", key: "about", special: "hidden" },
-] as const satisfies ReadonlyArray<{
-  label: string;
-  key: string;
-  special?: string;
-}>;
+  { label: "GALLERY", key: "gallery", icon: LayoutGridIcon },
+  { label: "POST", key: "post", icon: GalleryVerticalIcon },
+  { label: "REPOST", key: "repost", icon: Repeat2Icon },
+  { label: "BOOKMARK", key: "bookmark", icon: BookmarkIcon },
+  { label: "LIKE", key: "like", icon: HeartIcon },
+];
 
 type ContentKey = (typeof profileNav)[number]["key"];
 
@@ -45,24 +47,30 @@ export default function ProfileContent({
 
   return (
     <SidebarProvider>
-      <div className="container flex flex-col pt-6 mx-auto">
+      <div className="container flex flex-col pt-2 mx-auto">
         {/* Nav */}
-        <nav className="pb-4 border-b border-muted">
-          <ul className="flex gap-2.5 overflow-x-auto scrollbar-hide">
-            {profileNav.map(({ key, label, special }) => (
-              <Button
-                key={label}
-                variant="ghost"
-                className={cn(
-                  "p-4 rounded-sm",
-                  content === key ? "bg-primary hover:bg-primary-dim" : null,
-                  special ? "lg:hidden" : null,
-                )}
-                onClick={() => handleNavClick(key)}
-              >
-                {label}
-              </Button>
-            ))}
+        <nav className="px-3 pb-4 border-b border-muted">
+          <ul className="flex justify-between sm:justify-start sm:gap-2 md:gap-4">
+            {profileNav.map(({ key, label, icon }) => {
+              const Icon = icon;
+
+              return (
+                <Button
+                  key={label}
+                  variant="ghost"
+                  onClick={() => handleNavClick(key)}
+                  className={cn(
+                    "p-4 text-text-muted rounded-sm",
+                    content === key
+                      ? "text-text bg-primary hover:bg-primary-dim"
+                      : null,
+                  )}
+                >
+                  {Icon && <Icon className="size-5" />}
+                  <span className="hidden sm:block">{label}</span>
+                </Button>
+              );
+            })}
           </ul>
         </nav>
 
