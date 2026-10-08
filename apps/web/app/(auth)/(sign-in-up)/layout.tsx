@@ -25,15 +25,15 @@ export default async function AuthLayout({
     <>
       <AuthHeader />
 
-      <div className="container grid grid-cols-1 flex-1 min-h-[calc(100svh-144px)] gap-4 p-2 mx-auto lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="hidden w-full sm:px-8 lg:flex">
+      <main className="container grid min-h-[calc(100svh-9rem)] flex-1 grid-cols-1 items-center gap-8 py-4 sm:py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(26rem,0.95fr)] lg:gap-12 xl:gap-20">
+        <section className="hidden w-full lg:flex">
           <div className="flex flex-col justify-center w-full h-full max-w-180 mx-auto gap-4">
-            <TypographyH2 className="flex flex-col text-5xl leading-[0.92]">
+            <TypographyH2 className="flex flex-col text-4xl leading-[0.96] xl:text-6xl">
               Connect with the{" "}
               <span className="text-primary">global pack.</span>
             </TypographyH2>
 
-            <Card className="h-3/6 w-full max-w-155 -rotate-6 rounded-4xl border border-white/5 bg-background p-5 shadow-[0_28px_80px_rgba(0,0,0,0.52)]">
+            <Card className="h-[clamp(18rem,40vh,30rem)] w-full max-w-155 -rotate-3 rounded-4xl border border-white/5 bg-background p-4 shadow-[0_28px_80px_rgba(0,0,0,0.52)] xl:-rotate-6 xl:p-5">
               <CardContent className="relative h-full overflow-hidden rounded-4xl border-border bg-background p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)] rotate-3">
                 <div
                   className="absolute inset-0 opacity-90"
@@ -61,10 +61,10 @@ export default async function AuthLayout({
           </div>
         </section>
 
-        <section className="place-self-center w-full max-w-160 py-4 rounded-base shadow-2xl md:px-8 md:bg-secondary-dim">
-          <Card className="space-y-8">{children}</Card>
+        <section className="w-full max-w-xl place-self-center rounded-2xl bg-secondary-dim/80 p-4 shadow-2xl ring-1 ring-white/5 sm:p-7 lg:p-8">
+          <Card className="space-y-6 sm:space-y-8">{children}</Card>
         </section>
-      </div>
+      </main>
 
       <AuthFooter />
     </>

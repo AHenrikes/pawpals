@@ -38,27 +38,14 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const protectedPaths = [
-    "/",
-    "/store",
-    "/messages",
-    "/community",
-    "/pawpal-meet",
-    "/notifications",
-    "/settings",
-    "/@",
-    "/api",
-  ];
   const publicPaths = [
-    "/home",
-    "/about",
-    "/contact-us",
     "/sign-up",
     "/sign-in",
     "/forgot-password",
     "/confirm",
     "/sign-up-success",
     "/new-password",
+    "/error",
   ];
   const pathname = request.nextUrl.pathname;
 
@@ -67,11 +54,7 @@ export async function updateSession(request: NextRequest) {
     publicPaths.some((path) => pathname.startsWith(path)) ||
     /^\/api\/core\/fursonas\/available\/[^/]+$/.test(pathname);
 
-  if (
-    !isPublicApi &&
-    protectedPaths.some((path) => pathname.startsWith(path)) &&
-    !user
-  ) {
+  if (!isPublicApi && !user) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";

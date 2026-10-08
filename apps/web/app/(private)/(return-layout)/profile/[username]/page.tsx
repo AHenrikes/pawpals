@@ -4,7 +4,7 @@ import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { useUser } from "@/providers/UserProvider";
 import { useProfile } from "@/hooks/core/fursonas/useProfile";
-import { useFollow } from "@/hooks/social/followers/useFollow";
+import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
@@ -35,7 +35,8 @@ export default function ProfilePage() {
     isMutual,
     toggle,
     loading: followLoading,
-  } = useFollow(id);
+  } = useProfileFollow(id);
+
   const {
     posts,
     following,
@@ -65,10 +66,19 @@ export default function ProfilePage() {
     if (!isOwnProfile || !viewedFursona)
       throw new Error("Cannot edit other profiles");
     try {
-      await api.patch<{ fursona: FursonaTypes }>(
-        `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}`,
-        updates,
-      );
+      const { username, ...profileUpdates } = updates;
+      if (username && username !== viewedFursona.username) {
+        await api.post(
+          `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}/change-username`,
+          { new_username: username },
+        );
+      }
+      if (Object.keys(profileUpdates).length > 0) {
+        await api.patch<{ fursona: FursonaTypes }>(
+          `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}`,
+          profileUpdates,
+        );
+      }
       toast.success("Fursona updated");
       await refresh();
     } catch (err) {
@@ -88,7 +98,7 @@ export default function ProfilePage() {
           onClick={() => setIsEditOpen(true)}
         />
 
-        <div className="container relative -mt-15 mx-auto md:-mt-25 z-20">
+        <div className="container relative z-20 -mt-14 pb-10 sm:-mt-18 md:-mt-24">
           {/* Profile header */}
           <ProfileName
             fursona={viewedFursona}
@@ -108,8 +118,8 @@ export default function ProfilePage() {
             toggle={handleFollowToggle}
           />
 
-          <section className="flex gap-10">
-            <main className="flex-1 space-y-4 w-full">
+          <section className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
+            <main className="w-full min-w-0 flex-1 space-y-4">
               {/* About */}
               <ProfileAbout fursona={viewedFursona} />
 

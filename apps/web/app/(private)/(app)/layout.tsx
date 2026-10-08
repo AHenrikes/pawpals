@@ -1,5 +1,4 @@
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
-import { HomeTabsProvider } from "@/providers/HomeTabsProvider";
 import { requireUser } from "@/lib/auth/requireUser";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { redirect } from "next/navigation";
@@ -17,17 +16,14 @@ export default async function DashboardLayout({
 
   return (
     <div id="DashboardLayout">
-      <HomeTabsProvider>
-        <SidebarProvider className="flex flex-col">
-          <Header />
+      <SidebarProvider className="flex flex-col">
+        <Header />
 
-          <SidebarInset>
-            <MainNav />
-
-            {children}
-          </SidebarInset>
-        </SidebarProvider>
-      </HomeTabsProvider>
+        <SidebarInset>
+          <MainNav />
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   );
 }

@@ -32,9 +32,9 @@ export default function UpdatePassword() {
   );
 
   return (
-    <main className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
+    <main className="container flex min-h-svh items-center justify-center py-8 sm:py-12">
+      <Card className="w-full max-w-md rounded-2xl bg-secondary-dim/80 p-4 shadow-2xl ring-1 ring-white/5 sm:p-7">
+        <CardHeader className="space-y-2">
           <CardTitle className="text-2xl">Reset Your Password</CardTitle>
 
           <CardDescription>

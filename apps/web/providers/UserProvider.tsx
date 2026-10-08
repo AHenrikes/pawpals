@@ -16,7 +16,7 @@ import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { useRouter } from "next/navigation";
 import { type AccountTypes } from "@/types/account";
-import { type FursonaTypes } from "@/types/fursona";
+import type { FursonaTypes, FursonaWithBoolean } from "@/types/fursona";
 
 export type UserContextType = {
   account: AccountTypes | null;
@@ -61,6 +61,7 @@ export function UserProvider({
   }, []);
 
   const clearAuthState = useCallback(() => {
+    api.setActingFursona(null);
     queryClient.clear();
     setState({
       account: null,
@@ -85,7 +86,7 @@ export function UserProvider({
       setState({
         account: {
           ...res.account,
-          dob: new Date(res.account.dob),
+          dob: res.account.dob ? new Date(res.account.dob) : null,
           created_at: new Date(res.account.created_at),
           updated_at: new Date(res.account.updated_at),
         },
@@ -107,7 +108,6 @@ export function UserProvider({
       if (isMountedRef.current) setState({ error: toError(err) });
     } finally {
       if (refreshIdRef.current === id) setState({ loading: false });
-      setState({ loading: false });
     }
   }, [supabase, setState]);
 
@@ -123,7 +123,16 @@ export function UserProvider({
           return res.fursonas ?? [];
         },
       });
-      setState({ fursonas });
+      const storedActingId = api.getActingFursona();
+      const acting =
+        fursonas.find((fursona) => fursona.id === storedActingId) ??
+        fursonas.find(
+          (fursona) => (fursona as FursonaWithBoolean).is_default,
+        ) ??
+        fursonas[0] ??
+        null;
+      api.setActingFursona(acting?.id ?? null);
+      setState({ fursonas, currentFursona: acting });
     } catch (err) {
       setState({ error: toError(err) });
     }
@@ -182,15 +191,28 @@ export function UserProvider({
       try {
         setState({ loading: true, error: null });
 
-        const res = await api.patch<{ fursona: FursonaTypes }>(
-          `/api/core/fursonas/${fursonaId}`,
-          { is_current: true },
+        let ownedFursonas = fursonas;
+        let updated = ownedFursonas.find(
+          (fursona) => fursona.id === fursonaId,
         );
 
-        const updated = res.fursona;
+        // A newly created fursona is not yet present in this provider's state.
+        // Refresh ownership from the server before rejecting the switch.
+        if (!updated) {
+          const res = await api.get<{ fursonas: FursonaTypes[] }>(
+            "/api/core/fursonas",
+          );
+          ownedFursonas = res.fursonas ?? [];
+          updated = ownedFursonas.find(
+            (fursona) => fursona.id === fursonaId,
+          );
+        }
+
+        if (!updated) throw new Error("Fursona is not owned by this account.");
+        api.setActingFursona(fursonaId);
 
         // Update local fursonas list to reflect the current flag
-        const next = fursonas.map((f) => ({
+        const next = ownedFursonas.map((f) => ({
           ...f,
           is_current: f.id === updated.id,
         }));

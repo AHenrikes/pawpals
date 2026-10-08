@@ -53,7 +53,7 @@ export default function ForgotPasswordForm() {
     <>
       <AuthHeader />
 
-      <main className="relative flex min-h-[calc(100svh-144px)] items-center justify-center overflow-hidden p-6 md:p-10 select-none">
+      <main className="container relative flex min-h-[calc(100svh-9rem)] items-center justify-center overflow-hidden py-8 select-none sm:py-12">
         {/* Background Glow */}
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/2 top-24 h-125 w-125 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
@@ -71,7 +71,7 @@ export default function ForgotPasswordForm() {
                 transition={{ duration: 0.2 }}
               >
                 <Card className="border border-border rounded-sm shadow-2xl">
-                  <CardContent className="flex flex-col items-center px-6 py-10 text-center">
+                  <CardContent className="flex flex-col items-center px-4 py-8 text-center sm:px-6 sm:py-10">
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -119,14 +119,14 @@ export default function ForgotPasswordForm() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className="space-y-10">
+                <Card className="space-y-8 sm:space-y-10">
                   <CardHeader className="space-y-5 text-center">
                     <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                       <Mail className="h-6 w-6" />
                     </div>
 
                     <div className="space-y-2">
-                      <CardTitle className="text-3xl">
+                      <CardTitle className="text-2xl sm:text-3xl">
                         Forgot your password?
                       </CardTitle>
 

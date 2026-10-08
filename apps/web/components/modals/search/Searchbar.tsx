@@ -27,15 +27,16 @@ export function Searchbar() {
   return (
     <>
       <Button
-        size="icon-lg"
+        size="icon"
         variant="none"
         onClick={() => setOpen(true)}
+        aria-label="Search"
         className={cn(
           "flex justify-center items-center text-text-muted rounded-sm hover:text-text",
           `${open ? "hidden" : ""}`,
         )}
       >
-        <SearchIcon />
+        <SearchIcon aria-hidden="true" />
       </Button>
 
       <SearchDialog open={open} onClose={() => setOpen(false)} />

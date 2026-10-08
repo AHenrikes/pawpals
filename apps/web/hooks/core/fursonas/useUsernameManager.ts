@@ -9,22 +9,16 @@ interface UsernameAvailability {
 }
 
 /**
- * Hook for managing username operations (checking availability, changing username, etc.)
+ * Hook for checking username availability.
  *
  * Usage:
  * ```tsx
- * const { checkAvailability, changeUsername, getCooldown } = useUsernameManager();
+ * const { checkAvailability } = useUsernameManager();
  *
  * // Check if username is available
  * const result = await checkAvailability('newname');
  * if (result.available) {
  *   // Username is available
- * }
- *
- * // Change username (with cooldown enforcement)
- * const changeResult = await changeUsername(fursonaId, 'newname');
- * if (changeResult.success) {
- *   // Username changed
  * }
  * ```
  */
@@ -96,10 +90,6 @@ export function useUsernameManager() {
     },
     [],
   );
-
-  // TODO:
-  // - changeUsername: Enforce 30-day cooldown, validate, update username
-  // - getCooldown: Get cooldown status for a fursona
 
   return {
     checkAvailability,

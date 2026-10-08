@@ -30,7 +30,7 @@ export const GET = withUser(
       .schema("social")
       .from("v_fursona_stats")
       .select(
-        "follower_count, following_count, post_count, like_count, reputation",
+        "post_count, follower_count, following_count, like_count, reputation",
       )
       .eq("fursona_id", id)
       .single();
@@ -39,9 +39,9 @@ export const GET = withUser(
     if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
     return okPrivateRead({
+      post_count: data.post_count,
       follower_count: data.follower_count,
       following_count: data.following_count,
-      post_count: data.post_count,
       like_count: data.like_count,
       reputation_count: data.reputation,
     } satisfies ProfileCounts);

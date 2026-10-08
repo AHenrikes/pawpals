@@ -71,7 +71,7 @@ export default function SignUpSuccess() {
       ))}
 
       {/* Content */}
-      <div className="flex flex-col items-center gap-6 z-10">
+      <div className="z-10 flex w-full flex-col items-center gap-4 px-4 sm:gap-6">
         <motion.div
           initial={{ scale: 0, rotate: -30, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
@@ -93,8 +93,8 @@ export default function SignUpSuccess() {
           >
             <Image
               src="/images/app/party-popper.png"
-              width={160}
-              height={160}
+              width={128}
+              height={128}
               alt="Party popper"
               priority
             />
@@ -132,7 +132,7 @@ export default function SignUpSuccess() {
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="px-8 pb-8">
+            <CardContent className="px-4 pb-6 sm:px-8 sm:pb-8">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

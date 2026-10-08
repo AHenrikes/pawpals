@@ -1,6 +1,5 @@
-@import 'tailwindcss';
-@import 'tailwind-scrollbar-hide/v4';
-@import 'maplibre-gl/dist/maplibre-gl.css';
+@import "tailwindcss";
+@import "tailwind-scrollbar-hide/v4";
 @plugin 'tailwindcss-animate';
 
 @source '../../../packages/ui/src/**/*.{js,ts,jsx,tsx,mdx}';
@@ -46,7 +45,7 @@
   --color-text-confirmative: hsl(var(--text-confirmative));
   --color-text-muted: hsl(var(--text-muted));
 
-  --color-gradient-background: hsl(var(--gradient))
+  --color-gradient-background: hsl(var(--gradient));
 }
 
 /*
@@ -137,7 +136,11 @@
     --font-display: "Manrope", "Segoe UI", sans-serif;
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
 
-    --gradient-background: linear-gradient(135deg, hsl(var(--background)), hsl(var(--accent)));
+    --gradient-background: linear-gradient(
+      135deg,
+      hsl(var(--background)),
+      hsl(var(--accent))
+    );
   }
 
   .dark {
@@ -174,7 +177,11 @@
     --font-display: "Manrope", "Segoe UI", sans-serif;
     --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
 
-    --gradient-background: linear-gradient(45deg, hsl(var(--background)) 50%, hsl(var(--accent)));
+    --gradient-background: linear-gradient(
+      45deg,
+      hsl(var(--background)) 50%,
+      hsl(var(--accent))
+    );
   }
 
   * {
@@ -182,8 +189,15 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-dvh overflow-x-hidden bg-background text-foreground;
     font-family: var(--font-body);
+  }
+
+  button,
+  a,
+  input,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1,
@@ -202,7 +216,16 @@
 }
 
 @layer components {
-  html { scrollbar-width: none }
+  html {
+    scrollbar-width: none;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 3vw, 2rem);
+  }
 }
 
 [data-sonner-toast] {

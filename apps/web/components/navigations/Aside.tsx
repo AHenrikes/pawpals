@@ -11,14 +11,8 @@ import { useEffect, useState, useTransition } from "react";
 import {
   PlusIcon,
   LogOutIcon,
-  // FilmIcon,
   HomeIcon,
-  // StoreIcon,
-  // InboxIcon,
-  // UsersIcon,
   PawPrintIcon,
-  // BellRingIcon,
-  // SettingsIcon,
   ArrowDownIcon,
 } from "lucide-react";
 import {
@@ -44,7 +38,6 @@ import {
 import { CreateFursonaPanelModal } from "../modals/CreateFursonaPanelModal";
 import { createPortal } from "react-dom";
 import { Separator } from "@repo/ui/separator";
-import PostModal from "@/components/modals/CreatePostModal";
 
 type MainNavItem = {
   href: string;
@@ -54,13 +47,6 @@ type MainNavItem = {
 
 const mainNavItems: MainNavItem[] = [
   { href: AUTH_ROUTES.HOME, label: "Home", Icon: HomeIcon },
-  // { href: AUTH_ROUTES.REELS, label: "Reels", Icon: FilmIcon },
-  // { href: AUTH_ROUTES.STORE, label: "Store", Icon: StoreIcon },
-  // { href: AUTH_ROUTES.MESSAGES, label: "Inbox", Icon: InboxIcon },
-  // { href: AUTH_ROUTES.COMMUNITY, label: "Community", Icon: UsersIcon },
-  // { href: AUTH_ROUTES.PAWPALS_MEET, label: "Pawpals meet", Icon: PawPrintIcon },
-  // { href: AUTH_ROUTES.NOTIFICATION, label: "Notification", Icon: BellRingIcon },
-  // { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: SettingsIcon },
 ];
 
 export default function MainNav() {
@@ -77,7 +63,6 @@ export default function MainNav() {
   const { state, openMobile, isMobile } = useSidebar();
 
   const [, startTransition] = useTransition();
-  const [postOpen, setPostOpen] = useState(false);
   const [isFursonasOpen, setFursonasOpen] = useState(false);
   const [isCreateFursonaOpen, setCreateFursonaOpen] = useState(false);
 
@@ -115,7 +100,7 @@ export default function MainNav() {
   LockScreen((isMobile && openMobile) || isCreateFursonaOpen);
 
   return (
-    <Sidebar collapsible="icon" className="group/sidebar shrink-0">
+    <Sidebar collapsible="icon" className="group/sidebar ml-1 shrink-0">
       <SidebarGroup>
         {mainNavItems.map(({ href, label, Icon }) => {
           const isActive = pathname === href;
@@ -127,10 +112,10 @@ export default function MainNav() {
                 isActive={isActive}
                 className={cn("text-text-muted", isActive && "text-text")}
               >
-                <Link href={href} className="p-3" draggable="false">
+                <Link href={href} className="pr-9" draggable="false">
                   <Icon
                     className={cn(
-                      "h-6 w-6 shrink-0",
+                      "size-6 shrink-0",
                       !isActive && "opacity-60",
                     )}
                   />
@@ -263,28 +248,6 @@ export default function MainNav() {
 
         <SidebarGroup className="flex flex-col">
           <SidebarMenuButton
-            onClick={() => setPostOpen(true)}
-            className="bg-primary rounded-sm hover:bg-primary-dim"
-          >
-            <PlusIcon className="w-6 h-6 shrink-0" />
-
-            <AnimatePresence initial={false} mode="wait">
-              {!isCollapsed && (
-                <motion.span
-                  key="post-label"
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: "auto" }}
-                  exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="overflow-hidden whitespace-nowrap"
-                >
-                  POST
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </SidebarMenuButton>
-
-          <SidebarMenuButton
             onClick={() => signOut()}
             className="bg-destructive/40 rounded-sm hover:bg-destructive"
           >
@@ -308,8 +271,6 @@ export default function MainNav() {
         </SidebarGroup>
       </SidebarFooter>
 
-      <PostModal isOpen={postOpen} onClose={() => setPostOpen(false)} />
-
       {isCreateFursonaOpen &&
         createPortal(
           <AnimatePresence>
@@ -318,7 +279,7 @@ export default function MainNav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-              className="fixed inset-0 h-svh"
+              className="fixed inset-0 z-50 h-svh"
             >
               <CreateFursonaPanelModal
                 isOpen={isCreateFursonaOpen}

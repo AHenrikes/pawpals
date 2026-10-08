@@ -21,7 +21,7 @@ export default function ProfileBanner({
       initial={{ opacity: 0, scale: 0.99 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative flex justify-center items-end w-full h-64 md:h-[55dvh]"
+      className="relative flex h-56 w-full items-end justify-center sm:h-72 md:h-96 xl:h-112"
     >
       {fursona.banner_url && (
         <Image
@@ -30,14 +30,14 @@ export default function ProfileBanner({
           fill
           quality={85}
           loading="lazy"
-          className="object-cover pointer-events-none z-10"
+          className="pointer-events-none z-10 object-cover"
         />
       )}
 
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-background pointer-events-none z-20" />
 
       {isOwnProfile && (
-        <div className="container grid place-content-end px-2.5 py-4 z-50">
+        <div className="container z-30 grid place-content-end py-4">
           <Button
             size={"icon-sm"}
             variant={"outline"}

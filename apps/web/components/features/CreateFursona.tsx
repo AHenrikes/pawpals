@@ -29,7 +29,7 @@ export default function CreateFursona({
 
   const display_name = fursona.display_name.trim();
   const species = (fursona.species ?? "").trim();
-  const placeholder1 = `${display_name}_${Math.random().toString(36).substring(2, 5)}`;
+  const placeholder1 = display_name ? `${display_name}_paw` : "your_fursona";
   const placeholder2 = `${display_name}_${species}`;
   const hasSpecies = species.length > 0;
   const usernameSuggestion = hasSpecies ? placeholder2 : placeholder1;
@@ -104,7 +104,7 @@ export default function CreateFursona({
         </div>
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field>
           <FieldLabel htmlFor="fursona-species">Species</FieldLabel>
 
@@ -133,19 +133,6 @@ export default function CreateFursona({
           />
         </Field>
       </div>
-
-      {/* <Field className="hidden">
-        <FieldLabel htmlFor="fursona-bio">Bio</FieldLabel>
-
-        <Textarea
-          id="fursona-bio"
-          placeholder="Tell us about yourself..."
-          value={fursona.bio ?? ""}
-          onChange={(e) => onFursonaChange("bio", e.target.value)}
-          rows={4}
-          className="h-12 bg-secondary border-0 focus-visible:ring-foreground/10"
-        />
-      </Field> */}
     </FieldGroup>
   );
 }

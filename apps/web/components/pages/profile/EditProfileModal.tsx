@@ -145,21 +145,11 @@ export function EditProfileModal({
 
       const [avatarUrl, bannerUrl] = await Promise.all([
         avatarFile
-          ? uploadFursonaImage(
-              avatarFile,
-              account.id,
-              fursonaId,
-              "fursona-avatars",
-            )
+          ? uploadFursonaImage(avatarFile, fursonaId, "fursona-avatars")
           : Promise.resolve(null),
 
         bannerFile
-          ? uploadFursonaImage(
-              bannerFile,
-              account.id,
-              fursonaId,
-              "fursona-banners",
-            )
+          ? uploadFursonaImage(bannerFile, fursonaId, "fursona-banners")
           : Promise.resolve(null),
       ]);
 
@@ -173,7 +163,7 @@ export function EditProfileModal({
         ...(bannerUrl && { banner_url: bannerUrl }),
       });
 
-      router.push(`@${username}`);
+      router.push(`/@${username}`);
       await refresh();
       onClose();
     } catch (err) {
@@ -182,8 +172,6 @@ export function EditProfileModal({
       setLoading(false);
     }
   };
-
-  if (error) return null;
 
   return (
     <Dialog
@@ -195,7 +183,7 @@ export function EditProfileModal({
       }}
     >
       <DialogContent
-        className="w-full max-w-md rounded-lg bg-background p-6"
+        className="w-full max-w-lg rounded-xl bg-background p-4 sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <Button
@@ -307,10 +295,10 @@ export function EditProfileModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="species" variant={"muted"}>
-              Spieces
+              Species
             </Label>
 
             <Input
@@ -344,7 +332,9 @@ export function EditProfileModal({
           disabled={loading}
         />
 
-        <div className="flex gap-2">
+        {error && <p className="text-sm text-destructive">{error}</p>}
+
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <Button
             variant="outline"
             className="flex-1"

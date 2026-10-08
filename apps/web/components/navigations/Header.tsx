@@ -1,32 +1,28 @@
 import Link from "next/link";
 import { SidebarTrigger } from "@/providers/SidebarProvider";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
-import { DropdownMenu } from "@repo/ui/dropdown-menu";
 import { TypographyH1 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/modals/search/Searchbar";
-import HomeTabs from "./HomeTabs";
 import HeaderAvatar from "../avatar-icons/HeaderAvatar";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 w-full h-16 backdrop-blur-sm z-40">
-      <div className="flex h-full w-full items-center justify-between px-2 mx-auto md:px-6">
+    <header className="sticky top-0 z-40 h-16 w-full border-b border-border/20 bg-background/75 backdrop-blur-xl">
+      <div className="flex h-full items-center justify-between px-2 md:px-6">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
 
           <Link href={AUTH_ROUTES.HOME}>
-            <TypographyH1 className="text-text">PAWPALS</TypographyH1>
+            <TypographyH1 className="text-lg text-text sm:text-xl md:text-2xl">
+              PAWPALS
+            </TypographyH1>
           </Link>
         </div>
-
-        <HomeTabs />
 
         <div className="flex items-center gap-2">
           <Searchbar />
 
-          <DropdownMenu>
-            <HeaderAvatar />
-          </DropdownMenu>
+          <HeaderAvatar />
         </div>
       </div>
     </header>

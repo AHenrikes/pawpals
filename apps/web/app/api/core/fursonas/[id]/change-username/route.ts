@@ -122,8 +122,9 @@ export const POST = withUser(
         .json()
         .catch(() => ({}))) as ChangeUsernameRequest;
 
-      if (!body.new_username || typeof body.new_username !== "string")
-        badRequest("New username is required");
+      if (!body.new_username || typeof body.new_username !== "string") {
+        return badRequest("New username is required");
+      }
 
       const newUsername = body.new_username.trim().toLowerCase();
 
@@ -134,11 +135,11 @@ export const POST = withUser(
         p_account_id: account.id,
       });
 
-      if (error) serverError(error.message);
+      if (error) return serverError(error.message);
 
       const result = data as ChangeUsernameResponse;
 
-      if (!result.success) badRequest("Username change failed");
+      if (!result.success) return badRequest("Username change failed");
 
       return ok(result);
     } catch (error) {

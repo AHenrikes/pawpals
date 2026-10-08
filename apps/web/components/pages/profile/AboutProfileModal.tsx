@@ -1,21 +1,12 @@
 "use client";
 
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@repo/ui/drawer";
-import { motion } from "framer-motion";
+import { Drawer, DrawerContent } from "@repo/ui/drawer";
 import { type FursonaProfile } from "@/types/fursona";
 import {
   TypographyLead,
   TypographyP,
   TypographySmall,
-  TypographyXSmall,
 } from "@repo/ui/typography";
-import { Label } from "@repo/ui/label";
 import { Separator } from "@repo/ui/separator";
 
 interface AboutProfileModalProps {
@@ -36,8 +27,8 @@ export function AboutProfileModal({
         if (!open) onClose();
       }}
     >
-      <DrawerContent className="w-full h-[64dvh] px-4 bg-background">
-        <div className="container space-y-4 pb-4 mx-auto overflow-y-scroll scrollbar-hide">
+      <DrawerContent className="h-[min(75dvh,44rem)] w-full bg-background px-4 sm:px-6">
+        <div className="mx-auto w-full max-w-3xl space-y-4 overflow-y-auto pb-6 scrollbar-hide">
           {fursona.bio ? (
             <>
               <div className="space-y-4">

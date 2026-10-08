@@ -26,7 +26,7 @@ export async function requireUser() {
   const { data: account, error: accountError } = await supabase
     .schema("core")
     .from("accounts")
-    .select("id, firstname, lastname, email, dob, is_active, is_suspended")
+    .select("id, status, platform_role, default_fursona_id")
     .eq("user_id", user.id)
     .single();
 
@@ -54,7 +54,7 @@ export async function requireUser() {
     };
   }
 
-  if (!account.is_active || account.is_suspended) {
+  if (account.status !== "active") {
     return {
       supabase,
       user: null,

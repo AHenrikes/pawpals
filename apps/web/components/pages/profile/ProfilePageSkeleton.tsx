@@ -7,21 +7,21 @@ export default function ProfilePageSkeleton() {
       <motion.section
         key="banner-skeleton"
         exit={{ opacity: 0 }}
-        className="relative w-full h-64 md:h-[55dvh]"
+        className="relative h-56 w-full sm:h-72 md:h-96 xl:h-[28rem]"
       >
         <Skeleton className="h-full" />
       </motion.section>
 
-      <section className="px-2 py-4 sm:container sm:mx-auto md:px-4">
-        <div className="relative flex-1 -mt-15.5 space-y-4 sm:-mt-20 md:-mt-24">
+      <section className="container py-4">
+        <div className="relative -mt-18 flex-1 space-y-4 md:-mt-24">
           <motion.div
             key="avatar-skeleton"
             exit={{ opacity: 0 }}
-            className="flex w-full min-w-0 items-end gap-2"
+            className="flex w-full min-w-0 items-end gap-3 sm:gap-4"
           >
-            <Skeleton className="animate-none h-28 w-28 rounded-full border-4 border-background shadow-lg shrink-0 md:h-44 md:w-44" />
+            <Skeleton className="h-24 w-24 shrink-0 animate-none rounded-full border-4 border-background shadow-lg sm:h-32 sm:w-32 md:h-40 md:w-40" />
 
-            <div className="flex-1 min-w-0 space-y-1 px-2 md:mb-5">
+            <div className="min-w-0 flex-1 space-y-1 pb-2 sm:pb-4">
               <div className="min-w-0 space-y-0.5">
                 <Skeleton className="h-9 w-52 rounded-xs" />
 
@@ -39,9 +39,12 @@ export default function ProfilePageSkeleton() {
               exit={{ opacity: 0 }}
               className="w-full space-y-6"
             >
-              <div className="flex items-center gap-4">
+              <div className="grid grid-cols-4 gap-2 sm:flex sm:items-center sm:gap-4">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="flex items-center w-20 gap-2">
+                  <div
+                    key={i}
+                    className="flex min-w-16 flex-col items-center gap-1 sm:w-20 sm:flex-row sm:gap-2"
+                  >
                     <Skeleton className="h-7 w-10 rounded-full" />
                     <Skeleton className="h-4 w-full rounded-xs" />
                   </div>
@@ -51,7 +54,7 @@ export default function ProfilePageSkeleton() {
               <Skeleton className="h-16 w-full rounded-sm" />
             </motion.div>
 
-            <aside className="hidden flex-col w-125 max-w-[320px] space-y-6 gap-5 lg:block xl:max-w-full">
+            <aside className="hidden w-72 shrink-0 flex-col gap-5 space-y-6 lg:block xl:w-80">
               <Skeleton className="h-16 w-full rounded-sm" />
               <Skeleton className="h-full w-full rounded-sm" />
             </aside>

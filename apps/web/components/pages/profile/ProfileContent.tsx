@@ -12,9 +12,7 @@ import {
   LayoutGridIcon,
   Repeat2Icon,
 } from "lucide-react";
-import { ProfileGallery } from "./Gallery";
 import { type FursonaProfile } from "@/types/fursona";
-import ProfilePostCards from "./ProfilePostCards";
 
 const profileNav = [
   { label: "GALLERY", key: "gallery", icon: LayoutGridIcon },
@@ -46,11 +44,10 @@ export default function ProfileContent({
   };
 
   return (
-    <SidebarProvider>
-      <div className="container flex flex-col pt-2 mx-auto">
+    <SidebarProvider className="flex min-w-0 flex-col pt-2">
         {/* Nav */}
-        <nav className="px-3 pb-4 border-b border-muted">
-          <ul className="flex justify-between sm:justify-start sm:gap-2 md:gap-4">
+        <nav className="overflow-x-auto border-b border-muted pb-3 scrollbar-hide">
+          <ul className="flex min-w-max justify-between sm:gap-12 md:justify-start md:gap-3">
             {profileNav.map(({ key, label, icon }) => {
               const Icon = icon;
 
@@ -60,14 +57,14 @@ export default function ProfileContent({
                   variant="ghost"
                   onClick={() => handleNavClick(key)}
                   className={cn(
-                    "p-4 text-text-muted rounded-sm",
+                    "h-10 rounded-sm px-3 text-text-muted sm:px-4",
                     content === key
                       ? "text-text bg-primary hover:bg-primary-dim"
                       : null,
                   )}
                 >
                   {Icon && <Icon className="size-5" />}
-                  <span className="hidden sm:block">{label}</span>
+                  <span className="hidden text-xs md:block sm:text-sm">{label}</span>
                 </Button>
               );
             })}
@@ -83,20 +80,19 @@ export default function ProfileContent({
             animate="center"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="grow space-y-4 min-h-[calc(100dvh-80px)] py-2 lg:overflow-y-auto scrollbar-hide md:py-4"
+            className="min-h-48 grow space-y-4 py-4 sm:min-h-64"
           >
-            {content === "gallery" && <ProfileGallery username={fursona.id} />}
+            {content === "gallery" && <div>Gallery coming soon</div>}
 
-            {content === "post" && <ProfilePostCards fursonaId={fursona.id} />}
+            {content === "post" && <div>Post coming soon</div>}
 
-            {content === "archive" && <div>Archive coming soon</div>}
+            {content === "repost" && <div>Repost coming soon</div>}
 
-            {content === "likes" && <div>Likes coming soon</div>}
+            {content === "bookmark" && <div>Bookmarks coming soon</div>}
 
-            {content === "about" && <div>Likes coming soon</div>}
+            {content === "like" && <div>Likes coming soon</div>}
           </motion.section>
         </AnimatePresence>
-      </div>
     </SidebarProvider>
   );
 }

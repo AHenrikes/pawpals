@@ -5,9 +5,6 @@ export const ERROR_MESSAGES = {
   // Form validation
   DISPLAY_NAME_REQUIRED: "Display name is required",
   USERNAME_REQUIRED: "Username is required",
-  BIO_REQUIRED: "Bio is required",
-  SPECIES_REQUIRED: "Species is required",
-  PRONOUNS_REQUIRED: "Pronouns are required",
   WEAK_PASSWORD: "Password should be at least 6 characters",
 
   // Search
@@ -24,8 +21,6 @@ export const ERROR_MESSAGES = {
   // Social actions
   FOLLOW_FAILED: "Failed to follow user",
   UNFOLLOW_FAILED: "Failed to unfollow user",
-  LIKE_FAILED: "Failed to like fursona",
-  UNLIKE_FAILED: "Failed to unlike fursona",
 
   // Fursona management
   FURSONA_NOT_IDENTIFIED: "Failed to identify fursona",
@@ -41,13 +36,6 @@ export const ERROR_MESSAGES = {
   FURSONA_DELETE_FAILED: "Failed to delete fursona",
   FURSONA_SWITCH_FAILED: "Failed to switch fursona",
   MAX_FURSONAS_REACHED: "Maximum number of fursonas reached",
-
-  // Post
-  POST_NOT_FOUND: "Failed to fetch post",
-  POST_ERROR: "Failed to post content",
-  INVALID_POST_TYPE: "Invalid post type",
-  INVALID_VISIBILITY_TYPE: "Invalid visibility type",
-  MEDIA_REQUIRED: "Atleest one media is required",
 
   // Upload
   UPLOAD_FAILED: "Upload failed",

@@ -1,0 +1,1 @@
+grant select on social.v_fursona_stats to authenticated;

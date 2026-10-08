@@ -4,15 +4,15 @@ export default function ProfileAside({
   isFollowing,
 }: Readonly<{ isFollowing: boolean }>) {
   return (
-    <aside className="sticky top-6 hidden h-full max-h-[clac(100dvh-64px)] max-w-[320px] space-y-6 lg:block xl:max-w-full">
-      <section className="flex flex-col gap-16 xl:gap-6">
-        <div className="relative flex flex-col h-10 gap-6 xl:flex-row">
+    <aside className="sticky top-20 hidden h-fit w-80 shrink-0 space-y-6 lg:block">
+      <section className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 rounded-xl border border-muted/30 bg-secondary-dim/60 p-4">
           <span className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-primary shadow-lg shadow-red-500/70" />
             <TypographyLead>Reputation</TypographyLead>
           </span>
 
-          <div className="relative bottom-2.5 flex items-center gap-6">
+          <div className="flex items-center justify-between gap-2">
             <span className="flex flex-col items-center gap-2">
               <TypographyXSmall className="text-text-muted">
                 New User
@@ -36,26 +36,6 @@ export default function ProfileAside({
           </div>
         </div>
 
-        {/* <div className="flex h-10 items-center gap-10">
-          <span className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-primary shadow-lg shadow-red-500/70" />
-            <TypographyLead>Member since :</TypographyLead>
-          </span>
-
-          <TypographySmall className="text-text-muted">{new Date(fursona.created_at).toLocaleDateString()}</TypographySmall>
-        </div> */}
-
-        {/* {!isOwn && isMutual && isFollowing && mutualSince && (
-          <div className="flex h-10 items-center gap-10">
-            <span className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-primary shadow-lg shadow-red-500/70" />
-              <TypographyLead>Mutual since :</TypographyLead>
-            </span>
-
-            <TypographySmall className="text-text-muted">{new Date(mutualSince).toLocaleDateString()}</TypographySmall>
-          </div>
-        )} */}
-
         <div className="space-y-6 p-4 w-full border border-muted/30">
           <TypographyLead>Socials</TypographyLead>
 
@@ -69,21 +49,6 @@ export default function ProfileAside({
       </section>
 
       <section className="h-full space-y-6">
-        {/* <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">
-          <TypographyLead>Whishlist</TypographyLead>
-
-          <div className="space-y-6 max-h-56 overflow-auto scrollbar-hide">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={`user-col1-${i}`}
-                className="flex items-center gap-2 animate-pulse"
-              >
-                <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
-                <div className="h-4 w-full md:h-10 bg-muted rounded" />
-              </div>
-            ))}
-          </div>
-        </div> */}
 
         {!isFollowing && (
           <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">

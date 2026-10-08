@@ -76,11 +76,11 @@ export default function ProfileName({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-        className="flex w-full min-w-0 items-end gap-2"
+        className="flex w-full min-w-0 items-end gap-3 sm:gap-4"
       >
         <Avatar
           size="lg"
-          className="h-28 w-28 md:h-44 md:w-44 border-4 border-background shadow-lg shrink-0"
+          className="h-24 w-24 shrink-0 border-4 border-background shadow-lg sm:h-32 sm:w-32 md:h-40 md:w-40"
         >
           <AvatarImage
             src={fursona.avatar_url ?? undefined}
@@ -89,13 +89,13 @@ export default function ProfileName({
           <AvatarFallback>{getInitials(fursona.display_name)}</AvatarFallback>
         </Avatar>
 
-        <div className="flex-1 min-w-0 space-y-1 px-2 md:mb-5">
+        <div className="min-w-0 flex-1 space-y-2 pb-1 sm:pb-3 md:mb-2">
           <div className="min-w-0">
-            <TypographyH1 className="truncate text-xl sm:text-2xl">
+            <TypographyH1 className="truncate text-xl sm:text-2xl lg:text-3xl">
               {fursona.display_name}
             </TypographyH1>
 
-            <span className="flex min-w-0 items-center gap-1.5">
+            <span className="flex min-w-0 flex-wrap items-center gap-1.5">
               <TypographyP className="min-w-0 truncate text-text-muted">
                 @{fursona.username}
               </TypographyP>
@@ -106,7 +106,7 @@ export default function ProfileName({
             </span>
           </div>
 
-          <div className="flex min-w-0 items-center gap-4">
+          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4">
             <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto scrollbar-hide">
               {new Array(1, 2, 3, 4, 5, 6).map((item) => (
                 <div
@@ -132,7 +132,7 @@ export default function ProfileName({
                   variant={isFollowing ? "outline" : "default"}
                   onClick={() => toggle()}
                   disabled={followLoading}
-                  className="shrink-0 rounded-full px-2 md:px-4"
+                  className="shrink-0 rounded-full px-3 sm:px-4"
                 >
                   {followLoading ? (
                     <Loader2Icon className="h-4 w-4 animate-spin" />
@@ -157,7 +157,7 @@ export default function ProfileName({
       {/* Numbers */}
       <motion.div
         key="counts"
-        className="flex gap-4 px-4 py-4 overflow-y-scroll scrollbar-hide"
+        className="grid grid-cols-4 gap-2 overflow-x-auto py-4 scrollbar-hide sm:flex sm:px-4 sm:gap-6 sm:pb-8"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
@@ -168,12 +168,15 @@ export default function ProfileName({
           { count: followingCount, label: "Following" },
           { count: likesCount, label: "Likes" },
         ].map(({ count, label }) => (
-          <div key={label} className="flex items-center gap-2">
-            <TypographyLead className="text-text-muted font-bold text-lg sm:text-xl">
+          <div
+            key={label}
+            className="flex min-w-16 flex-col items-center gap-1.5 rounded-base bg-secondary-dim/40 px-2 py-2 sm:min-w-0 sm:flex-row sm:bg-transparent sm:p-0"
+          >
+            <TypographyLead className="text-base font-bold text-text sm:text-xl">
               {formatNumbers(count)}
             </TypographyLead>
 
-            <TypographyXSmall className="text-text-muted text-xs">
+            <TypographyXSmall className="text-[0.65rem] text-text-muted sm:text-xs">
               {label}
             </TypographyXSmall>
           </div>

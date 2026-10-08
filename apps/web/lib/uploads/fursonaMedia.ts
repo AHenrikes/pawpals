@@ -39,7 +39,6 @@ const ALL_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp"];
 
 export async function uploadFursonaImage(
   file: File,
-  accountId: string,
   fursonaId: string,
   bucket: Bucket,
 ): Promise<string> {
@@ -64,8 +63,7 @@ export async function uploadFursonaImage(
   if (!ext || !ALL_EXTENSIONS.includes(ext)) {
     throw new Error("Invalid file extension");
   }
-  // Match migration path structure: {account_id}/{fursona_id}/{file_id}.{ext}
-  const path = `${accountId}/${fursonaId}/${fileId}.${ext}`;
+  const path = `${fursonaId}/${fileId}.${ext}`;
 
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: "31536000",
@@ -73,15 +71,6 @@ export async function uploadFursonaImage(
   });
 
   if (error) throw error;
-
-  // Clean up old files only after successful upload
-  const oldPaths = ALL_EXTENSIONS.filter((e) => e !== ext).map(
-    (e) => `${accountId}/${fursonaId}/${fursonaId}.${e}`,
-  ); // or query fursona_media for the real old path
-
-  await Promise.allSettled(
-    oldPaths.map((p) => supabase.storage.from(bucket).remove([p])),
-  );
 
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
 

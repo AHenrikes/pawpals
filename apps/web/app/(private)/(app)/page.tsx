@@ -1,58 +1,33 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useHomeTabs } from "@/providers/HomeTabsProvider";
-import PostCards from "./post/page";
+import Link from "next/link";
+import { useUser } from "@/providers/UserProvider";
+import { Searchbar } from "@/components/modals/search/Searchbar";
+import { Button } from "@repo/ui/button";
+import { TypographyH1, TypographyP } from "@repo/ui/typography";
 
 export default function Dashboard() {
-  const { content, direction } = useHomeTabs();
-
-  const slideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
-  };
-
-  // window.addEventListener("unhandledrejection", (event) => {
-  //   console.error("reason:", event.reason);
-  //   console.error("stack:", event.reason?.stack);
-  //   console.error("full:", JSON.stringify(event.reason, Object.getOwnPropertyNames(event.reason ?? {})));
-  // });
+  const { currentFursona } = useUser();
 
   return (
-    <div className="flex flex-1 w-full py-4 md:pr-4">
-      <AnimatePresence mode="popLayout" custom={direction}>
-        <motion.section
-          key={content}
-          custom={direction}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="w-full"
-        >
-          {content === "posts" && <PostCards />}
+    <main className="container flex min-h-[calc(100svh-4rem)] max-w-4xl flex-col items-center justify-center gap-6 py-12 text-center sm:gap-8">
+      <div className="space-y-2">
+        <TypographyH1 className="text-3xl sm:text-4xl lg:text-5xl">
+          Welcome{currentFursona ? `, ${currentFursona.display_name}` : ""}
+        </TypographyH1>
+        <TypographyP className="text-text-muted">
+          Find other fursonas, build your profile, and grow your circle.
+        </TypographyP>
+      </div>
 
-          {content === "reels" && (
-            <div className="grid w-full place-content-center">
-              Reels coming soon
-            </div>
-          )}
-
-          {content === "following" && (
-            <div className="grid w-full place-content-center">
-              Following coming soon
-            </div>
-          )}
-        </motion.section>
-      </AnimatePresence>
-
-      <aside className="hidden sticky top-20 flex-col w-full max-w-100 h-[calc(100svh-96px)] gap-5 xl:flex">
-        <div className="bg-secondary animate-pulse w-full h-96 rounded-md shadow-lg" />
-
-        <div className="bg-secondary animate-pulse w-full h-full rounded-md shadow-lg" />
-      </aside>
-    </div>
+      <div className="flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
+        <Searchbar />
+        {currentFursona && (
+          <Button asChild className="w-full sm:w-auto">
+            <Link href={`/@${currentFursona.username}`}>View my profile</Link>
+          </Button>
+        )}
+      </div>
+    </main>
   );
 }

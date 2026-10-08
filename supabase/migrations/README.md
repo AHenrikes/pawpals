@@ -1,350 +1,47 @@
-# Pawpals Database Migrations
+# Pawpals database baseline
 
-Supabase migrations for the Pawpals application. They set up schemas, tables, policies, functions, triggers, storage, and direct messages.
+This directory is the active, from-scratch database history for a new Supabase project.
+Only the current milestone is represented here: authentication, accounts, fursona
+profiles, profile discovery, and follows.
 
-## Migration Files
+## Migration order
 
-### 1. `20260606000001_core_schema.sql`
+1. `20261008000001_core.sql` creates accounts, private account details,
+   fursonas, ownership helpers, transactional fursona RPCs, and core RLS.
+2. `20261008000002_social.sql` creates profile visibility helpers and fursona-scoped follows.
+3. `20261008000004_api_and_storage.sql` creates public RPC wrappers and avatar/banner Storage policies.
+4. `20261008000005_profile_contract.sql` adds username lifecycle, search, counts, and atomic profile deletion.
 
-**Core account and fursona management**
+Only `core`, `social`, and `public` are exposed through the Data API. Sensitive
+account details remain in the unexposed `private` schema.
 
-**Tables:**
+## Acting fursona
 
-- `core.accounts` - User account profiles linked to Supabase auth
-- `core.fursonas` - Fursona profiles with media URLs
+`core.accounts.default_fursona_id` is only a fallback. The acting identity is
+device/session state, not a global database flag. Requests that act as a fursona
+must send its UUID explicitly to an RPC. Reads using RLS for follower-only data may
+send `x-acting-fursona-id`; ownership is still verified by the database.
 
-**Constraints:**
+## Media paths
 
-- Maximum 3 fursonas per account
-- Minimum 1 fursona per account (can't delete all)
-- Only one current fursona per account
-- Only one default fursona per account
+- Avatar/banner object names: `{fursona_id}/{file_name}`
+  The avatar and banner buckets are public product assets. Rows store their public URLs.
 
-**Functions & Triggers:**
-
-- `create_initial_fursona()` - Auto-creates default fursona on account creation
-- `ensure_minimum_fursona()` - Prevents deletion of last fursona
-- `handle_fursona_update()` - Auto-switches to default if current is deactivated
-- `update_account_timestamp()` - Auto-updates account timestamp on changes
-
-**RLS Policies:**
-
-- Users can only view/modify their own accounts
-- Users can view/create fursonas for their accounts
-- Public can view active fursonas
-
----
-
-### 2. `20260606000002_social_schema.sql`
-
-**Social interactions and community features**
-
-**Tables:**
-
-- `social.followers` - Follow relationships between fursonas
-- `social.likes` - Likes on fursonas
-- `social.posts` - Content/posts by fursonas
-- `social.reports` - Moderation reports
-
-**Functions & Triggers:**
-
-- `update_follower_count()` - Automatically updates reputation on follow/unfollow
-- `update_post_like_count()` - Tracks likes on posts
-- `update_post_timestamp()` - Auto-updates post modification time
-
-**RLS Policies:**
-
-- Public can view published posts and active fursonas
-- Users can only manage their own follows, likes, and posts
-- Users can report inappropriate content
-- Moderation team can review reports (future-proof)
-
-**Constraints:**
-
-- No self-follows or self-likes
-- Unique follow/like relationships
-- Valid report reasons
-
----
-
-### 3. `20260606000003_media_schema.sql`
-
-Historical draft retained for migration history. Its definitions were consolidated into the social schema and storage policy migration; it intentionally performs no changes.
-
-The active media tables and policies are documented in migrations 2 and 4.
-
--->
-
-### 4. `20260606000004_init_storage_policies.sql`
-
-**Supabase Storage bucket configuration and policies**
-
-**Buckets:**
-
-1. `fursona-avatars` (5MB, public)
-   - JPEG, PNG, WebP
-   - Public read access
-
-2. `fursona-banners` (10MB, public)
-   - JPEG, PNG, WebP, GIF
-   - Public read access
-
-3. `post-media` (20MB, public)
-   - Images and videos
-   - Public read access
-
-**Path Structure:**
-
-```
-{bucket}/{account_id}/{fursona_id}/{file_id}.{extension}
-```
-
-**Policies:**
-
-- Users can only upload to their own folder
-- Public/authenticated read access as appropriate
-- Users can update and delete own files
-
----
-
-### 5. `20260606000005_utility_views_and_functions.sql`
-
-**Helper views and functions for common queries**
-
-**Functions:**
-
-- `get_user_profile()` - Get current user with active fursona
-- `get_fursona_profile(username)` - Get detailed fursona profile with stats
-- `search_fursonas(search_term)` - Search by username/display name
-- `switch_current_fursona(id)` - Switch active fursona
-- `get_user_fursonas()` - Get all user's fursonas
-- `get_follow_status(id1, id2)` - Check follow relationship
-- `delete_user_account()` - Delete account with cascade
-
-**Views:**
-
-- `v_accounts_with_stats` - Active accounts with fursona counts
-- `v_fursona_stats` - Fursona profiles with social stats
-- `v_top_fursonas` - Top 100 fursonas by reputation
-
----
-
-## Running Migrations Locally
-
-### Prerequisites
+## Applying to a new project
 
 ```bash
-npm install -g supabase
+supabase db reset --local
+supabase db push
 ```
 
-### Initialize Local Supabase
-
-```bash
-cd /path/to/pawpals
-supabase init
-```
-
-### Start Local Supabase
-
-```bash
-supabase start
-```
-
-### Apply Migrations
-
-Migrations in `supabase/migrations/` are automatically applied when `supabase start` runs.
-
-To manually apply a specific migration:
-
-```bash
-supabase migration up
-```
-
-### Reset Database
-
-```bash
-supabase db reset
-```
-
----
-
-## Key Constraints & Business Rules
-
-### Account Management
-
-- ✅ Account linked to Supabase auth via `user_id`
-- ✅ Account must have at least 1 active fursona
-- ✅ Default fursona created automatically on signup
-- ✅ Default fursona username generated from email
-
-### Fursona Management
-
-- ✅ Maximum 3 fursonas per account
-- ✅ Can't delete the last fursona
-- ✅ One default fursona (for account recovery)
-- ✅ One current fursona (active profile)
-- ✅ If current is deactivated, switches to default
-- ✅ Auto-updates timestamp on changes
-
-### Media Management
-
-- ✅ Avatar/banner URLs stored in fursona record
-- ✅ Default system media on fursona creation
-- ✅ Only one primary media per type per fursona
-- ✅ Updates fursona URL when primary changes
-- ✅ Storage bucket paths: `{account_id}/{fursona_id}/{file_id}`
-
-### Social Features
-
-- ✅ No self-follows or self-likes
-- ✅ Reputation updated on follow/unfollow
-- ✅ Public posts visible to all
-- ✅ Post media is publicly readable through the `post-media` bucket
-- ✅ Report system for moderation
-
-### Security
-
-- ✅ Row-level security on all tables
-- ✅ Users can only see their own data
-- ✅ Storage policies enforce user boundaries
-- ✅ Service role for admin operations
-
----
-
-## Database Architecture
-
-```
-Schema: core
-├── accounts (user_id from auth.users)
-└── fursonas (account_id FK, max 3, min 1)
-│
-Schema: social
-├── followers (fursona → fursona)
-├── likes (fursona → fursona)
-├── posts (fursona → posts)
-│   └── post_media (uploaded post media)
-└── reports (fursona/post → moderation)
-```
-
----
-
-## Default Values
-
-### Fursona Creation
-
-```sql
--- Default avatar (DiceBear API with seed = user_id)
-avatar_url: '/apps/web/public/Avatar.jpg'
-
--- Default banner
-banner_url: '/apps/web/public/Banner.jpg'
-
--- Default bio
-bio: 'Welcome to Pawpals!'
-```
-
----
-
-## Common Queries
-
-### Get current user's profile
-
-```sql
-SELECT * FROM core.get_user_profile();
-```
-
-### Get fursona with stats
-
-```sql
-SELECT * FROM core.get_fursona_profile('username');
-```
-
-### Search fursonas
-
-```sql
-SELECT * FROM core.search_fursonas('search_term');
-```
-
-### Switch active fursona
-
-```sql
-SELECT core.switch_current_fursona('fursona_id'::uuid);
-```
-
-### Get user's fursonas
-
-```sql
-SELECT * FROM core.get_user_fursonas();
-```
-
-### Check follow status
-
-```sql
-SELECT * FROM social.get_follow_status(follower_id, following_id);
-```
-
----
-
-## Deploying to Production
-
-1. **Backup production database**
-
-   ```bash
-   supabase db push
-   ```
-
-2. **Test migrations locally first**
-
-   ```bash
-   supabase db reset
-   supabase migration up
-   ```
-
-3. **Push to Supabase Cloud**
-
-   ```bash
-   supabase link --project-ref {project-ref}
-   supabase db push
-   ```
-
-4. **Verify migrations applied**
-   ```bash
-   supabase migration list --linked
-   ```
-
----
-
-## Troubleshooting
-
-### Constraint violation on fursona delete
-
-**Issue**: "An account must have at least one active fursona"  
-**Solution**: Ensure accounts always have at least one active fursona before deletion
-
-### Max fursonas constraint
-
-**Issue**: "Check constraint violated on fursonas insert"  
-**Solution**: Check that account has < 3 active fursonas
-
-### Storage policy issues
-
-**Issue**: "401 Unauthorized" on file upload  
-**Solution**: Ensure file path matches user UUID format and check bucket policies
-
-### RLS policy denials
-
-**Issue**: "new row violates row-level security policy"  
-**Solution**: Verify `auth.uid()` matches user_id in accounts table
-
----
-
-## Future Enhancements
-
-- [ ] Message/DM system with encryption
-- [ ] Comment system on posts
-- [ ] Hashtag search and trending
-- [ ] Media CDN optimization
-- [ ] Moderation dashboard
-- [ ] Admin analytics
-- [ ] Batch operations
-- [ ] Audit logging
+`db push` applies migrations; it is not a backup command. For an existing project,
+create a backup and cutover plan instead of treating this baseline as additive.
+
+## Required tests before production
+
+- concurrent fifth-fursona creation
+- suspended-account writes through direct Data API calls
+- acting with another account's fursona ID
+- public, follower-only, and private profile reads
+- follow request and unfollow behavior
+- username uniqueness and cooldown enforcement

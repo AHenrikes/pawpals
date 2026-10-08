@@ -13,6 +13,7 @@ import {
   isValidElement,
   cloneElement,
 } from "react";
+import { Button } from "@repo/ui/button";
 
 type SidebarContextValue = {
   state: "expanded" | "collapsed";
@@ -26,9 +27,9 @@ type SidebarContextValue = {
 
 const SidebarContext = createContext<SidebarContextValue | null>(null);
 
-const SIDEBAR_WIDTH = "25rem";
-const SIDEBAR_WIDTH_ICON = "6rem";
-const SIDEBAR_WIDTH_MOBILE = "20rem";
+const SIDEBAR_WIDTH = "20rem";
+const SIDEBAR_WIDTH_ICON = "4.75rem";
+const SIDEBAR_WIDTH_MOBILE = "min(20rem, calc(100vw - 1rem))";
 
 export function useSidebar() {
   const context = useContext(SidebarContext);
@@ -160,7 +161,7 @@ export function Sidebar({
         animate={{ width: isCollapsed ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "sticky top-16 hidden pl-5 pr-6 py-4 h-[calc(100svh-64px)] shrink-0 bg-surface-container-low/80 overflow-hidden md:flex",
+          "sticky top-16 hidden h-[calc(100svh-64px)] shrink-0 overflow-hidden bg-surface-container-low/80 px-3 py-4 backdrop-blur-xl md:flex lg:px-4",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
           variant === "floating" && "m-2 rounded-2xl border",
           className,
@@ -183,14 +184,12 @@ export function Sidebar({
         data-side={side}
         data-variant={variant}
         data-state={openMobile ? "expanded" : "collapsed"}
-        animate={{ width: isCollapsed ? "w-(--sidebar-width-mobile)" : "" }}
-        transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "group/sidebar fixed top-16 py-4 px-2 h-[calc(100svh-64px)] z-40 w-(--sidebar-width-mobile) border-r border-border bg-background transition-transform md:hidden",
+          "group/sidebar fixed top-16 z-50 h-[calc(100svh-64px)] w-(--sidebar-width-mobile) border-r border-border bg-background/95 p-2 shadow-2xl backdrop-blur-xl transition-transform duration-200 md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-full flex-col rounded-xl bg-surface-container-highest/60">
+        <div className="flex h-full flex-col rounded-xl bg-secondary-dim/60 p-2">
           {children}
         </div>
       </motion.aside>
@@ -370,7 +369,9 @@ export function SidebarTrigger({
   const { toggleSidebar } = useSidebar();
 
   return (
-    <button
+    <Button
+      size={"icon"}
+      variant={"none"}
       type="button"
       className={cn(
         "inline-flex h-10 w-10 items-center justify-center rounded-full text-text cursor-pointer",
@@ -379,10 +380,9 @@ export function SidebarTrigger({
       onClick={toggleSidebar}
       {...props}
     >
-      {/* <PanelLeft className="h-5 w-5" /> */}
-      <PawPrint className="h-6 w-6 text-primary" />
+      <PawPrint className="text-primary" aria-hidden="true" />
       <span className="sr-only">Toggle Sidebar</span>
-    </button>
+    </Button>
   );
 }
 

@@ -25,6 +25,7 @@ export default function AuthCardFooter({
     <>
       {step === "account" ? (
         <Button
+          size={"lg"}
           onClick={goToFursonaStep}
           disabled={values.email === undefined}
           className="h-12 w-full rounded-sm"
@@ -34,6 +35,7 @@ export default function AuthCardFooter({
       ) : (
         <div className="flex gap-4">
           <Button
+            size={"lg"}
             onClick={() => setStep("account")}
             className="h-12 w-full bg-accent rounded-sm"
           >
@@ -41,6 +43,7 @@ export default function AuthCardFooter({
           </Button>
 
           <Button
+            size={"lg"}
             type="submit"
             disabled={isLoading}
             className="h-12 w-full rounded-sm"

@@ -2,7 +2,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { redirect } from "next/navigation";
 import { type Metadata } from "next";
-import ProfileHeader from "@/components/pages/profile/ProfileHeader";
+import ReturnHeader from "@/components/navigations/ReturnHeader";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -14,7 +14,7 @@ export default async function DashboardLayout({
 
   return (
     <>
-      <ProfileHeader />
+      <ReturnHeader />
 
       {children}
     </>

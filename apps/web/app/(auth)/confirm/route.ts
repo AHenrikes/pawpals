@@ -19,12 +19,18 @@ export async function GET(request: NextRequest) {
     const metadata = user.user_metadata ?? {};
     const initFursona = metadata.onboarding_init_fursona;
 
+    if (!initFursona?.display_name || !initFursona?.username || !user.email) {
+      errorRedirect(
+        "Sign-up profile data is incomplete. Please sign up again.",
+      );
+    }
+
     const { error } = await supabase.rpc("create_account", {
-      p_firstname: metadata.firstname,
-      p_lastname: metadata.lastname,
       p_email: user.email,
       p_display_name: initFursona.display_name,
       p_username: initFursona.username,
+      p_first_name: metadata.firstname,
+      p_last_name: metadata.lastname,
       p_species: initFursona.species ?? null,
       p_pronouns: initFursona.pronouns ?? null,
       p_bio: initFursona.bio ?? null,

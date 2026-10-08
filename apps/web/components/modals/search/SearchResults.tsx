@@ -43,7 +43,7 @@ export default function SearchResults({
                       key={f.username}
                       href={`/@${f.username}`}
                       onClick={handleClose}
-                      className="flex items-center w-64 gap-2 bg-surface border border-muted shadow-lg hover:bg-surface-highest"
+                      className="flex w-full items-center gap-3 rounded-lg border border-border/30 bg-secondary-dim/70 p-2.5 shadow-sm transition-colors hover:bg-secondary sm:max-w-md"
                     >
                       <Avatar size="lg">
                         <AvatarImage

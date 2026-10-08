@@ -7,6 +7,6 @@ import { createClient } from "@repo/supabase/client";
  * Hook to get a memoized Supabase client instance.
  * Prevents unnecessary re-instantiation of the client on every render.
  */
-export function useSupabaseClient() {
-  return useMemo(() => createClient(), []);
+export function useSupabaseClient(actingFursonaId?: string | null) {
+  return useMemo(() => createClient(actingFursonaId), [actingFursonaId]);
 }

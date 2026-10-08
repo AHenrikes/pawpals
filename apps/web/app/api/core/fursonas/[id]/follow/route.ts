@@ -12,40 +12,35 @@ import { withUser } from "@/lib/auth/withUser";
 export const GET = withUser(
   async (
     { supabase, account },
-    _req: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
   ) => {
     const { id } = await params;
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
-    const { data: self, error: selfError } = await supabase
-      .schema("core")
-      .from("fursonas")
-      .select("id")
-      .eq("account_id", account.id)
-      .eq("is_current", true)
-      .single();
-
-    if (selfError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-    if (!self) {
+    const actingFursonaId =
+      request.headers.get("x-acting-fursona-id") ?? account.default_fursona_id;
+    if (!actingFursonaId) {
       return ok({ isFollowing: false, isMutual: false, mutualSince: null });
     }
 
     const [{ data: following }, { data: followedBy }] = await Promise.all([
       supabase
         .schema("social")
-        .from("followers")
-        .select("id")
-        .eq("follower_fursona_id", self.id)
-        .eq("following_fursona_id", id)
+        .from("follows")
+        .select("created_at")
+        .eq("follower_fursona_id", actingFursonaId)
+        .eq("followed_fursona_id", id)
+        .eq("status", "accepted")
         .maybeSingle(),
 
       supabase
         .schema("social")
-        .from("followers")
-        .select("id, created_at")
+        .from("follows")
+        .select("created_at")
         .eq("follower_fursona_id", id)
-        .eq("following_fursona_id", self.id)
+        .eq("followed_fursona_id", actingFursonaId)
+        .eq("status", "accepted")
         .maybeSingle(),
     ]);
 
@@ -60,33 +55,26 @@ export const GET = withUser(
 export const POST = withUser(
   async (
     { supabase, account },
-    _req: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
   ) => {
     const { id } = await params;
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
-    const { data: self, error: selfError } = await supabase
-      .schema("core")
-      .from("fursonas")
-      .select("id")
-      .eq("account_id", account.id)
-      .eq("is_current", true)
-      .single();
+    const actingFursonaId =
+      request.headers.get("x-acting-fursona-id") ?? account.default_fursona_id;
+    if (!actingFursonaId) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    if (actingFursonaId === id) return badRequest("Cannot follow yourself");
 
-    if (selfError) return serverError(ERROR_MESSAGES.SERVER_ERROR);
-    if (!self) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-    if (self.id === id) return badRequest("Cannot follow yourself");
-
-    const { error } = await supabase
-      .schema("social")
-      .from("followers")
-      .insert({ follower_fursona_id: self.id, following_fursona_id: id });
+    const { data: status, error } = await supabase.rpc("request_follow", {
+      p_actor_fursona_id: actingFursonaId,
+      p_target_fursona_id: id,
+    });
 
     if (error?.code === "23505") return conflict("Already following");
     if (error) return serverError(error.message);
 
-    return ok({ following: true });
+    return ok({ following: status === "accepted", status });
   },
 );
 
@@ -94,29 +82,22 @@ export const POST = withUser(
 export const DELETE = withUser(
   async (
     { supabase, account },
-    _req: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
   ) => {
     const { id } = await params;
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
-    const { data: self, error: selfError } = await supabase
-      .schema("core")
-      .from("fursonas")
-      .select("id")
-      .eq("account_id", account.id)
-      .eq("is_current", true)
-      .single();
-
-    if (selfError) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    if (!self) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    const actingFursonaId =
+      request.headers.get("x-acting-fursona-id") ?? account.default_fursona_id;
+    if (!actingFursonaId) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
 
     const { error } = await supabase
       .schema("social")
-      .from("followers")
+      .from("follows")
       .delete()
-      .eq("follower_fursona_id", self.id)
-      .eq("following_fursona_id", id);
+      .eq("follower_fursona_id", actingFursonaId)
+      .eq("followed_fursona_id", id);
 
     if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
 

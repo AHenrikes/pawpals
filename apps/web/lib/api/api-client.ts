@@ -22,6 +22,33 @@ class APIClient {
     };
   }
 
+  private getHeaders(): HeadersInit {
+    if (globalThis.window === undefined) return this.defaultHeaders;
+    const actingFursonaId = globalThis.window.localStorage.getItem(
+      "pawpals:acting-fursona-id",
+    );
+    return actingFursonaId
+      ? { ...this.defaultHeaders, "x-acting-fursona-id": actingFursonaId }
+      : this.defaultHeaders;
+  }
+
+  setActingFursona(fursonaId: string | null) {
+    if (globalThis.window === undefined) return;
+    if (fursonaId) {
+      globalThis.window.localStorage.setItem(
+        "pawpals:acting-fursona-id",
+        fursonaId,
+      );
+    } else {
+      globalThis.window.localStorage.removeItem("pawpals:acting-fursona-id");
+    }
+  }
+
+  getActingFursona(): string | null {
+    if (globalThis.window === undefined) return null;
+    return globalThis.window.localStorage.getItem("pawpals:acting-fursona-id");
+  }
+
   /**
    * Centralized error handling with sanitization
    */
@@ -74,7 +101,7 @@ class APIClient {
     const url = `${this.baseUrl}${endpoint}`;
     const response = await fetch(url, {
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       signal: options?.signal,
     });
 
@@ -92,7 +119,7 @@ class APIClient {
     const url = `${this.baseUrl}${endpoint}`;
     const response = await fetch(url, {
       method,
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     });
 

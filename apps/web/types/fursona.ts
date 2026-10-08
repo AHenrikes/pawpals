@@ -15,7 +15,6 @@ export type FursonaTypes = {
   species?: string;
   pronouns?: string;
   bio?: string;
-  reputation: number;
   created_at: Date;
   updated_at: Date;
 };
@@ -35,7 +34,6 @@ export type FursonaSearch = {
   username: string;
   display_name: string;
   avatar_url?: string;
-  reputation: number;
 };
 
 export type FursonaProfile = {
@@ -47,13 +45,12 @@ export type FursonaProfile = {
   species?: string;
   pronouns?: string;
   bio?: string;
-  reputation: number;
   created_at: Date;
 };
 
 export type FursonaWithBoolean = FursonaTypes & {
-  is_current: boolean;
-  is_default: boolean;
+  is_current?: boolean;
+  is_default?: boolean;
 };
 
 export type FursonaWithAccountId = FursonaWithBoolean & {

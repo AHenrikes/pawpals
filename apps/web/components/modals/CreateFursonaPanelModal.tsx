@@ -8,7 +8,9 @@ import { motion } from "framer-motion";
 import { toast } from "@repo/ui/sonner";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers/UserProvider";
-import { type FursonaCreate } from "@/types/fursona";
+import { api } from "@/lib/api/api-client";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import type { FursonaCreate, FursonaTypes } from "@/types/fursona";
 import CreateFursona from "@/components/features/CreateFursona";
 
 interface CreateFursonaPanelModalProps {
@@ -60,21 +62,9 @@ export function CreateFursonaPanelModal({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/core/fursonas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fursona),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        toast.error("Failed to create fursona");
-
-        throw new Error(data.message);
-      }
-
-      const data = await response.json();
-      const createdFursona = data.fursona;
+      const { fursona: createdFursona } = await api.post<{
+        fursona: FursonaTypes;
+      }>("/api/core/fursonas", fursona);
 
       // Switch to the newly created fursona
       await switchCurrentFursona(createdFursona.id);
@@ -92,7 +82,7 @@ export function CreateFursonaPanelModal({
       router.push(`/@${createdFursona.username}`);
       toast.success(`Created ${createdFursona.display_name} successfully`);
     } catch {
-      toast.error("Failed to create fursona");
+      toast.error(ERROR_MESSAGES.FURSONA_CREATE_FAILED);
       return;
     } finally {
       setLoading(false);
@@ -117,9 +107,9 @@ export function CreateFursonaPanelModal({
       initial={{ opacity: 0, scale: 1.1 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-      className="flex items-center justify-center h-full bg-black/50"
+      className="flex h-full items-end justify-center bg-black/50 p-2 sm:items-center sm:p-4"
     >
-      <div className="relative w-full max-w-160 mx-4 rounded-lg bg-background p-6 shadow-lg max-h-[90vh]">
+      <div className="relative max-h-[calc(100dvh-1rem)] w-full max-w-xl overflow-y-auto rounded-t-2xl bg-background p-4 shadow-2xl sm:max-h-[90dvh] sm:rounded-2xl sm:p-6">
         <Button
           variant="ghost"
           onClick={handleClose}
@@ -146,7 +136,7 @@ export function CreateFursonaPanelModal({
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
           <Button
             onClick={handleClose}
             disabled={loading}
