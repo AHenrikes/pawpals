@@ -192,9 +192,7 @@ export function UserProvider({
         setState({ loading: true, error: null });
 
         let ownedFursonas = fursonas;
-        let updated = ownedFursonas.find(
-          (fursona) => fursona.id === fursonaId,
-        );
+        let updated = ownedFursonas.find((fursona) => fursona.id === fursonaId);
 
         // A newly created fursona is not yet present in this provider's state.
         // Refresh ownership from the server before rejecting the switch.
@@ -203,9 +201,7 @@ export function UserProvider({
             "/api/core/fursonas",
           );
           ownedFursonas = res.fursonas ?? [];
-          updated = ownedFursonas.find(
-            (fursona) => fursona.id === fursonaId,
-          );
+          updated = ownedFursonas.find((fursona) => fursona.id === fursonaId);
         }
 
         if (!updated) throw new Error("Fursona is not owned by this account.");

@@ -49,7 +49,6 @@ export default function ProfileAside({
       </section>
 
       <section className="h-full space-y-6">
-
         {!isFollowing && (
           <div className="space-y-6 p-4 w-full bg-secondary-dim border border-muted/30">
             <TypographyLead>Upcoming events</TypographyLead>

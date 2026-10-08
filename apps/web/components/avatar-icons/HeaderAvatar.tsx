@@ -93,10 +93,7 @@ export default function HeaderAvatar() {
 
     <Link href={`/@${currentFursona?.username}`}>
       <Avatar size="sm">
-        <AvatarImage
-          src={`${currentFursona?.avatar_url}`}
-          alt={displayName}
-        />
+        <AvatarImage src={`${currentFursona?.avatar_url}`} alt={displayName} />
 
         <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
       </Avatar>

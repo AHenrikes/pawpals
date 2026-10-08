@@ -114,10 +114,7 @@ export default function MainNav() {
               >
                 <Link href={href} className="pr-9" draggable="false">
                   <Icon
-                    className={cn(
-                      "size-6 shrink-0",
-                      !isActive && "opacity-60",
-                    )}
+                    className={cn("size-6 shrink-0", !isActive && "opacity-60")}
                   />
 
                   <AnimatePresence initial={false} mode="wait">
