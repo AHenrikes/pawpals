@@ -14,7 +14,7 @@ export interface ProfileSearchResult {
   data: import("@/types/fursona").FursonaSearch;
 }
 
-export default function ProfileSearchDialog({
+export default function SearchProfileDialog({
   open,
   onClose,
 }: Readonly<{ open: boolean; onClose: () => void }>) {

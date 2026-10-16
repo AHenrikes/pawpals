@@ -6,14 +6,18 @@ import {
 import { FursonaSearch } from "@/types/fursona";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { getInitials } from "@/lib/helpers/getInitials";
-import type { NavOption, SearchResult } from "./SearchDialog";
+import type { NavOption, SearchResult } from "./SearchModal";
 import Link from "next/link";
+import { motion } from "framer-motion";
+
+const MotionLink = motion(Link);
 
 interface SearchResults {
   loading: boolean;
   error: Error | null;
   results: SearchResult[];
   handleClose: () => void;
+  onSelect?: () => void;
 }
 
 export default function SearchResults({
@@ -21,6 +25,7 @@ export default function SearchResults({
   error,
   results,
   handleClose,
+  onSelect = () => undefined,
 }: Readonly<SearchResults>) {
   return (
     <>
@@ -35,15 +40,25 @@ export default function SearchResults({
 
               {results
                 .filter((r) => r.type === "fursona")
-                .map((r) => {
+                .map((r, index) => {
                   const f = r.data as FursonaSearch;
 
                   return (
-                    <Link
+                    <MotionLink
                       key={f.username}
                       href={`/@${f.username}`}
-                      onClick={handleClose}
-                      className="flex w-full items-center gap-3 rounded-lg border border-border/30 bg-secondary-dim/70 p-2.5 shadow-sm transition-colors hover:bg-secondary sm:max-w-md"
+                      onClick={() => {
+                        onSelect();
+                        handleClose();
+                      }}
+                      className="flex w-full items-center gap-4 rounded-sm border border-border/10 bg-secondary-dim/70 p-2 shadow-sm transition-colors hover:bg-secondary sm:max-w-72"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.25,
+                        delay: index * 0.06,
+                        ease: "easeOut",
+                      }}
                     >
                       <Avatar size="lg">
                         <AvatarImage
@@ -65,7 +80,7 @@ export default function SearchResults({
                           @{f.username}
                         </TypographyXSmall>
                       </div>
-                    </Link>
+                    </MotionLink>
                   );
                 })}
             </div>
@@ -80,17 +95,27 @@ export default function SearchResults({
               <div className="flex flex-col pt-2 gap-2">
                 {results
                   .filter((r) => r.type === "nav")
-                  .map((r) => {
+                  .map((r, index) => {
                     const nav = r.data as NavOption;
                     return (
-                      <Link
+                      <MotionLink
                         key={nav.label}
                         href={nav.path}
-                        onClick={handleClose}
+                        onClick={() => {
+                          onSelect();
+                          handleClose();
+                        }}
                         className="flex px-2 py-2 rounded transition-colors hover:bg-primary-dim"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.25,
+                          delay: index * 0.06,
+                          ease: "easeOut",
+                        }}
                       >
                         {nav.label}
-                      </Link>
+                      </MotionLink>
                     );
                   })}
               </div>

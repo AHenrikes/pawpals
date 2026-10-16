@@ -23,7 +23,7 @@ interface EditProfileModalProps {
   onSave: (updates: Partial<FursonaTypes>) => Promise<void>;
 }
 
-export function EditProfileModal({
+export default function ProfileEditModal({
   fursona,
   isOpen,
   onClose,

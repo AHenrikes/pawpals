@@ -43,7 +43,7 @@ function formatNumbers(count: number): string {
   return `${scaled.toFixed(scaled % 1 === 0 ? 0 : 1)}${units[tier]}`;
 }
 
-export default function ProfileName({
+export default function ProfileInfo({
   fursona,
 
   isOwnProfile,

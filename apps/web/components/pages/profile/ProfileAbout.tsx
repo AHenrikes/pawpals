@@ -4,9 +4,9 @@ import { Button } from "@repo/ui/button";
 import { TypographySmall, TypographyXSmall } from "@repo/ui/typography";
 import { motion } from "framer-motion";
 import { DotIcon, MaximizeIcon } from "lucide-react";
-import { type FursonaProfile } from "@/types/fursona";
 import { useState } from "react";
-import { AboutProfileModal } from "./AboutProfileModal";
+import { type FursonaProfile } from "@/types/fursona";
+import ProfileAboutModal from "./ProfileAboutModal";
 
 export default function ProfileAbout({
   fursona,
@@ -60,7 +60,7 @@ export default function ProfileAbout({
       </motion.div>
 
       {/* Profile about modal */}
-      <AboutProfileModal
+      <ProfileAboutModal
         fursona={fursona}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

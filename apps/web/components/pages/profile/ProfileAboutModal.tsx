@@ -15,7 +15,7 @@ interface AboutProfileModalProps {
   onClose: () => void;
 }
 
-export function AboutProfileModal({
+export default function ProfileAboutModal({
   fursona,
   isOpen,
   onClose,

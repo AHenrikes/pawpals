@@ -78,10 +78,7 @@ export function TypographyP({
   ...props
 }: React.ComponentProps<"p">) {
   return (
-    <p
-      className={cn("text-base text-text/40 leading-7", className)}
-      {...props}
-    />
+    <p className={cn("text-base text-text leading-7", className)} {...props} />
   );
 }
 

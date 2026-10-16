@@ -8,16 +8,16 @@ import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
-import { EditProfileModal } from "@/components/pages/profile/EditProfileModal";
 import { toast } from "@repo/ui/sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FursonaTypes } from "@/types/fursona";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
-import ProfileName from "@/components/pages/profile/ProfileName";
+import ProfileInfo from "@/components/pages/profile/ProfileInfo";
 import ProfileContent from "@/components/pages/profile/ProfileContent";
 import ProfileAside from "@/components/pages/profile/ProfileAside";
 import ProfilePageSkeleton from "@/components/pages/profile/ProfilePageSkeleton";
 import ProfileAbout from "@/components/pages/profile/ProfileAbout";
+import ProfileEditModal from "@/components/pages/profile/ProfileEditModal";
 
 export default function ProfilePage() {
   const { currentFursona, refresh, loading: userLoading } = useUser();
@@ -100,7 +100,7 @@ export default function ProfilePage() {
 
         <div className="container relative z-20 -mt-14 pb-10 sm:-mt-18 md:-mt-24">
           {/* Profile header */}
-          <ProfileName
+          <ProfileInfo
             fursona={viewedFursona}
 
             // CTA buttons
@@ -133,7 +133,7 @@ export default function ProfilePage() {
 
         {/* Profile setting modal */}
         {isOwnProfile && viewedFursona && (
-          <EditProfileModal
+          <ProfileEditModal
             fursona={viewedFursona as FursonaTypes}
             isOpen={isEditOpen}
             onClose={() => setIsEditOpen(false)}

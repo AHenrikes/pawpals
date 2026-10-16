@@ -22,6 +22,7 @@ export default function Dashboard() {
 
       <div className="flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center">
         <Searchbar />
+
         {currentFursona && (
           <Button asChild className="w-full sm:w-auto">
             <Link href={`/@${currentFursona.username}`}>View my profile</Link>

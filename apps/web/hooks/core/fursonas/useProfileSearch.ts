@@ -15,7 +15,7 @@ export function useProfileSearch(term: string, debounceMs = 300) {
 
   const {
     data: results = [],
-    isLoading,
+    isFetching,
     error,
   } = useQuery<FursonaSearch[], Error>({
     queryKey: ["fursona-search", debouncedTerm],
@@ -31,7 +31,7 @@ export function useProfileSearch(term: string, debounceMs = 300) {
 
   return {
     results: results || [],
-    loading: isLoading,
+    loading: Boolean(term.trim()) && (term !== debouncedTerm || isFetching),
     error,
   };
 }
