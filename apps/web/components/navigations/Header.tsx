@@ -7,7 +7,7 @@ import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { TypographyH1 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/modals/search/Searchbar";
 import { cn } from "@repo/ui/lib/utils";
-import HeaderAvatar from "../avatar-icons/HeaderAvatar";
+import AvatarIcon from "../avatar-icons/AvatarIcon";
 
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -33,7 +33,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <Searchbar onOpenChange={setSearchOpen} />
 
-          <HeaderAvatar />
+          <AvatarIcon />
         </div>
       </div>
     </header>

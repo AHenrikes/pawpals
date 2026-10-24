@@ -16,10 +16,14 @@ export type ProfileCounts = {
   reputation_count: number;
 };
 
+type ProfileStatsRow = Omit<ProfileCounts, "reputation_count"> & {
+  reputation: number;
+};
+
 export const GET = withUser(
   async (
     { supabase },
-    _req: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
   ) => {
     const { id } = await params;
@@ -28,22 +32,22 @@ export const GET = withUser(
 
     const { data, error } = await supabase
       .schema("social")
-      .from("v_fursona_stats")
-      .select(
-        "post_count, follower_count, following_count, like_count, reputation",
-      )
-      .eq("fursona_id", id)
-      .single();
+      .rpc("get_fursona_stats", {
+        p_target_fursona_id: id,
+        p_actor_fursona_id: request.headers.get("x-acting-fursona-id") || null,
+      })
+      .maybeSingle();
 
     if (error) return serverError(error.message);
     if (!data) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+    const stats = data as ProfileStatsRow;
 
     return okPrivateRead({
-      post_count: data.post_count,
-      follower_count: data.follower_count,
-      following_count: data.following_count,
-      like_count: data.like_count,
-      reputation_count: data.reputation,
+      post_count: stats.post_count,
+      follower_count: stats.follower_count,
+      following_count: stats.following_count,
+      like_count: stats.like_count,
+      reputation_count: stats.reputation,
     } satisfies ProfileCounts);
   },
 );

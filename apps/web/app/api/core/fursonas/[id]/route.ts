@@ -19,6 +19,92 @@ import {
 } from "@/lib/helpers/normalizeInput";
 import { type SupabaseClient } from "@supabase/supabase-js";
 
+const visibilityValues = new Set(["public", "followers_only", "private"]);
+const achievementValues = new Set([
+  "early_paw",
+  "community_builder",
+  "event_explorer",
+  "trusted_pal",
+]);
+const socialPlatformValues = new Set([
+  "website",
+  "bluesky",
+  "discord",
+  "instagram",
+  "telegram",
+  "tiktok",
+  "twitch",
+  "x",
+  "youtube",
+]);
+
+function normalizeSocialLinks(links: FursonaWithBoolean["social_links"]) {
+  if (!Array.isArray(links) || links.length > 6) return null;
+
+  const normalized = links.map((link) => ({
+    platform: link.platform,
+    url: link.url.trim(),
+  }));
+
+  const valid = normalized.every((link) => {
+    if (
+      !socialPlatformValues.has(link.platform) ||
+      !link.url ||
+      link.url.length > 300
+    )
+      return false;
+    try {
+      return new URL(link.url).protocol === "https:";
+    } catch {
+      return false;
+    }
+  });
+  return valid ? normalized : null;
+}
+
+function parseProfilePreferences(
+  body: FursonaWithBoolean,
+  updates: Record<string, unknown>,
+) {
+  if (body.visibility !== undefined) {
+    if (!visibilityValues.has(body.visibility))
+      return "Invalid profile visibility.";
+    updates.visibility = body.visibility;
+  }
+
+  for (const field of [
+    "show_reputation",
+    "show_events",
+    "show_communities",
+  ] as const) {
+    if (body[field] === undefined) continue;
+    if (typeof body[field] !== "boolean") return `Invalid ${field} value.`;
+    updates[field] = body[field];
+  }
+
+  if (body.social_links !== undefined) {
+    const socialLinks = normalizeSocialLinks(body.social_links);
+
+    if (!socialLinks) return "Add no more than 6 social links using valid HTTPS URLs.";
+    updates.social_links = socialLinks;
+  }
+
+  if (body.featured_achievements !== undefined) {
+    const achievements = body.featured_achievements;
+
+    if (
+      !Array.isArray(achievements) ||
+      achievements.length > 3 ||
+      !achievements.every((item) => achievementValues.has(item))
+    ) {
+      return "Choose up to 3 valid achievements.";
+    }
+    updates.featured_achievements = [...new Set(achievements)];
+  }
+
+  return null;
+}
+
 function buildPatchUpdates(body: FursonaWithBoolean) {
   const updates: Record<string, unknown> = {};
 
@@ -45,6 +131,9 @@ function buildPatchUpdates(body: FursonaWithBoolean) {
       updates[field] = normalizeOptionalText(body[field]);
     }
   }
+
+  const preferenceError = parseProfilePreferences(body, updates);
+  if (preferenceError) return { updates, error: preferenceError };
 
   return { updates, error: null };
 }
@@ -141,7 +230,7 @@ export const PATCH = withUser(
       .schema("core")
       .from("fursonas")
       .select(
-        "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, updated_at",
+        "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, visibility, social_links, show_reputation, show_events, show_communities, featured_achievements, status, created_at, updated_at",
       )
       .eq("id", id)
       .eq("account_id", account.id)

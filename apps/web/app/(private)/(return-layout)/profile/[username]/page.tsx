@@ -1,16 +1,12 @@
 "use client";
 
-import { api } from "@/lib/api/api-client";
-import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { useUser } from "@/providers/UserProvider";
 import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
-import { toast } from "@repo/ui/sonner";
-import { AnimatePresence, motion } from "framer-motion";
-import type { FursonaTypes } from "@/types/fursona";
+import { AnimatePresence } from "framer-motion";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
 import ProfileInfo from "@/components/pages/profile/ProfileInfo";
 import ProfileContent from "@/components/pages/profile/ProfileContent";
@@ -20,7 +16,7 @@ import ProfileAbout from "@/components/pages/profile/ProfileAbout";
 import ProfileEditModal from "@/components/pages/profile/ProfileEditModal";
 
 export default function ProfilePage() {
-  const { currentFursona, refresh, loading: userLoading } = useUser();
+  const { currentFursona, loading: userLoading } = useUser();
   const { username: paramUsername } = useParams<{ username: string }>();
   const { profile, loading: profileLoading } = useProfile(paramUsername);
 
@@ -42,6 +38,7 @@ export default function ProfilePage() {
     following,
     followers,
     likes,
+    reputation,
     refetch: refetchCounts,
   } = useProfileCounts(id);
 
@@ -61,32 +58,6 @@ export default function ProfilePage() {
   if (!viewedFursona) {
     return null;
   }
-
-  const handleEditSave = async (updates: Partial<FursonaTypes>) => {
-    if (!isOwnProfile || !viewedFursona)
-      throw new Error("Cannot edit other profiles");
-    try {
-      const { username, ...profileUpdates } = updates;
-      if (username && username !== viewedFursona.username) {
-        await api.post(
-          `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}/change-username`,
-          { new_username: username },
-        );
-      }
-      if (Object.keys(profileUpdates).length > 0) {
-        await api.patch<{ fursona: FursonaTypes }>(
-          `/api/core/fursonas/${(viewedFursona as FursonaTypes).id}`,
-          profileUpdates,
-        );
-      }
-      toast.success("Fursona updated");
-      await refresh();
-    } catch (err) {
-      const message = getErrorMessage(err);
-      toast.error(`Update failed: ${message}`);
-      throw new Error(message);
-    }
-  };
 
   return (
     <AnimatePresence mode="wait">
@@ -127,17 +98,15 @@ export default function ProfilePage() {
               <ProfileContent fursona={viewedFursona} />
             </main>
 
-            <ProfileAside isFollowing={isFollowing} />
+            <ProfileAside fursona={viewedFursona} reputation={reputation} />
           </section>
         </div>
 
         {/* Profile setting modal */}
         {isOwnProfile && viewedFursona && (
           <ProfileEditModal
-            fursona={viewedFursona as FursonaTypes}
             isOpen={isEditOpen}
             onClose={() => setIsEditOpen(false)}
-            onSave={handleEditSave}
           />
         )}
       </>

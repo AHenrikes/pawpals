@@ -14,6 +14,7 @@ import {
   HomeIcon,
   PawPrintIcon,
   ArrowDownIcon,
+  SettingsIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +48,7 @@ type MainNavItem = {
 
 const mainNavItems: MainNavItem[] = [
   { href: AUTH_ROUTES.HOME, label: "Home", Icon: HomeIcon },
+  { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: SettingsIcon },
 ];
 
 export default function MainNav() {

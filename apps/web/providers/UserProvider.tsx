@@ -15,11 +15,11 @@ import { toError } from "@/lib/helpers/error-utils";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { useRouter } from "next/navigation";
-import { type AccountTypes } from "@/types/account";
+import { type PrivateAccountTypes } from "@/types/account";
 import type { FursonaTypes, FursonaWithBoolean } from "@/types/fursona";
 
 export type UserContextType = {
-  account: AccountTypes | null;
+  account: PrivateAccountTypes | null;
   fursonas: FursonaTypes[];
   currentFursona: FursonaTypes | null;
   loading: boolean;
@@ -42,7 +42,7 @@ export function UserProvider({
   const refreshIdRef = useRef(0);
   const router = useRouter();
 
-  const [account, setAccount] = useState<AccountTypes | null>(null);
+  const [account, setAccount] = useState<PrivateAccountTypes | null>(null);
   const [fursonas, setFursonas] = useState<FursonaTypes[]>([]);
   const [currentFursona, setCurrentFursona] = useState<FursonaTypes | null>(
     null,
@@ -77,7 +77,7 @@ export function UserProvider({
 
     try {
       const res = await api.get<{
-        account: AccountTypes;
+        account: PrivateAccountTypes;
         currentFursona: FursonaTypes | null;
       }>("/api/core/accounts");
 

@@ -13,7 +13,7 @@ export const GET = withUser(async ({ supabase, account }) => {
     .schema("core")
     .from("fursonas")
     .select(
-      "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, visibility, status, created_at, updated_at",
+      "id, display_name, username, bio, species, pronouns, avatar_url, banner_url, visibility, featured_achievements, social_links, show_reputation, show_events, show_communities, status, created_at, updated_at",
     )
     .eq("account_id", account.id)
     .order("created_at", { ascending: true });
@@ -82,7 +82,7 @@ export const POST = withUser(
       .schema("core")
       .from("fursonas")
       .select(
-        "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, visibility, status, created_at, updated_at",
+        "id, display_name, username, bio, species, pronouns, avatar_url, banner_url, visibility, featured_achievements, social_links, show_reputation, show_events, show_communities, status, created_at, updated_at",
       )
       .eq("id", fursonaId)
       .single();

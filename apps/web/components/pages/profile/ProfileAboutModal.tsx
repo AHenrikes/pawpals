@@ -1,128 +1,139 @@
 "use client";
 
 import { Drawer, DrawerContent } from "@repo/ui/drawer";
-import { type FursonaProfile } from "@/types/fursona";
+import { Separator } from "@repo/ui/separator";
 import {
   TypographyLead,
   TypographyP,
   TypographySmall,
 } from "@repo/ui/typography";
-import { Separator } from "@repo/ui/separator";
+import type { FursonaProfile, ProfileAchievement } from "@/types/fursona";
+import {
+  AwardIcon,
+  CalendarDaysIcon,
+  ExternalLinkIcon,
+  UsersIcon,
+} from "lucide-react";
 
-interface AboutProfileModalProps {
-  fursona: FursonaProfile;
-  isOpen: boolean;
-  onClose: () => void;
+const achievementDetails: Record<
+  ProfileAchievement,
+  { name: string; symbol: string }
+> = {
+  early_paw: { name: "Early Paw", symbol: "🐾" },
+  community_builder: { name: "Community Builder", symbol: "🏕️" },
+  event_explorer: { name: "Event Explorer", symbol: "🧭" },
+  trusted_pal: { name: "Trusted Pal", symbol: "✨" },
+};
+
+function EmptyState({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <p className="rounded-lg border border-dashed border-border/30 p-4 text-center text-sm text-text-muted">
+      {children}
+    </p>
+  );
 }
 
 export default function ProfileAboutModal({
   fursona,
   isOpen,
   onClose,
-}: Readonly<AboutProfileModalProps>) {
+}: Readonly<{
+  fursona: FursonaProfile;
+  isOpen: boolean;
+  onClose: () => void;
+}>) {
+  const socials = fursona.social_links ?? [];
+  const achievements = fursona.featured_achievements ?? [];
+
   return (
-    <Drawer
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
-      <DrawerContent className="h-[min(75dvh,44rem)] w-full bg-background px-4 sm:px-6">
-        <div className="mx-auto w-full max-w-3xl space-y-4 overflow-y-auto pb-6 scrollbar-hide">
-          {fursona.bio ? (
-            <>
-              <div className="space-y-4">
-                <TypographyLead>Bio</TypographyLead>
+    <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DrawerContent className="h-[min(78dvh,48rem)] w-full bg-background px-4 sm:px-6">
+        <div className="mx-auto w-full max-w-3xl space-y-5 overflow-y-auto pb-8 scrollbar-hide">
+          <section className="space-y-3">
+            <TypographyLead>About</TypographyLead>
+            <TypographyP className="text-text-muted wrap-break-word">
+              {fursona.bio || "This fursona has not added a bio yet."}
+            </TypographyP>
+            <TypographySmall className="text-text-muted">
+              Member since {new Date(fursona.created_at).toLocaleDateString()}
+            </TypographySmall>
+          </section>
 
-                <div className="flex flex-col gap-2">
-                  <TypographyP className="text-text-muted wrap-break-word">
-                    {fursona.bio}
-                  </TypographyP>
+          <Separator className="h-px" />
 
-                  <div className="flex items-center gap-2">
-                    <TypographySmall className="text-text-muted wrap-break-word">
-                      Member since :
-                    </TypographySmall>
-
-                    <TypographyP className="text-text-muted wrap-break-word">
-                      {new Date(fursona.created_at).toLocaleDateString()}
-                    </TypographyP>
-                  </div>
-                </div>
-              </div>
-
-              <Separator className="h-0.5" />
-            </>
-          ) : null}
-
-          <div className="space-y-4">
+          <section className="space-y-3">
             <TypographyLead>Socials</TypographyLead>
+            {socials.length > 0 ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {socials.map((social) => (
+                  <a
+                    key={`${social.platform}-${social.url}`}
+                    href={social.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between rounded-lg bg-secondary-dim p-3 text-sm capitalize hover:text-primary"
+                  >
+                    <span>{social.platform}</span>
+                    <ExternalLinkIcon className="size-4" />
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <EmptyState>No social links shared.</EmptyState>
+            )}
+          </section>
 
-            <div className="flex overflow-x-scroll gap-6 scrollbar-hide">
-              <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
-              <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
-              <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
-              <div className="h-35 w-30 shrink-0 bg-secondary border border-primary/80 rounded-sm" />
-            </div>
-          </div>
-
-          <Separator className="h-0.5" />
-
-          <div className="space-y-4">
-            <TypographyLead>Whishlist</TypographyLead>
-
-            <div className="space-y-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={`row-${i}`}
-                  className="flex items-center gap-2 animate-pulse"
-                >
-                  <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
-                  <div className="h-8 w-full md:h-10 bg-muted rounded" />
+          {achievements.length > 0 && (
+            <>
+              <Separator className="h-px" />
+              <section className="space-y-3">
+                <span className="flex items-center gap-2">
+                  <AwardIcon className="size-5 text-primary" />
+                  <TypographyLead>Achievements</TypographyLead>
+                </span>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {achievements.map((id) => {
+                    const achievement = achievementDetails[id];
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center gap-3 rounded-lg bg-secondary-dim p-3"
+                      >
+                        <span className="text-2xl">{achievement.symbol}</span>
+                        <TypographySmall>{achievement.name}</TypographySmall>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
-          </div>
+              </section>
+            </>
+          )}
 
-          <Separator className="h-0.5" />
+          {fursona.show_events !== false && (
+            <>
+              <Separator className="h-px" />
+              <section className="space-y-3">
+                <span className="flex items-center gap-2">
+                  <CalendarDaysIcon className="size-5 text-primary" />
+                  <TypographyLead>Events joined</TypographyLead>
+                </span>
+                <EmptyState>No public event activity yet.</EmptyState>
+              </section>
+            </>
+          )}
 
-          <div className="space-y-4">
-            <TypographyLead>Upcoming events</TypographyLead>
-
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={`user-col1-${i}`}
-                  className="flex items-center gap-2 animate-pulse"
-                >
-                  <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
-                  <div className="h-8 w-full md:h-10 bg-muted rounded" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Separator className="h-0.5" />
-
-          <div className="space-y-4">
-            <TypographyLead>Communities</TypographyLead>
-
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={`user-col1-${i}`}
-                  className="flex items-center gap-2 animate-pulse"
-                >
-                  <div className="h-12 w-12 md:h-14 md:w-14 bg-muted rounded-full shrink-0" />
-
-                  <div className="space-y-2 flex-1">
-                    <div className="h-6 w-full md:h-6 bg-muted rounded" />
-                    <div className="h-5 w-2/3 md:h-5 bg-muted rounded" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {fursona.show_communities !== false && (
+            <>
+              <Separator className="h-px" />
+              <section className="space-y-3">
+                <span className="flex items-center gap-2">
+                  <UsersIcon className="size-5 text-primary" />
+                  <TypographyLead>Communities</TypographyLead>
+                </span>
+                <EmptyState>No public communities yet.</EmptyState>
+              </section>
+            </>
+          )}
         </div>
       </DrawerContent>
     </Drawer>

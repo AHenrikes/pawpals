@@ -161,7 +161,7 @@ export function Sidebar({
         animate={{ width: isCollapsed ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "sticky top-16 hidden h-[calc(100svh-64px)] shrink-0 overflow-hidden bg-surface-container-low/80 px-3 py-4 backdrop-blur-xl md:flex lg:px-4",
+          "sticky top-16 hidden h-[calc(100svh-65px)] shrink-0 overflow-hidden bg-surface-container-low/80 px-3 py-4 backdrop-blur-xl md:flex lg:px-4",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
           variant === "floating" && "m-2 rounded-2xl border",
           className,

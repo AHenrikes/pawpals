@@ -5,6 +5,7 @@ import { useUser } from "@/providers/UserProvider";
 import { Searchbar } from "@/components/modals/search/Searchbar";
 import { Button } from "@repo/ui/button";
 import { TypographyH1, TypographyP } from "@repo/ui/typography";
+import { SettingsIcon } from "lucide-react";
 
 export default function Dashboard() {
   const { currentFursona } = useUser();
@@ -28,6 +29,13 @@ export default function Dashboard() {
             <Link href={`/@${currentFursona.username}`}>View my profile</Link>
           </Button>
         )}
+
+        <Button asChild variant="outline" className="w-full sm:w-auto">
+          <Link href="/settings">
+            <SettingsIcon />
+            Settings
+          </Link>
+        </Button>
       </div>
     </main>
   );
