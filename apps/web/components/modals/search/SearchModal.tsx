@@ -103,15 +103,16 @@ export default function SearchModal({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.45, ease: "easeInOut" }}
-          key="popup-overlay"
-          aria-hidden="true"
-          className="fixed inset-x-0 top-16 bottom-0 z-30 backdrop-blur-md"
-        />
-      )}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            key="popup-overlay"
+            aria-hidden="true"
+            className="fixed inset-0 top-16 backdrop-blur-md z-30"
+          />
+        )}
 
       {open && (
         <PopoverContent

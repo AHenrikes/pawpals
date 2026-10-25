@@ -90,17 +90,22 @@ export default function SettingsAccount({
   };
 
   return (
-    <div className="w-full space-y-6 pb-10">
+    <div className="w-full space-y-8 pb-12">
       <section className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <TypographyH3>Account info</TypographyH3>
+          <div>
+            <TypographyH3>Account information</TypographyH3>
+            <p className="mt-1 text-sm text-text-muted">
+              Your personal details and contact information.
+            </p>
+          </div>
           <p className="flex items-center gap-1.5 text-xs text-text-muted">
             <ShieldCheckIcon className="size-4" />
             This information is never shown on your profile.
           </p>
         </div>
 
-        <div className="divide-y divide-border/20 overflow-hidden rounded-xl border border-border/20 bg-secondary-dim/30">
+        <div className="glass-panel divide-y divide-border/30 overflow-hidden rounded-2xl">
           <div className="grid gap-4 p-5 sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:items-center">
             <Label htmlFor="account-first-name" variant="muted">
               First name
@@ -159,17 +164,15 @@ export default function SettingsAccount({
           </div>
 
           <div className="grid gap-4 p-5 sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:items-center">
-            <Label variant="muted">
-              Date of birth
-            </Label>
+            <Label variant="muted">Date of birth</Label>
             <TypographySmall>{formatDate(account?.dob)}</TypographySmall>
           </div>
 
           <div className="grid gap-4 p-5 sm:grid-cols-[9rem_minmax(0,1fr)_auto] sm:items-center">
-            <Label variant="muted">
-              Phone number
-            </Label>
-            <TypographySmall>{account?.phoneNumber || "Not provided"}</TypographySmall>
+            <Label variant="muted">Phone number</Label>
+            <TypographySmall>
+              {account?.phoneNumber || "Not provided"}
+            </TypographySmall>
           </div>
 
           {editingDetails && (
@@ -188,11 +191,14 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <hr className="border-muted" />
-
       <section className="space-y-4">
-        <TypographyH3>Password & security</TypographyH3>
-        <div className="divide-y divide-border/20 overflow-hidden rounded-xl border border-border/20 bg-secondary-dim/30">
+        <div>
+          <TypographyH3>Password & security</TypographyH3>
+          <p className="mt-1 text-sm text-text-muted">
+            Protect access to your Pawpals account.
+          </p>
+        </div>
+        <div className="glass-panel divide-y divide-border/30 overflow-hidden rounded-2xl">
           <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <span className="flex items-center gap-3">
               <LockKeyholeIcon className="size-5 text-text-muted" />
@@ -234,12 +240,15 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <hr className="border-muted" />
-
       <section className="space-y-4">
-        <TypographyH3>Account status</TypographyH3>
-        <div className="grid gap-5 rounded-xl border border-border/20 bg-secondary-dim/30 p-5 sm:grid-cols-3">
-          <div className="space-y-1">
+        <div>
+          <TypographyH3>Account status</TypographyH3>
+          <p className="mt-1 text-sm text-text-muted">
+            A quick overview of your membership.
+          </p>
+        </div>
+        <div className="glass-panel grid gap-4 rounded-2xl p-5 sm:grid-cols-3">
+          <div className="rounded-xl bg-primary/8 p-4">
             <TypographyXSmall className="flex items-center gap-1.5 text-text-muted">
               <CalendarDaysIcon className="size-3.5" />
               Member since
@@ -247,14 +256,14 @@ export default function SettingsAccount({
             <TypographySmall>{formatDate(account?.created_at)}</TypographySmall>
           </div>
 
-          <div className="flex items-center gap-1 md:flex-col md:items-start">
+          <div className="flex items-center gap-1 rounded-xl bg-primary/8 p-4 md:flex-col md:items-start">
             <TypographyXSmall className="text-text-muted">
               Age group
             </TypographyXSmall>
             <TypographySmall>{getAgeGroup(account?.dob)}</TypographySmall>
           </div>
 
-          <div className="space-y-1">
+          <div className="rounded-xl bg-primary/8 p-4">
             <TypographyXSmall className="flex items-center gap-1.5 text-text-muted">
               <CheckCircle2Icon className="size-3.5" />
               Account record
@@ -264,9 +273,7 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <hr className="border-muted" />
-
-      <section className="space-y-4 rounded-xl border border-destructive/25 bg-destructive/5 p-5">
+      <section className="space-y-4 rounded-2xl border border-destructive/25 bg-destructive/8 p-5 backdrop-blur-xl">
         <div>
           <TypographyH3>Danger zone</TypographyH3>
           <p className="mt-1 text-sm text-text-muted">

@@ -8,6 +8,7 @@ import { TypographyH1 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/modals/search/Searchbar";
 import { cn } from "@repo/ui/lib/utils";
 import AvatarIcon from "../avatar-icons/AvatarIcon";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -15,8 +16,8 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 w-full border-b border-b-border/20 transition-colors z-50",
-        searchOpen ? "bg-background" : "bg-background/75",
+        "sticky top-0 z-50 w-full border-b border-b-white/10 shadow-lg shadow-black/5 transition-colors",
+        searchOpen ? "bg-background" : "bg-background/65 backdrop-blur-2xl",
       )}
     >
       <div className="flex items-center justify-between h-16 px-2 md:px-4">
@@ -32,8 +33,10 @@ export default function Header() {
 
         <div className="flex items-center gap-4">
           <Searchbar onOpenChange={setSearchOpen} />
-
-          <AvatarIcon />
+          <ThemeSwitcher />
+          <div className="rounded-full ring-2 ring-white/10 transition hover:ring-primary/50">
+            <AvatarIcon />
+          </div>
         </div>
       </div>
     </header>

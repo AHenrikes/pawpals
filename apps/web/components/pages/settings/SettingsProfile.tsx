@@ -103,7 +103,7 @@ function PreferenceToggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between gap-4 rounded-lg border border-border/15 bg-secondary-dim/35 p-4 text-left transition-colors hover:bg-secondary-dim/60"
+      className="glass-control flex w-full items-center justify-between gap-4 rounded-xl p-4 text-left"
     >
       <span>
         <span className="block text-sm font-semibold">{label}</span>
@@ -138,7 +138,7 @@ function SettingsSection({
   children: React.ReactNode;
 }>) {
   return (
-    <section className="space-y-4 rounded-xl border border-border/20 bg-secondary-dim/20 p-4 sm:p-5">
+    <section className="glass-panel space-y-5 rounded-2xl p-5 sm:p-6">
       <div>
         <TypographyH3>{title}</TypographyH3>
         <p className="mt-1 text-sm text-text-muted">{description}</p>
@@ -237,7 +237,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
     setSocialLinks((links) =>
       links.map((link, itemIndex) =>
         itemIndex === index ? { ...link, ...updates } : link,
-    ),
+      ),
     );
     setNewChange(true);
   };
@@ -364,9 +364,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   };
 
   return (
-    <div className="w-full space-y-6 pb-28">
+    <div className="w-full space-y-8 pb-28">
       <div>
-        <TypographyH2>Profile</TypographyH2>
+        <TypographyH2>Public profile</TypographyH2>
         <p className="mt-1 text-sm text-text-muted">
           Shape what people see when they visit your active fursona.
         </p>
@@ -387,9 +387,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                   id="profile-display-name"
                   value={displayName}
                   onChange={(event) => {
-                    setDisplayName(event.target.value)
-                    setNewChange(true)}
-                  }
+                    setDisplayName(event.target.value);
+                    setNewChange(true);
+                  }}
                   disabled={saving}
                   maxLength={50}
                 />
@@ -404,8 +404,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                     id="profile-username"
                     value={username}
                     onChange={(event) => {
-                      setUsername(event.target.value)
-                      setNewChange(true)
+                      setUsername(event.target.value);
+                      setNewChange(true);
                     }}
                     disabled={saving}
                     error={isAvailable === false}
@@ -427,8 +427,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                   id="profile-species"
                   value={species}
                   onChange={(event) => {
-                    setSpecies(event.target.value)
-                    setNewChange(true)
+                    setSpecies(event.target.value);
+                    setNewChange(true);
                   }}
                   placeholder="e.g. Arctic fox"
                   disabled={saving}
@@ -443,8 +443,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                   id="profile-pronouns"
                   value={pronouns}
                   onChange={(event) => {
-                    setPronouns(event.target.value)
-                    setNewChange(true)
+                    setPronouns(event.target.value);
+                    setNewChange(true);
                   }}
                   placeholder="e.g. they/them"
                   disabled={saving}
@@ -465,14 +465,14 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 id="profile-bio"
                 value={bio}
                 onChange={(event) => {
-                  setBio(event.target.value)
-                  setNewChange(true)
+                  setBio(event.target.value);
+                  setNewChange(true);
                 }}
                 maxLength={190}
                 rows={5}
                 disabled={saving}
                 placeholder="A little something about your fursona..."
-                className="bg-secondary-dim"
+                className="bg-surface/55 backdrop-blur-lg focus-visible:border-primary/60 focus-visible:ring-3 focus-visible:ring-primary/20"
               />
             </div>
           </SettingsSection>
@@ -500,7 +500,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                         platform: event.target.value as ProfileSocialPlatform,
                       })
                     }
-                    className="h-11 rounded-sm border border-secondary bg-secondary-dim px-3 text-sm outline-none focus:ring-1 focus:ring-ring"
+                    className="h-11 rounded-lg border border-border/60 bg-surface/55 px-3 text-sm outline-none backdrop-blur-lg focus:border-primary/60 focus:ring-3 focus:ring-primary/20"
                   >
                     {platformOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -582,8 +582,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                   className={cn(
                     "flex-col items-start min-h-32 gap-0 rounded-xl border p-4 text-left transition-colors duration-250",
                     visibility === value
-                      ? "border-primary bg-primary/10"
-                      : "border-border/20 bg-secondary-dim/30 hover:border-muted",
+                      ? "border-primary/60 bg-primary/15 shadow-lg shadow-primary/10"
+                      : "border-border/40 bg-surface/35 hover:border-primary/35 hover:bg-surface/60",
                   )}
                 >
                   <Icon
@@ -659,8 +659,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                     className={cn(
                       "flex items-start gap-3 rounded-xl border p-4 text-left transition-colors",
                       selected
-                        ? "border-primary bg-primary/10"
-                        : "border-border/20 bg-secondary-dim/30 hover:border-border",
+                        ? "border-primary/60 bg-primary/15 shadow-sm shadow-primary/10"
+                        : "border-border/40 bg-surface/35 hover:border-primary/35 hover:bg-surface/60",
                     )}
                   >
                     <span className="text-2xl" aria-hidden="true">
@@ -687,11 +687,11 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
         </div>
 
-        <aside className="xl:sticky xl:top-0">
+        <aside className="xl:sticky xl:top-20">
           <p className="mb-2 text-xs font-semibold tracking-widest text-text-muted uppercase">
             Live preview
           </p>
-          <div className="overflow-hidden rounded-xl border border-border/20 bg-secondary-dim shadow-xl">
+          <div className="glass-panel overflow-hidden rounded-2xl">
             <button
               type="button"
               onClick={() => bannerInputRef.current?.click()}
@@ -721,7 +721,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
               <button
                 type="button"
                 onClick={() => avatarInputRef.current?.click()}
-                className="group relative -mt-9 block size-20 cursor-pointer overflow-hidden rounded-full border-4 border-secondary-dim bg-muted"
+                className="group relative -mt-9 block size-20 cursor-pointer overflow-hidden rounded-full border-4 border-surface bg-muted shadow-xl"
                 aria-label="Change avatar"
               >
                 {avatarPreview && (
@@ -802,12 +802,14 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         </aside>
       </div>
 
-      <div 
+      <div
         className={cn(
-          "flex flex-col-reverse -mx-4 gap-2 border-t border-border/20 bg-background/90 p-4 backdrop-blur-md z-20 sm:mx-0 sm:flex-row sm:justify-end sm:rounded-xl sm:border",
-          newChange || isAvailable === false ? "sticky bottom-0" : false
-        )}>
-        <Button variant="ghost" 
+          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 bg-background/75 p-4 shadow-2xl shadow-black/10 backdrop-blur-2xl sm:mx-0 sm:flex-row sm:justify-end sm:rounded-2xl sm:border",
+          newChange || isAvailable === false ? "sticky bottom-0" : false,
+        )}
+      >
+        <Button
+          variant="ghost"
           onClick={() => {
             resetProfile();
           }}

@@ -6,6 +6,8 @@ import { useCleanupBlobUrl } from "@/hooks/useCleanupBlobUrl";
 import { useUser } from "@/providers/UserProvider";
 import { Button } from "@repo/ui/button";
 import { XIcon } from "lucide-react";
+import { SlidersHorizontalIcon } from "lucide-react";
+import { TypographyH1 } from "@repo/ui/typography";
 import EditProfileAside, { type EditProfileSection } from "./SettingsAside";
 import SettingsAccount from "./SettingsAccount";
 import SettingsProfile from "./SettingsProfile";
@@ -87,13 +89,13 @@ export default function SettingsPage({
   }, [resetForms]);
 
   return (
-    <div className="flex h-dvh min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+    <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full flex-1 flex-col md:flex-row">
       <EditProfileAside
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
 
-      <section className="relative min-w-0 flex-1 overflow-y-auto p-4 md:pt-18 scrollbar-hide">
+      <section className="relative min-w-0 flex-1 p-4 sm:p-6 lg:p-10">
         {onClose && (
           <Button
             type="button"
@@ -107,7 +109,21 @@ export default function SettingsPage({
           </Button>
         )}
 
-        <div className="mx-auto w-full max-w-4xl">
+        <div className="mx-auto w-full max-w-5xl">
+          <header className="mb-8 flex items-start gap-4">
+            <span className="hidden size-12 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-lg shadow-primary/10 sm:flex">
+              <SlidersHorizontalIcon className="size-5" aria-hidden="true" />
+            </span>
+            <div>
+              <TypographyH1 className="text-3xl sm:text-4xl">
+                Settings
+              </TypographyH1>
+              <p className="mt-2 max-w-2xl text-sm text-text-muted sm:text-base">
+                Manage your private account and shape how your active fursona
+                appears across Pawpals.
+              </p>
+            </div>
+          </header>
           {activeSection === "account" && (
             <SettingsAccount
               firstName={firstName}
@@ -120,7 +136,7 @@ export default function SettingsPage({
           )}
 
           {activeSection === "profile" && !currentFursona && (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-text-muted">
+            <div className="glass-panel rounded-2xl border-dashed p-10 text-center text-text-muted">
               Create a fursona before editing your public profile.
             </div>
           )}

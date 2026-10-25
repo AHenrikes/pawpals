@@ -5,13 +5,14 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "./lib/utils";
 
 const buttonVariants = cva(
-  "cursor-pointer group/button inline-flex min-w-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-hidden select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "cursor-pointer group/button inline-flex min-w-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-semibold whitespace-nowrap transition-all outline-hidden select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/35 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-dim",
+        default:
+          "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary-dim hover:shadow-primary/30",
         outline:
-          "border-muted hover:border-border aria-expanded:bg-muted aria-expanded:text-text",
+          "border-border/70 bg-surface/35 backdrop-blur-lg hover:border-primary/50 hover:bg-surface/70 aria-expanded:bg-muted aria-expanded:text-text",
         secondary:
           "bg-secondary-dim hover:bg-secondary aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         accent: "bg-accent text-primary-foreground hover:bg-accent/80",

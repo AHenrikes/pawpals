@@ -96,8 +96,8 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
             Search Pawpals
           </FieldLabel>
 
-          <InputGroup className="h-9 w-10 overflow-hidden rounded-sm border-border/20 bg-transparent transition-[background-color,border-color] duration-300 hover:border-border hover:bg-secondary-dim focus-within:bg-background">
-            <InputGroupAddon className="px-2.5 text-text-muted">
+          <InputGroup className="glass-control h-9 w-10 overflow-hidden border-border rounded-full transition-[background-color,border-color] duration-300 hover:border-primary focus-within:border-primary/50">
+            <InputGroupAddon className="px-2.5 bg-background text-text-muted">
               <SearchIcon aria-hidden="true" className="size-5" />
             </InputGroupAddon>
 
@@ -114,7 +114,7 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
                   handleClose();
                 }
               }}
-              className="min-w-40 p-0 text-text"
+              className="min-w-40 p-0 text-text bg-background backdrop-blur-none"
             />
           </InputGroup>
         </Field>

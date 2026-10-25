@@ -6,16 +6,29 @@ import { Searchbar } from "../modals/search/Searchbar";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
+import { ThemeSwitcher } from "./ThemeSwitcher";
+import { useCurrentPath } from "@/hooks/usePath";
+
+function getUsername(pathname: string): boolean {
+  if (pathname.startsWith("/@")) {
+    const username = decodeURIComponent(pathname.slice(2));
+    return Boolean(username);
+  }
+
+  return false;
+}
 
 export default function ReturnHeader() {
   const router = useRouter();
+  const profilePage = getUsername(useCurrentPath());
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <header
       className={cn(
-        "absolute top-0 w-full transition-colors z-50",
-        searchOpen ? "bg-background" : "bg-transparent",
+        "top-0 w-full border-white/10 shadow-black/5 transition-colors z-50",
+        profilePage ? "absolute" : "fixed bg-background/65 border-b shadow-lg backdrop-blur-2xl",
+        searchOpen ? "bg-background" : null,
       )}
     >
       <div className="flex justify-between items-center h-16 px-2 md:px-4">
@@ -24,19 +37,20 @@ export default function ReturnHeader() {
           variant={"outline"}
           onClick={() => router.back()}
           aria-label="Go back"
-          className="text-text-muted rounded-full hover:text-text"
+          className="glass-control rounded-full text-text-muted hover:text-text"
         >
           <ArrowLeftIcon aria-hidden="true" className="size-5" />
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2">
           <Searchbar onOpenChange={setSearchOpen} />
+          <ThemeSwitcher />
 
           <Button
             size="icon"
             variant={"none"}
             aria-label="Page information"
-            className="text-text-muted hover:text-text"
+            className="text-text-muted hover:bg-surface/60 hover:text-text"
           >
             <CircleAlertIcon aria-hidden="true" />
           </Button>

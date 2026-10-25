@@ -161,7 +161,7 @@ export function Sidebar({
         animate={{ width: isCollapsed ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className={cn(
-          "sticky top-16 hidden h-[calc(100svh-65px)] shrink-0 overflow-hidden bg-surface-container-low/80 px-3 py-4 backdrop-blur-xl md:flex lg:px-4",
+          "sticky top-16 hidden h-[calc(100svh-65px)] shrink-0 overflow-hidden border-r border-white/10 bg-background/65 px-3 py-4 shadow-xl shadow-black/5 backdrop-blur-2xl md:flex lg:px-4",
           side === "left" ? "order-first" : "order-last border-r-0 border-l",
           variant === "floating" && "m-2 rounded-2xl border",
           className,
@@ -185,7 +185,7 @@ export function Sidebar({
         data-variant={variant}
         data-state={openMobile ? "expanded" : "collapsed"}
         className={cn(
-          "group/sidebar fixed top-16 z-50 h-[calc(100svh-64px)] w-(--sidebar-width-mobile) border-r border-border bg-background/95 p-2 shadow-2xl backdrop-blur-xl transition-transform duration-200 md:hidden",
+          "group/sidebar fixed top-16 z-50 h-[calc(100svh-64px)] w-(--sidebar-width-mobile) border-r border-white/10 bg-background/80 p-2 shadow-2xl backdrop-blur-2xl transition-transform duration-200 md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -321,7 +321,8 @@ export function SidebarMenuButton({
     "group/menu-button flex w-full items-center gap-3 px-3 py-2.5 text-left text-[15px] rounded-xl transition",
     "cursor-pointer hover:bg-secondary hover:text-text",
     "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
-    isActive && "bg-accent hover:bg-accent",
+    isActive &&
+      "border border-primary/25 bg-primary/15 text-foreground shadow-sm shadow-primary/10 hover:bg-primary/20",
     className,
   );
 

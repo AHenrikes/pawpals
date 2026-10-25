@@ -32,13 +32,16 @@ export default function SettingsAside({
   onSectionChange,
 }: Readonly<EditProfileAsideProps>) {
   return (
-    <aside className="space-y-4 border-b border-border/20 p-4 pt-18 md:w-56 md:shrink-0 md:border-r md:border-b-0 lg:w-72">
+    <aside className="border-b border-white/10 bg-surface/35 p-4 backdrop-blur-2xl md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-60 md:shrink-0 md:border-r md:border-b-0 md:p-6 lg:w-72">
+      <p className="mb-4 hidden text-xs font-semibold tracking-[0.18em] text-text-muted uppercase md:block">
+        Preferences
+      </p>
       <AvatarWithName />
 
-      <div className="w-full h-0.5 bg-muted" />
+      <div className="my-5 h-px w-full bg-border/40" />
 
       <nav aria-label="Profile settings">
-        <ul className="flex gap-2 md:flex-col">
+        <ul className="grid grid-cols-2 gap-2 md:flex md:flex-col">
           {sections.map(({ id, label, description, Icon }) => {
             const isActive = activeSection === id;
             return (
@@ -49,9 +52,9 @@ export default function SettingsAside({
                   onClick={() => onSectionChange(id)}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "h-auto w-full justify-start gap-3 px-3 py-7 rounded-md text-left",
+                    "h-auto min-h-16 w-full justify-start gap-3 rounded-xl px-3 py-3 text-left",
                     isActive
-                      ? "bg-accent text-white hover:bg-secondary"
+                      ? "border border-primary/25 bg-primary/15 text-foreground shadow-sm shadow-primary/10 hover:bg-primary/20"
                       : "text-text-muted hover:bg-secondary hover:text-text",
                   )}
                 >
@@ -63,7 +66,7 @@ export default function SettingsAside({
                     <span
                       className={cn(
                         "hidden truncate text-[0.68rem] font-normal md:block",
-                        isActive ? "text-white/70" : "text-text-muted",
+                        "text-text-muted",
                       )}
                     >
                       {description}

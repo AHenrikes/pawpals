@@ -102,7 +102,7 @@ export default function MainNav() {
   LockScreen((isMobile && openMobile) || isCreateFursonaOpen);
 
   return (
-    <Sidebar collapsible="icon" className="group/sidebar ml-1 shrink-0">
+    <Sidebar collapsible="icon" className="group/sidebar shrink-0">
       <SidebarGroup>
         {mainNavItems.map(({ href, label, Icon }) => {
           const isActive = pathname === href;
