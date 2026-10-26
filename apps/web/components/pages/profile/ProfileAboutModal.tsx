@@ -49,6 +49,7 @@ export default function ProfileAboutModal({
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent className="h-[min(78dvh,48rem)] w-full bg-background px-4 sm:px-6">
         <div className="mx-auto w-full max-w-3xl space-y-5 overflow-y-auto pb-8 scrollbar-hide">
+          {/* Bio */}
           <section className="space-y-3">
             <TypographyLead>About</TypographyLead>
             <TypographyP className="text-text-muted wrap-break-word">
@@ -61,6 +62,7 @@ export default function ProfileAboutModal({
 
           <Separator className="h-px" />
 
+          {/* Socials */}
           <section className="space-y-3">
             <TypographyLead>Socials</TypographyLead>
             {socials.length > 0 ? (
@@ -83,7 +85,8 @@ export default function ProfileAboutModal({
             )}
           </section>
 
-          {achievements.length > 0 && (
+          {/* Achievements */}
+          {/* {achievements.length > 0 && (
             <>
               <Separator className="h-px" />
               <section className="space-y-3">
@@ -107,7 +110,7 @@ export default function ProfileAboutModal({
                 </div>
               </section>
             </>
-          )}
+          )} */}
 
           {fursona.show_events !== false && (
             <>
@@ -131,6 +134,19 @@ export default function ProfileAboutModal({
                   <TypographyLead>Communities</TypographyLead>
                 </span>
                 <EmptyState>No public communities yet.</EmptyState>
+              </section>
+            </>
+          )}
+
+          {fursona.show_events === false && fursona.show_communities === false && (
+            <>
+              <Separator className="h-px" />
+              <section className="space-y-3">
+                <span className="flex items-center gap-2">
+                  <UsersIcon className="size-5 text-primary" />
+                  <TypographyLead>Suggested Accounts</TypographyLead>
+                </span>
+                <EmptyState>No Suggested users found.</EmptyState>
               </section>
             </>
           )}

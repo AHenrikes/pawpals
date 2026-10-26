@@ -36,7 +36,6 @@ export default function ProfileAside({
   fursona,
   reputation,
 }: Readonly<{ fursona: FursonaProfile; reputation: number }>) {
-  const achievements = fursona.featured_achievements ?? [];
   const socials = fursona.social_links ?? [];
   let reputationLabel = "New pal";
   if (reputation >= 100) reputationLabel = "Trusted";
@@ -44,6 +43,7 @@ export default function ProfileAside({
 
   return (
     <aside className="sticky top-20 hidden h-fit w-80 shrink-0 space-y-4 lg:block">
+      {/* Reputation */}
       {fursona.show_reputation !== false && (
         <section className="rounded-xl border border-border/20 bg-secondary-dim/50 p-4">
           <span className="flex items-center gap-2">
@@ -64,6 +64,7 @@ export default function ProfileAside({
         </section>
       )}
 
+      {/* socials */}
       <section className="rounded-xl border border-border/20 bg-secondary-dim/35 p-4">
         <TypographyLead>Socials</TypographyLead>
         {socials.length > 0 ? (
@@ -88,7 +89,8 @@ export default function ProfileAside({
         )}
       </section>
 
-      {achievements.length > 0 && (
+      {/* Achievements */}
+      {/* {achievements.length > 0 && (
         <section className="rounded-xl border border-border/20 bg-secondary-dim/35 p-4">
           <span className="flex items-center gap-2">
             <AwardIcon className="size-5 text-primary" />
@@ -109,8 +111,9 @@ export default function ProfileAside({
             })}
           </div>
         </section>
-      )}
+      )} */}
 
+      {/* Joined events */}
       {fursona.show_events !== false && (
         <section className="rounded-xl border border-border/20 bg-secondary-dim/35 p-4">
           <span className="flex items-center gap-2">
@@ -125,6 +128,7 @@ export default function ProfileAside({
         </section>
       )}
 
+      {/* Joined communities */}
       {fursona.show_communities !== false && (
         <section className="rounded-xl border border-border/20 bg-secondary-dim/35 p-4">
           <span className="flex items-center gap-2">
@@ -134,6 +138,20 @@ export default function ProfileAside({
           <div className="mt-3">
             <EmptyProfileSection>
               No public communities yet.
+            </EmptyProfileSection>
+          </div>
+        </section>
+      )}
+
+      {fursona.show_events === false && fursona.show_communities === false && (
+        <section className="rounded-xl border border-border/20 bg-secondary-dim/35 p-4">
+          <span className="flex items-center gap-2">
+            <UsersIcon className="size-5 text-primary" />
+            <TypographyLead>Suggested Accounts</TypographyLead>
+          </span>
+          <div className="mt-3">
+            <EmptyProfileSection>
+              No suggested users found.
             </EmptyProfileSection>
           </div>
         </section>

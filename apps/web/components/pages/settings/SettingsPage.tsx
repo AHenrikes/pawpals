@@ -4,8 +4,6 @@ import { useDebouncedCallback } from "use-debounce";
 import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
 import { useCleanupBlobUrl } from "@/hooks/useCleanupBlobUrl";
 import { useUser } from "@/providers/UserProvider";
-import { Button } from "@repo/ui/button";
-import { XIcon } from "lucide-react";
 import { SlidersHorizontalIcon } from "lucide-react";
 import { TypographyH1 } from "@repo/ui/typography";
 import EditProfileAside, { type EditProfileSection } from "./SettingsAside";
@@ -89,41 +87,14 @@ export default function SettingsPage({
   }, [resetForms]);
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full flex-1 flex-col md:flex-row">
+    <>
       <EditProfileAside
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
 
-      <section className="relative min-w-0 flex-1 p-4 sm:p-6 lg:p-10">
-        {onClose && (
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="outline"
-            onClick={onClose}
-            aria-label="Close settings"
-            className="absolute top-4 right-4 z-10 rounded-full"
-          >
-            <XIcon />
-          </Button>
-        )}
-
-        <div className="mx-auto w-full max-w-5xl">
-          <header className="mb-8 flex items-start gap-4">
-            <span className="hidden size-12 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-lg shadow-primary/10 sm:flex">
-              <SlidersHorizontalIcon className="size-5" aria-hidden="true" />
-            </span>
-            <div>
-              <TypographyH1 className="text-3xl sm:text-4xl">
-                Settings
-              </TypographyH1>
-              <p className="mt-2 max-w-2xl text-sm text-text-muted sm:text-base">
-                Manage your private account and shape how your active fursona
-                appears across Pawpals.
-              </p>
-            </div>
-          </header>
+      <section className="relative flex-1 min-w-0 p-4 overflow-y-scroll scrollbar-hide sm:px-10 sm:pt-6 lg:pb-28">
+        <div className="w-full max-w-5xl mx-auto">
           {activeSection === "account" && (
             <SettingsAccount
               firstName={firstName}
@@ -173,6 +144,6 @@ export default function SettingsPage({
           )}
         </div>
       </section>
-    </div>
+    </>
   );
 }

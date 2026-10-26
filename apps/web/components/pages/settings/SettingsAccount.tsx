@@ -90,19 +90,21 @@ export default function SettingsAccount({
   };
 
   return (
-    <div className="w-full space-y-8 pb-12">
+    <div className="w-full space-y-8">
       <section className="space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <TypographyH3>Account information</TypographyH3>
+        <div>
+          <TypographyH3>Account information</TypographyH3>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <p className="mt-1 text-sm text-text-muted">
               Your personal details and contact information.
             </p>
+
+            <p className="flex items-center gap-1.5 text-xs text-text-muted">
+              <ShieldCheckIcon className="size-4" />
+              This information is never shown on your profile.
+            </p>
           </div>
-          <p className="flex items-center gap-1.5 text-xs text-text-muted">
-            <ShieldCheckIcon className="size-4" />
-            This information is never shown on your profile.
-          </p>
         </div>
 
         <div className="glass-panel divide-y divide-border/30 overflow-hidden rounded-2xl">

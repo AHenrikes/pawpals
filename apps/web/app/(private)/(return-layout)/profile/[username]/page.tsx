@@ -7,13 +7,14 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { AnimatePresence } from "framer-motion";
+import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
 import ProfileInfo from "@/components/pages/profile/ProfileInfo";
 import ProfileContent from "@/components/pages/profile/ProfileContent";
 import ProfileAside from "@/components/pages/profile/ProfileAside";
 import ProfilePageSkeleton from "@/components/pages/profile/ProfilePageSkeleton";
 import ProfileAbout from "@/components/pages/profile/ProfileAbout";
-import ProfileEditModal from "@/components/pages/profile/ProfileEditModal";
+import SettingsPage from "@/components/pages/settings/SettingsPage";
 
 export default function ProfilePage() {
   const { currentFursona, loading: userLoading } = useUser();
@@ -69,7 +70,7 @@ export default function ProfilePage() {
           onClick={() => setIsEditOpen(true)}
         />
 
-        <div className="container relative z-20 -mt-14 pb-10 sm:-mt-18 md:-mt-24">
+        <div className="container relative z-20 -mt-14 pb-16 sm:-mt-18 md:-mt-24">
           {/* Profile header */}
           <ProfileInfo
             fursona={viewedFursona}
@@ -104,10 +105,15 @@ export default function ProfilePage() {
 
         {/* Profile setting modal */}
         {isOwnProfile && viewedFursona && (
-          <ProfileEditModal
-            isOpen={isEditOpen}
-            onClose={() => setIsEditOpen(false)}
-          />
+          <Dialog open={isEditOpen} onOpenChange={(open) => !open && setIsEditOpen(false)}>
+            <DialogContent
+              showCloseButton={false}
+              className="p-0 flex w-full flex-1 flex-col mx-auto bg-background rounded-xl overflow-hidden sm:p-0 md:flex-row md:max-w-[calc(100dvw-12rem)] md:max-h-[calc(100dvh-12rem)] xl:max-w-7xl"
+            >
+              <DialogTitle className="sr-only">Profile settings</DialogTitle>
+              <SettingsPage initialSection="profile" onClose={() => setIsEditOpen(false)} />
+            </DialogContent>
+          </Dialog>
         )}
       </>
     </AnimatePresence>

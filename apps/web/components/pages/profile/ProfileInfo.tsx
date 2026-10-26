@@ -17,6 +17,7 @@ import {
   UserRoundCheckIcon,
 } from "lucide-react";
 import ProfileCTA from "./ProfileCTA";
+import useAchievement from "@/hooks/useAchievement";
 
 interface ProfileInfoProps {
   fursona: FursonaProfile;
@@ -58,6 +59,9 @@ export default function ProfileInfo({
 
   toggle,
 }: Readonly<ProfileInfoProps>) {
+  const achievements = fursona.featured_achievements ?? [];
+  const achievementDetails = useAchievement();
+
   let followLabel = "Follow";
   let FollowIcon = UserPlusIcon;
 
@@ -107,15 +111,30 @@ export default function ProfileInfo({
           </div>
 
           <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4">
+            {/* achivements */}
             <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto scrollbar-hide">
-              {new Array(1, 2, 3, 4, 5, 6).map((item) => (
-                <div
-                  key={item}
-                  className="h-6 w-6 shrink-0 rounded-sm border border-primary/80 bg-secondary"
-                />
-              ))}
+              {achievements.map((achievementId) => {
+                const achievement = achievementDetails.find(
+                  ({ id }) => id === achievementId,
+                );
+
+                if (!achievement) return null;
+
+                return (
+                  <span
+                    key={achievement.id}
+                    role="img"
+                    aria-label={`${achievement.name}: ${achievement.description}`}
+                    title={`${achievement.name}: ${achievement.description}`}
+                    className="grid size-8 shrink-0 place-items-center rounded-full border border-primary/20 bg-primary/10 cursor-pointer"
+                  >
+                    {achievement.symbol}
+                  </span>
+                );
+              })}
             </div>
 
+            {/* CTA buttons */}
             {!isOwnProfile && (
               <div className="flex shrink-0 items-center gap-2">
                 {isFollowing && isMutual && (

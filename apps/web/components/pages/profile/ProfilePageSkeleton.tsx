@@ -7,7 +7,7 @@ export default function ProfilePageSkeleton() {
       <motion.section
         key="banner-skeleton"
         exit={{ opacity: 0 }}
-        className="relative h-56 w-full sm:h-72 md:h-96 xl:h-[28rem]"
+        className="relative h-56 w-full sm:h-72 md:h-96 xl:h-112"
       >
         <Skeleton className="h-full" />
       </motion.section>
@@ -33,25 +33,32 @@ export default function ProfilePageSkeleton() {
             </div>
           </motion.div>
 
-          <section className="flex gap-4">
+          <section>
             <motion.div
-              key="info-skeleton"
+              key="count-skeleton"
               exit={{ opacity: 0 }}
-              className="w-full space-y-6"
+              className="w-full"
             >
               <div className="grid grid-cols-4 gap-2 sm:flex sm:items-center sm:gap-4">
-                {[0, 1, 2].map((i) => (
+                {[0, 1, 2, 3].map((i) => (
                   <div
                     key={i}
                     className="flex min-w-16 flex-col items-center gap-1 sm:w-20 sm:flex-row sm:gap-2"
                   >
-                    <Skeleton className="h-7 w-10 rounded-full" />
-                    <Skeleton className="h-4 w-full rounded-xs" />
+                    <Skeleton className="h-16 w-full rounded-sm sm:h-10" />
                   </div>
                 ))}
               </div>
+            </motion.div>
+          </section>
 
-              <Skeleton className="h-16 w-full rounded-sm" />
+          <section className="flex gap-4">
+            <motion.div
+              key="others-skeleton"
+              exit={{ opacity: 0 }}
+              className="w-full space-y-6"
+            >
+              <Skeleton className="h-24 w-full rounded-sm" />
             </motion.div>
 
             <aside className="hidden w-72 shrink-0 flex-col gap-5 space-y-6 lg:block xl:w-80">

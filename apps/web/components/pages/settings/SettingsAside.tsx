@@ -3,7 +3,7 @@
 import AvatarWithName from "@/components/avatar-icons/AvatarWithName";
 import { Button } from "@repo/ui/button";
 import { cn } from "@repo/ui/lib/utils";
-import { CircleUserRoundIcon, UserRoundPenIcon } from "lucide-react";
+import { CircleUserRoundIcon, SlidersHorizontalIcon, UserRoundPenIcon } from "lucide-react";
 
 export type EditProfileSection = "account" | "profile";
 
@@ -32,10 +32,7 @@ export default function SettingsAside({
   onSectionChange,
 }: Readonly<EditProfileAsideProps>) {
   return (
-    <aside className="border-b border-white/10 bg-surface/35 p-4 backdrop-blur-2xl md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-60 md:shrink-0 md:border-r md:border-b-0 md:p-6 lg:w-72">
-      <p className="mb-4 hidden text-xs font-semibold tracking-[0.18em] text-text-muted uppercase md:block">
-        Preferences
-      </p>
+    <aside className="shrink-0 border-b border-white/10 bg-surface/35 p-4 backdrop-blur-2xl md:w-60 md:border-r md:border-b-0 md:p-6 lg:w-72">
       <AvatarWithName />
 
       <div className="my-5 h-px w-full bg-border/40" />

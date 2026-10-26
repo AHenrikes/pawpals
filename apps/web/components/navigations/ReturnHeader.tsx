@@ -8,11 +8,11 @@ import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { useCurrentPath } from "@/hooks/usePath";
+import { TypographyH1 } from "@repo/ui/typography";
 
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
-    const username = decodeURIComponent(pathname.slice(2));
-    return Boolean(username);
+    return true;
   }
 
   return false;
@@ -32,15 +32,21 @@ export default function ReturnHeader() {
       )}
     >
       <div className="flex justify-between items-center h-16 px-2 gap-4 md:px-4">
-        <Button
-          size="icon-sm"
-          variant={"outline"}
-          onClick={() => router.back()}
-          aria-label="Go back"
-          className="glass-control rounded-full text-text-muted hover:text-text"
-        >
-          <ArrowLeftIcon aria-hidden="true" className="size-5" />
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            size="icon-sm"
+            variant={"outline"}
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="glass-control rounded-full text-text-muted hover:text-text"
+          >
+            <ArrowLeftIcon aria-hidden="true" className="size-5" />
+          </Button>
+
+          <TypographyH1 className="hidden text-3xl sm:block sm:text-2xl">
+            {useCurrentPath().slice(1)}
+          </TypographyH1>
+        </div>
 
         <div className="flex items-center gap-2">
           <Searchbar onOpenChange={setSearchOpen} />

@@ -364,7 +364,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   };
 
   return (
-    <div className="w-full space-y-8 pb-28">
+    <div className="w-full space-y-8">
       <div>
         <TypographyH2>Public profile</TypographyH2>
         <p className="mt-1 text-sm text-text-muted">
@@ -472,7 +472,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 rows={5}
                 disabled={saving}
                 placeholder="A little something about your fursona..."
-                className="bg-surface/55 backdrop-blur-lg focus-visible:border-primary/60 focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="bg-surface/55 backdrop-blur-lg rounded-md focus-visible:border-primary/60 focus-visible:ring-3 focus-visible:ring-primary/20"
               />
             </div>
           </SettingsSection>

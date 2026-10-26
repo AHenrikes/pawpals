@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { SettingsIcon } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { useRouter } from "next/navigation";
 import { type FursonaProfile } from "@/types/fursona";
 import Image from "next/image";
 
@@ -15,6 +16,17 @@ export default function ProfileBanner({
   isOwnProfile,
   onClick,
 }: Readonly<ProfileBannerProps>) {
+  const router = useRouter();
+
+  const handleSettingsClick = () => {
+    if (globalThis.matchMedia("(max-width: 1024px)").matches) {
+      router.push("/settings");
+      return;
+    }
+
+    onClick();
+  };
+
   return (
     <motion.div
       key="banner-content"
@@ -41,7 +53,7 @@ export default function ProfileBanner({
           <Button
             size={"icon-sm"}
             variant={"outline"}
-            onClick={onClick}
+            onClick={handleSettingsClick}
             className="p-1 text-text-muted hover:text-text"
           >
             <SettingsIcon />
