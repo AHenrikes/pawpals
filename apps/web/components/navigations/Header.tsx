@@ -20,7 +20,7 @@ export default function Header() {
         searchOpen ? "bg-background" : "bg-background/65 backdrop-blur-2xl",
       )}
     >
-      <div className="flex items-center justify-between h-16 px-2 md:px-4">
+      <div className="flex justify-between items-center h-16 px-2 gap-3 md:px-4">
         <div className="flex gap-1 items-center">
           <SidebarTrigger className="border-none" />
 
@@ -31,7 +31,7 @@ export default function Header() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Searchbar onOpenChange={setSearchOpen} />
           <ThemeSwitcher />
           <div className="rounded-full ring-2 ring-white/10 transition hover:ring-primary/50">

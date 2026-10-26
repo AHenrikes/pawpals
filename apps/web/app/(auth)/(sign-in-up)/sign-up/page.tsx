@@ -101,7 +101,6 @@ export default function SignUp() {
 
       if (error) {
         toast.error(ERROR_MESSAGES.SERVER_ERROR);
-        toast.error(error.code);
         return;
       }
 

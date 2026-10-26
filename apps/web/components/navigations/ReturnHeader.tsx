@@ -31,7 +31,7 @@ export default function ReturnHeader() {
         searchOpen ? "bg-background" : null,
       )}
     >
-      <div className="flex justify-between items-center h-16 px-2 md:px-4">
+      <div className="flex justify-between items-center h-16 px-2 gap-4 md:px-4">
         <Button
           size="icon-sm"
           variant={"outline"}
@@ -42,7 +42,7 @@ export default function ReturnHeader() {
           <ArrowLeftIcon aria-hidden="true" className="size-5" />
         </Button>
 
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center gap-2">
           <Searchbar onOpenChange={setSearchOpen} />
           <ThemeSwitcher />
 
