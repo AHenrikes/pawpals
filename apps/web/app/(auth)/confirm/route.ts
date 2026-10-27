@@ -1,7 +1,6 @@
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { createServer } from "@repo/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
-import { redirect } from "next/navigation";
 import { type User } from "@supabase/supabase-js";
 
 export async function GET(request: NextRequest) {
@@ -12,17 +11,17 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? AUTH_ROUTES.HOME;
   const supabase = await createServer();
 
-  const errorRedirect = (msg: string): never =>
-    redirect(`${AUTH_ROUTES.ERROR}?error=${encodeURIComponent(msg)}`);
+  const errorRedirect = (msg: string) =>
+    NextResponse.redirect(
+      new URL(`${AUTH_ROUTES.ERROR}?error=${encodeURIComponent(msg)}`, request.url),
+    );
 
   const handleUser = async (user: User) => {
     const metadata = user.user_metadata ?? {};
     const initFursona = metadata.onboarding_init_fursona;
 
     if (!initFursona?.display_name || !initFursona?.username || !user.email) {
-      errorRedirect(
-        "Sign-up profile data is incomplete. Please sign up again.",
-      );
+      return errorRedirect("Sign-up profile data is incomplete. Please sign up again.");
     }
 
     const { error } = await supabase.rpc("create_account", {
@@ -36,22 +35,29 @@ export async function GET(request: NextRequest) {
       p_bio: initFursona.bio ?? null,
     });
 
-    if (error) errorRedirect(error.message);
+    if (error) return errorRedirect(error.message);
+    return null;
   };
 
   if (token_hash && type) {
     const { data, error } = await supabase.auth.verifyOtp({ type, token_hash });
 
-    if (error) errorRedirect(error.message);
-    if (data.user) await handleUser(data.user);
+    if (error) return errorRedirect(error.message);
+    if (data.user) {
+      const redirectResponse = await handleUser(data.user);
+      if (redirectResponse) return redirectResponse;
+    }
   } else if (code) {
     const {
       data: { user },
       error,
     } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (error) errorRedirect(error.message);
-    if (user) await handleUser(user);
+    if (error) return errorRedirect(error.message);
+    if (user) {
+      const redirectResponse = await handleUser(user);
+      if (redirectResponse) return redirectResponse;
+    }
   } else {
     return NextResponse.redirect(
       new URL(`/error?error=No token hash or type`, request.url),

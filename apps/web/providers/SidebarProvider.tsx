@@ -9,11 +9,11 @@ import {
   useContext,
   useMemo,
   createContext,
-  useEffect,
   isValidElement,
   cloneElement,
 } from "react";
 import { Button } from "@repo/ui/button";
+import useIsMobile from "@/hooks/useIsMobile";
 
 type SidebarContextValue = {
   state: "expanded" | "collapsed";
@@ -58,22 +58,7 @@ export function SidebarProvider({
 }: SidebarProviderProps) {
   const [openState, setOpenState] = useState(defaultOpen);
   const [openMobile, setOpenMobile] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = globalThis.matchMedia("(max-width: 767px)");
-
-    const handleChange = (event: MediaQueryListEvent | MediaQueryList) => {
-      setIsMobile(event.matches);
-    };
-
-    handleChange(mediaQuery);
-
-    const listener = (event: MediaQueryListEvent) => handleChange(event);
-    mediaQuery.addEventListener("change", listener);
-
-    return () => mediaQuery.removeEventListener("change", listener);
-  }, []);
+  const isMobile = useIsMobile();
 
   const open = openProp ?? openState;
 

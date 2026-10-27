@@ -3,9 +3,9 @@
 import AvatarWithName from "@/components/avatar-icons/AvatarWithName";
 import { Button } from "@repo/ui/button";
 import { cn } from "@repo/ui/lib/utils";
-import { CircleUserRoundIcon, SlidersHorizontalIcon, UserRoundPenIcon } from "lucide-react";
+import { CircleUserRoundIcon, UserRoundPenIcon } from "lucide-react";
 
-export type EditProfileSection = "account" | "profile";
+export type EditProfileSection = "account" | "profile" | null;
 
 const sections = [
   {
@@ -25,20 +25,27 @@ const sections = [
 type EditProfileAsideProps = {
   activeSection: EditProfileSection;
   onSectionChange: (section: EditProfileSection) => void;
+  mobileNavigation?: boolean;
 };
 
 export default function SettingsAside({
   activeSection,
   onSectionChange,
+  mobileNavigation = false,
 }: Readonly<EditProfileAsideProps>) {
   return (
-    <aside className="shrink-0 border-b border-white/10 bg-surface/35 p-4 backdrop-blur-2xl md:w-60 md:border-r md:border-b-0 md:p-6 lg:w-72">
+    <aside
+      className={cn(
+        "shrink-0 border-b border-white/10 bg-surface/35 p-4 backdrop-blur-2xl md:w-60 md:border-r md:border-b-0 md:p-6 lg:w-72",
+        mobileNavigation && "w-1/2 border-r",
+      )}
+    >
       <AvatarWithName />
 
       <div className="my-5 h-px w-full bg-border/40" />
 
       <nav aria-label="Profile settings">
-        <ul className="grid grid-cols-2 gap-2 md:flex md:flex-col">
+        <ul className="flex flex-col gap-2">
           {sections.map(({ id, label, description, Icon }) => {
             const isActive = activeSection === id;
             return (

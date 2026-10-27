@@ -9,6 +9,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { useCurrentPath } from "@/hooks/usePath";
 import { TypographyH1 } from "@repo/ui/typography";
+import { useReturnHeader } from "./ReturnHeaderProvider";
 
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
@@ -20,14 +21,18 @@ function getUsername(pathname: string): boolean {
 
 export default function ReturnHeader() {
   const router = useRouter();
-  const profilePage = getUsername(useCurrentPath());
+  const pathname = useCurrentPath();
+  const profilePage = getUsername(pathname);
+  const { override } = useReturnHeader();
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <header
       className={cn(
         "top-0 w-full border-white/10 shadow-black/5 transition-colors z-50",
-        profilePage ? "absolute" : "fixed bg-background/65 border-b shadow-lg backdrop-blur-2xl",
+        profilePage
+          ? "absolute"
+          : "fixed bg-background/65 border-b shadow-lg backdrop-blur-2xl",
         searchOpen ? "bg-background" : null,
       )}
     >
@@ -36,8 +41,8 @@ export default function ReturnHeader() {
           <Button
             size="icon-sm"
             variant={"outline"}
-            onClick={() => router.back()}
-            aria-label="Go back"
+            onClick={override?.onBack ?? (() => router.back())}
+            aria-label={override ? "Previous" : "Go back"}
             className="glass-control rounded-full text-text-muted hover:text-text"
           >
             <ArrowLeftIcon aria-hidden="true" className="size-5" />

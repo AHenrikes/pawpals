@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useUsernameManager } from "@/hooks/core/fursonas/useUsernameManager";
 import { useCleanupBlobUrl } from "@/hooks/useCleanupBlobUrl";
+import useIsMobile from "@/hooks/useIsMobile";
 import { useUser } from "@/providers/UserProvider";
-import { SlidersHorizontalIcon } from "lucide-react";
-import { TypographyH1 } from "@repo/ui/typography";
+import { cn } from "@repo/ui/lib/utils";
+import { useReturnHeader } from "@/components/navigations/ReturnHeaderProvider";
 import EditProfileAside, { type EditProfileSection } from "./SettingsAside";
 import SettingsAccount from "./SettingsAccount";
 import SettingsProfile from "./SettingsProfile";
@@ -13,16 +14,22 @@ import SettingsProfile from "./SettingsProfile";
 type EditProfilePanelProps = {
   initialSection?: EditProfileSection;
   onClose?: () => void;
+  mobileNavigation?: boolean;
 };
 
 export default function SettingsPage({
-  initialSection = "account",
+  initialSection,
   onClose,
+  mobileNavigation = false,
 }: Readonly<EditProfilePanelProps>) {
   const { account, currentFursona, refresh } = useUser();
   const { checkAvailability, loading: usernameLoading } = useUsernameManager();
-  const [activeSection, setActiveSection] =
-    useState<EditProfileSection>(initialSection);
+  const isMobileViewport = useIsMobile();
+  const [activeSection, setActiveSection] = useState<EditProfileSection>(
+    initialSection ?? "profile",
+  );
+  const [isMobileSectionOpen, setIsMobileSectionOpen] = useState(false);
+  const { setOverride } = useReturnHeader();
   const [saving, setSaving] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -64,8 +71,35 @@ export default function SettingsPage({
   }, [activeSection, checkUsername, username]);
 
   useEffect(() => {
-    setActiveSection(initialSection);
-  }, [initialSection]);
+    if (isMobileSectionOpen) return;
+    setActiveSection(
+      mobileNavigation && isMobileViewport && initialSection == null
+        ? null
+        : (initialSection ?? "profile"),
+    );
+  }, [initialSection, isMobileViewport, isMobileSectionOpen, mobileNavigation]);
+
+  useEffect(() => {
+    if (!mobileNavigation || !isMobileViewport || !isMobileSectionOpen) {
+      setOverride(null);
+      return;
+    }
+
+    setOverride({
+      // title: activeSection === "account" ? "My account" : "Profile",
+      onBack: () => {
+        setIsMobileSectionOpen(false);
+        setActiveSection(null);
+      },
+    });
+    return () => setOverride(null);
+  }, [
+    activeSection,
+    isMobileSectionOpen,
+    isMobileViewport,
+    mobileNavigation,
+    setOverride,
+  ]);
 
   const resetForms = useCallback(() => {
     setFirstName(account?.firstname ?? "");
@@ -87,13 +121,32 @@ export default function SettingsPage({
   }, [resetForms]);
 
   return (
-    <>
+    <div
+      className={cn(
+        "flex min-h-0 flex-1",
+        mobileNavigation
+          ? cn(
+              "w-[200%] transition-transform duration-300 ease-in-out md:w-full md:translate-x-0",
+              isMobileSectionOpen ? "-translate-x-1/2" : "translate-x-0",
+            )
+          : "flex-col md:flex-row",
+      )}
+    >
       <EditProfileAside
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        mobileNavigation={mobileNavigation}
+        onSectionChange={(section) => {
+          setActiveSection(section);
+          setIsMobileSectionOpen(true);
+        }}
       />
 
-      <section className="relative flex-1 min-w-0 p-4 overflow-y-scroll scrollbar-hide sm:px-10 sm:pt-6 lg:pb-28">
+      <section
+        className={cn(
+          "relative min-w-0 overflow-y-auto p-4 scrollbar-hide sm:px-10 sm:pt-6 lg:pb-28",
+          mobileNavigation ? "w-1/2 shrink-0 md:w-auto md:flex-1" : "flex-1",
+        )}
+      >
         <div className="w-full max-w-5xl mx-auto">
           {activeSection === "account" && (
             <SettingsAccount
@@ -142,8 +195,14 @@ export default function SettingsPage({
               usernameLoading={usernameLoading}
             />
           )}
+
+          {activeSection === null && currentFursona && (
+            <div className="grid place-content-center h-dvh overflow-hidden">
+              <p>Choose a section</p>
+            </div>
+          )}
         </div>
       </section>
-    </>
+    </div>
   );
 }
