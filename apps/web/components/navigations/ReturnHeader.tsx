@@ -3,13 +3,14 @@
 import { Button } from "@repo/ui/button";
 import { ArrowLeftIcon, CircleAlertIcon } from "lucide-react";
 import { Searchbar } from "../modals/search/Searchbar";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { useCurrentPath } from "@/hooks/usePath";
 import { TypographyH1 } from "@repo/ui/typography";
 import { useReturnHeader } from "./ReturnHeaderProvider";
+import { motion } from "framer-motion";
 
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
@@ -20,7 +21,7 @@ function getUsername(pathname: string): boolean {
 }
 
 export default function ReturnHeader() {
-  const router = useRouter();
+  const { back } = usePageTransition();
   const pathname = useCurrentPath();
   const profilePage = getUsername(pathname);
   const { override } = useReturnHeader();
@@ -31,40 +32,44 @@ export default function ReturnHeader() {
       className={cn(
         "top-0 w-full border-white/10 shadow-black/5 transition-colors z-50",
         profilePage
-          ? "absolute"
+          ? "absolute bg-linear-to-b from-background to-transparent"
           : "fixed bg-background/65 border-b shadow-lg backdrop-blur-2xl",
         searchOpen ? "bg-background" : null,
       )}
     >
       <div className="flex justify-between items-center h-16 px-2 gap-4 md:px-4">
-        <div className="flex gap-3">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex gap-2"
+        >
           <Button
             size="icon-sm"
             variant={"outline"}
-            onClick={override?.onBack ?? (() => router.back())}
+            onClick={override?.onBack ?? back}
             aria-label={override ? "Previous" : "Go back"}
             className="glass-control rounded-full text-text-muted hover:text-text"
           >
             <ArrowLeftIcon aria-hidden="true" className="size-5" />
           </Button>
 
-          <TypographyH1 className="hidden text-3xl sm:block sm:text-2xl">
+          <TypographyH1 className="hidden text-lg md:block md:text-2xl">
             {useCurrentPath().slice(1)}
           </TypographyH1>
-        </div>
+        </motion.div>
 
         <div className="flex items-center gap-2">
           <Searchbar onOpenChange={setSearchOpen} />
           <ThemeSwitcher />
 
-          <Button
-            size="icon"
-            variant={"none"}
+          <motion.button
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
             aria-label="Page information"
-            className="text-text-muted hover:bg-surface/60 hover:text-text"
+            className="p-1 text-text-muted hover:text-text hover:cursor-pointer"
           >
             <CircleAlertIcon aria-hidden="true" />
-          </Button>
+          </motion.button>
         </div>
       </div>
     </header>

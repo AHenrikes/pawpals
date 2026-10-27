@@ -9,6 +9,6 @@ export function useCurrentPath() {
 export function useIsCurrentPath(path: string): boolean {
   const currentPath = useCurrentPath();
   const normalizedPath = path.startsWith("/") ? path : "/" + path;
-  
+
   return currentPath === normalizedPath;
 }

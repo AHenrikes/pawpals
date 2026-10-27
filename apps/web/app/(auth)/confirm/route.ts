@@ -13,7 +13,10 @@ export async function GET(request: NextRequest) {
 
   const errorRedirect = (msg: string) =>
     NextResponse.redirect(
-      new URL(`${AUTH_ROUTES.ERROR}?error=${encodeURIComponent(msg)}`, request.url),
+      new URL(
+        `${AUTH_ROUTES.ERROR}?error=${encodeURIComponent(msg)}`,
+        request.url,
+      ),
     );
 
   const handleUser = async (user: User) => {
@@ -21,7 +24,9 @@ export async function GET(request: NextRequest) {
     const initFursona = metadata.onboarding_init_fursona;
 
     if (!initFursona?.display_name || !initFursona?.username || !user.email) {
-      return errorRedirect("Sign-up profile data is incomplete. Please sign up again.");
+      return errorRedirect(
+        "Sign-up profile data is incomplete. Please sign up again.",
+      );
     }
 
     const { error } = await supabase.rpc("create_account", {

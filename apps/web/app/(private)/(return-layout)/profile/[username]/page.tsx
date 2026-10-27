@@ -6,7 +6,6 @@ import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
-import { AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
 import ProfileInfo from "@/components/pages/profile/ProfileInfo";
@@ -61,61 +60,65 @@ export default function ProfilePage() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <>
-        {/* Banner */}
-        <ProfileBanner
+    <>
+      {/* Banner */}
+      <ProfileBanner
+        fursona={viewedFursona}
+        isOwnProfile={isOwnProfile}
+        onClick={() => setIsEditOpen(true)}
+      />
+
+      <div className="container relative z-20 -mt-14 pb-16 sm:-mt-18 md:-mt-24">
+        {/* Profile header */}
+        <ProfileInfo
           fursona={viewedFursona}
+
+          // CTA buttons
           isOwnProfile={isOwnProfile}
-          onClick={() => setIsEditOpen(true)}
+          isFollowing={isFollowing}
+          isMutual={isMutual}
+          followLoading={followLoading}
+
+          // Counts
+          postsCount={posts}
+          followersCount={followers}
+          followingCount={following}
+          likesCount={likes}
+
+          toggle={handleFollowToggle}
         />
 
-        <div className="container relative z-20 -mt-14 pb-16 sm:-mt-18 md:-mt-24">
-          {/* Profile header */}
-          <ProfileInfo
-            fursona={viewedFursona}
+        <section className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
+          <main className="w-full min-w-0 flex-1 space-y-4">
+            {/* About */}
+            <ProfileAbout fursona={viewedFursona} />
 
-            // CTA buttons
-            isOwnProfile={isOwnProfile}
-            isFollowing={isFollowing}
-            isMutual={isMutual}
-            followLoading={followLoading}
+            {/* Content */}
+            <ProfileContent fursona={viewedFursona} />
+          </main>
 
-            // Counts
-            postsCount={posts}
-            followersCount={followers}
-            followingCount={following}
-            likesCount={likes}
+          <ProfileAside fursona={viewedFursona} reputation={reputation} />
+        </section>
+      </div>
 
-            toggle={handleFollowToggle}
-          />
-
-          <section className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
-            <main className="w-full min-w-0 flex-1 space-y-4">
-              {/* About */}
-              <ProfileAbout fursona={viewedFursona} />
-
-              {/* Content */}
-              <ProfileContent fursona={viewedFursona} />
-            </main>
-
-            <ProfileAside fursona={viewedFursona} reputation={reputation} />
-          </section>
-        </div>
-
-        {/* Profile setting modal */}
-        {isOwnProfile && viewedFursona && (
-          <Dialog open={isEditOpen} onOpenChange={(open) => !open && setIsEditOpen(false)}>
-            <DialogContent
-              showCloseButton={false}
-              className="p-0 flex w-full flex-1 flex-col mx-auto bg-background rounded-xl overflow-hidden sm:p-0 md:flex-row md:max-w-[calc(100dvw-12rem)] md:max-h-[calc(100dvh-12rem)] xl:max-w-7xl"
-            >
-              <DialogTitle className="sr-only">Profile settings</DialogTitle>
-              <SettingsPage initialSection="profile" onClose={() => setIsEditOpen(false)} />
-            </DialogContent>
-          </Dialog>
-        )}
-      </>
-    </AnimatePresence>
+      {/* Profile setting modal */}
+      {isOwnProfile && viewedFursona && (
+        <Dialog
+          open={isEditOpen}
+          onOpenChange={(open) => !open && setIsEditOpen(false)}
+        >
+          <DialogContent
+            showCloseButton={false}
+            className="p-0 flex w-full flex-1 flex-col mx-auto bg-background rounded-xl overflow-hidden sm:p-0 md:flex-row md:max-w-[calc(100dvw-12rem)] md:max-h-[calc(100dvh-12rem)] xl:max-w-7xl"
+          >
+            <DialogTitle className="sr-only">Profile settings</DialogTitle>
+            <SettingsPage
+              initialSection="profile"
+              onClose={() => setIsEditOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }

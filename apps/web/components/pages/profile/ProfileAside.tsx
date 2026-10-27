@@ -150,9 +150,7 @@ export default function ProfileAside({
             <TypographyLead>Suggested Accounts</TypographyLead>
           </span>
           <div className="mt-3">
-            <EmptyProfileSection>
-              No suggested users found.
-            </EmptyProfileSection>
+            <EmptyProfileSection>No suggested users found.</EmptyProfileSection>
           </div>
         </section>
       )}

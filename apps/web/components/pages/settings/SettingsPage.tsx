@@ -197,7 +197,7 @@ export default function SettingsPage({
           )}
 
           {activeSection === null && currentFursona && (
-            <div className="grid place-content-center h-dvh overflow-hidden">
+            <div className="grid place-content-center">
               <p>Choose a section</p>
             </div>
           )}

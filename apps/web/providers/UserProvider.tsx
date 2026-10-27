@@ -14,7 +14,7 @@ import { api } from "@/lib/api/api-client";
 import { toError } from "@/lib/helpers/error-utils";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { type PrivateAccountTypes } from "@/types/account";
 import type { FursonaTypes, FursonaWithBoolean } from "@/types/fursona";
 
@@ -40,7 +40,7 @@ export function UserProvider({
   const isMountedRef = useRef(true);
   const initialLoadDone = useRef(false);
   const refreshIdRef = useRef(0);
-  const router = useRouter();
+  const { navigate } = usePageTransition();
 
   const [account, setAccount] = useState<PrivateAccountTypes | null>(null);
   const [fursonas, setFursonas] = useState<FursonaTypes[]>([]);
@@ -148,7 +148,7 @@ export function UserProvider({
       if (!isMountedRef.current) return;
 
       if (event === "SIGNED_OUT") {
-        router.push(AUTH_ROUTES.SIGN_IN);
+        navigate(AUTH_ROUTES.SIGN_IN, { replace: true });
         clearAuthState();
         setState({ loading: false });
         return;
@@ -178,7 +178,7 @@ export function UserProvider({
       isMountedRef.current = false;
       data?.subscription?.unsubscribe();
     };
-  }, [router, refresh, supabase, clearAuthState, setState]);
+  }, [navigate, refresh, supabase, clearAuthState, setState]);
 
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();

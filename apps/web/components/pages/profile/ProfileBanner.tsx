@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { SettingsIcon } from "lucide-react";
 import { Button } from "@repo/ui/button";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { type FursonaProfile } from "@/types/fursona";
 import Image from "next/image";
 
@@ -16,11 +16,11 @@ export default function ProfileBanner({
   isOwnProfile,
   onClick,
 }: Readonly<ProfileBannerProps>) {
-  const router = useRouter();
+  const { navigate } = usePageTransition();
 
   const handleSettingsClick = () => {
     if (globalThis.matchMedia("(max-width: 1024px)").matches) {
-      router.push("/settings");
+      navigate("/settings");
       return;
     }
 

@@ -9,7 +9,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
@@ -177,7 +177,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
     refresh,
     onClose,
   } = props;
-  const router = useRouter();
+  const { navigate } = usePageTransition();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const platformOptions = usePlatformOption();
@@ -354,7 +354,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       setNewChange(false);
       toast.success("Profile settings saved");
       if (onClose && nextUsername !== currentFursona.username)
-        router.replace(`/@${nextUsername}`);
+        navigate(`/@${nextUsername}`, { replace: true });
       onClose?.();
     } catch (error) {
       toast.error(`Update failed: ${getErrorMessage(error)}`);

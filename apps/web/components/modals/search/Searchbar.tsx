@@ -20,6 +20,7 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
   const inputId = useId();
   const fieldRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -32,11 +33,19 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
 
   useEffect(() => {
     return () => {
+      if (openTimer.current) clearTimeout(openTimer.current);
       if (closeTimer.current) clearTimeout(closeTimer.current);
     };
   }, []);
 
   LockScreen(open);
+
+  const clearOpenTimer = () => {
+    if (openTimer.current) {
+      clearTimeout(openTimer.current);
+      openTimer.current = null;
+    }
+  };
 
   const clearCloseTimer = () => {
     if (closeTimer.current) {
@@ -47,10 +56,20 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
 
   const handleMouseEnter = () => {
     clearCloseTimer();
+    clearOpenTimer();
+    openTimer.current = setTimeout(() => {
+      openTimer.current = null;
+      setIsHovered(true);
+    }, 350);
+  };
+
+  const handleModalMouseEnter = () => {
+    clearCloseTimer();
     setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
+    clearOpenTimer();
     clearCloseTimer();
     closeTimer.current = setTimeout(() => {
       setIsHovered(false);
@@ -59,6 +78,7 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
   };
 
   const handleClose = () => {
+    clearOpenTimer();
     clearCloseTimer();
     setIsHovered(false);
     setIsFocused(false);
@@ -89,7 +109,10 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
           ref={fieldRef}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          onFocusCapture={() => setIsFocused(true)}
+          onFocusCapture={() => {
+            clearOpenTimer();
+            setIsFocused(true);
+          }}
           onBlurCapture={handleBlur}
         >
           <FieldLabel htmlFor={inputId} className="sr-only">
@@ -97,7 +120,7 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
           </FieldLabel>
 
           <InputGroup className="glass-control h-9 w-10 overflow-hidden border-border rounded-full transition-[background-color,border-color] duration-300 hover:border-primary focus-within:border-primary/50">
-            <InputGroupAddon className="px-2.5 bg-background text-text-muted">
+            <InputGroupAddon className="p-2 bg-background text-text-muted">
               <SearchIcon aria-hidden="true" className="size-5" />
             </InputGroupAddon>
 
@@ -124,7 +147,7 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
         open={open}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
-        onMouseEnter={handleMouseEnter}
+        onMouseEnter={handleModalMouseEnter}
         onMouseLeave={handleMouseLeave}
         onFocusCapture={() => setIsFocused(true)}
         onBlurCapture={handleBlur}

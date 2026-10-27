@@ -6,7 +6,7 @@ import { TypographySmall } from "@repo/ui/typography";
 import { X } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "@repo/ui/sonner";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { useUser } from "@/providers/UserProvider";
 import { api } from "@/lib/api/api-client";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
@@ -24,7 +24,7 @@ export function CreateFursonaPanelModal({
   onClose,
   onSuccess,
 }: Readonly<CreateFursonaPanelModalProps>) {
-  const router = useRouter();
+  const { navigate } = usePageTransition();
   const { switchCurrentFursona } = useUser();
 
   const [loading, setLoading] = useState(false);
@@ -79,7 +79,7 @@ export function CreateFursonaPanelModal({
         bio: "",
       });
 
-      router.push(`/@${createdFursona.username}`);
+      navigate(`/@${createdFursona.username}`);
       toast.success(`Created ${createdFursona.display_name} successfully`);
     } catch {
       toast.error(ERROR_MESSAGES.FURSONA_CREATE_FAILED);

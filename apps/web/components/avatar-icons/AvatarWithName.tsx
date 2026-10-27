@@ -7,7 +7,9 @@ import { useUser } from "@/providers/UserProvider";
 import Link from "next/link";
 import { TypographyLead, TypographyP } from "@repo/ui/typography";
 
-export default function AvatarWithName({ size }: Readonly<{ size?: "lg" | "sm" }>) {
+export default function AvatarWithName({
+  size,
+}: Readonly<{ size?: "lg" | "sm" }>) {
   const { currentFursona } = useUser();
 
   const displayName = useMemo(() => {
@@ -31,7 +33,9 @@ export default function AvatarWithName({ size }: Readonly<{ size?: "lg" | "sm" }
 
       <span>
         <TypographyLead>{currentFursona?.display_name}</TypographyLead>
-        <TypographyP className="text-xs">{currentFursona?.username}</TypographyP>
+        <TypographyP className="text-xs">
+          {currentFursona?.username}
+        </TypographyP>
       </span>
     </Link>
   );

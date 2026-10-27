@@ -85,7 +85,8 @@ function parseProfilePreferences(
   if (body.social_links !== undefined) {
     const socialLinks = normalizeSocialLinks(body.social_links);
 
-    if (!socialLinks) return "Add no more than 6 social links using valid HTTPS URLs.";
+    if (!socialLinks)
+      return "Add no more than 6 social links using valid HTTPS URLs.";
     updates.social_links = socialLinks;
   }
 

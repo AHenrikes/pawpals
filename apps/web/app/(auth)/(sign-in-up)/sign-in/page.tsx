@@ -6,7 +6,7 @@ import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { Circle, EyeIcon, EyeOffIcon, MessagesSquare } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/field";
 import { validateSignIn } from "@/lib/auth/auth-validation";
@@ -21,7 +21,7 @@ import { useState } from "react";
 import { TypographyH2, TypographyP } from "@repo/ui/typography";
 
 export default function SignIn() {
-  const router = useRouter();
+  const { navigate } = usePageTransition();
   const supabase = useSupabaseClient();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +35,7 @@ export default function SignIn() {
       });
       if (error) throw error;
 
-      router.replace(AUTH_ROUTES.HOME);
+      navigate(AUTH_ROUTES.HOME, { replace: true });
     },
     { validate: validateSignIn },
   );

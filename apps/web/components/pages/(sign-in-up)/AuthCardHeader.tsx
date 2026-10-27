@@ -11,6 +11,7 @@ export default function AuthCardHeader({
     <CardHeader className="grid grid-cols-2 p-1 bg-secondary text-center rounded-sm shadow-xl overflow-hidden">
       <Link
         href={AUTH_ROUTES.SIGN_IN}
+        data-no-page-transition
         className={cn(
           "p-3 rounded-xs",
           activePath === AUTH_ROUTES.SIGN_IN ? "bg-accent" : null,
@@ -21,6 +22,7 @@ export default function AuthCardHeader({
 
       <Link
         href={AUTH_ROUTES.SIGN_UP}
+        data-no-page-transition
         className={cn(
           "p-3 rounded-xs",
           activePath === AUTH_ROUTES.SIGN_UP ? "bg-accent" : null,

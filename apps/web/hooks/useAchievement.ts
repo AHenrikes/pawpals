@@ -33,5 +33,5 @@ const achievements: Array<{
 ];
 
 export default function useAchievement() {
-  return achievements 
+  return achievements;
 }

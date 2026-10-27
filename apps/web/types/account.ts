@@ -4,7 +4,7 @@ export type AccountType = {
   status: "active" | "suspended" | "closed";
   platform_role: "user" | "admin";
   default_fursona_id: string;
-}
+};
 
 export type PrivateAccountTypes = {
   account_id: string;

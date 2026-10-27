@@ -14,10 +14,10 @@ import {
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { FormError } from "@/components/ui/form-error";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 
 export default function UpdatePassword() {
-  const router = useRouter();
+  const { navigate } = usePageTransition();
   const supabase = useSupabaseClient();
 
   const { values, error, isLoading, handleChange, handleSubmit } = useAuthForm(
@@ -27,7 +27,7 @@ export default function UpdatePassword() {
         password: values.password,
       });
       if (error) throw error;
-      router.push(AUTH_ROUTES.HOME);
+      navigate(AUTH_ROUTES.HOME);
     },
   );
 

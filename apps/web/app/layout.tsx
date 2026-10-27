@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@repo/ui/sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { type Metadata } from "next";
+import { PageTransitionProvider } from "@/components/transitions/PageTransitionProvider";
 import "./pawpals.css";
 
 // TODO remove before publishing
@@ -46,7 +47,7 @@ export default function RootLayout({
         >
           <QueryProvider>
             <Toaster position="top-center" />
-            {children}
+            <PageTransitionProvider>{children}</PageTransitionProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

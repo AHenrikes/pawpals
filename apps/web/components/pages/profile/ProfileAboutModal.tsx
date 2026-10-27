@@ -138,18 +138,19 @@ export default function ProfileAboutModal({
             </>
           )}
 
-          {fursona.show_events === false && fursona.show_communities === false && (
-            <>
-              <Separator className="h-px" />
-              <section className="space-y-3">
-                <span className="flex items-center gap-2">
-                  <UsersIcon className="size-5 text-primary" />
-                  <TypographyLead>Suggested Accounts</TypographyLead>
-                </span>
-                <EmptyState>No Suggested users found.</EmptyState>
-              </section>
-            </>
-          )}
+          {fursona.show_events === false &&
+            fursona.show_communities === false && (
+              <>
+                <Separator className="h-px" />
+                <section className="space-y-3">
+                  <span className="flex items-center gap-2">
+                    <UsersIcon className="size-5 text-primary" />
+                    <TypographyLead>Suggested Accounts</TypographyLead>
+                  </span>
+                  <EmptyState>No Suggested users found.</EmptyState>
+                </section>
+              </>
+            )}
         </div>
       </DrawerContent>
     </Drawer>

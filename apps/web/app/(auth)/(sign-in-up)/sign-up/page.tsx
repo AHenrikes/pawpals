@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
@@ -22,7 +22,7 @@ type SignUpValues = {
 };
 
 export default function SignUp() {
-  const router = useRouter();
+  const { navigate } = usePageTransition();
   const supabase = useSupabaseClient();
 
   const [isUsernameAvailable, setIsUsernameAvailable] =
@@ -104,7 +104,7 @@ export default function SignUp() {
         return;
       }
 
-      router.push(AUTH_ROUTES.SIGNUP_SUCCESS);
+      navigate(AUTH_ROUTES.SIGNUP_SUCCESS);
     },
   );
 
