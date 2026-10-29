@@ -4,7 +4,7 @@ import {
   okPrivateRead,
   serverError,
 } from "@/lib/api/responses";
-import { withUser } from "@/lib/auth/withUser";
+import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { NextRequest } from "next/server";
 
@@ -20,12 +20,12 @@ type ProfileStatsRow = Omit<ProfileCounts, "reputation_count"> & {
   reputation: number;
 };
 
-export const GET = withUser(
-  async (
-    { supabase },
+export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
-  ) => {
+  ) {
+    const { supabase, account, response } = await requireUser();
+    if (response && response.status !== 401) return response;
     const { id } = await params;
 
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
@@ -34,7 +34,9 @@ export const GET = withUser(
       .schema("social")
       .rpc("get_fursona_stats", {
         p_target_fursona_id: id,
-        p_actor_fursona_id: request.headers.get("x-acting-fursona-id") || null,
+        p_actor_fursona_id: account
+          ? request.headers.get("x-acting-fursona-id") || account.default_fursona_id
+          : null,
       })
       .maybeSingle();
 
@@ -49,5 +51,4 @@ export const GET = withUser(
       like_count: stats.like_count,
       reputation_count: stats.reputation,
     } satisfies ProfileCounts);
-  },
-);
+  }

@@ -1,4 +1,5 @@
 import { withUser } from "@/lib/auth/withUser";
+import { requireUser } from "@/lib/auth/requireUser";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import {
   FursonaCreate,
@@ -20,6 +21,7 @@ import {
 import { type SupabaseClient } from "@supabase/supabase-js";
 
 const visibilityValues = new Set(["public", "followers_only", "private"]);
+const profileThemeValues = new Set(["light", "dark"]);
 const achievementValues = new Set([
   "early_paw",
   "community_builder",
@@ -71,6 +73,13 @@ function parseProfilePreferences(
       return "Invalid profile visibility.";
     updates.visibility = body.visibility;
   }
+
+  if (body.profile_theme !== undefined) {
+    if (!profileThemeValues.has(body.profile_theme)) return "Invalid profile theme.";
+    updates.profile_theme = body.profile_theme;
+  }
+
+  if (body.show_reputation === false) return "Reputation is always visible.";
 
   for (const field of [
     "show_reputation",
@@ -169,12 +178,12 @@ async function applyFursonaPatch(
   return null;
 }
 
-export const GET = withUser(
-  async (
-    { supabase },
+export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
-  ) => {
+  ) {
+    const { supabase, account, response } = await requireUser();
+    if (response && response.status !== 401) return response;
     const { id } = await params;
 
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
@@ -183,7 +192,9 @@ export const GET = withUser(
       .schema("social")
       .rpc("get_fursona_profile_by_identifier", {
         p_identifier: id,
-        p_actor_fursona_id: request.headers.get("x-acting-fursona-id") || null,
+        p_actor_fursona_id: account
+          ? request.headers.get("x-acting-fursona-id") || account.default_fursona_id
+          : null,
       })
       .maybeSingle();
 
@@ -192,8 +203,7 @@ export const GET = withUser(
     if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
     if (!profile) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
     return okPrivateRead<FursonaProfile>(profile as unknown as FursonaProfile);
-  },
-);
+  }
 
 export const PATCH = withUser(
   async (
@@ -225,13 +235,19 @@ export const PATCH = withUser(
       updates,
     );
 
-    if (patchError) return badRequest(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    if (patchError) {
+      console.error("Profile update failed", {
+        code: patchError.code,
+        message: patchError.message,
+      });
+      return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    }
 
     const { data: fursona, error: fetchError } = await supabase
       .schema("core")
       .from("fursonas")
       .select(
-        "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, visibility, social_links, show_reputation, show_events, show_communities, featured_achievements, status, created_at, updated_at",
+        "id, display_name, username, avatar_url, banner_url, species, pronouns, bio, visibility, profile_theme, social_links, show_reputation, show_events, show_communities, featured_achievements, status, created_at, updated_at",
       )
       .eq("id", id)
       .eq("account_id", account.id)

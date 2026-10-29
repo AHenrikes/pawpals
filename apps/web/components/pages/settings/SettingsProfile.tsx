@@ -13,6 +13,8 @@ import { usePageTransition } from "@/components/transitions/PageTransitionProvid
 import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
+import { MAX_IMAGE_SIZE_BYTES } from "@/lib/uploads/imageLimits";
+import { mediaImageLoader } from "@/lib/uploads/mediaImageLoader";
 import { cn } from "@/lib/helpers/utils";
 import type {
   FursonaTypes,
@@ -26,7 +28,7 @@ import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
 import { toast } from "@repo/ui/sonner";
-import { TypographyH2, TypographyH3 } from "@repo/ui/typography";
+import { TypographyH3 } from "@repo/ui/typography";
 import {
   AtSignIcon,
   AwardIcon,
@@ -138,12 +140,15 @@ function SettingsSection({
   children: React.ReactNode;
 }>) {
   return (
-    <section className="glass-panel space-y-5 rounded-2xl p-5 sm:p-6">
+    <section className="space-y-5">
       <div>
         <TypographyH3>{title}</TypographyH3>
         <p className="mt-1 text-sm text-text-muted">{description}</p>
       </div>
-      {children}
+
+      <div className="glass-panel space-y-4 rounded-2xl p-5 sm:p-6">
+        {children}
+      </div>
     </section>
   );
 }
@@ -183,21 +188,25 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   const platformOptions = usePlatformOption();
   const achievements = useAchievement();
   const [newChange, setNewChange] = useState(false);
+
   const [visibility, setVisibility] = useState<ProfileVisibility>(
     currentFursona.visibility ?? "public",
   );
+
+  const [profileTheme, setProfileTheme] = useState<"light" | "dark">(currentFursona.profile_theme ?? "dark");
+
   const [socialLinks, setSocialLinks] = useState<ProfileSocialLink[]>(
     currentFursona.social_links ?? [],
   );
-  const [showReputation, setShowReputation] = useState(
-    currentFursona.show_reputation ?? true,
-  );
+
   const [showEvents, setShowEvents] = useState(
     currentFursona.show_events ?? true,
   );
+
   const [showCommunities, setShowCommunities] = useState(
     currentFursona.show_communities ?? true,
   );
+
   const [featuredAchievements, setFeaturedAchievements] = useState<
     ProfileAchievement[]
   >(currentFursona.featured_achievements ?? []);
@@ -206,17 +215,18 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
     () => achievements.filter((item) => featuredAchievements.includes(item.id)),
     [featuredAchievements],
   );
+
   const visibilityLabel = {
     public: "Visible to everyone",
     followers_only: "Visible to followers",
-    private: "Visible only to you",
+    private: "Visible to approved followers",
   }[visibility];
 
   const resetProfile = () => {
     resetForms();
     setVisibility(currentFursona.visibility ?? "public");
+    setProfileTheme(currentFursona.profile_theme ?? "dark");
     setSocialLinks(currentFursona.social_links ?? []);
-    setShowReputation(currentFursona.show_reputation ?? true);
     setShowEvents(currentFursona.show_events ?? true);
     setShowCommunities(currentFursona.show_communities ?? true);
     setFeaturedAchievements(currentFursona.featured_achievements ?? []);
@@ -225,8 +235,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
 
   useEffect(() => {
     setVisibility(currentFursona.visibility ?? "public");
+    setProfileTheme(currentFursona.profile_theme ?? "dark");
     setSocialLinks(currentFursona.social_links ?? []);
-    setShowReputation(currentFursona.show_reputation ?? true);
     setShowEvents(currentFursona.show_events ?? true);
     setShowCommunities(currentFursona.show_communities ?? true);
     setFeaturedAchievements(currentFursona.featured_achievements ?? []);
@@ -283,9 +293,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       event.target.value = "";
       return;
     }
-    const maxSize = type === "banner" ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      toast.error(`${type === "banner" ? "Banner" : "Avatar"} is too large.`);
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      toast.error(`${type === "banner" ? "Banner" : "Avatar"} is too large. Maximum size is ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024} MiB.`);
+      event.target.value = "";
       return;
     }
     const previewUrl = URL.createObjectURL(file);
@@ -339,11 +349,11 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         pronouns,
         bio,
         visibility,
+        profile_theme: profileTheme,
         social_links: socialLinks.map((link) => ({
           ...link,
           url: link.url.trim(),
         })),
-        show_reputation: showReputation,
         show_events: showEvents,
         show_communities: showCommunities,
         featured_achievements: featuredAchievements,
@@ -364,19 +374,12 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   };
 
   return (
-    <div className="w-full space-y-8">
-      <div>
-        <TypographyH2>Public profile</TypographyH2>
-        <p className="mt-1 text-sm text-text-muted">
-          Shape what people see when they visit your active fursona.
-        </p>
-      </div>
-
+    <div className="w-full space-y-8 pb-20">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
         <div className="space-y-6">
           <SettingsSection
-            title="Identity"
-            description="Your profile image, name, handle, and introduction."
+            title="Profile information"
+            description="Shape what people see when they visit your active fursona."
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -549,7 +552,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
 
           <SettingsSection
             title="Profile privacy"
-            description="Choose who can open and follow this fursona profile."
+            description="Choose who can view your content."
           >
             <div className="grid gap-3 sm:grid-cols-3">
               {[
@@ -568,7 +571,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 {
                   value: "private" as const,
                   label: "Private",
-                  detail: "Only you",
+                  detail: "Approved followers",
                   Icon: LockIcon,
                 },
               ].map(({ value, label, detail, Icon }) => (
@@ -599,7 +602,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 </Button>
               ))}
             </div>
-            {visibility === "followers_only" && (
+            {visibility !== "public" && (
               <p className="flex items-center gap-2 rounded-lg bg-primary/10 p-3 text-xs text-text-muted">
                 <ShieldCheckIcon className="size-4 text-primary" />
                 New follow requests require your approval before they can view
@@ -608,20 +611,17 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
             )}
           </SettingsSection>
 
+          <SettingsSection title="Profile theme" description="Visitors see this profile in your chosen theme without changing their app theme.">
+            <div className="flex gap-2">
+              {(["light", "dark"] as const).map((theme) => <Button key={theme} type="button" variant={profileTheme === theme ? "default" : "outline"} onClick={() => { setProfileTheme(theme); setNewChange(true); }}>{theme === "light" ? "Light" : "Dark"}</Button>)}
+            </div>
+          </SettingsSection>
+
           <SettingsSection
             title="Profile sections"
             description="Control which activity summaries visitors can see."
           >
             <div className="grid gap-3 md:grid-cols-3">
-              <PreferenceToggle
-                checked={showReputation}
-                onChange={(value) => {
-                  setShowReputation(value);
-                  setNewChange(true);
-                }}
-                label="Reputation"
-                description="Show score and trust level."
-              />
               <PreferenceToggle
                 checked={showEvents}
                 onChange={(value) => {
@@ -687,7 +687,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
         </div>
 
-        <aside className="xl:sticky xl:top-20">
+        <aside className="xl:sticky xl:top-7">
           <p className="mb-2 text-xs font-semibold tracking-widest text-text-muted uppercase">
             Live preview
           </p>
@@ -701,8 +701,10 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
               {bannerPreview && (
                 <Image
                   src={bannerPreview}
+                  loader={bannerPreview.startsWith("/api/media/") ? mediaImageLoader : undefined}
                   alt="Profile banner preview"
                   fill
+                  sizes="288px"
                   className="object-cover"
                 />
               )}
@@ -727,8 +729,10 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 {avatarPreview && (
                   <Image
                     src={avatarPreview}
+                    loader={avatarPreview.startsWith("/api/media/") ? mediaImageLoader : undefined}
                     alt="Avatar preview"
                     fill
+                    sizes="80px"
                     className="object-cover"
                   />
                 )}
@@ -774,11 +778,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 </div>
               )}
               <div className="mt-4 flex flex-wrap gap-2">
-                {showReputation && (
-                  <span className="rounded-full bg-primary/15 px-2 py-1 text-xs">
-                    Reputation
-                  </span>
-                )}
+                <span className="rounded-full bg-primary/15 px-2 py-1 text-xs">
+                  Reputation
+                </span>
                 {showEvents && (
                   <span className="rounded-full bg-primary/15 px-2 py-1 text-xs">
                     Events
@@ -804,8 +806,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
 
       <div
         className={cn(
-          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 bg-background/75 p-4 shadow-2xl shadow-black/10 backdrop-blur-2xl sm:mx-0 sm:flex-row sm:justify-end sm:rounded-2xl sm:border",
-          newChange || isAvailable === false ? "sticky bottom-0" : false,
+          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 p-4 shadow-black/10 backdrop-blur-2xl sm:mx-0 sm:flex-row sm:justify-end sm:bg-background/75 sm:rounded-2xl sm:border sm:shadow-2xl",
+          newChange || isAvailable === false ? "sticky bottom-0 sm:bottom-6" : false,
         )}
       >
         <Button

@@ -4,7 +4,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
@@ -14,20 +14,26 @@ import ProfileAside from "@/components/pages/profile/ProfileAside";
 import ProfilePageSkeleton from "@/components/pages/profile/ProfilePageSkeleton";
 import ProfileAbout from "@/components/pages/profile/ProfileAbout";
 import SettingsPage from "@/components/pages/settings/SettingsPage";
+import PageState from "@/components/pages/PageState";
 
 export default function ProfilePage() {
   const { currentFursona, loading: userLoading } = useUser();
   const { username: paramUsername } = useParams<{ username: string }>();
-  const { profile, loading: profileLoading } = useProfile(paramUsername);
+  const {
+    profile,
+    loading: profileLoading,
+    error: profileError,
+    refetch,
+  } = useProfile(paramUsername);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const id = profile?.id;
   const isOwnProfile = currentFursona?.id === id;
-  const viewedFursona = profile || currentFursona;
 
   const {
     isFollowing,
+    isPending,
     isMutual,
     toggle,
     loading: followLoading,
@@ -47,17 +53,24 @@ export default function ProfilePage() {
     await refetchCounts();
   };
 
-  const isLoading = isOwnProfile
-    ? userLoading || !currentFursona
-    : profileLoading;
-
-  if (isLoading) {
+  if (userLoading || profileLoading) {
     return <ProfilePageSkeleton />;
   }
 
-  if (!viewedFursona) {
-    return null;
+  if (profileError) {
+    return (
+      <PageState
+        error
+        title="Profile unavailable"
+        description="We couldn't load this profile right now. Please try again."
+        onRetry={() => void refetch()}
+      />
+    );
   }
+
+  if (!profile) notFound();
+
+  const viewedFursona = profile;
 
   return (
     <>
@@ -76,6 +89,7 @@ export default function ProfilePage() {
           // CTA buttons
           isOwnProfile={isOwnProfile}
           isFollowing={isFollowing}
+          isPending={isPending}
           isMutual={isMutual}
           followLoading={followLoading}
 

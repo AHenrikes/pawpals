@@ -143,7 +143,7 @@ export default function SettingsPage({
 
       <section
         className={cn(
-          "relative min-w-0 overflow-y-auto p-4 scrollbar-hide sm:px-10 sm:pt-6 lg:pb-28",
+          "relative min-w-0 overflow-y-auto px-2 scrollbar-hide sm:px-10 sm:pt-6",
           mobileNavigation ? "w-1/2 shrink-0 md:w-auto md:flex-1" : "flex-1",
         )}
       >

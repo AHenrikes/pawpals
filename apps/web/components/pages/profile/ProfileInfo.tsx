@@ -24,6 +24,7 @@ interface ProfileInfoProps {
 
   isOwnProfile: boolean;
   isFollowing: boolean;
+  isPending: boolean;
   isMutual: boolean;
   followLoading: boolean;
 
@@ -49,6 +50,7 @@ export default function ProfileInfo({
 
   isOwnProfile,
   isFollowing,
+  isPending,
   isMutual,
   followLoading,
 
@@ -65,7 +67,10 @@ export default function ProfileInfo({
   let followLabel = "Follow";
   let FollowIcon = UserPlusIcon;
 
-  if (isFollowing) {
+  if (isPending) {
+    followLabel = "Requested";
+    FollowIcon = UserMinusIcon;
+  } else if (isFollowing) {
     followLabel = "Unfollow";
     FollowIcon = UserMinusIcon;
   } else if (isMutual) {
@@ -93,7 +98,7 @@ export default function ProfileInfo({
           <AvatarFallback>{getInitials(fursona.display_name)}</AvatarFallback>
         </Avatar>
 
-        <div className="min-w-0 flex-1 space-y-2 pb-1 sm:pb-3 md:mb-2">
+        <div className="min-w-0 flex-1 space-y-2">
           <div className="min-w-0">
             <TypographyH1 className="truncate text-xl sm:text-2xl lg:text-3xl">
               {fursona.display_name}
@@ -110,33 +115,42 @@ export default function ProfileInfo({
             </span>
           </div>
 
-          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4">
+          <div className="flex min-w-0 justify-between items-center gap-2 sm:gap-4">
             {/* achivements */}
-            <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto scrollbar-hide">
-              {achievements.map((achievementId) => {
-                const achievement = achievementDetails.find(
-                  ({ id }) => id === achievementId,
-                );
+            {achievements.length > 0 ? (
+              <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto scrollbar-hide">
+                {achievements.map((achievementId) => {
+                  const achievement = achievementDetails.find(
+                    ({ id }) => id === achievementId,
+                  );
 
-                if (!achievement) return null;
+                  if (!achievement) return null;
 
-                return (
-                  <span
-                    key={achievement.id}
-                    role="img"
-                    aria-label={`${achievement.name}: ${achievement.description}`}
-                    title={`${achievement.name}: ${achievement.description}`}
-                    className="grid size-8 shrink-0 place-items-center rounded-full border border-primary/20 bg-primary/10 cursor-pointer"
-                  >
-                    {achievement.symbol}
-                  </span>
-                );
-              })}
-            </div>
+                  return (
+                    <span
+                      key={achievement.id}
+                      role="img"
+                      aria-label={`${achievement.name}: ${achievement.description}`}
+                      title={`${achievement.name}: ${achievement.description}`}
+                      className="grid size-8 shrink-0 place-items-center rounded-full border border-primary/20 bg-primary/10 cursor-pointer"
+                    >
+                      {achievement.symbol}
+                    </span>
+                  );
+                })}
+              </div>
+            ) : (
+              <span className="flex flex-wrap gap-x-2 text-text/60">
+                <TypographyXSmall>Member since :</TypographyXSmall>
+                <TypographyXSmall>
+                  {new Date(fursona.created_at).toLocaleDateString()}
+                </TypographyXSmall>
+              </span>
+            )}
 
             {/* CTA buttons */}
             {!isOwnProfile && (
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 justify-self-end items-center gap-2">
                 {isFollowing && isMutual && (
                   <Button
                     size="icon"
@@ -148,7 +162,7 @@ export default function ProfileInfo({
                 )}
 
                 <Button
-                  variant={isFollowing ? "outline" : "default"}
+                  variant={isFollowing || isPending ? "outline" : "default"}
                   onClick={() => toggle()}
                   disabled={followLoading}
                   className="shrink-0 rounded-full px-3 sm:px-4"

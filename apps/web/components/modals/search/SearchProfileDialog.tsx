@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Loader2Icon, SearchIcon, XIcon } from "lucide-react";
 import { useProfileSearch } from "@/hooks/core/fursonas/useProfileSearch";
+import {
+  PROFILE_SEARCH_MAX_LENGTH,
+  isValidProfileSearchTerm,
+} from "@/lib/search/profileSearchLimits";
 import { LockScreen } from "@/lib/helpers/lockBody";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
@@ -52,6 +56,7 @@ export default function SearchProfileDialog({
           <Input
             ref={inputRef}
             value={query}
+            maxLength={PROFILE_SEARCH_MAX_LENGTH + 1}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search fursonas by name or @username"
             aria-label="Search fursonas"
@@ -72,9 +77,16 @@ export default function SearchProfileDialog({
           </div>
         )}
         {error && (
-          <p className="text-sm text-destructive">Unable to search profiles.</p>
+          <p className="text-sm text-destructive">
+            {error.message || "Unable to search profiles."}
+          </p>
         )}
-        {!loading && !error && term.length > 0 && (
+        {term.length > 0 && !isValidProfileSearchTerm(term) && (
+          <p className="text-sm text-text-muted">
+            Enter 3 to 50 characters to search.
+          </p>
+        )}
+        {!loading && !error && isValidProfileSearchTerm(term) && (
           <SearchResults
             loading={false}
             error={null}
@@ -82,11 +94,14 @@ export default function SearchProfileDialog({
             handleClose={close}
           />
         )}
-        {!loading && term.length > 0 && results.length === 0 && (
-          <p className="p-6 text-center text-sm text-text-muted">
-            No profiles found.
-          </p>
-        )}
+        {!loading &&
+          !error &&
+          isValidProfileSearchTerm(term) &&
+          results.length === 0 && (
+            <p className="p-6 text-center text-sm text-text-muted">
+              No profiles found.
+            </p>
+          )}
       </section>
     </div>,
     document.body,

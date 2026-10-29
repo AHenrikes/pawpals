@@ -3,18 +3,27 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const sessionResponse = await updateSession(request);
+  if (sessionResponse.status >= 300 && sessionResponse.status < 400) {
+    return sessionResponse;
+  }
 
+  let aliasResponse: NextResponse | null = null;
   if (pathname.startsWith("/profile/")) {
     const username = pathname.replace("/profile/", "");
-    return NextResponse.redirect(new URL(`/@${username}`, request.url));
+    aliasResponse = NextResponse.redirect(new URL(`/@${username}`, request.url));
   }
 
   if (pathname.startsWith("/@")) {
     const username = pathname.slice(2);
-    return NextResponse.rewrite(new URL(`/profile/${username}`, request.url));
+    aliasResponse = NextResponse.rewrite(new URL(`/profile/${username}`, request.url), { request });
   }
 
-  return await updateSession(request);
+  if (!aliasResponse) return sessionResponse;
+  for (const cookie of sessionResponse.cookies.getAll()) {
+    aliasResponse.cookies.set(cookie);
+  }
+  return aliasResponse;
 }
 
 export const config = {
@@ -26,7 +35,7 @@ export const config = {
      * - favicon.ico (favicon file)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      */
-    // String.raw`/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)`,
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/api/media/:path*",
   ],
 };

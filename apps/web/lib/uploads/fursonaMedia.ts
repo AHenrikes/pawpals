@@ -1,4 +1,5 @@
 import { createClient } from "@repo/supabase/client";
+import { MAX_IMAGE_SIZE_BYTES } from "./imageLimits";
 
 type Bucket = "fursona-avatars" | "fursona-banners";
 
@@ -26,11 +27,11 @@ function makeOptimisticId() {
 const BUCKET_CONFIG: Record<Bucket, { maxSize: number; mimeTypes: string[] }> =
   {
     "fursona-avatars": {
-      maxSize: 5 * 1024 * 1024,
+      maxSize: MAX_IMAGE_SIZE_BYTES,
       mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"],
     },
     "fursona-banners": {
-      maxSize: 10 * 1024 * 1024,
+      maxSize: MAX_IMAGE_SIZE_BYTES,
       mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"],
     },
   };
@@ -66,15 +67,11 @@ export async function uploadFursonaImage(
   const path = `${fursonaId}/${fileId}.${ext}`;
 
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
-    cacheControl: "31536000",
+    cacheControl: "300",
     contentType: file.type,
   });
 
   if (error) throw error;
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-
-  if (!data?.publicUrl) throw new Error("Failed to generate public URL");
-
-  return data.publicUrl;
+  return `/api/media/${bucket}/${path}`;
 }

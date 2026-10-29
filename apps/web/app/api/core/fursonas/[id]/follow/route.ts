@@ -21,17 +21,16 @@ export const GET = withUser(
     const actingFursonaId =
       request.headers.get("x-acting-fursona-id") ?? account.default_fursona_id;
     if (!actingFursonaId) {
-      return ok({ isFollowing: false, isMutual: false, mutualSince: null });
+      return ok({ isFollowing: false, isPending: false, isMutual: false, mutualSince: null });
     }
 
     const [{ data: following }, { data: followedBy }] = await Promise.all([
       supabase
         .schema("social")
         .from("follows")
-        .select("created_at")
+        .select("created_at, status")
         .eq("follower_fursona_id", actingFursonaId)
         .eq("followed_fursona_id", id)
-        .eq("status", "accepted")
         .maybeSingle(),
 
       supabase
@@ -45,7 +44,8 @@ export const GET = withUser(
     ]);
 
     return ok({
-      isFollowing: !!following,
+      isPending: following?.status === "pending",
+      isFollowing: following?.status === "accepted",
       isMutual: !!followedBy,
       mutualSince: followedBy?.created_at ?? null,
     });

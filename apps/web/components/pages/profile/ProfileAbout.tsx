@@ -12,6 +12,8 @@ export default function ProfileAbout({
   fursona,
 }: Readonly<{ fursona: FursonaProfile }>) {
   const [isOpen, setIsOpen] = useState(false);
+  const achievements = fursona.featured_achievements ?? [];
+
 
   return (
     <>
@@ -33,14 +35,18 @@ export default function ProfileAbout({
               <TypographySmall className="text-text/80">About</TypographySmall>
             </div>
 
-            <DotIcon className="hidden text-text/60 sm:block" />
+            {achievements.length > 0 && (
+              <>
+                <DotIcon className="hidden text-text/60 sm:block" />
 
-            <span className="flex flex-wrap gap-x-2 text-text/60">
-              <TypographyXSmall>Member since :</TypographyXSmall>
-              <TypographyXSmall>
-                {new Date(fursona.created_at).toLocaleDateString()}
-              </TypographyXSmall>
-            </span>
+                <span className="flex flex-wrap gap-x-2 text-text/60">
+                  <TypographyXSmall>Member since :</TypographyXSmall>
+                  <TypographyXSmall>
+                    {new Date(fursona.created_at).toLocaleDateString()}
+                  </TypographyXSmall>
+                </span>
+              </>
+            )}
           </div>
 
           <Button

@@ -10,12 +10,13 @@ export type FursonaTypes = {
   id: string;
   display_name: string;
   username: string;
-  bio?: string;
-  species?: string;
-  pronouns?: string;
+  bio: string | null;
+  species: string | null;
+  pronouns: string | null;
   avatar_url: string | null;
   banner_url: string | null;
   visibility: ProfileVisibility;
+  profile_theme?: "light" | "dark";
   featured_achievements?: ProfileAchievement[];
   social_links?: ProfileSocialLink[];
   show_reputation?: boolean;
@@ -24,7 +25,7 @@ export type FursonaTypes = {
   last_username_change_at?: Date;
   status: "active" | "deactivated";
   created_at: Date;
-  updated_at: Date;
+  updated_at: Date | null;
 };
 
 export type FursonaInput = {
@@ -35,7 +36,7 @@ export type FursonaInput = {
   species?: string;
   pronouns?: string;
   bio?: string;
-  updated_at: Date;
+  updated_at: Date | null;
 };
 
 export type FursonaSearch = {
@@ -48,20 +49,23 @@ export type FursonaProfile = {
   id: string;
   display_name: string;
   username: string;
-  bio?: string;
-  species?: string;
-  pronouns?: string;
+  bio: string | null;
+  species: string | null;
+  pronouns: string | null;
   avatar_url: string | null;
   banner_url: string | null;
   visibility?: ProfileVisibility;
+  profile_theme?: "light" | "dark";
   featured_achievements?: ProfileAchievement[];
   social_links?: ProfileSocialLink[];
-  show_reputation?: boolean;
+  show_reputation?: boolean; /* reputation is not hidable */
   show_events?: boolean;
   show_communities?: boolean;
   created_at: Date;
+  updated_at: Date | null;
 };
 
+// All profiles are discoverable; content access depends on visibility and relationship.
 export type ProfileVisibility = "public" | "followers_only" | "private";
 
 export type ProfileSocialPlatform =
@@ -88,6 +92,6 @@ export type FursonaWithBoolean = FursonaTypes & {
   is_default?: boolean;
 };
 
-export type FursonaWithAccountId = FursonaWithBoolean & {
+export type FursonaWithAccountId = {
   account_id: string;
-};
+} & FursonaProfile;

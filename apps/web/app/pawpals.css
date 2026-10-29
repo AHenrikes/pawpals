@@ -115,7 +115,7 @@
 }
 
 @layer base {
-  :root {
+  :root, .profile-theme-light {
     color-scheme: light;
     --radius: 0.875rem;
     --blur: 1.5rem;
@@ -170,7 +170,7 @@
       hsl(var(--background));
   }
 
-  .dark {
+  .dark, .profile-theme-dark {
     color-scheme: dark;
     --background: 258, 43%, 6%;
     --foreground: 270, 35%, 96%;

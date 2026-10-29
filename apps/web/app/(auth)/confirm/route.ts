@@ -23,6 +23,17 @@ export async function GET(request: NextRequest) {
     const metadata = user.user_metadata ?? {};
     const initFursona = metadata.onboarding_init_fursona;
 
+    if (!initFursona) {
+      const { data: existingAccount, error } = await supabase
+        .schema("core")
+        .from("accounts")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) return errorRedirect(error.message);
+      if (existingAccount) return null;
+    }
+
     if (!initFursona?.display_name || !initFursona?.username || !user.email) {
       return errorRedirect(
         "Sign-up profile data is incomplete. Please sign up again.",
@@ -48,7 +59,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.verifyOtp({ type, token_hash });
 
     if (error) return errorRedirect(error.message);
-    if (data.user) {
+    if (data.user && type !== "email_change") {
       const redirectResponse = await handleUser(data.user);
       if (redirectResponse) return redirectResponse;
     }
@@ -69,7 +80,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const safeNext = next?.startsWith("/") ? next : "/";
-  await supabase.auth.updateUser({ data: { onboarding_init_fursona: null } });
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\")
+      ? next
+      : "/";
+  if (type !== "email_change") {
+    await supabase.auth.updateUser({ data: { onboarding_init_fursona: null } });
+  }
   return NextResponse.redirect(new URL(safeNext, request.url));
 }

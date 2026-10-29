@@ -54,7 +54,7 @@ export async function requireUser() {
     };
   }
 
-  if (account.status !== "active") {
+  if (account.status !== "active" && account.status !== "at_risk") {
     return {
       supabase,
       user: null,

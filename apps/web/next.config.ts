@@ -29,7 +29,6 @@ const nextConfig: NextConfig = {
         : []),
     ],
     qualities: [75, 85],
-    unoptimized: true,
   },
 };
 

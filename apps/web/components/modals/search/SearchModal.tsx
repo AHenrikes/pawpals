@@ -3,6 +3,7 @@
 import { type FocusEventHandler, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { useProfileSearch } from "@/hooks/core/fursonas/useProfileSearch";
+import { isValidProfileSearchTerm } from "@/lib/search/profileSearchLimits";
 import { TypographyP, TypographyXSmall } from "@repo/ui/typography";
 import { DrawerFooter } from "@repo/ui/drawer";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
@@ -145,6 +146,14 @@ export default function SearchModal({
                 />
               )}
 
+              {type !== "nav" &&
+                fursonaSearchTerm.trim() &&
+                !isValidProfileSearchTerm(fursonaSearchTerm) && (
+                  <div className="px-4 py-4 text-sm text-text-muted">
+                    Enter 3 to 50 characters to search profiles.
+                  </div>
+                )}
+
               {/* loading */}
               {searchQuery.trim() && loading && (
                 <div className="flex items-center p-4 gap-2">
@@ -162,21 +171,25 @@ export default function SearchModal({
               )}
 
               {/* search results */}
-              {searchQuery.trim() && (
-                <SearchResults
-                  loading={loading}
-                  results={results}
-                  error={error}
-                  handleClose={handleClose}
-                  onSelect={() => addSearch(searchQuery)}
-                />
-              )}
+              {searchQuery.trim() &&
+                (type === "nav" ||
+                  isValidProfileSearchTerm(fursonaSearchTerm)) && (
+                  <SearchResults
+                    loading={loading}
+                    results={results}
+                    error={error}
+                    handleClose={handleClose}
+                    onSelect={() => addSearch(searchQuery)}
+                  />
+                )}
 
               {/* no results */}
               {!loading &&
                 !error &&
                 results.length === 0 &&
-                searchQuery.trim() && (
+                searchQuery.trim() &&
+                (type === "nav" ||
+                  isValidProfileSearchTerm(fursonaSearchTerm)) && (
                   <div className="h-full p-4 text-sm text-text-muted text-center">
                     No results found
                   </div>

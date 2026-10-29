@@ -44,7 +44,7 @@ export default function ProfileAside({
   return (
     <aside className="sticky top-20 hidden h-fit w-80 shrink-0 space-y-4 lg:block">
       {/* Reputation */}
-      {fursona.show_reputation !== false && (
+      {(
         <section className="rounded-xl border border-border/20 bg-secondary-dim/50 p-4">
           <span className="flex items-center gap-2">
             <ShieldCheckIcon className="size-5 text-primary" />
@@ -88,30 +88,6 @@ export default function ProfileAside({
           </div>
         )}
       </section>
-
-      {/* Achievements */}
-      {/* {achievements.length > 0 && (
-        <section className="rounded-xl border border-border/20 bg-secondary-dim/35 p-4">
-          <span className="flex items-center gap-2">
-            <AwardIcon className="size-5 text-primary" />
-            <TypographyLead>Achievements</TypographyLead>
-          </span>
-          <div className="mt-3 grid gap-2">
-            {achievements.map((id) => {
-              const item = achievementDetails[id];
-              return (
-                <div
-                  key={id}
-                  className="flex items-center gap-3 rounded-lg bg-background/35 p-3"
-                >
-                  <span className="text-2xl">{item.symbol}</span>
-                  <TypographySmall>{item.name}</TypographySmall>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )} */}
 
       {/* Joined events */}
       {fursona.show_events !== false && (

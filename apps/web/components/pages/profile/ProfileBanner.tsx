@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { SettingsIcon } from "lucide-react";
 import { Button } from "@repo/ui/button";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
+import { mediaImageLoader } from "@/lib/uploads/mediaImageLoader";
 import { type FursonaProfile } from "@/types/fursona";
 import Image from "next/image";
 
@@ -38,8 +39,10 @@ export default function ProfileBanner({
       {fursona.banner_url && (
         <Image
           src={fursona.banner_url}
+          loader={fursona.banner_url.startsWith("/api/media/") ? mediaImageLoader : undefined}
           alt={`${fursona.display_name}'s banner`}
           fill
+          sizes="100vw"
           quality={85}
           loading="lazy"
           className="pointer-events-none z-10 object-cover"

@@ -6,7 +6,7 @@ const NO_STORE_HEADERS = {
 
 const PRIVATE_READ_HEADERS = {
   "Cache-Control": "private, max-age=15, stale-while-revalidate=30",
-  Vary: "Cookie",
+  Vary: "Cookie, x-acting-fursona-id",
 };
 
 /**

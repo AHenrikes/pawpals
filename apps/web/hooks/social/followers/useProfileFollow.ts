@@ -7,12 +7,14 @@ import { toError } from "@/lib/helpers/error-utils";
 
 type FollowStatus = {
   isFollowing: boolean;
+  isPending: boolean;
   isMutual: boolean;
   mutualSince: string | null;
 };
 
 const EMPTY_STATUS: FollowStatus = {
   isFollowing: false,
+  isPending: false,
   isMutual: false,
   mutualSince: null,
 };
@@ -50,17 +52,18 @@ export function useProfileFollow(id?: string) {
     setLoading(true);
     setError(null);
     try {
-      if (status.isFollowing) await api.delete(endpoint);
+      if (status.isFollowing || status.isPending) await api.delete(endpoint);
       else await api.post(endpoint);
       await Promise.all([
         load(),
+        queryClient.invalidateQueries({ queryKey: ["fursona"] }),
         queryClient.invalidateQueries({ queryKey: ["profile-counts", id] }),
       ]);
     } catch (cause) {
       setError(toError(cause));
       setLoading(false);
     }
-  }, [endpoint, id, load, queryClient, status.isFollowing]);
+  }, [endpoint, id, load, queryClient, status.isFollowing, status.isPending]);
 
   return { ...status, loading, error, toggle };
 }

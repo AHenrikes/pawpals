@@ -45,6 +45,7 @@ export default function AuthCardFooter({
           <Button
             size={"lg"}
             type="submit"
+            data-no-page-transition
             disabled={isLoading}
             className="h-12 w-full rounded-sm"
           >

@@ -16,7 +16,7 @@ import { useSupabaseClient } from "@/hooks/useSupabaseClient";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { type PrivateAccountTypes } from "@/types/account";
-import type { FursonaTypes, FursonaWithBoolean } from "@/types/fursona";
+import type { FursonaTypes } from "@/types/fursona";
 
 export type UserContextType = {
   account: PrivateAccountTypes | null;
@@ -87,8 +87,13 @@ export function UserProvider({
         account: {
           ...res.account,
           dob: res.account.dob ? new Date(res.account.dob) : null,
+          age_verified_at: res.account.age_verified_at
+            ? new Date(res.account.age_verified_at)
+            : null,
           created_at: new Date(res.account.created_at),
-          updated_at: new Date(res.account.updated_at),
+          updated_at: res.account.updated_at
+            ? new Date(res.account.updated_at)
+            : null,
         },
         currentFursona: res.currentFursona,
       });
@@ -102,6 +107,8 @@ export function UserProvider({
         "status" in err &&
         (err as { status: number }).status === 401
       ) {
+        clearAuthState();
+        navigate(AUTH_ROUTES.SIGN_IN, { replace: true, transition: false });
         await supabase.auth.signOut();
         return;
       }
@@ -109,7 +116,7 @@ export function UserProvider({
     } finally {
       if (refreshIdRef.current === id) setState({ loading: false });
     }
-  }, [supabase, setState]);
+  }, [supabase, setState, clearAuthState, navigate]);
 
   const fetchFursonas = useCallback(async () => {
     try {
@@ -126,9 +133,7 @@ export function UserProvider({
       const storedActingId = api.getActingFursona();
       const acting =
         fursonas.find((fursona) => fursona.id === storedActingId) ??
-        fursonas.find(
-          (fursona) => (fursona as FursonaWithBoolean).is_default,
-        ) ??
+        fursonas.find((fursona) => fursona.id === account?.default_fursona_id) ??
         fursonas[0] ??
         null;
       api.setActingFursona(acting?.id ?? null);
@@ -136,7 +141,7 @@ export function UserProvider({
     } catch (err) {
       setState({ error: toError(err) });
     }
-  }, [queryClient, setState]);
+  }, [account?.default_fursona_id, queryClient, setState]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -148,8 +153,8 @@ export function UserProvider({
       if (!isMountedRef.current) return;
 
       if (event === "SIGNED_OUT") {
-        navigate(AUTH_ROUTES.SIGN_IN, { replace: true });
         clearAuthState();
+        navigate(AUTH_ROUTES.SIGN_IN, { replace: true, transition: false });
         setState({ loading: false });
         return;
       }

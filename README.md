@@ -5,7 +5,7 @@ with shared packages for Supabase clients, UI primitives, and base configs.
 
 ## Workspace Layout
 
-- `apps/web`: main Next.js 15 app (auth, dashboard, API routes)
+- `apps/web`: main Next.js 16 app (auth, dashboard, API routes)
 - `packages/ui`: shared React UI primitives
 - `packages/supabase`: shared Supabase client/server helpers
 - `packages/eslint-config`: shared ESLint presets
@@ -13,7 +13,7 @@ with shared packages for Supabase clients, UI primitives, and base configs.
 
 ## Commands
 
-Run from repository root:
+Use Node.js 20.9 or newer. Run from repository root:
 
 ```sh
 npm run dev

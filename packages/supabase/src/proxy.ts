@@ -38,6 +38,8 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
+  // Add future public page URLs explicitly. A Next.js (public) route group
+  // does not add a URL prefix and must not make app routes public.
   const publicPaths = [
     "/sign-up",
     "/sign-in",
@@ -49,12 +51,16 @@ export async function updateSession(request: NextRequest) {
   ];
   const pathname = request.nextUrl.pathname;
 
-  // Check if this is a public API route that doesn't require auth
-  const isPublicApi =
-    publicPaths.some((path) => pathname.startsWith(path)) ||
+  const isPublicAuthPage = publicPaths.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+  const isUsernameAvailabilityApi =
     /^\/api\/core\/fursonas\/available\/[^/]+$/.test(pathname);
 
-  if (!isPublicApi && !user) {
+  if (!isPublicAuthPage && !isUsernameAvailabilityApi && !user) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
