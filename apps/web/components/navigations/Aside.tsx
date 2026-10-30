@@ -29,6 +29,7 @@ import { LockScreen } from "@/lib/helpers/lockBody";
 import { TypographyLead, TypographySmall } from "@repo/ui/typography";
 import { CardContent } from "@repo/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
 import { toast } from "@repo/ui/sonner";
 import { getInitials } from "@/lib/helpers/getInitials";
 import {
@@ -212,7 +213,7 @@ export default function MainNav() {
                   >
                     <Avatar size="lg">
                       <AvatarImage
-                        src={`${elem?.avatar_url}`}
+                        src={avatarImageSrc(elem?.avatar_url, 96)}
                         alt={elem?.display_name}
                       />
 

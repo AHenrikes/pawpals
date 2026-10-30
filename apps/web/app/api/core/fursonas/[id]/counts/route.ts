@@ -25,7 +25,7 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> },
   ) {
     const { supabase, account, response } = await requireUser();
-    if (response && response.status !== 401) return response;
+    if (response) return response;
     const { id } = await params;
 
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);

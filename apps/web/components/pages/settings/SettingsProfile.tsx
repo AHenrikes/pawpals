@@ -12,7 +12,7 @@ import {
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
-import { uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
+import { removeFursonaImage, uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
 import { MAX_IMAGE_SIZE_BYTES } from "@/lib/uploads/imageLimits";
 import { mediaImageLoader } from "@/lib/uploads/mediaImageLoader";
 import { cn } from "@/lib/helpers/utils";
@@ -328,8 +328,10 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       return;
     }
     setSaving(true);
+    const uploadedUrls: string[] = [];
+    let committed = false;
     try {
-      const [avatarUrl, bannerUrl] = await Promise.all([
+      const uploads = await Promise.allSettled([
         avatarFile
           ? uploadFursonaImage(avatarFile, currentFursona.id, "fursona-avatars")
           : Promise.resolve(null),
@@ -337,13 +339,16 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           ? uploadFursonaImage(bannerFile, currentFursona.id, "fursona-banners")
           : Promise.resolve(null),
       ]);
+      for (const result of uploads) {
+        if (result.status === "fulfilled" && result.value) uploadedUrls.push(result.value);
+      }
+      const failedUpload = uploads.find((result) => result.status === "rejected");
+      if (failedUpload?.status === "rejected") throw failedUpload.reason;
+      const avatarUrl = uploads[0].status === "fulfilled" ? uploads[0].value : null;
+      const bannerUrl = uploads[1].status === "fulfilled" ? uploads[1].value : null;
       const nextUsername = username.trim();
-      if (nextUsername !== currentFursona.username)
-        await api.post(
-          `/api/core/fursonas/${currentFursona.id}/change-username`,
-          { new_username: nextUsername },
-        );
       await api.patch(`/api/core/fursonas/${currentFursona.id}`, {
+        ...(nextUsername !== currentFursona.username && { username: nextUsername }),
         display_name: displayName.trim(),
         species,
         pronouns,
@@ -360,6 +365,11 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         ...(avatarUrl && { avatar_url: avatarUrl }),
         ...(bannerUrl && { banner_url: bannerUrl }),
       });
+      committed = true;
+      await Promise.allSettled([
+        avatarUrl && currentFursona.avatar_url ? removeFursonaImage(currentFursona.avatar_url) : Promise.resolve(),
+        bannerUrl && currentFursona.banner_url ? removeFursonaImage(currentFursona.banner_url) : Promise.resolve(),
+      ]);
       await refresh();
       setNewChange(false);
       toast.success("Profile settings saved");
@@ -367,6 +377,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         navigate(`/@${nextUsername}`, { replace: true });
       onClose?.();
     } catch (error) {
+      if (!committed) await Promise.allSettled(uploadedUrls.map(removeFursonaImage));
       toast.error(`Update failed: ${getErrorMessage(error)}`);
     } finally {
       setSaving(false);
@@ -475,7 +486,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 rows={5}
                 disabled={saving}
                 placeholder="A little something about your fursona..."
-                className="bg-surface/55 backdrop-blur-lg rounded-md focus-visible:border-primary/60 focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="rounded-md bg-surface focus-visible:border-primary/60 focus-visible:ring-3 focus-visible:ring-primary/20 md:bg-surface/55 md:backdrop-blur-lg"
               />
             </div>
           </SettingsSection>
@@ -503,7 +514,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                         platform: event.target.value as ProfileSocialPlatform,
                       })
                     }
-                    className="h-11 rounded-lg border border-border/60 bg-surface/55 px-3 text-sm outline-none backdrop-blur-lg focus:border-primary/60 focus:ring-3 focus:ring-primary/20"
+                    className="h-11 rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none focus:border-primary/60 focus:ring-3 focus:ring-primary/20 md:bg-surface/55 md:backdrop-blur-lg"
                   >
                     {platformOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -806,7 +817,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
 
       <div
         className={cn(
-          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 p-4 shadow-black/10 backdrop-blur-2xl sm:mx-0 sm:flex-row sm:justify-end sm:bg-background/75 sm:rounded-2xl sm:border sm:shadow-2xl",
+          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 bg-background p-4 sm:mx-0 sm:flex-row sm:justify-end sm:rounded-2xl sm:border md:bg-background/75 md:shadow-2xl md:shadow-black/10 md:backdrop-blur-2xl",
           newChange || isAvailable === false ? "sticky bottom-0 sm:bottom-6" : false,
         )}
       >

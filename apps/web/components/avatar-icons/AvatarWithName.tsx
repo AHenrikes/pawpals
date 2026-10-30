@@ -2,6 +2,7 @@
 
 import { getInitials } from "@/lib/helpers/getInitials";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
 import { useMemo } from "react";
 import { useUser } from "@/providers/UserProvider";
 import Link from "next/link";
@@ -26,7 +27,7 @@ export default function AvatarWithName({
       className="flex items-center gap-4 px-2 py-2 rounded-md transition-colors duration-300 hover:bg-accent"
     >
       <Avatar size={size}>
-        <AvatarImage src={`${currentFursona?.avatar_url}`} alt={displayName} />
+        <AvatarImage src={avatarImageSrc(currentFursona?.avatar_url, 96)} alt={displayName} />
 
         <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
       </Avatar>

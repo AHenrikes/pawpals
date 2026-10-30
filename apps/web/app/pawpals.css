@@ -268,11 +268,21 @@
   }
 
   .glass-panel {
-    @apply border border-white/10 bg-surface/70 shadow-2xl shadow-black/10 backdrop-blur-2xl;
+    @apply border border-white/10 bg-surface;
   }
 
   .glass-control {
-    @apply border border-border/60 bg-surface/55 shadow-sm backdrop-blur-xl transition-colors hover:border-primary/45 hover:bg-surface/80;
+    @apply border border-border/60 bg-surface transition-colors hover:border-primary/45 hover:bg-surface/80;
+  }
+
+  @media (min-width: 768px) {
+    .glass-panel {
+      @apply bg-surface/70 shadow-2xl shadow-black/10 backdrop-blur-2xl;
+    }
+
+    .glass-control {
+      @apply bg-surface/55 shadow-sm backdrop-blur-xl;
+    }
   }
 }
 
@@ -282,10 +292,15 @@
   user-select: none;
 }
 
-#DashboardLayout {
+#AppLayout {
   background: var(--gradient-background);
-  background-attachment: fixed;
   min-height: 100dvh;
+}
+
+@media (min-width: 768px) {
+  #AppLayout {
+    background-attachment: fixed;
+  }
 }
 
 .gradientBG {

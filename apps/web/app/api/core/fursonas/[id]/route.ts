@@ -19,6 +19,7 @@ import {
   normalizeRequiredName,
 } from "@/lib/helpers/normalizeInput";
 import { type SupabaseClient } from "@supabase/supabase-js";
+import { normalizeSocialLinks } from "@/lib/validation/socialLinks";
 
 const visibilityValues = new Set(["public", "followers_only", "private"]);
 const profileThemeValues = new Set(["light", "dark"]);
@@ -28,42 +29,6 @@ const achievementValues = new Set([
   "event_explorer",
   "trusted_pal",
 ]);
-const socialPlatformValues = new Set([
-  "website",
-  "bluesky",
-  "discord",
-  "instagram",
-  "telegram",
-  "tiktok",
-  "twitch",
-  "x",
-  "youtube",
-]);
-
-function normalizeSocialLinks(links: FursonaWithBoolean["social_links"]) {
-  if (!Array.isArray(links) || links.length > 6) return null;
-
-  const normalized = links.map((link) => ({
-    platform: link.platform,
-    url: link.url.trim(),
-  }));
-
-  const valid = normalized.every((link) => {
-    if (
-      !socialPlatformValues.has(link.platform) ||
-      !link.url ||
-      link.url.length > 300
-    )
-      return false;
-    try {
-      return new URL(link.url).protocol === "https:";
-    } catch {
-      return false;
-    }
-  });
-  return valid ? normalized : null;
-}
-
 function parseProfilePreferences(
   body: FursonaWithBoolean,
   updates: Record<string, unknown>,
@@ -154,14 +119,15 @@ async function applyFursonaPatch(
   accountId: string,
   body: FursonaWithBoolean,
   updates: Record<string, unknown>,
+  newUsername: string | null,
 ) {
-  if (Object.keys(updates).length > 0) {
-    const { error } = await supabase
-      .schema("core")
-      .from("fursonas")
-      .update(updates)
-      .eq("id", fursonaId)
-      .eq("account_id", accountId);
+  if (Object.keys(updates).length > 0 || newUsername) {
+    const { error } = await supabase.rpc("save_fursona_profile", {
+      p_fursona_id: fursonaId,
+      p_account_id: accountId,
+      p_updates: updates,
+      p_new_username: newUsername,
+    });
     if (error) return error;
   }
 
@@ -183,7 +149,7 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> },
   ) {
     const { supabase, account, response } = await requireUser();
-    if (response && response.status !== 401) return response;
+    if (response) return response;
     const { id } = await params;
 
     if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
@@ -220,7 +186,11 @@ export const PATCH = withUser(
 
     if (error) return badRequest(error);
 
-    const hasUpdates = Object.keys(updates).length > 0;
+    const newUsername = body.username === undefined ? null :
+      typeof body.username === "string" && /^[a-zA-Z0-9_-]{3,50}$/.test(body.username.trim())
+        ? body.username.trim().toLowerCase() : "";
+    if (newUsername === "") return badRequest("Invalid username.");
+    const hasUpdates = Object.keys(updates).length > 0 || Boolean(newUsername);
     const isSettingDefault =
       body.is_default === true || body.is_current === true;
 
@@ -233,9 +203,12 @@ export const PATCH = withUser(
       account.id,
       body,
       updates,
+      newUsername,
     );
 
     if (patchError) {
+      if (["23505", "23514", "P0001", "22023"].includes(patchError.code))
+        return badRequest(patchError.message);
       console.error("Profile update failed", {
         code: patchError.code,
         message: patchError.message,

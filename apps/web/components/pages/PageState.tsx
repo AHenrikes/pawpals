@@ -22,7 +22,7 @@ export default function PageState({
       <section className="glass-panel relative w-full max-w-2xl overflow-hidden rounded-4xl p-8 text-center sm:p-12">
         <div
           aria-hidden="true"
-          className="absolute -right-16 -top-20 size-64 rounded-full bg-primary/15 blur-3xl"
+          className="absolute -right-16 -top-20 hidden size-64 rounded-full bg-primary/15 blur-3xl md:block"
         />
         <div className="relative mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
           <SearchXIcon aria-hidden="true" className="size-8" />

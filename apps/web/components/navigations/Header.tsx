@@ -17,8 +17,8 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full border-b border-b-white/10 shadow-lg shadow-black/5 transition-colors",
-        searchOpen ? "bg-background" : "bg-background/65 backdrop-blur-2xl",
+        "sticky top-0 z-50 w-full border-b border-b-white/10 bg-background transition-colors md:shadow-lg md:shadow-black/5",
+        !searchOpen && "md:bg-background/65 md:backdrop-blur-2xl",
       )}
     >
       <div className="flex justify-between items-center h-16 px-2 gap-3 md:px-4">

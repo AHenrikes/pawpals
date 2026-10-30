@@ -42,11 +42,9 @@ function durationFor(pathname: string) {
     /^\/(sign-in|sign-up|sign-up-success|forgot-password|new-password|error)(\/|$)/.test(
       pathname,
     )
-  ) {
-    return 0.78;
-  }
-  if (pathname.startsWith("/@")) return 0.74;
-  return 0.7;
+  ) return 0.4;
+  if (pathname.startsWith("/@")) return 0.35;
+  return 0.25;
 }
 
 export function PageTransitionProvider({
@@ -224,10 +222,10 @@ export function PageTransitionProvider({
       if (
         !anchor ||
         anchor.hasAttribute("download") ||
-        anchor.dataset.noPageTransition !== undefined
+        anchor.dataset.noPageTransition !== undefined ||
+        (anchor.target && anchor.target !== "_self")
       )
         return;
-      if (anchor.target && anchor.target !== "_self") return;
 
       const url = new URL(anchor.href, window.location.href);
       if (

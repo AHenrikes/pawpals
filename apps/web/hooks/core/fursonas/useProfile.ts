@@ -1,24 +1,25 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { type FursonaTypes } from "@/types/fursona";
+import { type FursonaProfile } from "@/types/fursona";
 import { api } from "@/lib/api/api-client";
 import { useUser } from "@/providers/UserProvider";
 
-export function useProfile(id: string) {
+export function useProfile(id: string, initialProfile?: FursonaProfile) {
   const { currentFursona, loading: userLoading } = useUser();
   const {
-    data: profile = null,
+    data: profile = initialProfile ?? null,
     isLoading,
     error,
     refetch,
   } = useQuery({
     queryKey: ["fursona", id, currentFursona?.id],
+    initialData: initialProfile,
     enabled: !!id && !userLoading,
     staleTime: 0,
     queryFn: async () => {
       try {
-        return await api.get<FursonaTypes>(
+        return await api.get<FursonaProfile>(
           `/api/core/fursonas/${encodeURIComponent(id)}`,
         );
       } catch (cause) {
@@ -34,5 +35,5 @@ export function useProfile(id: string) {
     },
   });
 
-  return { profile, loading: userLoading || isLoading, error, refetch };
+  return { profile, loading: !initialProfile && (userLoading || isLoading), error, refetch };
 }

@@ -5,12 +5,13 @@ import {
 } from "@repo/ui/typography";
 import { FursonaSearch } from "@/types/fursona";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
+import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
 import { getInitials } from "@/lib/helpers/getInitials";
 import type { NavOption, SearchResult } from "./SearchModal";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 interface SearchResults {
   loading: boolean;
@@ -62,7 +63,7 @@ export default function SearchResults({
                     >
                       <Avatar size="lg">
                         <AvatarImage
-                          src={`${f?.avatar_url}`}
+                          src={avatarImageSrc(f?.avatar_url, 96)}
                           alt={f.display_name}
                         />
 

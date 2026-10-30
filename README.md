@@ -26,7 +26,7 @@ npm run format
 Scope to a specific workspace when needed:
 
 ```sh
-npm run dev -- --filter=web
+npm run dev -- --filter=@pawpals/web
 npm run build -- --filter=@repo/ui
 ```
 

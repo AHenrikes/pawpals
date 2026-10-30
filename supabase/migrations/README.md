@@ -14,6 +14,7 @@ including authentication, accounts, profiles, discovery, follows, and media.
 2. `20261030010002_social.sql` defines follow data, profile visibility, and social RPCs.
 3. `20261030010003_api.sql` exposes the intentionally available public RPC wrappers.
 4. `20261030010004_media.sql` creates private media buckets and Storage policies.
+5. `20261030010006_atomic_profile_save.sql` saves profile fields and username changes in one database transaction.
 
 Add future schema changes as new, dated migrations. Do not edit these baseline
 files after a project has applied them. A database that already applied the old

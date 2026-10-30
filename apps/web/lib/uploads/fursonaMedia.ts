@@ -75,3 +75,12 @@ export async function uploadFursonaImage(
 
   return `/api/media/${bucket}/${path}`;
 }
+
+export async function removeFursonaImage(url: string): Promise<void> {
+  const match = /^\/api\/media\/(fursona-avatars|fursona-banners)\/([0-9a-f-]{36}\/[^/]+)$/i.exec(url);
+  if (!match) return;
+  const [, bucket, path] = match;
+  if (!bucket || !path) return;
+  const { error } = await createClient().storage.from(bucket).remove([path]);
+  if (error) throw error;
+}

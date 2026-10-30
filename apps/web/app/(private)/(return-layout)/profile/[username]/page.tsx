@@ -1,138 +1,45 @@
-"use client";
+import { notFound, redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth/requireUser";
+import Profile from "@/components/pages/profile/Profile";
+import type { FursonaProfile } from "@/types/fursona";
 
-import { useUser } from "@/providers/UserProvider";
-import { useProfile } from "@/hooks/core/fursonas/useProfile";
-import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
-import { useState } from "react";
-import { notFound, useParams } from "next/navigation";
-import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
-import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
-import ProfileBanner from "@/components/pages/profile/ProfileBanner";
-import ProfileInfo from "@/components/pages/profile/ProfileInfo";
-import ProfileContent from "@/components/pages/profile/ProfileContent";
-import ProfileAside from "@/components/pages/profile/ProfileAside";
-import ProfilePageSkeleton from "@/components/pages/profile/ProfilePageSkeleton";
-import ProfileAbout from "@/components/pages/profile/ProfileAbout";
-import SettingsPage from "@/components/pages/settings/SettingsPage";
-import PageState from "@/components/pages/PageState";
+export default async function ProfilePage({
+  params
+}: Readonly<{ params: Promise<{ username: string }> }>) {
+  const { username } = await params;
+  const { supabase, account } = await requireUser();
+  if (!account) redirect("/sign-in");
 
-export default function ProfilePage() {
-  const { currentFursona, loading: userLoading } = useUser();
-  const { username: paramUsername } = useParams<{ username: string }>();
-  const {
-    profile,
-    loading: profileLoading,
-    error: profileError,
-    refetch,
-  } = useProfile(paramUsername);
+  const { data, error } = await supabase
+    .schema("social")
+    .rpc("get_fursona_profile_by_identifier", {
+      p_identifier: username,
+      p_actor_fursona_id: account.default_fursona_id,
+    })
+    .maybeSingle();
 
-  const [isEditOpen, setIsEditOpen] = useState(false);
-
-  const id = profile?.id;
-  const isOwnProfile = currentFursona?.id === id;
-
-  const {
-    isFollowing,
-    isPending,
-    isMutual,
-    toggle,
-    loading: followLoading,
-  } = useProfileFollow(id);
-
-  const {
-    posts,
-    following,
-    followers,
-    likes,
-    reputation,
-    refetch: refetchCounts,
-  } = useProfileCounts(id);
-
-  const handleFollowToggle = async () => {
-    await toggle();
-    await refetchCounts();
+  if (error) throw error;
+  if (!data) notFound();
+  const profile = data as unknown as Omit<
+    FursonaProfile,
+    "created_at" | "updated_at"
+  > & {
+    can_view_content: boolean;
+    created_at: string;
+    updated_at: string | null;
   };
-
-  if (userLoading || profileLoading) {
-    return <ProfilePageSkeleton />;
-  }
-
-  if (profileError) {
-    return (
-      <PageState
-        error
-        title="Profile unavailable"
-        description="We couldn't load this profile right now. Please try again."
-        onRetry={() => void refetch()}
-      />
-    );
-  }
-
-  if (!profile) notFound();
-
-  const viewedFursona = profile;
+  const initialProfile: FursonaProfile | undefined = profile.can_view_content
+    ? ({
+        ...profile,
+        created_at: new Date(profile.created_at),
+        updated_at: profile.updated_at ? new Date(profile.updated_at) : null,
+      } as FursonaProfile)
+    : undefined;
 
   return (
-    <>
-      {/* Banner */}
-      <ProfileBanner
-        fursona={viewedFursona}
-        isOwnProfile={isOwnProfile}
-        onClick={() => setIsEditOpen(true)}
-      />
-
-      <div className="container relative z-20 -mt-14 pb-16 sm:-mt-18 md:-mt-24">
-        {/* Profile header */}
-        <ProfileInfo
-          fursona={viewedFursona}
-
-          // CTA buttons
-          isOwnProfile={isOwnProfile}
-          isFollowing={isFollowing}
-          isPending={isPending}
-          isMutual={isMutual}
-          followLoading={followLoading}
-
-          // Counts
-          postsCount={posts}
-          followersCount={followers}
-          followingCount={following}
-          likesCount={likes}
-
-          toggle={handleFollowToggle}
-        />
-
-        <section className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
-          <main className="w-full min-w-0 flex-1 space-y-4">
-            {/* About */}
-            <ProfileAbout fursona={viewedFursona} />
-
-            {/* Content */}
-            <ProfileContent fursona={viewedFursona} />
-          </main>
-
-          <ProfileAside fursona={viewedFursona} reputation={reputation} />
-        </section>
-      </div>
-
-      {/* Profile setting modal */}
-      {isOwnProfile && viewedFursona && (
-        <Dialog
-          open={isEditOpen}
-          onOpenChange={(open) => !open && setIsEditOpen(false)}
-        >
-          <DialogContent
-            showCloseButton={false}
-            className="p-0 flex w-full flex-1 flex-col mx-auto bg-background rounded-xl overflow-hidden sm:p-0 md:flex-row md:max-w-[calc(100dvw-12rem)] md:max-h-[calc(100dvh-12rem)] xl:max-w-7xl"
-          >
-            <DialogTitle className="sr-only">Profile settings</DialogTitle>
-            <SettingsPage
-              initialSection="profile"
-              onClose={() => setIsEditOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-    </>
+    <Profile
+      username={username}
+      initialProfile={initialProfile}
+    />
   );
 }

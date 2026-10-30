@@ -44,7 +44,8 @@ export default function ProfileBanner({
           fill
           sizes="100vw"
           quality={85}
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
           className="pointer-events-none z-10 object-cover"
         />
       )}

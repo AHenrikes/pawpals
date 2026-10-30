@@ -15,9 +15,10 @@ import {
   UserMinusIcon,
   UserPlusIcon,
   UserRoundCheckIcon,
+  UserRoundXIcon,
 } from "lucide-react";
-import ProfileCTA from "./ProfileCTA";
 import useAchievement from "@/hooks/useAchievement";
+import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
 
 interface ProfileInfoProps {
   fursona: FursonaProfile;
@@ -69,7 +70,7 @@ export default function ProfileInfo({
 
   if (isPending) {
     followLabel = "Requested";
-    FollowIcon = UserMinusIcon;
+    FollowIcon = UserRoundXIcon;
   } else if (isFollowing) {
     followLabel = "Unfollow";
     FollowIcon = UserMinusIcon;
@@ -92,20 +93,20 @@ export default function ProfileInfo({
           className="h-24 w-24 shrink-0 border-4 border-background shadow-lg sm:h-32 sm:w-32 md:h-40 md:w-40"
         >
           <AvatarImage
-            src={fursona.avatar_url ?? undefined}
+            src={avatarImageSrc(fursona.avatar_url, 320)}
             alt={fursona.display_name}
           />
           <AvatarFallback>{getInitials(fursona.display_name)}</AvatarFallback>
         </Avatar>
 
-        <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex flex-1 justify-between items-end min-w-0 mb-1 md:mb-4">
           <div className="min-w-0">
-            <TypographyH1 className="truncate text-xl sm:text-2xl lg:text-3xl">
+            <TypographyH1 className="truncate text-xl leading-6 sm:text-2xl lg:text-3xl">
               {fursona.display_name}
             </TypographyH1>
 
             <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-              <TypographyP className="min-w-0 truncate text-text-muted">
+              <TypographyP className="min-w-0 truncate text-text-muted leading-6 lg:leading-7">
                 @{fursona.username}
               </TypographyP>
 
@@ -113,10 +114,7 @@ export default function ProfileInfo({
                 {fursona.pronouns}
               </TypographyXSmall>
             </span>
-          </div>
 
-          <div className="flex min-w-0 justify-between items-center gap-2 sm:gap-4">
-            {/* achivements */}
             {achievements.length > 0 ? (
               <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto scrollbar-hide">
                 {achievements.map((achievementId) => {
@@ -147,43 +145,41 @@ export default function ProfileInfo({
                 </TypographyXSmall>
               </span>
             )}
-
-            {/* CTA buttons */}
-            {!isOwnProfile && (
-              <div className="flex shrink-0 justify-self-end items-center gap-2">
-                {isFollowing && isMutual && (
-                  <Button
-                    size="icon"
-                    variant="accent"
-                    className="shrink-0 p-2 text-text-muted hover:text-text"
-                  >
-                    <MailIcon />
-                  </Button>
-                )}
-
-                <Button
-                  variant={isFollowing || isPending ? "outline" : "default"}
-                  onClick={() => toggle()}
-                  disabled={followLoading}
-                  className="shrink-0 rounded-full px-3 sm:px-4"
-                >
-                  {followLoading ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      {/* Small screens */}
-                      <FollowIcon className="h-4 w-4 sm:hidden" />
-
-                      {/* sm and above */}
-                      <span className="hidden sm:inline">{followLabel}</span>
-                    </>
-                  )}
-                </Button>
-
-                <ProfileCTA />
-              </div>
-            )}
           </div>
+
+          {/* CTA buttons */}
+          {!isOwnProfile && (
+            <div className="flex shrink-0 justify-self-end items-center gap-2">
+              {isFollowing && isMutual && (
+                <Button
+                  size="icon"
+                  variant="accent"
+                  className="shrink-0 p-2 text-text-muted hover:text-text"
+                >
+                  <MailIcon />
+                </Button>
+              )}
+
+              <Button
+                variant={isFollowing || isPending ? "outline" : "default"}
+                onClick={() => toggle()}
+                disabled={followLoading}
+                className="shrink-0 rounded-full px-3 sm:px-4"
+              >
+                {followLoading ? (
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    {/* Small screens */}
+                    <FollowIcon className="h-4 w-4 sm:hidden" />
+
+                    {/* sm and above */}
+                    <span className="hidden sm:inline">{followLabel}</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </motion.section>
 

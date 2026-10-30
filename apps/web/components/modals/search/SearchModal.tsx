@@ -39,12 +39,6 @@ interface SearchDialogProps {
 
 const NAV_OPTIONS: NavOption[] = [
   { label: "Home", path: "/" },
-  { label: "Store", path: "/store" },
-  { label: "DMs", path: "/dms" },
-  { label: "Communities", path: "/communities" },
-  { label: "Pawpal-Meet", path: "/meet" },
-  { label: "Threads", path: "/threads" },
-  { label: "Notifications", path: "/notifications" },
   { label: "Settings", path: "/settings" },
 ];
 

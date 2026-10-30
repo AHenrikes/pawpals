@@ -1,29 +1,21 @@
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
-import { requireUser } from "@/lib/auth/requireUser";
-import { AUTH_ROUTES } from "@/lib/constants/auth";
-import { redirect } from "next/navigation";
 import { type Metadata } from "next";
 import Header from "@/components/navigations/Header";
 import MainNav from "@/components/navigations/Aside";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-export default async function DashboardLayout({
+export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { account } = await requireUser();
-  if (!account) redirect(AUTH_ROUTES.SIGN_IN);
-
   return (
-    <div id="DashboardLayout">
-      <SidebarProvider className="flex flex-col">
-        <Header />
+    <SidebarProvider id="AppLayout" className="flex flex-col">
+      <Header />
 
-        <SidebarInset>
-          <MainNav />
-          {children}
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+      <SidebarInset>
+        <MainNav />
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

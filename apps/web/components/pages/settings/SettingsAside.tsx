@@ -36,7 +36,7 @@ export default function SettingsAside({
   return (
     <aside
       className={cn(
-        "h-dvh shrink-0 p-4 bg-surface/35 border-b border-white/10 backdrop-blur-2xl md:w-60 md:border-r md:border-b-0 md:p-6 lg:w-72",
+        "h-dvh shrink-0 border-b border-white/10 bg-surface p-4 md:w-60 md:border-r md:border-b-0 md:bg-surface/35 md:p-6 md:backdrop-blur-2xl lg:w-72",
         mobileNavigation && "w-1/2 border-r",
       )}
     >

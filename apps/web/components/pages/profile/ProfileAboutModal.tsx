@@ -7,25 +7,11 @@ import {
   TypographyP,
   TypographySmall,
 } from "@repo/ui/typography";
-import type { FursonaProfile, ProfileAchievement } from "@/types/fursona";
-import {
-  AwardIcon,
-  CalendarDaysIcon,
-  ExternalLinkIcon,
-  UsersIcon,
-} from "lucide-react";
+import type { FursonaProfile } from "@/types/fursona";
+import { CalendarDaysIcon, ExternalLinkIcon, UsersIcon } from "lucide-react";
+import { safeSocialLinks } from "@/lib/validation/socialLinks";
 
-const achievementDetails: Record<
-  ProfileAchievement,
-  { name: string; symbol: string }
-> = {
-  early_paw: { name: "Early Paw", symbol: "🐾" },
-  community_builder: { name: "Community Builder", symbol: "🏕️" },
-  event_explorer: { name: "Event Explorer", symbol: "🧭" },
-  trusted_pal: { name: "Trusted Pal", symbol: "✨" },
-};
-
-function EmptyState({ children }: Readonly<{ children: React.ReactNode }>) {
+export function EmptyState({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <p className="rounded-lg border border-dashed border-border/30 p-4 text-center text-sm text-text-muted">
       {children}
@@ -42,8 +28,7 @@ export default function ProfileAboutModal({
   isOpen: boolean;
   onClose: () => void;
 }>) {
-  const socials = fursona.social_links ?? [];
-  const achievements = fursona.featured_achievements ?? [];
+  const socials = safeSocialLinks(fursona.social_links);
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -85,32 +70,6 @@ export default function ProfileAboutModal({
             )}
           </section>
 
-          {/* Achievements */}
-          {/* {achievements.length > 0 && (
-            <>
-              <Separator className="h-px" />
-              <section className="space-y-3">
-                <span className="flex items-center gap-2">
-                  <AwardIcon className="size-5 text-primary" />
-                  <TypographyLead>Achievements</TypographyLead>
-                </span>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {achievements.map((id) => {
-                    const achievement = achievementDetails[id];
-                    return (
-                      <div
-                        key={id}
-                        className="flex items-center gap-3 rounded-lg bg-secondary-dim p-3"
-                      >
-                        <span className="text-2xl">{achievement.symbol}</span>
-                        <TypographySmall>{achievement.name}</TypographySmall>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            </>
-          )} */}
 
           {fursona.show_events !== false && (
             <>

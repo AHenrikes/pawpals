@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
+    "test": "node --test tests/*.test.mjs",
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {

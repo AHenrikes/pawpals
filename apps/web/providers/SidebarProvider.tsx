@@ -170,7 +170,7 @@ export function Sidebar({
         data-variant={variant}
         data-state={openMobile ? "expanded" : "collapsed"}
         className={cn(
-          "group/sidebar fixed top-16 z-50 h-[calc(100svh-64px)] w-(--sidebar-width-mobile) border-r border-white/10 bg-background/80 p-2 shadow-2xl backdrop-blur-2xl transition-transform duration-200 md:hidden",
+          "group/sidebar fixed top-16 z-50 h-[calc(100svh-64px)] w-(--sidebar-width-mobile) border-r border-white/10 bg-background p-2 transition-transform duration-200 md:hidden",
           openMobile ? "translate-x-0" : "-translate-x-full",
         )}
       >

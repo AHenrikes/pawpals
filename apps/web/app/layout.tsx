@@ -1,9 +1,8 @@
 import { Be_Vietnam_Pro, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@repo/ui/sonner";
-import { QueryProvider } from "@/providers/QueryProvider";
-import { type Metadata } from "next";
 import { PageTransitionProvider } from "@/components/transitions/PageTransitionProvider";
+import { type Metadata } from "next";
 import "./pawpals.css";
 
 // TODO remove before publishing
@@ -45,10 +44,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>
-            <Toaster position="top-center" />
-            <PageTransitionProvider>{children}</PageTransitionProvider>
-          </QueryProvider>
+          <Toaster position="top-center" />
+          <PageTransitionProvider>{children}</PageTransitionProvider>
         </ThemeProvider>
       </body>
     </html>

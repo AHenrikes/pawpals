@@ -21,11 +21,11 @@ export default function Dashboard() {
       <section className="glass-panel relative w-full overflow-hidden rounded-4xl p-6 sm:p-10 lg:p-14">
         <div
           aria-hidden="true"
-          className="absolute -right-20 -top-24 size-72 rounded-full bg-primary/20 blur-3xl"
+          className="absolute -right-20 -top-24 hidden size-72 rounded-full bg-primary/20 blur-3xl md:block"
         />
         <div
           aria-hidden="true"
-          className="absolute -bottom-32 left-1/3 size-80 rounded-full bg-fuchsia-500/10 blur-3xl"
+          className="absolute -bottom-32 left-1/3 hidden size-80 rounded-full bg-fuchsia-500/10 blur-3xl md:block"
         />
 
         <div className="relative grid items-center gap-10 lg:grid-cols-[1.2fr_.8fr]">

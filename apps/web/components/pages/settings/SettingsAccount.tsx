@@ -592,7 +592,7 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-destructive/25 bg-destructive/8 p-5 backdrop-blur-xl">
+      <section className="space-y-4 rounded-2xl border border-destructive/25 bg-surface p-5 md:bg-destructive/8 md:backdrop-blur-xl">
         <div>
           <TypographyH3>Danger zone</TypographyH3>
           <p className="mt-1 text-sm text-text-muted">

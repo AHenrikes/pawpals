@@ -33,7 +33,7 @@ export default function ReturnHeader() {
         "top-0 w-full border-white/10 shadow-black/5 transition-colors z-50",
         profilePage
           ? "absolute bg-linear-to-b from-background to-transparent"
-          : "fixed bg-background/65 border-b shadow-lg backdrop-blur-2xl",
+          : "fixed border-b bg-background md:bg-background/65 md:shadow-lg md:backdrop-blur-2xl",
         searchOpen ? "bg-background" : null,
       )}
     >
