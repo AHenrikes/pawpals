@@ -17,7 +17,8 @@ export function useProfile(id: string, initialProfile?: FursonaProfile, initialA
     queryKey: ["fursona", id, currentFursona?.id],
     initialData: matchingInitialProfile,
     enabled: !!id && !userLoading,
-    staleTime: 0,
+    // The server already fetched this profile for the first render.
+    staleTime: 30 * 1000,
     queryFn: async () => {
       try {
         return await api.get<FursonaProfile>(

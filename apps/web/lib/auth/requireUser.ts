@@ -31,13 +31,18 @@ export async function requireUser() {
     .single();
 
   if (accountError) {
+    const missingAccount = accountError.code === "PGRST116";
     return {
       supabase,
       user: null,
       account: null,
       response: NextResponse.json(
-        { error: `Account query failed: ${accountError.message}` },
-        { status: 404 },
+        {
+          error: missingAccount
+            ? "Account not found"
+            : "Unable to load account",
+        },
+        { status: missingAccount ? 404 : 500 },
       ),
     };
   }

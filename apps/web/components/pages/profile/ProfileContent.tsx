@@ -56,6 +56,8 @@ export default function ProfileContent({
                 key={label}
                 variant="ghost"
                 onClick={() => handleNavClick(key)}
+                aria-label={label.toLowerCase()}
+                aria-pressed={content === key}
                 className={cn(
                   "h-10 rounded-sm px-3 text-text-muted sm:px-4",
                   content === key

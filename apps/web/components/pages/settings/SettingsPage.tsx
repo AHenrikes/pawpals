@@ -44,6 +44,7 @@ export default function SettingsPage({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const usernameCheckId = useRef(0);
+  const formIdentity = useRef<string | null>(null);
 
   useCleanupBlobUrl(avatarPreview);
   useCleanupBlobUrl(bannerPreview);
@@ -117,8 +118,11 @@ export default function SettingsPage({
   }, [account, currentFursona]);
 
   useEffect(() => {
+    const identity = `${account?.id ?? ""}:${currentFursona?.id ?? ""}`;
+    if (formIdentity.current === identity) return;
+    formIdentity.current = identity;
     resetForms();
-  }, [resetForms]);
+  }, [account?.id, currentFursona?.id, resetForms]);
 
   return (
     <div

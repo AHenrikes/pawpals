@@ -38,7 +38,6 @@ export function UserProvider({
   const supabase = useSupabaseClient();
   const queryClient = useQueryClient();
   const isMountedRef = useRef(true);
-  const initialLoadDone = useRef(false);
   const refreshIdRef = useRef(0);
   const { navigate } = usePageTransition();
 
@@ -97,8 +96,6 @@ export function UserProvider({
         },
         currentFursona: res.currentFursona,
       });
-
-      initialLoadDone.current = true;
     } catch (err: unknown) {
       if (refreshIdRef.current !== id) return;
       if (
@@ -133,7 +130,9 @@ export function UserProvider({
       const storedActingId = api.getActingFursona();
       const acting =
         fursonas.find((fursona) => fursona.id === storedActingId) ??
-        fursonas.find((fursona) => fursona.id === account?.default_fursona_id) ??
+        fursonas.find(
+          (fursona) => fursona.id === account?.default_fursona_id,
+        ) ??
         fursonas[0] ??
         null;
       api.setActingFursona(acting?.id ?? null);
@@ -159,22 +158,14 @@ export function UserProvider({
         return;
       }
 
-      // Skip the SIGNED_IN that fires on initial session restore
-      // if (event === "SIGNED_IN" && !initialLoadDone.current) {
-      //   initialLoadDone.current = true;
-      //   return;
-      // }
+      // The initial account request already covers session restoration.
       if (event === "SIGNED_IN" && skipNextInitialSignIn) {
         skipNextInitialSignIn = false;
         return;
       }
       skipNextInitialSignIn = false;
 
-      if (
-        event === "SIGNED_IN" ||
-        event === "TOKEN_REFRESHED" ||
-        event === "USER_UPDATED"
-      ) {
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
         refresh();
       }
     });

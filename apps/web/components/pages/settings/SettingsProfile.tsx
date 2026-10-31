@@ -190,6 +190,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   const platformOptions = usePlatformOption();
   const achievements = useAchievement();
   const [newChange, setNewChange] = useState(false);
+  const formFursonaId = useRef(currentFursona.id);
 
   const [visibility, setVisibility] = useState<ProfileVisibility>(
     currentFursona.visibility ?? "public",
@@ -236,6 +237,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   };
 
   useEffect(() => {
+    if (formFursonaId.current === currentFursona.id) return;
+    formFursonaId.current = currentFursona.id;
     setVisibility(currentFursona.visibility ?? "public");
     setProfileTheme(currentFursona.profile_theme ?? "dark");
     setSocialLinks(currentFursona.social_links ?? []);

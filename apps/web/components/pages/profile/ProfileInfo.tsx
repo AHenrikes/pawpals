@@ -154,6 +154,7 @@ export default function ProfileInfo({
                 <Button
                   size="icon"
                   variant="accent"
+                  aria-label="Message fursona"
                   className="shrink-0 p-2 text-text-muted hover:text-text"
                 >
                   <MailIcon />
@@ -164,6 +165,7 @@ export default function ProfileInfo({
                 variant={isFollowing || isPending ? "outline" : "default"}
                 onClick={() => toggle()}
                 disabled={followLoading}
+                aria-label={followLabel}
                 className="shrink-0 rounded-full px-3 sm:px-4"
               >
                 {followLoading ? (

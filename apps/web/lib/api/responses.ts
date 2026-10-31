@@ -27,7 +27,11 @@ export function badRequest(message: string) {
 }
 
 export function serverError(message: string) {
-  return NextResponse.json({ error: message }, { status: 500 });
+  console.error("API request failed:", message);
+  return NextResponse.json(
+    { error: "Something went wrong. Please try again." },
+    { status: 500 },
+  );
 }
 
 export function conflict(message: string) {

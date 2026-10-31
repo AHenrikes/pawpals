@@ -58,6 +58,7 @@ export default function ProfileBanner({
             size={"icon-sm"}
             variant={"outline"}
             onClick={handleSettingsClick}
+            aria-label="Edit profile settings"
             className="p-1 text-text-muted hover:text-text"
           >
             <SettingsIcon />

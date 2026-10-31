@@ -9,12 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  animate,
-  motion,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -39,8 +34,17 @@ const droplets = [
 ];
 
 function durationFor(pathname: string) {
-  if (pathname.startsWith("/@")) return 0.4;
-  return 0.35;
+  if (pathname.startsWith("/@")) return 0.3;
+  return 0.25;
+}
+
+function isPrivatePage(pathname: string) {
+  return (
+    pathname === "/" ||
+    pathname === "/settings" ||
+    pathname.startsWith("/@") ||
+    pathname.startsWith("/profile/")
+  );
 }
 
 export function PageTransitionProvider({
@@ -61,6 +65,9 @@ export function PageTransitionProvider({
   const busy = useRef(false);
   const finishing = useRef(false);
   const pendingFrom = useRef<string | null>(null);
+  const expectedPath = useRef<string | null>(null);
+  const knownPrivateHistory = useRef<string[]>([]);
+  const simpleReveal = useRef(false);
   const fallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loadingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const duration = useRef(0.7);
@@ -81,15 +88,32 @@ export function PageTransitionProvider({
     setShowLoading(false);
 
     try {
+      if (simpleReveal.current) {
+        // Opacity stays smooth on phones where animated multi-layer masks can stutter.
+        await animate(tint, 0, {
+          duration: duration.current,
+          ease: "easeOut",
+        });
+        return;
+      }
       reveal.set(0);
       setIsRevealing(true);
       // The destination is painted under the opaque cover. Open it with droplets.
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve()),
+      );
       await animate(reveal, 1, {
-        duration: duration.current * 1.65,
+        duration: duration.current * 1.4,
         ease: [0.4, 0, 0.4, 1],
       });
     } finally {
+      if (
+        expectedPath.current &&
+        window.location.pathname !== expectedPath.current
+      ) {
+        expectedPath.current = null;
+        knownPrivateHistory.current = [];
+      }
       tint.set(0);
       reveal.set(0);
       setIsRevealing(false);
@@ -110,6 +134,9 @@ export function PageTransitionProvider({
       }
 
       busy.current = true;
+      simpleReveal.current = window.matchMedia(
+        "(pointer: coarse) and (max-width: 1024px)",
+      ).matches;
       setExitingPath(window.location.pathname);
       setDestinationPath(destination);
       setIsTransitioning(true);
@@ -168,13 +195,18 @@ export function PageTransitionProvider({
         return;
       }
 
-      if (options?.transition === false) {
-        if (options.replace) router.replace(next, { scroll: options.scroll });
-        else router.push(next, { scroll: options.scroll });
+      if (options?.transition === false || !isPrivatePage(url.pathname)) {
+        if (options?.replace) router.replace(next, { scroll: options.scroll });
+        else router.push(next, { scroll: options?.scroll });
         return;
       }
 
+      router.prefetch(next);
       void run(url.pathname, () => {
+        expectedPath.current = url.pathname;
+        if (!options?.replace) {
+          knownPrivateHistory.current.push(window.location.pathname);
+        }
         if (options?.replace) router.replace(next, { scroll: options.scroll });
         else router.push(next, { scroll: options?.scroll });
       });
@@ -183,7 +215,16 @@ export function PageTransitionProvider({
   );
 
   const back = useCallback(() => {
-    void run(null, () => router.back());
+    const previous = knownPrivateHistory.current.at(-1);
+    if (!previous || !isPrivatePage(previous)) {
+      router.back();
+      return;
+    }
+    void run(previous, () => {
+      knownPrivateHistory.current.pop();
+      expectedPath.current = previous;
+      router.back();
+    });
   }, [router, run]);
 
   const contextValue = useMemo(
@@ -192,6 +233,12 @@ export function PageTransitionProvider({
   );
 
   useEffect(() => {
+    if (expectedPath.current === pathname) {
+      expectedPath.current = null;
+    } else if (!pendingFrom.current) {
+      // Browser history or a navigation outside this provider invalidates our stack.
+      knownPrivateHistory.current = [];
+    }
     if (pendingFrom.current && pathname !== pendingFrom.current) {
       // Let the destination layout paint before uncovering it.
       const frame = requestAnimationFrame(() => void finish());
@@ -224,6 +271,7 @@ export function PageTransitionProvider({
       const url = new URL(anchor.href, window.location.href);
       if (
         url.origin !== window.location.origin ||
+        !isPrivatePage(url.pathname) ||
         url.pathname === window.location.pathname
       )
         return;
@@ -291,5 +339,7 @@ export function usePageTransition() {
     [router],
   );
   const back = useCallback(() => router.back(), [router]);
-  return context ?? { navigate, back, exitingPath: null, destinationPath: null };
+  return (
+    context ?? { navigate, back, exitingPath: null, destinationPath: null }
+  );
 }

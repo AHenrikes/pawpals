@@ -18,6 +18,10 @@ including authentication, accounts, profiles, discovery, follows, and media.
 6. `20261030010007_subscriber_visibility.sql` adds the subscriber-only enum value.
 7. `20261030010008_profile_subscriptions.sql` adds trusted subscription entitlements and separates subscriber and follower access.
 8. `20261030010009_public_profile_metadata.sql` exposes profile details and media to signed-in users while retaining post visibility rules.
+9. `20261031010001_current_profile_media.sql` limits other members' media reads to images currently referenced by active profiles while preserving owner access to uploads.
+10. `20261031010002_batch_profile_reads.sql` loads follow-list profiles in one database request.
+11. `20261031010003_active_profile_readers.sql` enforces active or at-risk viewer status for profile RPCs and profile media, including direct Data API calls.
+12. `20261031010004_active_social_readers.sql` applies the same viewer-status rule to direct follow and profile-stat reads.
 
 Add future schema changes as new, dated migrations. Do not edit these baseline
 files after a project has applied them. A database that already applied the old
@@ -28,7 +32,7 @@ data you need.
 
 Only `core`, `social`, and `public` are exposed through the Data API. Sensitive
 account details remain in the unexposed `private` schema.
-Profile RPCs, search, and media require an authenticated user. Anonymous access
+Profile RPCs, search, and media require an active or at-risk account. Anonymous access
 is limited to Auth flows and username availability during sign-up. Future public
 pages should use explicit routes and separate, intentionally public data.
 The web proxy keeps an explicit public URL allowlist; placing a page in a
@@ -87,8 +91,8 @@ send `x-acting-fursona-id`; ownership is still verified by the database.
 - Avatar/banner object names: `{fursona_id}/{file_name}`
 - Avatar and banner buckets are private. Rows store application media paths such as
   `/api/media/fursona-avatars/{fursona_id}/{file_name}`. The media route reads
-  through the request's Supabase session, so Storage policies allow signed-in
-  users to read media belonging to active profiles.
+  through the request's Supabase session. Storage policies allow active or
+  at-risk members to read images currently referenced by active profiles.
 
 ## Applying to a new project
 

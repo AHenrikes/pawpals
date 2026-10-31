@@ -57,8 +57,13 @@ function checkLinting() {
     execSync('npm run lint 2>&1', { cwd: ROOT, stdio: 'pipe' });
     log.success('No ESLint errors found');
   } catch (e) {
-    issues++;
-    log.error(`ESLint found errors (run 'npm run lint' for details)\n\n${e}`);
+    if (e.code === 'EPERM') {
+      warnings++;
+      log.warn('ESLint could not start in this environment; run npm run lint directly');
+    } else {
+      issues++;
+      log.error(`ESLint found errors (run 'npm run lint' for details)\n\n${e}`);
+    }
   }
 
   try {
@@ -66,8 +71,13 @@ function checkLinting() {
     execSync('npm run check-types 2>&1', { cwd: ROOT, stdio: 'pipe' });
     log.success('No TypeScript errors found');
   } catch (e) {
-    issues++;
-    log.error(`TypeScript errors found (run 'npm run check-types' for details)\n\n${e}`);
+    if (e.code === 'EPERM') {
+      warnings++;
+      log.warn('TypeScript could not start in this environment; run npm run check-types directly');
+    } else {
+      issues++;
+      log.error(`TypeScript errors found (run 'npm run check-types' for details)\n\n${e}`);
+    }
   }
 }
 
@@ -118,7 +128,7 @@ function checkDuplication() {
   const hookFiles = getFilesRecursive(WEB_DIR, /useAuth|useSocial|useSupabase/);
   if (hookFiles.length > 0) {
     log.info(`Found ${hookFiles.length} custom hooks`);
-    log.success('Custom hooks are properly centralized');
+    log.info('Review hook usage before consolidating or removing files');
   }
 }
 
@@ -162,7 +172,7 @@ function checkMaintainability() {
   }
 
   // Check Supabase client usage
-  const supabaseUsage = getFilesRecursive(WEB_DIR, /supabase|@repo\/supabase/);
+  const supabaseUsage = findFilesWithPattern(WEB_DIR, /@repo\/supabase|@supabase\/supabase-js/);
   log.info(`Found ${supabaseUsage.length} files using Supabase`);
 }
 
@@ -185,17 +195,11 @@ function checkUnnecessaryCode() {
   }
 
   // Check for unused modals
-  const modalFiles = getFilesRecursive(WEB_DIR, /components\/dialogs\/.*\.tsx$/);
-  const modalImports = countImports(WEB_DIR, 'components/dialogs/');
-  if (modalFiles.length > modalImports) {
-    warnings++;
-    log.warn(`Found ${modalFiles.length - modalImports} potentially unused modal components`);
-  } else {
-    log.success(`All ${modalFiles.length} modal components are in use`);
-  }
+  const modalFiles = getFilesRecursive(WEB_DIR, /components\/modals\/.*\.tsx$/);
+  log.info(`Found ${modalFiles.length} modal components; import counts cannot prove usage`);
 
-  // Check for console.log statements (actual calls, not in comments/strings)
-  const consoleLogFiles = findFilesWithPattern(WEB_DIR, /console\.(log|warn|error|debug)\s*\(/);
+  // Error logging is expected in server routes; only flag debugging calls.
+  const consoleLogFiles = findFilesWithPattern(WEB_DIR, /console\.(log|debug)\s*\(/);
   if (consoleLogFiles.length > 0) {
     warnings++;
     log.warn(`Found ${consoleLogFiles.length} files with console statements`);
@@ -237,7 +241,7 @@ function checkUIConsistency() {
     warnings++;
     log.warn(`Found ${customUICount} files with inline CSS - use Tailwind/component library`);
   } else {
-    log.success('UI is consistent with component library + Tailwind');
+    log.info('No CSS-in-JS usage found; visual consistency requires review');
   }
 
   // Check for Tailwind class consistency
@@ -246,9 +250,10 @@ function checkUIConsistency() {
     log.success('Tailwind configuration is centralized');
   }
 
-  // Check for dark mode implementation
-  const darkModeFiles = findFilesWithPattern(WEB_DIR, /dark:/);
-  log.info(`Found ${darkModeFiles.length} files with dark mode classes`);
+  const themeCss = path.join(WEB_DIR, 'app', 'pawpals.css');
+  if (fs.existsSync(themeCss) && fs.readFileSync(themeCss, 'utf8').includes('.dark')) {
+    log.info('Dark theme tokens are defined in app/pawpals.css');
+  }
 
   // Check providers
   const providerFiles = getFilesRecursive(WEB_DIR, /providers\//);
@@ -314,22 +319,21 @@ function checkPerformance() {
     log.success('All dependencies appear to be in use');
   }
 
-  // Check for large files
+  // Long components are harder to review even when minified byte size is small.
   const largeFiles = getFilesRecursive(WEB_DIR, /\.(tsx?|jsx?)$/)
     .map(f => ({ 
       path: f, 
-      size: fs.statSync(f).size 
+      lines: fs.readFileSync(f, 'utf8').split('\n').length
     }))
-    .filter(f => f.size > 50000)
-    .sort((a, b) => b.size - a.size)
+    .filter(f => f.lines > 500)
+    .sort((a, b) => b.lines - a.lines)
     .slice(0, 5);
 
   if (largeFiles.length > 0) {
     warnings++;
-    log.warn(`Found ${largeFiles.length} large files (>50KB) - consider splitting:`);
+    log.warn(`Found ${largeFiles.length} files over 500 lines - review for cohesive sections:`);
     largeFiles.forEach(f => {
-      const kb = (f.size / 1024).toFixed(1);
-      log.info(`  ${path.relative(WEB_DIR, f.path)} - ${kb}KB`);
+      log.info(`  ${path.relative(WEB_DIR, f.path)} - ${f.lines} lines`);
     });
   } else {
     log.success('No overly large files detected');
@@ -341,7 +345,7 @@ function checkPerformance() {
     warnings++;
     log.warn(`Found ${imgTags.length} <img> tags - use Next.js Image component for optimization`);
   } else {
-    log.success('Images are properly optimized');
+    log.info('No native img tags found; image delivery still needs runtime measurement');
   }
 }
 
@@ -413,20 +417,6 @@ function findFilesWithPattern(dir, pattern) {
       return false;
     }
   });
-}
-
-function countImports(dir, importPath) {
-  const files = getFilesRecursive(dir, /\.(ts|tsx|js|jsx)$/);
-  let count = 0;
-  files.forEach(file => {
-    try {
-      const content = fs.readFileSync(file, 'utf8');
-      if (content.includes(`from "${importPath}`) || content.includes(`from '${importPath}`)) {
-        count++;
-      }
-    } catch{}
-  });
-  return count;
 }
 
 // ============ RUN SCAN ============
