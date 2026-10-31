@@ -47,6 +47,8 @@ export type FursonaSearch = {
 
 export type FursonaProfile = {
   id: string;
+  /** Whether the current viewer may see this user's posts when posts are implemented. */
+  can_view_content?: boolean;
   display_name: string;
   username: string;
   bio: string | null;
@@ -65,8 +67,8 @@ export type FursonaProfile = {
   updated_at: Date | null;
 };
 
-// All profiles are discoverable; content access depends on visibility and relationship.
-export type ProfileVisibility = "public" | "followers_only" | "private";
+// Signed-in users can view profiles; post access depends on visibility and relationship.
+export type ProfileVisibility = "public" | "subscribers_only" | "private";
 
 export type ProfileSocialPlatform =
   | "website"

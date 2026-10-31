@@ -12,7 +12,6 @@ import {
 import {
   animate,
   motion,
-  useMotionTemplate,
   useMotionValue,
   useTransform,
 } from "framer-motion";
@@ -27,6 +26,8 @@ type NavigateOptions = {
 type TransitionContextValue = {
   navigate: (href: string, options?: NavigateOptions) => void;
   back: () => void;
+  exitingPath: string | null;
+  destinationPath: string | null;
 };
 
 const TransitionContext = createContext<TransitionContextValue | null>(null);
@@ -38,13 +39,8 @@ const droplets = [
 ];
 
 function durationFor(pathname: string) {
-  if (
-    /^\/(sign-in|sign-up|sign-up-success|forgot-password|new-password|error)(\/|$)/.test(
-      pathname,
-    )
-  ) return 0.4;
-  if (pathname.startsWith("/@")) return 0.35;
-  return 0.25;
+  if (pathname.startsWith("/@")) return 0.4;
+  return 0.35;
 }
 
 export function PageTransitionProvider({
@@ -52,11 +48,8 @@ export function PageTransitionProvider({
 }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
   const pathname = usePathname();
-  const blur = useMotionValue(0);
   const tint = useMotionValue(0);
   const reveal = useMotionValue(0);
-  const backdropFilter = useMotionTemplate`blur(${blur}px)`;
-  const backgroundColor = useMotionTemplate`hsla(var(--surface), ${tint})`;
   const dropletMask = useTransform(reveal, (progress) =>
     droplets
       .map(({ x, y, delay }) => {
@@ -74,6 +67,8 @@ export function PageTransitionProvider({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
+  const [exitingPath, setExitingPath] = useState<string | null>(null);
+  const [destinationPath, setDestinationPath] = useState<string | null>(null);
 
   const finish = useCallback(async () => {
     if (finishing.current || !busy.current) return;
@@ -88,25 +83,26 @@ export function PageTransitionProvider({
     try {
       reveal.set(0);
       setIsRevealing(true);
-      // Let the fully blurred destination settle before the droplets open.
-      await new Promise((resolve) => setTimeout(resolve, 160));
+      // The destination is painted under the opaque cover. Open it with droplets.
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       await animate(reveal, 1, {
         duration: duration.current * 1.65,
         ease: [0.4, 0, 0.4, 1],
       });
     } finally {
-      blur.set(0);
       tint.set(0);
       reveal.set(0);
       setIsRevealing(false);
       busy.current = false;
       finishing.current = false;
       setIsTransitioning(false);
+      setExitingPath(null);
+      setDestinationPath(null);
     }
-  }, [blur, tint, reveal]);
+  }, [tint, reveal]);
 
   const run = useCallback(
-    async (destination: string, action: () => void) => {
+    async (destination: string | null, action: () => void) => {
       if (busy.current) return;
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         action();
@@ -114,25 +110,20 @@ export function PageTransitionProvider({
       }
 
       busy.current = true;
+      setExitingPath(window.location.pathname);
+      setDestinationPath(destination);
       setIsTransitioning(true);
       setIsRevealing(false);
       setShowLoading(false);
-      duration.current = durationFor(destination);
-      blur.set(0);
+      duration.current = durationFor(destination ?? window.location.pathname);
       tint.set(0);
       reveal.set(0);
 
       try {
-        await Promise.all([
-          animate(blur, 56, {
-            duration: duration.current,
-            ease: [0.32, 0, 0.2, 1],
-          }),
-          animate(tint, 1, {
-            duration: duration.current,
-            ease: [0.32, 0, 0.2, 1],
-          }),
-        ]);
+        await animate(tint, 1, {
+          duration: duration.current,
+          ease: [0.32, 0, 0.2, 1],
+        });
         // Paint the opaque cover before replacing the page beneath it.
         if (document.visibilityState === "visible") {
           await new Promise<void>((resolve) => {
@@ -151,7 +142,7 @@ export function PageTransitionProvider({
         void finish();
       }
     },
-    [blur, tint, reveal, finish],
+    [tint, reveal, finish],
   );
 
   const navigate = useCallback(
@@ -192,10 +183,13 @@ export function PageTransitionProvider({
   );
 
   const back = useCallback(() => {
-    void run(window.location.pathname, () => router.back());
+    void run(null, () => router.back());
   }, [router, run]);
 
-  const contextValue = useMemo(() => ({ navigate, back }), [navigate, back]);
+  const contextValue = useMemo(
+    () => ({ navigate, back, exitingPath, destinationPath }),
+    [navigate, back, exitingPath, destinationPath],
+  );
 
   useEffect(() => {
     if (pendingFrom.current && pathname !== pendingFrom.current) {
@@ -258,11 +252,9 @@ export function PageTransitionProvider({
         aria-hidden="true"
       >
         <motion.div
-          className="absolute inset-0"
+          className="absolute inset-0 bg-background"
           style={{
-            backdropFilter,
-            WebkitBackdropFilter: backdropFilter,
-            backgroundColor,
+            opacity: tint,
             maskImage: isRevealing ? dropletMask : "none",
             WebkitMaskImage: isRevealing ? dropletMask : "none",
             maskComposite: "intersect",
@@ -290,9 +282,14 @@ export function PageTransitionProvider({
 
 export function usePageTransition() {
   const context = useContext(TransitionContext);
-  if (!context)
-    throw new Error(
-      "usePageTransition must be used inside PageTransitionProvider",
-    );
-  return context;
+  const router = useRouter();
+  const navigate = useCallback(
+    (href: string, options?: NavigateOptions) => {
+      if (options?.replace) router.replace(href, { scroll: options.scroll });
+      else router.push(href, { scroll: options?.scroll });
+    },
+    [router],
+  );
+  const back = useCallback(() => router.back(), [router]);
+  return context ?? { navigate, back, exitingPath: null, destinationPath: null };
 }

@@ -6,7 +6,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
+/* Inline token references so a profile's local theme variables affect every utility. */
+@theme inline {
   --radius-xs: calc(var(--radius) - 12px);
   --radius-sm: calc(var(--radius) - 8px);
   --radius-md: calc(var(--radius) - 4px);

@@ -29,6 +29,7 @@ import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
 import { toast } from "@repo/ui/sonner";
 import { TypographyH3 } from "@repo/ui/typography";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AtSignIcon,
   AwardIcon,
@@ -154,6 +155,7 @@ function SettingsSection({
 }
 
 export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
+  const queryClient = useQueryClient();
   const {
     currentFursona,
     usernameLoading,
@@ -217,9 +219,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   );
 
   const visibilityLabel = {
-    public: "Visible to everyone",
-    followers_only: "Visible to followers",
-    private: "Visible to approved followers",
+    public: "Posts visible to signed-in users",
+    subscribers_only: "Posts visible to subscribers",
+    private: "Posts visible to approved followers",
   }[visibility];
 
   const resetProfile = () => {
@@ -371,6 +373,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         bannerUrl && currentFursona.banner_url ? removeFursonaImage(currentFursona.banner_url) : Promise.resolve(),
       ]);
       await refresh();
+      await queryClient.invalidateQueries({ queryKey: ["fursona"] });
       setNewChange(false);
       toast.success("Profile settings saved");
       if (onClose && nextUsername !== currentFursona.username)
@@ -562,21 +565,21 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
 
           <SettingsSection
-            title="Profile privacy"
-            description="Choose who can view your content."
+            title="Post visibility"
+            description="Choose who can view your posts. Your profile remains visible to signed-in users."
           >
             <div className="grid gap-3 sm:grid-cols-3">
               {[
                 {
                   value: "public" as const,
                   label: "Public",
-                  detail: "Anyone can view",
+                  detail: "Signed-in users",
                   Icon: Globe2Icon,
                 },
                 {
-                  value: "followers_only" as const,
-                  label: "Followers only",
-                  detail: "Approved followers",
+                  value: "subscribers_only" as const,
+                  label: "Subscribers only",
+                  detail: "Active subscribers",
                   Icon: UsersIcon,
                 },
                 {
@@ -613,11 +616,16 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 </Button>
               ))}
             </div>
-            {visibility !== "public" && (
+            {visibility === "private" && (
               <p className="flex items-center gap-2 rounded-lg bg-primary/10 p-3 text-xs text-text-muted">
                 <ShieldCheckIcon className="size-4 text-primary" />
                 New follow requests require your approval before they can view
-                the profile.
+                your posts.
+              </p>
+            )}
+            {visibility === "subscribers_only" && (
+              <p className="rounded-lg bg-primary/10 p-3 text-xs text-text-muted">
+                Subscriptions are not available yet. Your profile will still be visible to signed-in users.
               </p>
             )}
           </SettingsSection>

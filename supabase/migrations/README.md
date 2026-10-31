@@ -15,10 +15,13 @@ including authentication, accounts, profiles, discovery, follows, and media.
 3. `20261030010003_api.sql` exposes the intentionally available public RPC wrappers.
 4. `20261030010004_media.sql` creates private media buckets and Storage policies.
 5. `20261030010006_atomic_profile_save.sql` saves profile fields and username changes in one database transaction.
+6. `20261030010007_subscriber_visibility.sql` adds the subscriber-only enum value.
+7. `20261030010008_profile_subscriptions.sql` adds trusted subscription entitlements and separates subscriber and follower access.
+8. `20261030010009_public_profile_metadata.sql` exposes profile details and media to signed-in users while retaining post visibility rules.
 
 Add future schema changes as new, dated migrations. Do not edit these baseline
 files after a project has applied them. A database that already applied the old
-18-file history cannot accept these four files through `db push` as an additive
+18-file history cannot accept this baseline through `db push` as an additive
 upgrade. Back up that database and make a separate migration-history cutover plan.
 This includes the existing local database: do not reset it without preserving any
 data you need.
@@ -50,8 +53,18 @@ are available, then enable it and test an OTP end to end. Phone numbers must be
 entered in international format. A database trigger rejects a phone number that
 is already pending verification on another user.
 
-Subscription state is intentionally deferred until plans and billing behavior are
-defined; the initial release has no subscription feature.
+Subscriber-only posts use `social.profile_subscriptions` as an access entitlement.
+Only a trusted service role can grant, renew, or revoke it. It must be connected to
+a verified billing lifecycle before subscriptions can be purchased. The interface
+currently explains that subscriptions are unavailable. Existing `followers_only`
+profiles become `private` during migration so they retain follower-based access.
+The legacy enum value remains in PostgreSQL for compatibility but is rejected by
+the new constraint.
+All signed-in users can view profile details, including the bio, avatar, banner,
+and social links. The `can_view_content` RPC field is reserved for post access:
+public posts are available to signed-in users, subscriber-only posts require an
+active entitlement, and private posts require an accepted follow. Posts are not
+implemented yet. No profile metadata should be gated by this field.
 
 ## Profile search
 
@@ -66,7 +79,7 @@ names. The rate-limit table keeps one counter per account and is private.
 
 `core.accounts.default_fursona_id` is only a fallback. The acting identity is
 device/session state, not a global database flag. Requests that act as a fursona
-must send its UUID explicitly to an RPC. Reads using RLS for follower-only data may
+must send its UUID explicitly to an RPC. Future reads of private posts may
 send `x-acting-fursona-id`; ownership is still verified by the database.
 
 ## Media paths
@@ -74,8 +87,8 @@ send `x-acting-fursona-id`; ownership is still verified by the database.
 - Avatar/banner object names: `{fursona_id}/{file_name}`
 - Avatar and banner buckets are private. Rows store application media paths such as
   `/api/media/fursona-avatars/{fursona_id}/{file_name}`. The media route reads
-  through the request's Supabase session, so Storage policies enforce profile
-  visibility for each request.
+  through the request's Supabase session, so Storage policies allow signed-in
+  users to read media belonging to active profiles.
 
 ## Applying to a new project
 
@@ -92,6 +105,6 @@ create a backup and cutover plan instead of treating this baseline as additive.
 - concurrent fifth-fursona creation
 - suspended-account writes through direct Data API calls
 - acting with another account's fursona ID
-- public, follower-only, and private profile reads
+- authenticated profile reads and public, subscriber-only, and private post access checks
 - follow request and unfollow behavior
 - username uniqueness and cooldown enforcement

@@ -21,14 +21,18 @@ function getUsername(pathname: string): boolean {
 }
 
 export default function ReturnHeader() {
-  const { back } = usePageTransition();
+  const { back, exitingPath, destinationPath } = usePageTransition();
   const pathname = useCurrentPath();
   const profilePage = getUsername(pathname);
+  const isExitingToProfile = exitingPath === pathname && destinationPath?.startsWith("/@");
   const { override } = useReturnHeader();
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header
+    <motion.header
+      initial={false}
+      animate={isExitingToProfile ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
         "top-0 w-full border-white/10 shadow-black/5 transition-colors z-50",
         profilePage
@@ -72,6 +76,6 @@ export default function ReturnHeader() {
           </motion.button>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }

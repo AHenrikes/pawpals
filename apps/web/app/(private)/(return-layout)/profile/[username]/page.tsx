@@ -28,18 +28,17 @@ export default async function ProfilePage({
     created_at: string;
     updated_at: string | null;
   };
-  const initialProfile: FursonaProfile | undefined = profile.can_view_content
-    ? ({
-        ...profile,
-        created_at: new Date(profile.created_at),
-        updated_at: profile.updated_at ? new Date(profile.updated_at) : null,
-      } as FursonaProfile)
-    : undefined;
+  const initialProfile: FursonaProfile = {
+    ...profile,
+    created_at: new Date(profile.created_at),
+    updated_at: profile.updated_at ? new Date(profile.updated_at) : null,
+  };
 
   return (
     <Profile
       username={username}
       initialProfile={initialProfile}
+      initialActorId={account.default_fursona_id}
     />
   );
 }

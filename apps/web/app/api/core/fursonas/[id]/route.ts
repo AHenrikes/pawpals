@@ -21,7 +21,7 @@ import {
 import { type SupabaseClient } from "@supabase/supabase-js";
 import { normalizeSocialLinks } from "@/lib/validation/socialLinks";
 
-const visibilityValues = new Set(["public", "followers_only", "private"]);
+const visibilityValues = new Set(["public", "subscribers_only", "private"]);
 const profileThemeValues = new Set(["light", "dark"]);
 const achievementValues = new Set([
   "early_paw",

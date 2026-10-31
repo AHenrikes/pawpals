@@ -5,16 +5,17 @@ import { type FursonaProfile } from "@/types/fursona";
 import { api } from "@/lib/api/api-client";
 import { useUser } from "@/providers/UserProvider";
 
-export function useProfile(id: string, initialProfile?: FursonaProfile) {
+export function useProfile(id: string, initialProfile?: FursonaProfile, initialActorId?: string | null) {
   const { currentFursona, loading: userLoading } = useUser();
+  const matchingInitialProfile = currentFursona?.id === initialActorId ? initialProfile : undefined;
   const {
-    data: profile = initialProfile ?? null,
+    data: profile = matchingInitialProfile ?? null,
     isLoading,
     error,
     refetch,
   } = useQuery({
     queryKey: ["fursona", id, currentFursona?.id],
-    initialData: initialProfile,
+    initialData: matchingInitialProfile,
     enabled: !!id && !userLoading,
     staleTime: 0,
     queryFn: async () => {
@@ -35,5 +36,5 @@ export function useProfile(id: string, initialProfile?: FursonaProfile) {
     },
   });
 
-  return { profile, loading: !initialProfile && (userLoading || isLoading), error, refetch };
+  return { profile, loading: userLoading || isLoading, error, refetch };
 }
