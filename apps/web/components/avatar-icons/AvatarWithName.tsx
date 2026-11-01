@@ -1,9 +1,6 @@
 "use client";
 
-import { getInitials } from "@/lib/helpers/getInitials";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
-import { useMemo } from "react";
+import FursonaAvatar from "./FursonaAvatar";
 import { useUser } from "@/providers/UserProvider";
 import Link from "next/link";
 import { TypographyLead, TypographyP } from "@repo/ui/typography";
@@ -13,24 +10,18 @@ export default function AvatarWithName({
 }: Readonly<{ size?: "lg" | "sm" }>) {
   const { currentFursona } = useUser();
 
-  const displayName = useMemo(() => {
-    if (currentFursona?.display_name) {
-      return currentFursona.display_name;
-    }
-
-    return "Account";
-  }, [currentFursona?.display_name]);
+  const displayName = currentFursona?.display_name || "Account";
 
   return (
     <Link
       href={`/@${currentFursona?.username}`}
       className="flex items-center gap-4 px-2 py-2 rounded-md transition-colors duration-300 hover:bg-accent"
     >
-      <Avatar size={size}>
-        <AvatarImage src={avatarImageSrc(currentFursona?.avatar_url, 96)} alt={displayName} />
-
-        <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
-      </Avatar>
+      <FursonaAvatar
+        size={size}
+        name={displayName}
+        src={currentFursona?.avatar_url}
+      />
 
       <span>
         <TypographyLead>{currentFursona?.display_name}</TypographyLead>

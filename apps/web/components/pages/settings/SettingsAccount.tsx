@@ -217,7 +217,7 @@ export default function SettingsAccount({
   };
 
   return (
-    <div className="w-full space-y-8 pb-20">
+    <div className="w-full space-y-8">
       <section className="space-y-4">
         <div>
           <TypographyH3>Account information</TypographyH3>

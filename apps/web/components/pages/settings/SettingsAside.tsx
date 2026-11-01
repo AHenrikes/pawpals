@@ -1,11 +1,17 @@
 "use client";
 
 import AvatarWithName from "@/components/avatar-icons/AvatarWithName";
+import { useUser } from "@/providers/UserProvider";
 import { Button } from "@repo/ui/button";
 import { cn } from "@repo/ui/lib/utils";
-import { CircleUserRoundIcon, UserRoundPenIcon } from "lucide-react";
+import {
+  CircleUserRoundIcon,
+  LogOutIcon,
+  Settings2Icon,
+  UserRoundPenIcon,
+} from "lucide-react";
 
-export type EditProfileSection = "account" | "profile" | null;
+export type EditProfileSection = "account" | "profile" | "app" | null;
 
 const sections = [
   {
@@ -20,6 +26,12 @@ const sections = [
     description: "Your public fursona",
     Icon: UserRoundPenIcon,
   },
+  {
+    id: "app" as const,
+    label: "App settings",
+    description: "Appearance and accessibility",
+    Icon: Settings2Icon,
+  },
 ];
 
 type EditProfileAsideProps = {
@@ -33,10 +45,12 @@ export default function SettingsAside({
   onSectionChange,
   mobileNavigation = false,
 }: Readonly<EditProfileAsideProps>) {
+  const { signOut } = useUser();
+
   return (
     <aside
       className={cn(
-        "h-dvh shrink-0 border-b border-white/10 bg-surface p-4 md:w-60 md:border-r md:border-b-0 md:bg-surface/35 md:p-6 md:backdrop-blur-2xl lg:w-72",
+        "flex h-full min-h-0 shrink-0 flex-col overflow-y-auto border-b border-white/10 bg-surface p-4 md:w-60 md:border-r md:border-b-0 md:bg-surface/35 md:p-6 md:backdrop-blur-2xl lg:w-72",
         mobileNavigation && "w-1/2 border-r",
       )}
     >
@@ -44,7 +58,7 @@ export default function SettingsAside({
 
       <div className="my-5 h-px w-full bg-border/40" />
 
-      <nav aria-label="Profile settings">
+      <nav aria-label="Settings sections" className="flex flex-1 flex-col">
         <ul className="flex flex-col gap-2">
           {sections.map(({ id, label, description, Icon }) => {
             const isActive = activeSection === id;
@@ -81,6 +95,17 @@ export default function SettingsAside({
             );
           })}
         </ul>
+
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={() => void signOut()}
+          className="min-h-16 mt-auto w-full justify-start gap-3 rounded-xl px-3 py-3"
+        >
+          <LogOutIcon className="w-6 h-6 p-0.5 shrink-0" />
+
+          <span className="overflow-hidden whitespace-nowrap">Sign Out</span>
+        </Button>
       </nav>
     </aside>
   );

@@ -1,9 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { Button } from "@repo/ui/button";
 import {
   Drawer,
@@ -17,10 +15,10 @@ import {
 import { Input } from "@repo/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
 import { ArrowDownUpIcon, SearchIcon, UsersIcon, XIcon } from "lucide-react";
-import { getInitials } from "@/lib/helpers/getInitials";
-import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
 import { api } from "@/lib/api/api-client";
-import { TypographyP, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
+import { TypographySmall } from "@repo/ui/typography";
+import FursonaAvatar from "@/components/avatar-icons/FursonaAvatar";
+import Link from "next/link";
 
 export type ConnectionTab =
   "followers" | "following" | "subscribers" | "requests" | "subscribed";
@@ -288,8 +286,10 @@ export default function ProfileConnections({
                 side="bottom"
                 className="w-64 gap-1 p-2 bg-background rounded-md"
               >
-                <TypographySmall className="pb-2 border-b border-border/30 text-text-muted">Subscriptions</TypographySmall>
-                
+                <TypographySmall className="pb-2 border-b border-border/30 text-text-muted">
+                  Subscriptions
+                </TypographySmall>
+
                 {SUBSCRIPTION_TABS.map((name) => (
                   <Button
                     key={name}
@@ -400,7 +400,10 @@ export default function ProfileConnections({
               side="bottom"
               className="w-56 gap-1 p-2 bg-background rounded-md"
             >
-              <TypographySmall className="pb-2 text-text-muted border-b border-border/30">Sort connections</TypographySmall>
+              <TypographySmall className="pb-2 text-text-muted border-b border-border/30">
+                Sort connections
+              </TypographySmall>
+
               {(["newest", "oldest"] as const).map((option) => (
                 <Button
                   key={option}
@@ -465,16 +468,12 @@ export default function ProfileConnections({
                   onClick={onNavigate}
                   className="flex min-w-0 flex-1 items-center gap-3 py-4 hover:opacity-80"
                 >
-                  <Avatar className="size-11 shrink-0">
-                    <AvatarImage
-                      src={avatarImageSrc(item.avatarUrl, 96)}
-                      alt=""
-                    />
-
-                    <AvatarFallback>
-                      {getInitials(item.displayName)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <FursonaAvatar
+                    className="size-11 shrink-0"
+                    name={item.displayName}
+                    src={item.avatarUrl}
+                    alt=""
+                  />
 
                   <span className="min-w-0">
                     <span className="block truncate font-medium">

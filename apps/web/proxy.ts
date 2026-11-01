@@ -11,12 +11,16 @@ export async function proxy(request: NextRequest) {
   let aliasResponse: NextResponse | null = null;
   if (pathname.startsWith("/profile/")) {
     const username = pathname.replace("/profile/", "");
-    aliasResponse = NextResponse.redirect(new URL(`/@${username}`, request.url));
+    const destination = request.nextUrl.clone();
+    destination.pathname = `/@${username}`;
+    aliasResponse = NextResponse.redirect(destination);
   }
 
   if (pathname.startsWith("/@")) {
     const username = pathname.slice(2);
-    aliasResponse = NextResponse.rewrite(new URL(`/profile/${username}`, request.url), { request });
+    const destination = request.nextUrl.clone();
+    destination.pathname = `/profile/${username}`;
+    aliasResponse = NextResponse.rewrite(destination, { request });
   }
 
   if (!aliasResponse) return sessionResponse;

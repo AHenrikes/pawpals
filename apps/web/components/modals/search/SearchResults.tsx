@@ -4,9 +4,7 @@ import {
   TypographyXSmall,
 } from "@repo/ui/typography";
 import { FursonaSearch } from "@/types/fursona";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
-import { getInitials } from "@/lib/helpers/getInitials";
+import FursonaAvatar from "@/components/avatar-icons/FursonaAvatar";
 import type { NavOption, SearchResult } from "./SearchModal";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -61,16 +59,11 @@ export default function SearchResults({
                         ease: "easeOut",
                       }}
                     >
-                      <Avatar size="lg">
-                        <AvatarImage
-                          src={avatarImageSrc(f?.avatar_url, 96)}
-                          alt={f.display_name}
-                        />
-
-                        <AvatarFallback>
-                          {getInitials(f.display_name)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <FursonaAvatar
+                        size="lg"
+                        name={f.display_name}
+                        src={f.avatar_url}
+                      />
 
                       <div className="flex-1">
                         <TypographyLead className="font-medium text-sm md:text-base">

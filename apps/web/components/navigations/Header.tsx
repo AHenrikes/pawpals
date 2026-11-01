@@ -7,21 +7,24 @@ import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { TypographyH1 } from "@repo/ui/typography";
 import { Searchbar } from "@/components/modals/search/Searchbar";
 import { cn } from "@repo/ui/lib/utils";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 import { motion } from "framer-motion";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import AvatarIcon from "../avatar-icons/AvatarIcon";
+import { NotificationBell } from "./NotificationBell";
 
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const { exitingPath, destinationPath } = usePageTransition();
-  const isExitingToProfile = exitingPath !== null && destinationPath?.startsWith("/@");
+  const isExitingToProfile =
+    exitingPath !== null && destinationPath?.startsWith("/@");
 
   return (
     <div className="sticky top-0 w-full h-16 shrink-0 z-50">
       <motion.header
         initial={false}
-        animate={isExitingToProfile ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }}
+        animate={
+          isExitingToProfile ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }
+        }
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
           "absolute inset-0 w-full border-b border-b-white/10 bg-background transition-colors md:shadow-lg md:shadow-black/5",
@@ -37,13 +40,17 @@ export default function Header() {
             <SidebarTrigger className="border-none" />
 
             <Link href={AUTH_ROUTES.HOME} className="hidden md:block">
-              <TypographyH1 className="text-lg md:text-2xl">PAWPALS</TypographyH1>
+              <TypographyH1 className="text-lg md:text-2xl">
+                PAWPALS
+              </TypographyH1>
             </Link>
           </motion.div>
 
           <div className="flex items-center gap-2">
             <Searchbar onOpenChange={setSearchOpen} />
-            <ThemeSwitcher />
+
+            <NotificationBell />
+          
             <div className="rounded-full ring-2 ring-white/10 transition hover:ring-primary/50">
               <AvatarIcon />
             </div>

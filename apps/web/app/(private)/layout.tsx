@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
 import { redirect } from "next/navigation";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { AppPreferencesProvider } from "@/providers/AppPreferencesProvider";
 import { PageTransitionProvider } from "@/components/transitions/PageTransitionProvider";
 import { type Metadata } from "next";
 
@@ -15,10 +16,12 @@ export default async function PrivateLayout({
   if (!account) redirect(AUTH_ROUTES.SIGN_IN);
 
   return (
-    <PageTransitionProvider>
-      <QueryProvider>
-        <UserProvider>{children}</UserProvider>
-      </QueryProvider>
-    </PageTransitionProvider>
+    <AppPreferencesProvider>
+      <PageTransitionProvider>
+        <QueryProvider>
+          <UserProvider>{children}</UserProvider>
+        </QueryProvider>
+      </PageTransitionProvider>
+    </AppPreferencesProvider>
   );
 }

@@ -3,9 +3,14 @@
 import { useUser } from "@/providers/UserProvider";
 import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { notFound, usePathname } from "next/navigation";
+import {
+  notFound,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
@@ -33,6 +38,8 @@ export default function ProfilePage({
 }: Readonly<AuthenticatedProfilePageProp>) {
   const { currentFursona, fursonas } = useUser();
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { exitingPath, destinationPath } = usePageTransition();
   const isExiting =
     exitingPath === pathname && !destinationPath?.startsWith("/@");
@@ -52,6 +59,24 @@ export default function ProfilePage({
   const isOwnProfile = currentFursona?.id === id;
   const canManageConnections =
     isOwnProfile || fursonas.some((fursona) => fursona.id === id);
+  const requestedConnections = searchParams.get("connections");
+
+  useEffect(() => {
+    if (requestedConnections === "requests" && canManageConnections) {
+      setConnectionsTab("requests");
+    }
+  }, [requestedConnections, canManageConnections]);
+
+  const closeConnections = () => {
+    setConnectionsTab(null);
+    if (requestedConnections === "requests") {
+      const next = new URLSearchParams(searchParams.toString());
+      next.delete("connections");
+      router.replace(`${pathname}${next.size ? `?${next}` : ""}`, {
+        scroll: false,
+      });
+    }
+  };
 
   const {
     isFollowing,
@@ -183,7 +208,7 @@ export default function ProfilePage({
 
       <Dialog
         open={connectionsTab !== null}
-        onOpenChange={(open) => !open && setConnectionsTab(null)}
+        onOpenChange={(open) => !open && closeConnections()}
       >
         <DialogContent
           className="sm:p-0 hidden h-[min(78vh,760px)] flex-col overflow-hidden md:flex"
@@ -197,7 +222,7 @@ export default function ProfilePage({
               initialTab={connectionsTab}
               isOwner={canManageConnections}
               onProfileChange={refetchCounts}
-              onNavigate={() => setConnectionsTab(null)}
+              onNavigate={closeConnections}
             />
           )}
         </DialogContent>

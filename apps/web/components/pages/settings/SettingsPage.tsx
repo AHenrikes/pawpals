@@ -10,6 +10,7 @@ import { useReturnHeader } from "@/components/navigations/ReturnHeaderProvider";
 import EditProfileAside, { type EditProfileSection } from "./SettingsAside";
 import SettingsAccount from "./SettingsAccount";
 import SettingsProfile from "./SettingsProfile";
+import SettingsApp from "./SettingsApp";
 
 type EditProfilePanelProps = {
   initialSection?: EditProfileSection;
@@ -147,7 +148,7 @@ export default function SettingsPage({
 
       <section
         className={cn(
-          "relative min-w-0 overflow-y-auto px-2 scrollbar-hide sm:px-10 sm:pt-6",
+          "relative min-w-0 px-2 py-6 overflow-y-auto scrollbar-hide sm:px-10",
           mobileNavigation ? "w-1/2 shrink-0 md:w-auto md:flex-1" : "flex-1",
         )}
       >
@@ -200,7 +201,9 @@ export default function SettingsPage({
             />
           )}
 
-          {activeSection === null && currentFursona && (
+          {activeSection === "app" && <SettingsApp />}
+
+          {activeSection === null && (
             <div className="grid place-content-center">
               <p>Choose a section</p>
             </div>

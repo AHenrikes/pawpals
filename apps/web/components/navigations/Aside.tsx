@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AUTH_ROUTES } from "@/lib/constants/auth";
-import { cn } from "@/lib/helpers/utils";
+import { cn } from "@repo/ui/lib/utils";
 import { Button } from "@repo/ui/button";
 import { useUser } from "@/providers/UserProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,10 +28,8 @@ import type { LucideIcon } from "lucide-react";
 import { LockScreen } from "@/lib/helpers/lockBody";
 import { TypographyLead, TypographySmall } from "@repo/ui/typography";
 import { CardContent } from "@repo/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
-import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
+import FursonaAvatar from "@/components/avatar-icons/FursonaAvatar";
 import { toast } from "@repo/ui/sonner";
-import { getInitials } from "@/lib/helpers/getInitials";
 import {
   Collapsible,
   CollapsibleContent,
@@ -211,16 +209,11 @@ export default function MainNav() {
                       }`,
                     )}
                   >
-                    <Avatar size="lg">
-                      <AvatarImage
-                        src={avatarImageSrc(elem?.avatar_url, 96)}
-                        alt={elem?.display_name}
-                      />
-
-                      <AvatarFallback>
-                        {getInitials(elem?.display_name)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <FursonaAvatar
+                      size="lg"
+                      name={elem.display_name}
+                      src={elem.avatar_url}
+                    />
 
                     <TypographySmall>{elem.display_name}</TypographySmall>
                   </Button>

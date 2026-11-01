@@ -60,6 +60,7 @@ export default async function ConnectionsPage({
       <div className="mx-auto flex min-h-svh max-w-3xl flex-col pt-16 md:px-4 md:py-24">
         <div className="flex min-h-[calc(100svh-4rem)] flex-col border-border/50 bg-background md:min-h-[70vh] md:rounded-xl md:border">
           <ProfileConnections
+            key={`${profile.id}:${initialTab}`}
             id={profile.id}
             initialTab={initialTab}
             isOwner={isOwner}

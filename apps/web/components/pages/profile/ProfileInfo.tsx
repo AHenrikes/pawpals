@@ -114,9 +114,11 @@ export default function ProfileInfo({
                 @{fursona.username}
               </TypographyP>
 
-              <TypographyXSmall className="shrink-0 p-0.5 px-2 text-text/60 border border-foreground/10">
-                {fursona.pronouns}
-              </TypographyXSmall>
+              {fursona.pronouns !== null && (
+                <TypographyXSmall className="shrink-0 p-0.5 px-2 text-text/60 border border-foreground/10">
+                  {fursona.pronouns}
+                </TypographyXSmall>
+              )}
             </span>
 
             {achievements.length > 0 ? (

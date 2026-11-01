@@ -15,7 +15,7 @@ import { getErrorMessage } from "@/lib/helpers/error-utils";
 import { removeFursonaImage, uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
 import { MAX_IMAGE_SIZE_BYTES } from "@/lib/uploads/imageLimits";
 import { mediaImageLoader } from "@/lib/uploads/mediaImageLoader";
-import { cn } from "@/lib/helpers/utils";
+import { cn } from "@repo/ui/lib/utils";
 import type {
   FursonaTypes,
   ProfileAchievement,
@@ -391,7 +391,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
   };
 
   return (
-    <div className="w-full space-y-8 pb-20">
+    <div className="w-full space-y-8">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
         <div className="space-y-6">
           <SettingsSection
@@ -828,8 +828,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
 
       <div
         className={cn(
-          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 bg-background p-4 sm:mx-0 sm:flex-row sm:justify-end sm:rounded-2xl sm:border md:bg-background/75 md:shadow-2xl md:shadow-black/10 md:backdrop-blur-2xl",
-          newChange || isAvailable === false ? "sticky bottom-0 sm:bottom-6" : false,
+          "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 p-4 sm:mx-0 sm:flex-row sm:justify-end sm:rounded-2xl sm:border md:bg-background/75 md:shadow-2xl md:shadow-black/10 md:backdrop-blur-2xl",
+          newChange || isAvailable === false ? "sticky bottom-0 bg-background sm:bottom-6" : false,
         )}
       >
         <Button

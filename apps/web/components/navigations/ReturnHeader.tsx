@@ -6,11 +6,11 @@ import { Searchbar } from "../modals/search/Searchbar";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 import { useCurrentPath } from "@/hooks/usePath";
 import { TypographyH1 } from "@repo/ui/typography";
 import { useReturnHeader } from "./ReturnHeaderProvider";
 import { motion } from "framer-motion";
+import { NotificationBell } from "./NotificationBell";
 
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
@@ -24,14 +24,17 @@ export default function ReturnHeader() {
   const { back, exitingPath, destinationPath } = usePageTransition();
   const pathname = useCurrentPath();
   const profilePage = getUsername(pathname);
-  const isExitingToProfile = exitingPath === pathname && destinationPath?.startsWith("/@");
+  const isExitingToProfile =
+    exitingPath === pathname && destinationPath?.startsWith("/@");
   const { override } = useReturnHeader();
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <motion.header
       initial={false}
-      animate={isExitingToProfile ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }}
+      animate={
+        isExitingToProfile ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }
+      }
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
         "top-0 w-full border-white/10 shadow-black/5 transition-colors z-50",
@@ -64,7 +67,8 @@ export default function ReturnHeader() {
 
         <div className="flex items-center gap-2">
           <Searchbar onOpenChange={setSearchOpen} />
-          <ThemeSwitcher />
+
+          <NotificationBell />
 
           <motion.button
             initial={{ opacity: 0, y: -10 }}

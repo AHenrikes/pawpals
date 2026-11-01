@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/helpers/utils";
+import { cn } from "@repo/ui/lib/utils";
 import { PawPrint } from "lucide-react";
 import { motion } from "framer-motion";
 import {

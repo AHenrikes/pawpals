@@ -128,7 +128,10 @@ export function PageTransitionProvider({
   const run = useCallback(
     async (destination: string | null, action: () => void) => {
       if (busy.current) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (
+        document.documentElement.dataset.motion === "reduced" ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
         action();
         return;
       }
