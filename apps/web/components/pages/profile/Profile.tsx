@@ -18,22 +18,24 @@ import SettingsPage from "@/components/pages/settings/SettingsPage";
 import PageState from "@/components/pages/PageState";
 import ProfileContent from "./ProfileContent";
 import ReturnHeader from "@/components/navigations/ReturnHeader";
+import ProfileConnections, { type ConnectionTab } from "./ProfileConnections";
 
 type AuthenticatedProfilePageProp = {
   username: string;
   initialProfile?: import("@/types/fursona").FursonaProfile;
   initialActorId: string | null;
-}
+};
 
 export default function ProfilePage({
   username,
   initialProfile,
   initialActorId,
 }: Readonly<AuthenticatedProfilePageProp>) {
-  const { currentFursona } = useUser();
+  const { currentFursona, fursonas } = useUser();
   const pathname = usePathname();
   const { exitingPath, destinationPath } = usePageTransition();
-  const isExiting = exitingPath === pathname && !destinationPath?.startsWith("/@");
+  const isExiting =
+    exitingPath === pathname && !destinationPath?.startsWith("/@");
   const {
     profile,
     loading: profileLoading,
@@ -42,9 +44,14 @@ export default function ProfilePage({
   } = useProfile(username, initialProfile, initialActorId);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [connectionsTab, setConnectionsTab] = useState<ConnectionTab | null>(
+    null,
+  );
 
   const id = profile?.id;
   const isOwnProfile = currentFursona?.id === id;
+  const canManageConnections =
+    isOwnProfile || fursonas.some((fursona) => fursona.id === id);
 
   const {
     isFollowing,
@@ -54,16 +61,24 @@ export default function ProfilePage({
     loading: followLoading,
   } = useProfileFollow(id);
 
-  const { posts, following, followers, likes, reputation, refetch: refetchCounts } = useProfileCounts(id);
+  const {
+    posts,
+    following,
+    followers,
+    likes,
+    reputation,
+    refetch: refetchCounts,
+  } = useProfileCounts(id);
 
   const handleFollowToggle = async () => {
     await toggle();
     await refetchCounts();
   };
 
-  const profileTheme = (profile ?? initialProfile)?.profile_theme === "light"
-    ? "profile-theme-light"
-    : "profile-theme-dark";
+  const profileTheme =
+    (profile ?? initialProfile)?.profile_theme === "light"
+      ? "profile-theme-light"
+      : "profile-theme-dark";
 
   if (profileLoading) {
     return (
@@ -97,9 +112,11 @@ export default function ProfilePage({
         className="relative z-50"
         initial={{ opacity: 0, y: -100 }}
         animate={isExiting ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }}
-        transition={isExiting
-          ? { duration: 0.3, ease: "easeIn" }
-          : { duration: 1.5, ease: "easeInOut", delay: 0.45 }}
+        transition={
+          isExiting
+            ? { duration: 0.3, ease: "easeIn" }
+            : { duration: 1.5, ease: "easeInOut", delay: 0.45 }
+        }
       >
         <ReturnHeader />
       </motion.div>
@@ -129,6 +146,7 @@ export default function ProfilePage({
           likesCount={likes}
 
           toggle={handleFollowToggle}
+          onOpenConnections={setConnectionsTab}
         />
 
         <section className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
@@ -162,6 +180,28 @@ export default function ProfilePage({
           </DialogContent>
         </Dialog>
       )}
+
+      <Dialog
+        open={connectionsTab !== null}
+        onOpenChange={(open) => !open && setConnectionsTab(null)}
+      >
+        <DialogContent
+          className="sm:p-0 hidden h-[min(78vh,760px)] flex-col overflow-hidden md:flex"
+          showCloseButton={false}
+        >
+          <DialogTitle className="sr-only">Connections</DialogTitle>
+          {connectionsTab && (
+            <ProfileConnections
+              key={connectionsTab}
+              id={viewedFursona.id}
+              initialTab={connectionsTab}
+              isOwner={canManageConnections}
+              onProfileChange={refetchCounts}
+              onNavigate={() => setConnectionsTab(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

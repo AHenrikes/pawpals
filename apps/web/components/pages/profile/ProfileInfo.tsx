@@ -17,8 +17,10 @@ import {
   UserRoundCheckIcon,
   UserRoundXIcon,
 } from "lucide-react";
-import useAchievement from "@/hooks/useAchievement";
+import type { ConnectionTab } from "./ProfileConnections";
 import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
+import useAchievement from "@/hooks/useAchievement";
+import Link from "next/link";
 
 interface ProfileInfoProps {
   fursona: FursonaProfile;
@@ -35,6 +37,7 @@ interface ProfileInfoProps {
   likesCount: number;
 
   toggle: () => Promise<void>;
+  onOpenConnections: (tab: ConnectionTab) => void;
 }
 
 function formatNumbers(count: number): string {
@@ -61,6 +64,7 @@ export default function ProfileInfo({
   likesCount,
 
   toggle,
+  onOpenConnections,
 }: Readonly<ProfileInfoProps>) {
   const achievements = fursona.featured_achievements ?? [];
   const achievementDetails = useAchievement();
@@ -198,20 +202,54 @@ export default function ProfileInfo({
           { count: followersCount, label: "Followers" },
           { count: followingCount, label: "Following" },
           { count: likesCount, label: "Likes" },
-        ].map(({ count, label }) => (
-          <div
-            key={label}
-            className="flex min-w-16 flex-col items-center gap-1.5 rounded-base bg-secondary-dim/40 px-2 py-2 sm:min-w-0 sm:flex-row sm:bg-transparent sm:p-0"
-          >
-            <TypographyLead className="text-base font-bold text-text sm:text-xl">
-              {formatNumbers(count)}
-            </TypographyLead>
+        ].map(({ count, label }) => {
+          if (label === "Followers" || label === "Following")
+            return (
+              <div key={label} className="min-w-0">
+                <Link
+                  href={`/@${fursona.username}/connections?tab=${label.toLowerCase()}`}
+                  className="flex min-w-16 flex-col items-center gap-1.5 rounded-base bg-secondary-dim/40 px-2 py-2 cursor-pointer md:hidden hover:bg-secondary-dim"
+                >
+                  <TypographyLead className="text-base font-bold text-text">
+                    {formatNumbers(count)}
+                  </TypographyLead>
+                  <TypographyXSmall className="text-[0.65rem] text-text-muted">
+                    {label}
+                  </TypographyXSmall>
+                </Link>
 
-            <TypographyXSmall className="text-[0.65rem] text-text-muted sm:text-xs">
-              {label}
-            </TypographyXSmall>
-          </div>
-        ))}
+                <Button
+                  variant={"ghost"}
+                  onClick={() =>
+                    onOpenConnections(label.toLowerCase() as ConnectionTab)
+                  }
+                  className="hidden items-center gap-2 rounded-md px-2 py-2 cursor-pointer md:flex hover:bg-secondary-dim"
+                >
+                  <TypographyLead className="text-xl font-bold text-text">
+                    {formatNumbers(count)}
+                  </TypographyLead>
+                  <TypographyXSmall className="text-xs text-text-muted">
+                    {label}
+                  </TypographyXSmall>
+                </Button>
+              </div>
+            );
+
+          return (
+            <div
+              key={label}
+              className="flex min-w-16 flex-col items-center gap-1.5 rounded-base bg-secondary-dim/40 px-2 py-2 sm:min-w-0 sm:flex-row sm:bg-transparent sm:p-0"
+            >
+              <TypographyLead className="text-base font-bold text-text sm:text-xl">
+                {formatNumbers(count)}
+              </TypographyLead>
+
+              <TypographyXSmall className="text-[0.65rem] text-text-muted sm:text-xs">
+                {label}
+              </TypographyXSmall>
+            </div>
+          );
+        })}
       </motion.div>
     </>
   );

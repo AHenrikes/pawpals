@@ -22,6 +22,8 @@ including authentication, accounts, profiles, discovery, follows, and media.
 10. `20261031010002_batch_profile_reads.sql` loads follow-list profiles in one database request.
 11. `20261031010003_active_profile_readers.sql` enforces active or at-risk viewer status for profile RPCs and profile media, including direct Data API calls.
 12. `20261031010004_active_social_readers.sql` applies the same viewer-status rule to direct follow and profile-stat reads.
+13. `20261031010005_connections.sql` provides owner-only subscription lists and follower removal for the connections view.
+14. `20261031010006_connection_search.sql` searches complete connection lists while preserving private-list ownership checks.
 
 Add future schema changes as new, dated migrations. Do not edit these baseline
 files after a project has applied them. A database that already applied the old
