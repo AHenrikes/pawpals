@@ -1,4 +1,5 @@
 import { SidebarInset, SidebarProvider } from "@/providers/SidebarProvider";
+import { HeaderSearchProvider } from "@/components/navigations/HeaderSearchProvider";
 import { type Metadata } from "next";
 import Header from "@/components/navigations/Header";
 import MainNav from "@/components/navigations/Aside";
@@ -9,13 +10,15 @@ export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <SidebarProvider id="AppLayout" className="flex flex-col">
-      <Header />
+    <HeaderSearchProvider>
+      <SidebarProvider id="AppLayout" className="flex flex-col">
+        <Header />
 
-      <SidebarInset>
-        <MainNav />
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+        <SidebarInset>
+          <MainNav />
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
+    </HeaderSearchProvider>
   );
 }

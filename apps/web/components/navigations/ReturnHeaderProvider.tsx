@@ -10,6 +10,8 @@ type ReturnHeaderOverride = {
 type ReturnHeaderContextValue = {
   override: ReturnHeaderOverride | null;
   setOverride: (override: ReturnHeaderOverride | null) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 };
 
 const ReturnHeaderContext = createContext<ReturnHeaderContextValue | null>(
@@ -22,13 +24,16 @@ export function ReturnHeaderProvider({
   const [override, setOverrideState] = useState<ReturnHeaderOverride | null>(
     null,
   );
+  const [searchQuery, setSearchQuery] = useState("");
   const setOverride = useCallback(
     (value: ReturnHeaderOverride | null) => setOverrideState(value),
     [],
   );
 
   return (
-    <ReturnHeaderContext.Provider value={{ override, setOverride }}>
+    <ReturnHeaderContext.Provider
+      value={{ override, setOverride, searchQuery, setSearchQuery }}
+    >
       {children}
     </ReturnHeaderContext.Provider>
   );

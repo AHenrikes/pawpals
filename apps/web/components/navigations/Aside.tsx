@@ -15,6 +15,7 @@ import {
   PawPrintIcon,
   ArrowDownIcon,
   SettingsIcon,
+  MessageCircleIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +48,7 @@ type MainNavItem = {
 
 const mainNavItems: MainNavItem[] = [
   { href: AUTH_ROUTES.HOME, label: "Home", Icon: HomeIcon },
+  { href: "/messages", label: "Messages", Icon: MessageCircleIcon },
   { href: AUTH_ROUTES.SETTINGS, label: "Settings", Icon: SettingsIcon },
 ];
 

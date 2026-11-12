@@ -11,6 +11,7 @@ import { TypographyH1 } from "@repo/ui/typography";
 import { useReturnHeader } from "./ReturnHeaderProvider";
 import { motion } from "framer-motion";
 import { NotificationBell } from "./NotificationBell";
+import HeaderSearchInput from "./HeaderSearchInput";
 
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
@@ -20,13 +21,16 @@ function getUsername(pathname: string): boolean {
   return false;
 }
 
-export default function ReturnHeader() {
-  const { back, exitingPath, destinationPath } = usePageTransition();
+export default function ReturnHeader({
+  backHref,
+  title,
+}: Readonly<{ backHref?: string; title?: string }>) {
+  const { back, navigate, exitingPath, destinationPath } = usePageTransition();
   const pathname = useCurrentPath();
   const profilePage = getUsername(pathname);
   const isExitingToProfile =
     exitingPath === pathname && destinationPath?.startsWith("/@");
-  const { override } = useReturnHeader();
+  const { override, searchQuery, setSearchQuery } = useReturnHeader();
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
@@ -53,20 +57,42 @@ export default function ReturnHeader() {
           <Button
             size="icon-sm"
             variant={"outline"}
-            onClick={override?.onBack ?? back}
-            aria-label={override ? "Previous" : "Go back"}
+            onClick={
+              backHref ? () => navigate(backHref) : (override?.onBack ?? back)
+            }
+            aria-label={
+              backHref === "/messages"
+                ? "Back to chats"
+                : override
+                  ? "Previous"
+                  : "Go back"
+            }
             className="glass-control rounded-full text-text-muted hover:text-text"
           >
             <ArrowLeftIcon aria-hidden="true" className="size-5" />
           </Button>
 
           <TypographyH1 className="hidden text-lg md:block md:text-2xl">
-            {useCurrentPath().slice(1)}
+            {title ?? pathname.slice(1)}
           </TypographyH1>
         </motion.div>
 
         <div className="flex items-center gap-2">
-          <Searchbar onOpenChange={setSearchOpen} />
+          {pathname === "/settings" ? (
+            <>
+              <div className="hidden md:block">
+                <Searchbar onOpenChange={setSearchOpen} />
+              </div>
+
+              <HeaderSearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search settings"
+              />
+            </>
+          ) : (
+            <Searchbar onOpenChange={setSearchOpen} />
+          )}
 
           <NotificationBell />
 

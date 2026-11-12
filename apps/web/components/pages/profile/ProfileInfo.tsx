@@ -105,7 +105,7 @@ export default function ProfileInfo({
 
         <div className="flex flex-1 justify-between items-end min-w-0 mb-1 md:mb-4">
           <div className="min-w-0">
-            <TypographyH1 className="truncate text-xl leading-6 sm:text-2xl lg:text-3xl">
+            <TypographyH1 className="truncate text-xl sm:text-2xl lg:text-3xl">
               {fursona.display_name}
             </TypographyH1>
 
@@ -158,12 +158,15 @@ export default function ProfileInfo({
             <div className="flex shrink-0 justify-self-end items-center gap-2">
               {isFollowing && isMutual && (
                 <Button
+                  asChild
                   size="icon"
                   variant="accent"
                   aria-label="Message fursona"
                   className="shrink-0 p-2 text-text-muted hover:text-text"
                 >
-                  <MailIcon />
+                  <Link href={`/messages?peer=${fursona.id}`}>
+                    <MailIcon />
+                  </Link>
                 </Button>
               )}
 

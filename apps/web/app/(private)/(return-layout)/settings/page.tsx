@@ -8,7 +8,7 @@ export default function Settings() {
   return (
     <>
       <ReturnHeader />
-      <div className="gradientBG flex h-dvh flex-col pt-16 mx-auto overflow-hidden md:flex-row">
+      <div className="gradientBG flex flex-col h-dvh pt-16 mx-auto overflow-hidden md:flex-row">
         <SettingsPage mobileNavigation />
       </div>
     </>

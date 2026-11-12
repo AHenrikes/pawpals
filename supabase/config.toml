@@ -163,12 +163,12 @@ site_url = "http://127.0.0.1:3000"
 additional_redirect_urls = [
 	"http://localhost:3000",
 	"http://localhost:3000/confirm",
-	"http://127.0.0.1:3000",
-	"http://127.0.0.1:3000/confirm",
-	"http://192.168.1.219:3000/",
-	"http://192.168.1.219:3000/confirm",
+	"http://localhost:3000/new-password",
 	"http://192.168.1.220:3000/",
-	"http://192.168.1.220:3000/confirm"
+	"http://192.168.1.220:3000/confirm",
+	"http://192.168.1.221:3000/",
+	"http://192.168.1.221:3000/confirm",
+	"http://192.168.1.221:3000/new-password"
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
@@ -227,7 +227,7 @@ web3 = 30
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
-enable_signup = true
+enabled = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
@@ -265,7 +265,7 @@ otp_expiry = 3600
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
-enable_signup = false
+enabled = false
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
 # Template for sending OTP to users

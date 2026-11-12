@@ -9,10 +9,16 @@ import { Searchbar } from "@/components/modals/search/Searchbar";
 import { cn } from "@repo/ui/lib/utils";
 import { motion } from "framer-motion";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
-import AvatarIcon from "../avatar-icons/AvatarIcon";
 import { NotificationBell } from "./NotificationBell";
+import { SettingsIcon } from "lucide-react";
+import { useCurrentPath } from "@/hooks/usePath";
+import { useHeaderSearch } from "./HeaderSearchProvider";
+import AvatarIcon from "../avatar-icons/AvatarIcon";
+import HeaderSearchInput from "./HeaderSearchInput";
 
 export default function Header() {
+  const pathname = useCurrentPath();
+  const { query, setQuery } = useHeaderSearch();
   const [searchOpen, setSearchOpen] = useState(false);
   const { exitingPath, destinationPath } = usePageTransition();
   const isExitingToProfile =
@@ -37,7 +43,14 @@ export default function Header() {
             animate={{ opacity: 1, y: 0 }}
             className="flex gap-1 items-center"
           >
-            <SidebarTrigger className="border-none" />
+            <SidebarTrigger className="hidden border-none md:inline-flex" />
+
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 rounded-full px-2 py-2 text-sm md:hidden hover:bg-secondary focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <SettingsIcon className="size-5" />
+            </Link>
 
             <Link href={AUTH_ROUTES.HOME} className="hidden md:block">
               <TypographyH1 className="text-lg md:text-2xl">
@@ -47,10 +60,24 @@ export default function Header() {
           </motion.div>
 
           <div className="flex items-center gap-2">
-            <Searchbar onOpenChange={setSearchOpen} />
+            {pathname === "/messages" ? (
+              <>
+                <div className="hidden md:block">
+                  <Searchbar onOpenChange={setSearchOpen} />
+                </div>
+
+                <HeaderSearchInput
+                  value={query}
+                  onChange={setQuery}
+                  placeholder="Search messages"
+                />
+              </>
+            ) : (
+              <Searchbar onOpenChange={setSearchOpen} />
+            )}
 
             <NotificationBell />
-          
+
             <div className="rounded-full ring-2 ring-white/10 transition hover:ring-primary/50">
               <AvatarIcon />
             </div>

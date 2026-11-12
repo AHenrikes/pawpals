@@ -10,6 +10,7 @@ import {
   Settings2Icon,
   UserRoundPenIcon,
 } from "lucide-react";
+import HeaderSearchInput from "@/components/navigations/HeaderSearchInput";
 
 export type EditProfileSection = "account" | "profile" | "app" | null;
 
@@ -36,12 +37,16 @@ const sections = [
 
 type EditProfileAsideProps = {
   activeSection: EditProfileSection;
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
   onSectionChange: (section: EditProfileSection) => void;
   mobileNavigation?: boolean;
 };
 
 export default function SettingsAside({
   activeSection,
+  searchQuery,
+  onSearchQueryChange,
   onSectionChange,
   mobileNavigation = false,
 }: Readonly<EditProfileAsideProps>) {
@@ -50,50 +55,65 @@ export default function SettingsAside({
   return (
     <aside
       className={cn(
-        "flex h-full min-h-0 shrink-0 flex-col overflow-y-auto border-b border-white/10 bg-surface p-4 md:w-60 md:border-r md:border-b-0 md:bg-surface/35 md:p-6 md:backdrop-blur-2xl lg:w-72",
+        "flex flex-col h-full min-h-0 shrink-0 gap-4 overflow-y-auto border-b border-white/10 bg-surface p-4 md:w-60 md:border-r md:border-b-0 md:bg-surface/35 md:p-6 md:backdrop-blur-2xl lg:w-72",
         mobileNavigation && "w-1/2 border-r",
       )}
     >
       <AvatarWithName />
 
-      <div className="my-5 h-px w-full bg-border/40" />
+      <hr />
+
+      <div className="hidden md:block">
+        <HeaderSearchInput
+          value={searchQuery}
+          onChange={onSearchQueryChange}
+          placeholder="Search settings"
+          mobileOnly={false}
+        />
+      </div>
 
       <nav aria-label="Settings sections" className="flex flex-1 flex-col">
         <ul className="flex flex-col gap-2">
-          {sections.map(({ id, label, description, Icon }) => {
-            const isActive = activeSection === id;
-            return (
-              <li key={id} className="min-w-0 flex-1 md:flex-none">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => onSectionChange(id)}
-                  aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "h-auto min-h-16 w-full justify-start gap-3 rounded-xl px-3 py-3 text-left",
-                    isActive
-                      ? "border border-primary/25 bg-primary/15 text-foreground shadow-sm shadow-primary/10 hover:bg-primary/20"
-                      : "text-text-muted hover:bg-secondary hover:text-text",
-                  )}
-                >
-                  <Icon className="size-6" aria-hidden="true" />
-                  <span className="min-w-0">
-                    <span className="block truncate font-semibold">
-                      {label}
+          {sections
+            .filter(({ label, description }) =>
+              `${label} ${description}`
+                .toLocaleLowerCase()
+                .includes(searchQuery.trim().toLocaleLowerCase()),
+            )
+            .map(({ id, label, description, Icon }) => {
+              const isActive = activeSection === id;
+              return (
+                <li key={id} className="min-w-0 flex-1 md:flex-none">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => onSectionChange(id)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "h-auto min-h-16 w-full justify-start gap-3 rounded-xl px-3 py-3 text-left",
+                      isActive
+                        ? "border border-primary/25 bg-primary/15 text-foreground shadow-sm shadow-primary/10 hover:bg-primary/20"
+                        : "text-text-muted hover:bg-secondary hover:text-text",
+                    )}
+                  >
+                    <Icon className="size-6" aria-hidden="true" />
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">
+                        {label}
+                      </span>
+                      <span
+                        className={cn(
+                          "hidden truncate text-[0.68rem] font-normal md:block",
+                          "text-text-muted",
+                        )}
+                      >
+                        {description}
+                      </span>
                     </span>
-                    <span
-                      className={cn(
-                        "hidden truncate text-[0.68rem] font-normal md:block",
-                        "text-text-muted",
-                      )}
-                    >
-                      {description}
-                    </span>
-                  </span>
-                </Button>
-              </li>
-            );
-          })}
+                  </Button>
+                </li>
+              );
+            })}
         </ul>
 
         <Button

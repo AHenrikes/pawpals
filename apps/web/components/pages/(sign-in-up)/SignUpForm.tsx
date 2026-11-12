@@ -8,6 +8,7 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
+  InputGroupButton,
 } from "@repo/ui/input-group";
 import { type FursonaCreate } from "@/types/fursona";
 import CreateFursona from "../../features/CreateFursona";
@@ -83,7 +84,7 @@ export default function SignUpForm({
       ref={formRef}
       className="space-y-5"
       onSubmit={handleSubmit}
-      autoComplete="off"
+      autoComplete="on"
     >
       <motion.div
         layout
@@ -107,6 +108,8 @@ export default function SignUpForm({
                   <Input
                     id="first-name"
                     type="text"
+                    name="given-name"
+                    autoComplete="given-name"
                     placeholder="Jhon"
                     value={values.firstname}
                     onChange={(e) => handleChange("firstname", e.target.value)}
@@ -123,6 +126,8 @@ export default function SignUpForm({
                   <Input
                     id="last-name"
                     type="text"
+                    name="family-name"
+                    autoComplete="family-name"
                     placeholder="Doe"
                     value={values.lastname}
                     onChange={(e) => handleChange("lastname", e.target.value)}
@@ -139,6 +144,8 @@ export default function SignUpForm({
                 <Input
                   id="email"
                   type="email"
+                  name="email"
+                  autoComplete="email"
                   placeholder="Example@pawpals.com"
                   value={values.email}
                   onChange={(e) => handleChange("email", e.target.value)}
@@ -156,6 +163,8 @@ export default function SignUpForm({
                     <InputGroupInput
                       id="password"
                       type={showPassword ? "text" : "password"}
+                      name="new-password"
+                      autoComplete="new-password"
                       placeholder={showPassword ? "password" : "••••••••"}
                       value={values.password}
                       onChange={(e) => handleChange("password", e.target.value)}
@@ -163,28 +172,32 @@ export default function SignUpForm({
                       required
                     />
 
-                    <InputGroupAddon
-                      align={"inline-end"}
-                      onMouseDown={() => setShowPassword(true)}
-                      onMouseUp={() => setShowPassword(false)}
-                      onMouseLeave={() => setShowPassword(false)}
-                      onTouchStart={() => setShowPassword(true)}
-                      onTouchEnd={() => setShowPassword(false)}
-                      className="cursor-pointer text-text-muted hover:text-text"
-                    >
-                      {!showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        variant="ghost"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                        aria-pressed={showPassword}
+                        onClick={() => setShowPassword((visible) => !visible)}
+                        className="text-text-muted hover:text-text"
+                      >
+                        {showPassword ? <EyeIcon /> : <EyeOffIcon />}
+                      </InputGroupButton>
                     </InputGroupAddon>
                   </InputGroup>
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="confirmfname">
+                  <FieldLabel htmlFor="confirm-password">
                     Confirm Password
                   </FieldLabel>
 
                   <Input
-                    id="confirmfname"
+                    id="confirm-password"
                     type="password"
+                    name="confirm-password"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     value={values.confirmPassword}
                     onChange={(e) =>

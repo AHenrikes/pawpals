@@ -30,7 +30,7 @@ export default function SettingsPage({
     initialSection ?? "profile",
   );
   const [isMobileSectionOpen, setIsMobileSectionOpen] = useState(false);
-  const { setOverride } = useReturnHeader();
+  const { setOverride, searchQuery, setSearchQuery } = useReturnHeader();
   const [saving, setSaving] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -139,6 +139,8 @@ export default function SettingsPage({
     >
       <EditProfileAside
         activeSection={activeSection}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
         mobileNavigation={mobileNavigation}
         onSectionChange={(section) => {
           setActiveSection(section);
