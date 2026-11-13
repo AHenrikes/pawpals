@@ -1,44 +1,46 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  addHistorySelection,
+  isSearchHistoryEntry,
+  MAX_HISTORY_ITEMS,
+  type SearchHistoryEntry,
+} from "@/lib/search/searchHistoryEntries";
 
-const STORAGE_KEY = "pawpals:search-history";
-const MAX_HISTORY_ITEMS = 30;
+const STORAGE_KEY = "pawpals:recent-search-selections";
 
 export function useSearchHistory() {
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
 
   useEffect(() => {
     try {
       const saved = globalThis.localStorage.getItem(STORAGE_KEY);
-      if (saved) setHistory(JSON.parse(saved) as string[]);
+      if (!saved) return;
+      const parsed: unknown = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        setHistory(
+          parsed.filter(isSearchHistoryEntry).slice(0, MAX_HISTORY_ITEMS),
+        );
+      }
     } catch {
       globalThis.localStorage.removeItem(STORAGE_KEY);
     }
   }, []);
 
-  const save = useCallback((items: string[]) => {
+  const save = useCallback((items: SearchHistoryEntry[]) => {
     setHistory(items);
     globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, []);
 
-  const addSearch = useCallback(
-    (query: string) => {
-      const normalized = query.trim();
-      if (!normalized) return;
-      save(
-        [
-          normalized,
-          ...history.filter(
-            (item) => item.toLowerCase() !== normalized.toLowerCase(),
-          ),
-        ].slice(0, MAX_HISTORY_ITEMS),
-      );
+  const addSelection = useCallback(
+    (entry: SearchHistoryEntry) => {
+      save(addHistorySelection(history, entry));
     },
     [history, save],
   );
 
   const clearHistory = useCallback(() => save([]), [save]);
 
-  return { history, addSearch, clearHistory };
+  return { history, addSelection, clearHistory };
 }

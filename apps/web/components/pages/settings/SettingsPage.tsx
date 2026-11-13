@@ -14,31 +14,6 @@ import SettingsProfile from "./SettingsProfile";
 import SettingsApp from "./SettingsApp";
 import SettingsPrivacy from "./SettingsPrivacy";
 
-const sectionCopy = {
-  account: {
-    title: "My account",
-    description:
-      "Manage the private details and security of your Pawpals account.",
-  },
-  profile: {
-    title: "Profiles & socials",
-    description:
-      "Make your fursona feel like you and connect your other spaces.",
-  },
-  privacy: {
-    title: "Privacy & safety",
-    description: "Decide who can see what you share.",
-  },
-  notifications: {
-    title: "Notifications",
-    description: "Choose which activity gets your attention.",
-  },
-  appearance: {
-    title: "Appearance",
-    description: "Make Pawpals comfortable on this device.",
-  },
-} as const;
-
 type EditProfilePanelProps = {
   initialSection?: EditProfileSection;
   onClose?: () => void;

@@ -4,10 +4,10 @@ import {
   TypographyXSmall,
 } from "@repo/ui/typography";
 import { FursonaSearch } from "@/types/fursona";
-import FursonaAvatar from "@/components/avatar-icons/FursonaAvatar";
+import { motion, useReducedMotion } from "framer-motion";
 import type { NavOption, SearchResult } from "./SearchModal";
+import FursonaAvatar from "@/components/avatar-icons/FursonaAvatar";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 const MotionLink = motion.create(Link);
 
@@ -16,7 +16,56 @@ interface SearchResults {
   error: Error | null;
   results: SearchResult[];
   handleClose: () => void;
-  onSelect?: () => void;
+  onSelect?: (result: SearchResult) => void;
+  reduceMotion?: boolean;
+}
+
+export function ProfileResultLink({
+  profile,
+  onSelect,
+  index,
+  reduceMotion = false,
+}: Readonly<{
+  profile: FursonaSearch;
+  onSelect: () => void;
+  index?: number;
+  reduceMotion?: boolean;
+}>) {
+  const prefersReducedMotion = useReducedMotion();
+  const disableMotion = reduceMotion || prefersReducedMotion === true;
+  return (
+    <MotionLink
+      href={`/@${profile.username}`}
+      onClick={onSelect}
+      className="flex w-full items-center gap-4 rounded-sm border border-border/10 bg-secondary-dim/70 p-2 shadow-sm transition-colors hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:max-w-72"
+      initial={
+        index === undefined || disableMotion ? false : { opacity: 0, y: 10 }
+      }
+      animate={{ opacity: 1, y: 0 }}
+      transition={
+        index === undefined || disableMotion
+          ? undefined
+          : { duration: 0.25, delay: index * 0.06, ease: "easeOut" }
+      }
+    >
+      <div aria-hidden="true">
+        <FursonaAvatar
+          size="lg"
+          name={profile.display_name}
+          alt=""
+          src={profile.avatar_url}
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <TypographyLead className="truncate font-medium text-sm md:text-base">
+          {profile.display_name}
+        </TypographyLead>
+        <TypographyXSmall className="text-muted-foreground text-xs">
+          @{profile.username}
+        </TypographyXSmall>
+      </div>
+    </MotionLink>
+  );
 }
 
 export default function SearchResults({
@@ -25,7 +74,10 @@ export default function SearchResults({
   results,
   handleClose,
   onSelect = () => undefined,
+  reduceMotion = false,
 }: Readonly<SearchResults>) {
+  const prefersReducedMotion = useReducedMotion();
+  const disableMotion = reduceMotion || prefersReducedMotion === true;
   return (
     <>
       {/* Results */}
@@ -43,38 +95,16 @@ export default function SearchResults({
                   const f = r.data as FursonaSearch;
 
                   return (
-                    <MotionLink
+                    <ProfileResultLink
                       key={f.username}
-                      href={`/@${f.username}`}
-                      onClick={() => {
-                        onSelect();
+                      profile={f}
+                      index={index}
+                      reduceMotion={disableMotion}
+                      onSelect={() => {
+                        onSelect(r);
                         handleClose();
                       }}
-                      className="flex w-full items-center gap-4 rounded-sm border border-border/10 bg-secondary-dim/70 p-2 shadow-sm transition-colors hover:bg-secondary sm:max-w-72"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.25,
-                        delay: index * 0.06,
-                        ease: "easeOut",
-                      }}
-                    >
-                      <FursonaAvatar
-                        size="lg"
-                        name={f.display_name}
-                        src={f.avatar_url}
-                      />
-
-                      <div className="flex-1">
-                        <TypographyLead className="font-medium text-sm md:text-base">
-                          {f.display_name}
-                        </TypographyLead>
-
-                        <TypographyXSmall className="text-muted-foreground text-xs">
-                          @{f.username}
-                        </TypographyXSmall>
-                      </div>
-                    </MotionLink>
+                    />
                   );
                 })}
             </div>
@@ -96,15 +126,15 @@ export default function SearchResults({
                         key={nav.label}
                         href={nav.path}
                         onClick={() => {
-                          onSelect();
+                          onSelect(r);
                           handleClose();
                         }}
-                        className="flex px-2 py-2 rounded transition-colors hover:bg-primary-dim"
-                        initial={{ opacity: 0, y: 10 }}
+                        className="flex min-h-11 items-center rounded-sm px-2 py-2 transition-colors hover:bg-primary-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        initial={disableMotion ? false : { opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
-                          duration: 0.25,
-                          delay: index * 0.06,
+                          duration: disableMotion ? 0 : 0.25,
+                          delay: disableMotion ? 0 : index * 0.06,
                           ease: "easeOut",
                         }}
                       >

@@ -6,7 +6,7 @@ const cardVariant = cva("", {
   variants: {
     variant: {
       default: "",
-      rounded: "rounded-xl border bg-card text-card-foreground shadow-sm",
+      rounded: "rounded-sm border bg-card text-card-foreground shadow-sm",
     },
   },
   defaultVariants: {

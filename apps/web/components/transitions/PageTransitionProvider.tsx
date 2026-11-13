@@ -12,6 +12,8 @@ import {
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { layoutForPath, shouldTransition } from "./layoutForPath";
+import { distanceToPreviousPath } from "./privateHistory";
 
 type NavigateOptions = {
   replace?: boolean;
@@ -36,15 +38,6 @@ const droplets = [
 function durationFor(pathname: string) {
   if (pathname.startsWith("/@")) return 0.3;
   return 0.25;
-}
-
-function isPrivatePage(pathname: string) {
-  return (
-    pathname === "/" ||
-    pathname === "/settings" ||
-    pathname.startsWith("/@") ||
-    pathname.startsWith("/profile/")
-  );
 }
 
 export function PageTransitionProvider({
@@ -191,6 +184,9 @@ export function PageTransitionProvider({
             window.location.search +
             window.location.hash
         ) {
+          // Query/hash entries are not observed by usePathname, so their
+          // browser-history distance cannot be inferred from our route stack.
+          knownPrivateHistory.current = [];
           if (options?.replace)
             router.replace(next, { scroll: options.scroll });
           else router.push(next, { scroll: options?.scroll });
@@ -198,36 +194,55 @@ export function PageTransitionProvider({
         return;
       }
 
-      if (options?.transition === false || !isPrivatePage(url.pathname)) {
-        if (options?.replace) router.replace(next, { scroll: options.scroll });
-        else router.push(next, { scroll: options?.scroll });
-        return;
-      }
-
-      router.prefetch(next);
-      void run(url.pathname, () => {
+      const isPrivateNavigation =
+        layoutForPath(window.location.pathname) !== null &&
+        layoutForPath(url.pathname) !== null;
+      const distance =
+        isPrivateNavigation && !options?.replace
+          ? distanceToPreviousPath(knownPrivateHistory.current, url.pathname)
+          : 0;
+      const action = () => {
         expectedPath.current = url.pathname;
-        if (!options?.replace) {
+        if (distance > 0) {
+          knownPrivateHistory.current.length -= distance;
+          window.history.go(-distance);
+        } else if (!options?.replace && isPrivateNavigation) {
           knownPrivateHistory.current.push(window.location.pathname);
         }
         if (options?.replace) router.replace(next, { scroll: options.scroll });
-        else router.push(next, { scroll: options?.scroll });
-      });
+        else if (distance === 0) router.push(next, { scroll: options?.scroll });
+      };
+
+      if (
+        options?.transition === false ||
+        !shouldTransition(window.location.pathname, url.pathname)
+      ) {
+        action();
+        return;
+      }
+
+      if (distance === 0) router.prefetch(next);
+      void run(url.pathname, action);
     },
     [router, run],
   );
 
   const back = useCallback(() => {
     const previous = knownPrivateHistory.current.at(-1);
-    if (!previous || !isPrivatePage(previous)) {
+    if (!previous) {
       router.back();
       return;
     }
-    void run(previous, () => {
+    const action = () => {
       knownPrivateHistory.current.pop();
       expectedPath.current = previous;
       router.back();
-    });
+    };
+    if (!shouldTransition(window.location.pathname, previous)) {
+      action();
+      return;
+    }
+    void run(previous, action);
   }, [router, run]);
 
   const contextValue = useMemo(
@@ -274,7 +289,7 @@ export function PageTransitionProvider({
       const url = new URL(anchor.href, window.location.href);
       if (
         url.origin !== window.location.origin ||
-        !isPrivatePage(url.pathname) ||
+        layoutForPath(url.pathname) === null ||
         url.pathname === window.location.pathname
       )
         return;

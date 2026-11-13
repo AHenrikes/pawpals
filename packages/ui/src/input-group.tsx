@@ -71,7 +71,7 @@ const inputGroupButtonVariants = cva(
     variants: {
       size: {
         xs: "p-2.5 [&_svg:not([class*='size-'])]:size-4",
-        sm: "rounded-[min(var(--radius-md),1opx)] [&_svg:not([class*='size-'])]:size-3.5",
+        sm: "rounded-sm [&_svg:not([class*='size-'])]:size-3.5",
         icon: "p-2.5 [&_svg:not([class*='size-'])]:size-4",
         lg: "rounded-[min(var(--radius-md),10px)] [&_svg:not([class*='size-'])]:size-5",
         xl: "rounded-[min(var(--radius-md),10px)] [&_svg:not([class*='size-'])]:size-6",

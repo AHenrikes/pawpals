@@ -6,11 +6,14 @@ import {
   TypographyXSmall,
 } from "@repo/ui/typography";
 import { Clock3Icon, HashIcon, TrendingUpIcon } from "lucide-react";
+import { ProfileResultLink } from "./SearchResults";
+import type { SearchHistoryEntry } from "@/lib/search/searchHistoryEntries";
+import Link from "next/link";
 
 interface SearchDefaultProps {
-  history: string[];
+  history: SearchHistoryEntry[];
   onClearHistory: () => void;
-  onSelectHistory: (query: string) => void;
+  onSelectHistory: () => void;
 }
 
 export default function SearchDefault({
@@ -30,7 +33,7 @@ export default function SearchDefault({
               size="xs"
               variant="none"
               onClick={onClearHistory}
-              className="h-fit p-0 text-text-muted hover:text-text"
+              className="min-h-11 px-2 text-text-muted hover:text-text"
             >
               <TypographyXSmall>Clear</TypographyXSmall>
             </Button>
@@ -43,17 +46,31 @@ export default function SearchDefault({
               Your recent searches will appear here.
             </TypographyXSmall>
           ) : (
-            history.map((query) => (
-              <Button
-                key={query}
-                variant="none"
-                onClick={() => onSelectHistory(query)}
-                className="h-auto w-full justify-start gap-3 rounded-sm bg-secondary-dim/60 px-3 py-2 text-left text-text hover:bg-secondary"
-              >
-                <Clock3Icon className="size-4 shrink-0 text-text-muted" />
-                <span className="truncate">{query}</span>
-              </Button>
-            ))
+            history.map((entry) =>
+              entry.type === "fursona" ? (
+                <ProfileResultLink
+                  key={`fursona:${entry.username}`}
+                  profile={{
+                    username: entry.username,
+                    display_name: entry.displayName,
+                    avatar_url: entry.avatarUrl,
+                  }}
+                  onSelect={onSelectHistory}
+                />
+              ) : (
+                <Button
+                  key={`nav:${entry.path}`}
+                  asChild
+                  variant="none"
+                  className="min-h-11 w-full justify-start gap-3 rounded-sm bg-secondary-dim/60 px-3 py-2 text-left text-text hover:bg-secondary"
+                >
+                  <Link href={entry.path} onClick={onSelectHistory}>
+                    <Clock3Icon className="size-4 shrink-0 text-text-muted" />
+                    <span className="truncate">{entry.label}</span>
+                  </Link>
+                </Button>
+              ),
+            )
           )}
         </div>
       </section>

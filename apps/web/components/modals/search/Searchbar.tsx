@@ -147,7 +147,6 @@ export function Searchbar({ onOpenChange, theme }: SearchbarProps) {
       <SearchModal
         open={open}
         searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
         onMouseEnter={handleModalMouseEnter}
         onMouseLeave={handleMouseLeave}
         onFocusCapture={() => setIsFocused(true)}

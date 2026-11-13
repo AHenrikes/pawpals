@@ -12,6 +12,7 @@ import { Kbd } from "@repo/ui/kbd";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useAppPreferences } from "@/providers/AppPreferencesProvider";
 import { type FursonaSearch } from "@/types/fursona";
+import { type SearchHistoryEntry } from "@/lib/search/searchHistoryEntries";
 import SearchResults from "./SearchResults";
 import SearchDefault from "./SearchDefault";
 
@@ -22,10 +23,8 @@ export interface NavOption {
   path: string;
 }
 
-export interface SearchResult {
-  type: "fursona" | "nav";
-  data: FursonaSearch | NavOption;
-}
+export type SearchResult =
+  { type: "fursona"; data: FursonaSearch } | { type: "nav"; data: NavOption };
 
 interface SearchDialogProps {
   readonly open: boolean;
@@ -35,7 +34,6 @@ interface SearchDialogProps {
   readonly onFocusCapture: FocusEventHandler<HTMLDivElement>;
   readonly onBlurCapture: FocusEventHandler<HTMLDivElement>;
   readonly searchQuery: string;
-  readonly onSearchQueryChange: (query: string) => void;
   readonly theme?: string;
 }
 
@@ -76,13 +74,13 @@ export default function SearchModal({
   onFocusCapture,
   onBlurCapture,
   searchQuery,
-  onSearchQueryChange,
   theme,
 }: SearchDialogProps) {
-  const { history, addSearch, clearHistory } = useSearchHistory();
+  const { history, addSelection, clearHistory } = useSearchHistory();
   const prefersReducedMotion = useReducedMotion();
   const { motion: motionPreference } = useAppPreferences();
-  const reduceMotion = motionPreference === "reduced" || prefersReducedMotion;
+  const reduceMotion =
+    motionPreference === "reduced" || prefersReducedMotion === true;
 
   const { type, term } = parseSearchQuery(searchQuery);
   const fursonaSearchTerm = type === "nav" ? "" : term;
@@ -95,6 +93,26 @@ export default function SearchModal({
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
+
+  const handleSelection = useCallback(
+    (result: SearchResult) => {
+      const entry: SearchHistoryEntry =
+        result.type === "fursona"
+          ? {
+              type: "fursona",
+              username: result.data.username,
+              displayName: result.data.display_name,
+              avatarUrl: result.data.avatar_url,
+            }
+          : {
+              type: "nav",
+              path: result.data.path,
+              label: result.data.label,
+            };
+      addSelection(entry);
+    },
+    [addSelection],
+  );
 
   const results: SearchResult[] =
     type === "nav"
@@ -147,7 +165,7 @@ export default function SearchModal({
                 <SearchDefault
                   history={history}
                   onClearHistory={clearHistory}
-                  onSelectHistory={onSearchQueryChange}
+                  onSelectHistory={handleClose}
                 />
               )}
 
@@ -184,7 +202,8 @@ export default function SearchModal({
                     results={results}
                     error={error}
                     handleClose={handleClose}
-                    onSelect={() => addSearch(searchQuery)}
+                    onSelect={handleSelection}
+                    reduceMotion={reduceMotion}
                   />
                 )}
 
