@@ -24,6 +24,8 @@ including authentication, accounts, profiles, discovery, follows, and media.
 12. `20261031010004_active_social_readers.sql` applies the same viewer-status rule to direct follow and profile-stat reads.
 13. `20261031010005_connections.sql` provides owner-only subscription lists and follower removal for the connections view.
 14. `20261031010006_connection_search.sql` searches complete connection lists while preserving private-list ownership checks.
+15. `20261101010001_direct_messages.sql` and `20261101010002_unstarted_conversations.sql` add private mutual-follow messaging.
+16. `20261113010001_direct_message_rate_limit.sql` limits each account to 30 sent messages per minute, including direct RPC calls.
 
 Add future schema changes as new, dated migrations. Do not edit these baseline
 files after a project has applied them. A database that already applied the old

@@ -1,26 +1,14 @@
-import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { FlatCompat } from "@eslint/eslintrc";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+const config = [
+  ...nextVitals,
+  ...nextTypescript,
   {
-    ignores: [".next/**", "next-env.d.ts"],
+    // The existing client effects intentionally initialize state from auth,
+    // storage, and network data. Keep the previous lint baseline for this rule.
+    rules: { "react-hooks/set-state-in-effect": "off" },
   },
-  // {
-  //   files: ["**/*.tsx", "**/*.ts"],
-  //   rules: {
-  //     "@typescript-eslint/prefer-readonly": "warn",
-  //     "@typescript-eslint/prefer-function-type": "warn",
-  //   },
-  // },
 ];
 
-export default eslintConfig;
+export default config;

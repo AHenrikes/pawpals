@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { Button } from "@repo/ui/button";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { cn } from "@repo/ui/lib/utils";
 import { SidebarProvider } from "@/providers/SidebarProvider";
 import {
   BookmarkIcon,
   GalleryVerticalIcon,
   HeartIcon,
-  LayoutGridIcon,
+  ImageIcon,
   Repeat2Icon,
 } from "lucide-react";
-import { type FursonaProfile } from "@/types/fursona";
+import { useAppPreferences } from "@/providers/AppPreferencesProvider";
 
 const profileNav = [
-  { label: "GALLERY", key: "gallery", icon: LayoutGridIcon },
+  { label: "GALLERY", key: "gallery", icon: ImageIcon },
   { label: "POST", key: "post", icon: GalleryVerticalIcon },
   { label: "REPOST", key: "repost", icon: Repeat2Icon },
   { label: "BOOKMARK", key: "bookmark", icon: BookmarkIcon },
@@ -24,17 +24,35 @@ const profileNav = [
 
 type ContentKey = (typeof profileNav)[number]["key"];
 
-export default function ProfileContent({
-  fursona,
-}: Readonly<{ fursona: FursonaProfile }>) {
+export default function ProfileContent() {
   const [content, setContent] = useState<ContentKey>("gallery");
   const [direction, setDirection] = useState(0);
+  const tabId = useId();
+  const tabs = useRef<Array<HTMLButtonElement | null>>([]);
+  const prefersReducedMotion = useReducedMotion();
+  const { motion: motionPreference } = useAppPreferences();
+  const reduceMotion = motionPreference === "reduced" || prefersReducedMotion;
 
   const handleNavClick = (key: ContentKey) => {
     const oldIndex = profileNav.findIndex((n) => n.key === content);
     const newIndex = profileNav.findIndex((n) => n.key === key);
     setDirection(newIndex > oldIndex ? 1 : -1);
     setContent(key);
+  };
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex: number;
+    switch (event.key) {
+      case "ArrowRight": nextIndex = (index + 1) % profileNav.length; break;
+      case "ArrowLeft": nextIndex = (index - 1 + profileNav.length) % profileNav.length; break;
+      case "Home": nextIndex = 0; break;
+      case "End": nextIndex = profileNav.length - 1; break;
+      default: return;
+    }
+    event.preventDefault();
+    const nextTab = profileNav[nextIndex];
+    if (nextTab) handleNavClick(nextTab.key);
+    tabs.current[nextIndex]?.focus();
   };
 
   const slideVariants = {
@@ -46,44 +64,52 @@ export default function ProfileContent({
   return (
     <SidebarProvider className="flex min-w-0 flex-col pt-2">
       {/* Nav */}
-      <nav className="overflow-x-auto border-b border-muted pb-3 scrollbar-hide">
-        <ul className="flex min-w-max justify-between sm:gap-12 md:justify-start md:gap-3">
-          {profileNav.map(({ key, label, icon }) => {
+      <div className="overflow-x-auto border-b border-muted pb-3 scrollbar-hide">
+        <div role="tablist" aria-label="Profile content" className="flex min-w-max gap-2 sm:gap-4">
+          {profileNav.map(({ key, label, icon }, index) => {
             const Icon = icon;
 
             return (
               <Button
                 key={label}
+                ref={(node) => { tabs.current[index] = node; }}
+                id={`${tabId}-${key}`}
+                role="tab"
                 variant="ghost"
                 onClick={() => handleNavClick(key)}
-                aria-label={label.toLowerCase()}
-                aria-pressed={content === key}
+                onKeyDown={(event) => handleTabKeyDown(event, index)}
+                aria-selected={content === key}
+                tabIndex={content === key ? 0 : -1}
                 className={cn(
-                  "h-10 rounded-sm px-3 text-text-muted sm:px-4",
+                  "relative min-h-11 shrink-0 rounded-sm px-3 text-sm text-text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:px-4",
                   content === key
-                    ? "text-text bg-primary hover:bg-primary-dim"
+                    ? "text-text after:absolute after:inset-x-2 after:bottom-0 after:border-b-2 after:border-current"
                     : null,
                 )}
               >
-                {Icon && <Icon className="size-5" />}
-                <span className="hidden text-xs md:block sm:text-sm">
+                {Icon && <Icon className="size-5" aria-hidden="true" />}
+                <span className="text-sm">
                   {label}
                 </span>
               </Button>
             );
           })}
-        </ul>
-      </nav>
+        </div>
+      </div>
 
       <AnimatePresence mode="popLayout" custom={direction}>
         <motion.section
           key={content}
+          id={`${tabId}-panel-${content}`}
+          role="tabpanel"
+          aria-labelledby={`${tabId}-${content}`}
+          tabIndex={0}
           custom={direction}
           variants={slideVariants}
-          initial="enter"
+          initial={reduceMotion ? false : "enter"}
           animate="center"
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          exit={reduceMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.5, ease: "easeInOut" }}
           className="min-h-48 grow space-y-4 py-4 sm:min-h-64"
         >
           {content === "gallery" && <div>Gallery coming soon</div>}

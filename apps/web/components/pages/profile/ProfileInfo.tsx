@@ -20,6 +20,7 @@ import {
 import type { ConnectionTab } from "./ProfileConnections";
 import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
 import useAchievement from "@/hooks/useAchievement";
+import useIsMobile from "@/hooks/useIsMobile";
 import Link from "next/link";
 
 interface ProfileInfoProps {
@@ -68,6 +69,7 @@ export default function ProfileInfo({
 }: Readonly<ProfileInfoProps>) {
   const achievements = fursona.featured_achievements ?? [];
   const achievementDetails = useAchievement();
+  const isMobile = useIsMobile();
 
   let followLabel = "Follow";
   let FollowIcon = UserPlusIcon;
@@ -143,18 +145,10 @@ export default function ProfileInfo({
                   );
                 })}
               </div>
-            ) : (
-              <span className="flex flex-wrap gap-x-2 text-text/60">
-                <TypographyXSmall>Member since :</TypographyXSmall>
-                <TypographyXSmall>
-                  {new Date(fursona.created_at).toLocaleDateString()}
-                </TypographyXSmall>
-              </span>
-            )}
+            ) : null}
           </div>
 
-          {/* CTA buttons */}
-          {!isOwnProfile && (
+          {!isMobile && !isOwnProfile && (
             <div className="flex shrink-0 justify-self-end items-center gap-2">
               {isFollowing && isMutual && (
                 <Button
@@ -197,7 +191,7 @@ export default function ProfileInfo({
       {/* Numbers */}
       <motion.div
         key="counts"
-        className="grid grid-cols-4 gap-2 overflow-x-auto py-4 scrollbar-hide sm:flex sm:px-4 sm:gap-6 sm:pb-8"
+        className="grid grid-cols-4 gap-2 overflow-x-auto scrollbar-hide sm:flex"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
@@ -211,29 +205,20 @@ export default function ProfileInfo({
           if (label === "Followers" || label === "Following")
             return (
               <div key={label} className="min-w-0">
-                <Link
-                  href={`/@${fursona.username}/connections?tab=${label.toLowerCase()}`}
-                  className="flex min-w-16 flex-col items-center gap-1.5 rounded-base bg-secondary-dim/40 px-2 py-2 cursor-pointer md:hidden hover:bg-secondary-dim"
-                >
-                  <TypographyLead className="text-base font-bold text-text">
-                    {formatNumbers(count)}
-                  </TypographyLead>
-                  <TypographyXSmall className="text-[0.65rem] text-text-muted">
-                    {label}
-                  </TypographyXSmall>
-                </Link>
-
                 <Button
                   variant={"ghost"}
                   onClick={() =>
                     onOpenConnections(label.toLowerCase() as ConnectionTab)
                   }
-                  className="hidden items-center gap-2 rounded-md px-2 py-2 cursor-pointer md:flex hover:bg-secondary-dim"
+                  aria-haspopup="dialog"
+                  aria-label={`${count} ${label.toLowerCase()}`}
+                  className="flex h-auto w-full min-w-16 flex-col items-center gap-1.5 rounded-sm bg-secondary-dim/40 px-2 py-2 hover:bg-secondary-dim md:flex-row md:gap-2 md:bg-transparent"
                 >
-                  <TypographyLead className="text-xl font-bold text-text">
+                  <TypographyLead className="text-base font-bold text-text md:text-xl">
                     {formatNumbers(count)}
                   </TypographyLead>
-                  <TypographyXSmall className="text-xs text-text-muted">
+
+                  <TypographyXSmall className="text-[0.65rem] text-text-muted md:text-xs">
                     {label}
                   </TypographyXSmall>
                 </Button>
@@ -243,7 +228,7 @@ export default function ProfileInfo({
           return (
             <div
               key={label}
-              className="flex min-w-16 flex-col items-center gap-1.5 rounded-base bg-secondary-dim/40 px-2 py-2 sm:min-w-0 sm:flex-row sm:bg-transparent sm:p-0"
+              className="flex min-w-16 flex-col items-center gap-1.5 rounded-sm bg-secondary-dim/40 px-2 py-2 sm:min-w-0 sm:flex-row sm:bg-transparent sm:p-0"
             >
               <TypographyLead className="text-base font-bold text-text sm:text-xl">
                 {formatNumbers(count)}
@@ -256,6 +241,52 @@ export default function ProfileInfo({
           );
         })}
       </motion.div>
+
+      {/* CTA buttons */}
+      {isMobile && !isOwnProfile && (
+        <div className="grid grid-cols-2 gap-2">
+          {isFollowing && isMutual && (
+            <Button
+              aria-label="Message fursona"
+              className="shrink-0 rounded-md shadow-none"
+            >
+              <Link href={`/messages?peer=${fursona.id}`}>
+                <span className="sm:inline">Message</span>
+              </Link>
+            </Button>
+          )}
+
+          <Button
+            variant={isFollowing && isMutual || isPending ? "outline" : "default"}
+            onClick={() => toggle()}
+            disabled={followLoading}
+            aria-label={followLabel}
+            className="shrink-0 rounded-md shadow-none"
+          >
+            {followLoading ? (
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+            ) : (
+              <span className="sm:inline">{followLabel}</span>
+            )}
+          </Button>
+
+          {!isMutual && (
+            <Button
+              variant={"outline"}
+              onClick={() => toggle()}
+              disabled={followLoading}
+              aria-label={followLabel}
+              className="shrink-0 rounded-md px-3 sm:px-4"
+            >
+              {followLoading ? (
+                <Loader2Icon className="h-4 w-4 animate-spin" />
+              ) : (
+                <span className="sm:inline">share</span>
+              )}
+            </Button>
+          )}
+        </div>
+      )}
     </>
   );
 }

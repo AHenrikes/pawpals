@@ -17,7 +17,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import { getInitials } from "@/lib/helpers/getInitials";
 import { avatarImageSrc } from "@/lib/uploads/avatarImageSrc";
-import useIsMobile from "@/hooks/useIsMobile";
 
 type FollowRequest = {
   follower_fursona_id: string;
@@ -27,7 +26,6 @@ type FollowRequest = {
 };
 
 export function NotificationBell() {
-  const isMobile = useIsMobile();
   const { currentFursona } = useUser();
   const { followRequestAlerts } = useAppPreferences();
   const [open, setOpen] = useState(false);
@@ -87,11 +85,7 @@ export function NotificationBell() {
   }, [fursonaId, followRequestAlerts, open, loadRequests]);
 
   const badgeCount = followRequestAlerts ? requests.length : 0;
-  const reviewHref = username
-    ? isMobile
-      ? `/@${username}/connections?tab=requests`
-      : `/@${username}?connections=requests`
-    : null;
+  const reviewHref = username ? `/@${username}?connections=requests` : null;
 
   async function respond(followerId: string, accept: boolean) {
     if (!fursonaId) return;

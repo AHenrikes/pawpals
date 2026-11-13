@@ -20,6 +20,7 @@ export default async function ConnectionsPage({
   params: Promise<{ username: string }>;
   searchParams: Promise<{ tab?: string }>;
 }>) {
+  const showPage = false;
   const [{ username }, { tab }, { supabase, account }] = await Promise.all([
     params,
     searchParams,
@@ -53,7 +54,7 @@ export default async function ConnectionsPage({
       ? requestedTab
       : "followers";
 
-  return (
+  return showPage ? (
     <div className="min-h-svh bg-background text-text">
       <ReturnHeader />
 
@@ -68,5 +69,5 @@ export default async function ConnectionsPage({
         </div>
       </div>
     </div>
-  );
+  ) : ( <h1>Page does not exist</h1> );
 }

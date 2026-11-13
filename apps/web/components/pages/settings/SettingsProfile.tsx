@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import {
-  useMemo,
   useRef,
   useState,
   useEffect,
@@ -214,9 +213,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
     ProfileAchievement[]
   >(currentFursona.featured_achievements ?? []);
 
-  const selectedAchievementDetails = useMemo(
-    () => achievements.filter((item) => featuredAchievements.includes(item.id)),
-    [featuredAchievements],
+  const selectedAchievementDetails = achievements.filter((item) =>
+    featuredAchievements.includes(item.id),
   );
 
   const visibilityLabel = {

@@ -4,7 +4,7 @@ import { useUser } from "@/providers/UserProvider";
 import { useProfile } from "@/hooks/core/fursonas/useProfile";
 import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, type Transition } from "framer-motion";
 import {
   notFound,
   usePathname,
@@ -13,7 +13,9 @@ import {
 } from "next/navigation";
 import { useProfileCounts } from "@/hooks/core/views/useProfileCounts";
 import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
+import { Drawer, DrawerContent, DrawerTitle } from "@repo/ui/drawer";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
+import { useAppPreferences } from "@/providers/AppPreferencesProvider";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
 import ProfileInfo from "@/components/pages/profile/ProfileInfo";
 import ProfileAside from "@/components/pages/profile/ProfileAside";
@@ -24,6 +26,7 @@ import PageState from "@/components/pages/PageState";
 import ProfileContent from "./ProfileContent";
 import ReturnHeader from "@/components/navigations/ReturnHeader";
 import ProfileConnections, { type ConnectionTab } from "./ProfileConnections";
+import useIsMobile from "@/hooks/useIsMobile";
 
 type AuthenticatedProfilePageProp = {
   username: string;
@@ -37,9 +40,13 @@ export default function ProfilePage({
   initialActorId,
 }: Readonly<AuthenticatedProfilePageProp>) {
   const { currentFursona, fursonas } = useUser();
+  const { motion: motionPreference } = useAppPreferences();
+  const prefersReducedMotion = useReducedMotion();
+  const reduceMotion = motionPreference === "reduced" || prefersReducedMotion;
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isMobile = useIsMobile();
   const { exitingPath, destinationPath } = usePageTransition();
   const isExiting =
     exitingPath === pathname && !destinationPath?.startsWith("/@");
@@ -72,7 +79,8 @@ export default function ProfilePage({
     if (requestedConnections === "requests") {
       const next = new URLSearchParams(searchParams.toString());
       next.delete("connections");
-      router.replace(`${pathname}${next.size ? `?${next}` : ""}`, {
+      const queryString = next.toString();
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
         scroll: false,
       });
     }
@@ -105,11 +113,29 @@ export default function ProfilePage({
       ? "profile-theme-light"
       : "profile-theme-dark";
 
+  let headerTarget = { opacity: 1, y: 0 };
+  let headerTransition: Transition = {
+    duration: 1.5,
+    ease: "easeInOut",
+    delay: 0.45,
+  };
+
+  if (reduceMotion) {
+    headerTransition = { duration: 0 };
+  } else if (isExiting) {
+    headerTarget = { opacity: 0, y: -100 };
+    headerTransition = { duration: 0.3, ease: "easeIn" };
+  }
+
   if (profileLoading) {
     return (
       <div className={`${profileTheme} min-h-svh bg-background text-text`}>
-        <ReturnHeader />
-        <ProfilePageSkeleton />
+        <ReturnHeader theme={profileTheme} />
+
+        <main>
+          <output className="sr-only">Loading profile…</output>
+          <ProfilePageSkeleton />
+        </main>
       </div>
     );
   }
@@ -117,7 +143,7 @@ export default function ProfilePage({
   if (profileError) {
     return (
       <div className={`${profileTheme} min-h-svh bg-background text-text`}>
-        <ReturnHeader />
+        <ReturnHeader theme={profileTheme} />
         <PageState
           error
           title="Profile unavailable"
@@ -131,61 +157,81 @@ export default function ProfilePage({
   if (!profile) notFound();
 
   const viewedFursona = profile;
+  const connectionsList = connectionsTab && (
+    <ProfileConnections
+      key={connectionsTab}
+      id={viewedFursona.id}
+      initialTab={connectionsTab}
+      isOwner={canManageConnections}
+      onProfileChange={refetchCounts}
+      onNavigate={closeConnections}
+      withinDrawer={isMobile}
+    />
+  );
+
   return (
     <div className={`${profileTheme} min-h-svh bg-background text-text`}>
       <motion.div
         className="relative z-50"
-        initial={{ opacity: 0, y: -100 }}
-        animate={isExiting ? { opacity: 0, y: -100 } : { opacity: 1, y: 0 }}
-        transition={
-          isExiting
-            ? { duration: 0.3, ease: "easeIn" }
-            : { duration: 1.5, ease: "easeInOut", delay: 0.45 }
-        }
+        initial={reduceMotion ? false : { opacity: 0, y: -100 }}
+        animate={headerTarget}
+        transition={headerTransition}
       >
-        <ReturnHeader />
+        <ReturnHeader theme={profileTheme} />
       </motion.div>
-      {/* Banner */}
-      <ProfileBanner
-        fursona={viewedFursona}
-        isOwnProfile={isOwnProfile}
-        onClick={() => setIsEditOpen(true)}
-      />
 
-      <div className="container relative z-20 -mt-14 pb-16 sm:-mt-18 md:-mt-24">
-        {/* Profile header */}
-        <ProfileInfo
+      <main>
+        <ProfileBanner
           fursona={viewedFursona}
-
-          // CTA buttons
           isOwnProfile={isOwnProfile}
-          isFollowing={isFollowing}
-          isPending={isPending}
-          isMutual={isMutual}
-          followLoading={followLoading}
-
-          // Counts
-          postsCount={posts}
-          followersCount={followers}
-          followingCount={following}
-          likesCount={likes}
-
-          toggle={handleFollowToggle}
-          onOpenConnections={setConnectionsTab}
+          onClick={() => setIsEditOpen(true)}
         />
 
-        <section className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
-          <main className="w-full min-w-0 flex-1 space-y-4">
-            {/* About */}
-            <ProfileAbout fursona={viewedFursona} />
+        <div className="container relative space-y-4 z-20 -mt-14 pb-16 sm:-mt-18 md:-mt-24">
+          {/* Profile */}
+          <ProfileInfo
+            fursona={viewedFursona}
 
-            {/* Content */}
-            <ProfileContent fursona={viewedFursona} />
-          </main>
+            // CTA buttons
+            isOwnProfile={isOwnProfile}
+            isFollowing={isFollowing}
+            isPending={isPending}
+            isMutual={isMutual}
+            followLoading={followLoading}
 
-          <ProfileAside fursona={viewedFursona} reputation={reputation} />
-        </section>
-      </div>
+            // Counts
+            postsCount={posts}
+            followersCount={followers}
+            followingCount={following}
+            likesCount={likes}
+
+            toggle={handleFollowToggle}
+            onOpenConnections={setConnectionsTab}
+          />
+
+          {/* main */}
+          <div className="flex min-w-0 flex-col gap-6 lg:flex-row lg:items-start xl:gap-10">
+            <div className="w-full min-w-0 flex-1 space-y-4">
+              {/* About */}
+              <ProfileAbout
+                fursona={viewedFursona}
+                isOwnProfile={isOwnProfile}
+                theme={profileTheme}
+              />
+
+              {/* Content */}
+              <ProfileContent />
+            </div>
+
+            <ProfileAside
+              fursona={viewedFursona}
+              reputation={reputation}
+              postsCount={posts}
+              isOwnProfile={isOwnProfile}
+            />
+          </div>
+        </div>
+      </main>
 
       {/* Profile setting modal */}
       {isOwnProfile && viewedFursona && (
@@ -206,27 +252,33 @@ export default function ProfilePage({
         </Dialog>
       )}
 
-      <Dialog
-        open={connectionsTab !== null}
-        onOpenChange={(open) => !open && closeConnections()}
-      >
-        <DialogContent
-          className="sm:p-0 hidden h-[min(78vh,760px)] flex-col overflow-hidden md:flex"
-          showCloseButton={false}
+      {/* Follows */}
+      {isMobile ? (
+        <Drawer
+          open={connectionsTab !== null}
+          onOpenChange={(open) => !open && closeConnections()}
         >
-          <DialogTitle className="sr-only">Connections</DialogTitle>
-          {connectionsTab && (
-            <ProfileConnections
-              key={connectionsTab}
-              id={viewedFursona.id}
-              initialTab={connectionsTab}
-              isOwner={canManageConnections}
-              onProfileChange={refetchCounts}
-              onNavigate={closeConnections}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+          <DrawerContent className="h-[min(85svh,48rem)] bg-background pb-[env(safe-area-inset-bottom)] text-text data-[vaul-drawer-direction=bottom]:max-h-[85svh]">
+            <DrawerTitle className="sr-only">Connections</DrawerTitle>
+            {connectionsList}
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog
+          open={connectionsTab !== null}
+          onOpenChange={(open) => !open && closeConnections()}
+        >
+          <DialogContent
+            className="flex h-[min(78svh,760px)] max-h-[calc(100svh-2rem)] w-full flex-col gap-0 overflow-hidden rounded-xl p-0 motion-safe:duration-200 motion-reduce:duration-0 sm:max-h-[calc(100svh-2rem)] sm:max-w-2xl sm:p-0"
+            overlayClassName="motion-safe:duration-200 motion-reduce:duration-0"
+            showCloseButton={false}
+          >
+            <DialogTitle className="sr-only">Connections</DialogTitle>
+
+            {connectionsList}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

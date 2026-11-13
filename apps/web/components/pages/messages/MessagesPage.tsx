@@ -104,12 +104,20 @@ export default function MessagesPage({
     Boolean(standalone && peerParam),
   );
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
   const listRequest = useRef(0);
   const chatRequest = useRef(0);
   const bottomRef = useRef<HTMLLIElement>(null);
   const draftRef = useRef<HTMLTextAreaElement>(null);
   const openedPeer = useRef<string | null>(null);
   const activeChat = useRef<string | null>(null);
+
+  useEffect(() => {
+    const syncVisibility = () => setPageVisible(!document.hidden);
+    syncVisibility();
+    document.addEventListener("visibilitychange", syncVisibility);
+    return () => document.removeEventListener("visibilitychange", syncVisibility);
+  }, []);
 
   const loadConversations = useCallback(async (quiet = false) => {
     const request = ++listRequest.current;
@@ -177,6 +185,10 @@ export default function MessagesPage({
     activeChat.current = conversationId ?? null;
     setMessages([]);
     openedPeer.current = null;
+  }, [currentFursona?.id, conversationId]);
+
+  useEffect(() => {
+    if (!currentFursona?.id || !pageVisible) return;
     void loadConversations();
     const interval = window.setInterval(
       () => void loadConversations(true),
@@ -184,13 +196,14 @@ export default function MessagesPage({
     );
     return () => {
       window.clearInterval(interval);
+      // Invalidate an in-flight response when polling stops.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       listRequest.current++;
-      chatRequest.current++;
     };
-  }, [currentFursona?.id, conversationId, loadConversations]);
+  }, [currentFursona?.id, conversationId, loadConversations, pageVisible]);
 
   useEffect(() => {
-    if (!selectedId || !currentFursona?.id) return;
+    if (!selectedId || !currentFursona?.id || !pageVisible) return;
     void loadMessages(selectedId);
     const interval = window.setInterval(
       () => void loadMessages(selectedId, true),
@@ -198,9 +211,11 @@ export default function MessagesPage({
     );
     return () => {
       window.clearInterval(interval);
+      // Invalidate an in-flight response when polling stops.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       chatRequest.current++;
     };
-  }, [selectedId, currentFursona?.id, loadMessages]);
+  }, [selectedId, currentFursona?.id, loadMessages, pageVisible]);
 
   useEffect(() => {
     if (
@@ -322,13 +337,20 @@ export default function MessagesPage({
 
   useEffect(() => {
     if (messages.length)
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      bottomRef.current?.scrollIntoView({
+        behavior: document.documentElement.dataset.motion === "reduced" ||
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto" : "smooth",
+        block: "end",
+      });
   }, [messages.length, selectedId]);
-  const allConversations =
-    openedConversation &&
-    !conversations.some((item) => item.id === openedConversation.id)
+  const allConversations = useMemo(
+    () => openedConversation &&
+      !conversations.some((item) => item.id === openedConversation.id)
       ? [openedConversation, ...conversations]
-      : conversations;
+      : conversations,
+    [openedConversation, conversations],
+  );
   const selected = allConversations.find((item) => item.id === selectedId);
   useEffect(() => {
     if (standalone || !selectedId) return;

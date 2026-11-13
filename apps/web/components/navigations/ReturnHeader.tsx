@@ -13,6 +13,12 @@ import { motion } from "framer-motion";
 import { NotificationBell } from "./NotificationBell";
 import HeaderSearchInput from "./HeaderSearchInput";
 
+type ReturnHeaderProp = {
+  theme?: string;
+  backHref?: string;
+  title?: string;
+}
+
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
     return true;
@@ -22,9 +28,10 @@ function getUsername(pathname: string): boolean {
 }
 
 export default function ReturnHeader({
+  theme,
   backHref,
   title,
-}: Readonly<{ backHref?: string; title?: string }>) {
+}: Readonly<ReturnHeaderProp>) {
   const { back, navigate, exitingPath, destinationPath } = usePageTransition();
   const pathname = useCurrentPath();
   const profilePage = getUsername(pathname);
@@ -45,7 +52,7 @@ export default function ReturnHeader({
         profilePage
           ? "absolute bg-linear-to-b from-background to-transparent"
           : "fixed border-b bg-background md:bg-background/65 md:shadow-lg md:backdrop-blur-2xl",
-        searchOpen ? "bg-background" : null,
+        searchOpen ? `bg-background` : null,
       )}
     >
       <div className="flex justify-between items-center h-16 px-2 gap-4 md:px-4">
@@ -81,7 +88,7 @@ export default function ReturnHeader({
           {pathname === "/settings" ? (
             <>
               <div className="hidden md:block">
-                <Searchbar onOpenChange={setSearchOpen} />
+                <Searchbar onOpenChange={setSearchOpen} theme={theme} />
               </div>
 
               <HeaderSearchInput
@@ -91,7 +98,7 @@ export default function ReturnHeader({
               />
             </>
           ) : (
-            <Searchbar onOpenChange={setSearchOpen} />
+            <Searchbar onOpenChange={setSearchOpen} theme={theme}/>
           )}
 
           <NotificationBell />

@@ -9,8 +9,9 @@ import { DrawerFooter } from "@repo/ui/drawer";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { PopoverContent } from "@repo/ui/popover";
 import { Kbd } from "@repo/ui/kbd";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useAppPreferences } from "@/providers/AppPreferencesProvider";
 import { type FursonaSearch } from "@/types/fursona";
-import { AnimatePresence, motion } from "framer-motion";
 import SearchResults from "./SearchResults";
 import SearchDefault from "./SearchDefault";
 
@@ -35,6 +36,7 @@ interface SearchDialogProps {
   readonly onBlurCapture: FocusEventHandler<HTMLDivElement>;
   readonly searchQuery: string;
   readonly onSearchQueryChange: (query: string) => void;
+  readonly theme?: string;
 }
 
 const NAV_OPTIONS: NavOption[] = [
@@ -75,8 +77,12 @@ export default function SearchModal({
   onBlurCapture,
   searchQuery,
   onSearchQueryChange,
+  theme
 }: SearchDialogProps) {
   const { history, addSearch, clearHistory } = useSearchHistory();
+  const prefersReducedMotion = useReducedMotion();
+  const { motion: motionPreference } = useAppPreferences();
+  const reduceMotion = motionPreference === "reduced" || prefersReducedMotion;
 
   const { type, term } = parseSearchQuery(searchQuery);
   const fursonaSearchTerm = type === "nav" ? "" : term;
@@ -99,10 +105,10 @@ export default function SearchModal({
     <AnimatePresence>
       {open && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeInOut" }}
+          exit={reduceMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.25, ease: "easeInOut" }}
           key="popup-overlay"
           aria-hidden="true"
           className="fixed inset-0 top-16 backdrop-blur-md z-30"
@@ -117,7 +123,7 @@ export default function SearchModal({
           side="bottom"
           sideOffset={14}
           onOpenAutoFocus={(event) => event.preventDefault()}
-          className="w-dvw rounded-none border-none border-b-border/20 bg-background rounded-b-sm"
+          className={`${theme} bg-background w-dvw rounded-none border-none border-b-border/20 rounded-b-sm`}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
           onFocusCapture={onFocusCapture}
@@ -125,9 +131,9 @@ export default function SearchModal({
         >
           <motion.div
             key="search-popover"
-            initial={{ opacity: 0, y: -50, scaleY: 0.98 }}
+            initial={reduceMotion ? false : { opacity: 0, y: -50, scaleY: 0.98 }}
             animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            transition={{ duration: 0.35, ease: "easeInOut" }}
+            transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeInOut" }}
           >
             {/* Results Container */}
             <div className="flex-1 min-h-0 px-2 py-4 overflow-y-auto scrollbar-none z-50 md:min-h-74 md:px-6 md:pb-0">

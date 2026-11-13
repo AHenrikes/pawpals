@@ -1,5 +1,6 @@
 import { withUser } from "@/lib/auth/withUser";
 import { badRequest, okNoStore, serverError } from "@/lib/api/responses";
+import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 type Context = { params: Promise<{ id: string }> };
@@ -49,6 +50,11 @@ export const POST = withUser(
       });
     if (error?.code === "42501")
       return badRequest("Messaging requires a mutual follow.");
+    if (error?.code === "PT429")
+      return NextResponse.json(
+        { error: "Too many messages. Try again in a minute." },
+        { status: 429, headers: { "Retry-After": "60", "Cache-Control": "no-store" } },
+      );
     if (error) return serverError(error.message);
     return okNoStore({ message: data });
   },

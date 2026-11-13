@@ -23,16 +23,18 @@ export default function ProfileAboutModal({
   fursona,
   isOpen,
   onClose,
+  theme
 }: Readonly<{
   fursona: FursonaProfile;
   isOpen: boolean;
   onClose: () => void;
+  theme?: string;
 }>) {
   const socials = safeSocialLinks(fursona.social_links);
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="h-[min(78dvh,48rem)] w-full bg-background px-4 sm:px-6">
+      <DrawerContent className={`${theme} bg-background h-[min(78dvh,48rem)] w-full px-4 sm:px-6`}>
         <div className="mx-auto w-full max-w-3xl space-y-5 overflow-y-auto pb-8 scrollbar-hide">
           {/* Bio */}
           <section className="space-y-3">

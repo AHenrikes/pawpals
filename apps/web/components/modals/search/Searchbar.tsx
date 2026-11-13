@@ -14,9 +14,10 @@ import { LockScreen } from "@/lib/helpers/lockBody";
 
 interface SearchbarProps {
   readonly onOpenChange?: (open: boolean) => void;
+  readonly theme?: string;
 }
 
-export function Searchbar({ onOpenChange }: SearchbarProps) {
+export function Searchbar({ onOpenChange, theme }: SearchbarProps) {
   const inputId = useId();
   const fieldRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -152,6 +153,7 @@ export function Searchbar({ onOpenChange }: SearchbarProps) {
         onFocusCapture={() => setIsFocused(true)}
         onBlurCapture={handleBlur}
         onClose={handleClose}
+        theme={theme}
       />
     </Popover>
   );

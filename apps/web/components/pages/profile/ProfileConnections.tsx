@@ -9,6 +9,7 @@ import {
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
+  DrawerNestedRoot,
   DrawerTitle,
   DrawerTrigger,
 } from "@repo/ui/drawer";
@@ -49,12 +50,14 @@ export default function ProfileConnections({
   isOwner,
   onProfileChange,
   onNavigate,
+  withinDrawer = false,
 }: Readonly<{
   id: string;
   initialTab: ConnectionTab;
   isOwner: boolean;
   onProfileChange?: () => Promise<void>;
   onNavigate?: () => void;
+  withinDrawer?: boolean;
 }>) {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<ConnectionTab>(initialTab);
@@ -204,6 +207,7 @@ export default function ProfileConnections({
   const visibleError = searching ? null : error;
   const showLoading = !visibleError && (searching || !isCurrentList || loading);
   const emptyListName = tab === "subscribed" ? "subscriptions" : tab;
+  const MenuDrawer = withinDrawer ? DrawerNestedRoot : Drawer;
 
   return (
     <section className="flex min-h-0 flex-1 flex-col bg-background text-text">
@@ -228,7 +232,7 @@ export default function ProfileConnections({
 
         {isOwner && (
           <>
-            <Drawer>
+            <MenuDrawer>
               <DrawerTrigger asChild>
                 <Button
                   variant="outline"
@@ -264,7 +268,7 @@ export default function ProfileConnections({
                   </div>
                 </div>
               </DrawerContent>
-            </Drawer>
+            </MenuDrawer>
 
             <Popover
               open={subscriptionsOpen}
@@ -334,7 +338,7 @@ export default function ProfileConnections({
               type="button"
               aria-label="Clear search"
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text"
+              className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-text-muted hover:text-text"
             >
               <XIcon className="size-4" />
             </button>
@@ -347,7 +351,7 @@ export default function ProfileConnections({
             sorted by <b>{sort}</b>
           </TypographySmall>
 
-          <Drawer>
+          <MenuDrawer>
             <DrawerTrigger asChild>
               <Button
                 variant="ghost"
@@ -381,7 +385,7 @@ export default function ProfileConnections({
                 </div>
               </div>
             </DrawerContent>
-          </Drawer>
+          </MenuDrawer>
 
           <Popover open={sortOpen} onOpenChange={setSortOpen}>
             <PopoverTrigger asChild>

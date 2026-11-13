@@ -1,19 +1,25 @@
 "use client";
 
 import { Button } from "@repo/ui/button";
-import { TypographySmall, TypographyXSmall } from "@repo/ui/typography";
+import { TypographyXSmall } from "@repo/ui/typography";
 import { motion } from "framer-motion";
-import { DotIcon, MaximizeIcon } from "lucide-react";
+import { ListCollapseIcon } from "lucide-react";
 import { useState } from "react";
 import { type FursonaProfile } from "@/types/fursona";
 import ProfileAboutModal from "./ProfileAboutModal";
 
+type ProfileAboutProps = {
+  readonly fursona: FursonaProfile;
+  readonly isOwnProfile: boolean;
+  readonly theme?: string;
+}
+
 export default function ProfileAbout({
   fursona,
-}: Readonly<{ fursona: FursonaProfile }>) {
+  isOwnProfile,
+  theme
+}: ProfileAboutProps ) {
   const [isOpen, setIsOpen] = useState(false);
-  const achievements = fursona.featured_achievements ?? [];
-
 
   return (
     <>
@@ -26,43 +32,31 @@ export default function ProfileAbout({
           delay: 0.35,
           ease: "easeOut",
         }}
-        className="gradientBG mx-0 space-y-3 rounded-base px-4 py-3 sm:space-y-4 sm:px-5 sm:py-4"
+        className="space-y-3 px-2 md:px-0"
       >
-        <div className="flex items-start justify-between gap-2 sm:items-center">
-          <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-primary rounded-full shadow-lg shadow-red-500/70 md:h-3 md:w-3" />
-              <TypographySmall className="text-text/80">About</TypographySmall>
-            </div>
+        {isOwnProfile && (
+          <TypographyXSmall className="line-clamp-3 text-text-muted wrap-break-word lg:line-clamp-none">
+            {fursona.bio || "Your story starts here. Tell a little about yourself."}
+          </TypographyXSmall>
+        )}
 
-            {achievements.length > 0 && (
-              <>
-                <DotIcon className="hidden text-text/60 sm:block" />
-
-                <span className="flex flex-wrap gap-x-2 text-text/60">
-                  <TypographyXSmall>Member since :</TypographyXSmall>
-                  <TypographyXSmall>
-                    {new Date(fursona.created_at).toLocaleDateString()}
-                  </TypographyXSmall>
-                </span>
-              </>
-            )}
-          </div>
+        <div className="flex justify-between">
+          <span className="flex flex-wrap gap-x-2 text-text/60">
+            <TypographyXSmall>Member since :</TypographyXSmall>
+            <TypographyXSmall>
+              {new Date(fursona.created_at).toLocaleDateString()}
+            </TypographyXSmall>
+          </span>
 
           <Button
-            size={"icon"}
             variant={"none"}
             onClick={() => setIsOpen(true)}
             aria-label="Expand about section"
-            className="text-muted lg:hidden"
+            className="h-auto text-muted p-0 lg:hidden"
           >
-            <MaximizeIcon />
+            <ListCollapseIcon />
           </Button>
         </div>
-
-        <TypographyXSmall className="line-clamp-3 text-text-muted wrap-break-word lg:line-clamp-none">
-          {fursona.bio || "This fursona has not added a bio yet."}
-        </TypographyXSmall>
       </motion.div>
 
       {/* Profile about modal */}
@@ -70,6 +64,7 @@ export default function ProfileAbout({
         fursona={fursona}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        theme={theme}
       />
     </>
   );
