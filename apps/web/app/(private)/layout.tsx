@@ -7,6 +7,7 @@ import { AppPreferencesProvider } from "@/providers/AppPreferencesProvider";
 import { PageTransitionProvider } from "@/components/transitions/PageTransitionProvider";
 import { type Metadata } from "next";
 import MobileBottomNav from "@/components/navigations/MobileBottomNav";
+import ThemeSyncController from "@/providers/ThemeSyncController";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -21,6 +22,8 @@ export default async function PrivateLayout({
       <PageTransitionProvider>
         <QueryProvider>
           <UserProvider>
+            <ThemeSyncController />
+
             {children}
 
             <MobileBottomNav />

@@ -7,7 +7,8 @@ import { TypographyLead, TypographyP } from "@repo/ui/typography";
 
 export default function AvatarWithName({
   size,
-}: Readonly<{ size?: "lg" | "sm" }>) {
+  showUserName,
+}: Readonly<{ size?: "lg" | "sm", showUserName?: boolean }>) {
   const { currentFursona } = useUser();
 
   const displayName = currentFursona?.display_name || "Account";
@@ -25,9 +26,12 @@ export default function AvatarWithName({
 
       <span>
         <TypographyLead>{currentFursona?.display_name}</TypographyLead>
-        <TypographyP className="text-xs">
-          {currentFursona?.username}
-        </TypographyP>
+
+        {showUserName && (
+          <TypographyP className="text-xs">
+            {currentFursona?.username}
+          </TypographyP>
+        )}
       </span>
     </Link>
   );

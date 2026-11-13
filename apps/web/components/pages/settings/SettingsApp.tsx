@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useTheme } from "next-themes";
-import { cn } from "@repo/ui/lib/utils";
-import { TypographyH3 } from "@repo/ui/typography";
 import { useAppPreferences } from "@/providers/AppPreferencesProvider";
+import { useUser } from "@/providers/UserProvider";
 
 type Option<T extends string> = {
   value: T;
   label: string;
   description: string;
+  disabled?: boolean;
 };
 
 function PreferenceGroup<T extends string>({
   title,
+  anchor,
   description,
   value,
   options,
@@ -21,47 +22,54 @@ function PreferenceGroup<T extends string>({
   disabled = false,
 }: Readonly<{
   title: string;
+  anchor: string;
   description: string;
   value: T;
   options: readonly Option<T>[];
   onChange: (value: T) => void;
   disabled?: boolean;
 }>) {
+  const id = useId();
+
   return (
-    <section className="space-y-4">
-      <div>
-        <TypographyH3>{title}</TypographyH3>
-        <p className="mt-1 text-sm text-text-muted">{description}</p>
-      </div>
-      <div
-        className="glass-panel grid gap-3 rounded-2xl p-4 sm:grid-cols-3 sm:p-5"
-        role="group"
-        aria-label={title}
-      >
+    <fieldset
+      id={anchor}
+      tabIndex={-1}
+      className="space-y-4 scroll-mt-6 focus:outline-none"
+      aria-describedby={id}
+    >
+      <legend className="text-lg font-semibold text-text">{title}</legend>
+      <p id={id} className="text-sm text-text-muted">
+        {description}
+      </p>
+      <div className="glass-panel grid gap-3 rounded-2xl p-4 sm:grid-cols-2 sm:p-5">
         {options.map((option) => (
-          <button
+          <label
             key={option.value}
-            type="button"
-            disabled={disabled}
-            aria-pressed={!disabled && value === option.value}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              "glass-control min-h-24 rounded-xl border p-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-wait",
-              !disabled && value === option.value
-                ? "border-primary bg-primary/15"
-                : "border-border/40 hover:border-primary/50",
-            )}
+            className="glass-control flex min-h-24 cursor-pointer gap-3 rounded-xl border p-4 text-left transition-colors has-checked:border-primary has-checked:bg-primary/15 has-disabled:cursor-not-allowed has-disabled:opacity-60 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary"
           >
-            <span className="block text-sm font-semibold text-text">
-              {option.label}
+            <input
+              type="radio"
+              aria-label={option.label}
+              name={id}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => onChange(option.value)}
+              disabled={disabled || option.disabled}
+              className="mt-0.5 size-4 shrink-0 accent-primary"
+            />
+            <span>
+              <span className="block text-sm font-semibold text-text">
+                {option.label}
+              </span>
+              <span className="mt-1 block text-xs leading-relaxed text-text-muted">
+                {option.description}
+              </span>
             </span>
-            <span className="mt-1 block text-xs leading-relaxed text-text-muted">
-              {option.description}
-            </span>
-          </button>
+          </label>
         ))}
       </div>
-    </section>
+    </fieldset>
   );
 }
 
@@ -74,6 +82,12 @@ const themeOptions = [
   { value: "light", label: "Light", description: "Use the light appearance." },
   { value: "dark", label: "Dark", description: "Use the dark appearance." },
 ] as const;
+
+const followProfileOption = {
+  value: "profile",
+  label: "Follow active profile",
+  description: "Use this fursona's saved light or dark theme on this device.",
+} as const;
 
 const motionOptions = [
   {
@@ -114,8 +128,11 @@ const notificationOptions = [
   },
 ] as const;
 
-export default function SettingsApp() {
+export default function SettingsApp({
+  section,
+}: Readonly<{ section: "appearance" | "notifications" }>) {
   const { theme, setTheme } = useTheme();
+  const { currentFursona } = useUser();
   const {
     motion,
     setMotion,
@@ -123,50 +140,77 @@ export default function SettingsApp() {
     setTextSize,
     followRequestAlerts,
     setFollowRequestAlerts,
+    appThemeSource,
+    setAppThemeSource,
   } = useAppPreferences();
   const [mounted, setMounted] = useState(false);
+  let selectedTheme: "system" | "light" | "dark" | "profile" = "system";
+  if (mounted) {
+    if (appThemeSource === "profile") selectedTheme = "profile";
+    else if (theme === "light" || theme === "dark" || theme === "system")
+      selectedTheme = theme;
+  }
 
   useEffect(() => setMounted(true), []);
 
   return (
     <div className="w-full space-y-8">
-      <PreferenceGroup
-        title="Theme"
-        description="Choose how the app looks on this device. Your public profile has its own theme."
-        value={
-          mounted &&
-          (theme === "light" || theme === "dark" || theme === "system")
-            ? theme
-            : "system"
-        }
-        options={themeOptions}
-        onChange={setTheme}
-        disabled={!mounted}
-      />
+      {section === "appearance" && (
+        <>
+          <PreferenceGroup
+            title="Theme"
+            anchor="app-theme"
+            description="Choose a device theme, or follow your active fursona's saved theme."
+            value={selectedTheme}
+            options={[
+              ...themeOptions,
+              {
+                ...followProfileOption,
+                disabled:
+                  !currentFursona || currentFursona.profile_theme === "app",
+              },
+            ]}
+            onChange={(value) => {
+              if (value === "profile") {
+                setAppThemeSource("profile");
+              } else {
+                setAppThemeSource("independent");
+                setTheme(value);
+              }
+            }}
+            disabled={!mounted}
+          />
 
-      <PreferenceGroup
-        title="Animations"
-        description="Control movement throughout the app, including page transitions."
-        value={motion}
-        options={motionOptions}
-        onChange={setMotion}
-      />
+          <PreferenceGroup
+            title="Animations"
+            anchor="animations"
+            description="Control movement throughout the app, including page transitions."
+            value={motion}
+            options={motionOptions}
+            onChange={setMotion}
+          />
 
-      <PreferenceGroup
-        title="Text size"
-        description="Make app text easier to read. Your browser's zoom still works too."
-        value={textSize}
-        options={textSizeOptions}
-        onChange={setTextSize}
-      />
+          <PreferenceGroup
+            title="Text size"
+            anchor="text-size"
+            description="Make app text easier to read. Your browser's zoom still works too."
+            value={textSize}
+            options={textSizeOptions}
+            onChange={setTextSize}
+          />
+        </>
+      )}
 
-      <PreferenceGroup
-        title="Follow request alerts"
-        description="Choose whether pending follow requests appear as a badge on the notification bell. You can always review requests from the bell."
-        value={followRequestAlerts ? "on" : "off"}
-        options={notificationOptions}
-        onChange={(value) => setFollowRequestAlerts(value === "on")}
-      />
+      {section === "notifications" && (
+        <PreferenceGroup
+          title="Follow request alerts"
+          anchor="follow-request-alerts"
+          description="Choose whether pending follow requests appear as a badge on the notification bell. You can always review requests from the bell."
+          value={followRequestAlerts ? "on" : "off"}
+          options={notificationOptions}
+          onChange={(value) => setFollowRequestAlerts(value === "on")}
+        />
+      )}
     </div>
   );
 }

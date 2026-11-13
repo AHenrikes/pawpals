@@ -16,7 +16,7 @@ export type FursonaTypes = {
   avatar_url: string | null;
   banner_url: string | null;
   visibility: ProfileVisibility;
-  profile_theme?: "light" | "dark";
+  profile_theme?: "light" | "dark" | "app";
   featured_achievements?: ProfileAchievement[];
   social_links?: ProfileSocialLink[];
   show_reputation?: boolean;
@@ -57,7 +57,7 @@ export type FursonaProfile = {
   avatar_url: string | null;
   banner_url: string | null;
   visibility?: ProfileVisibility;
-  profile_theme?: "light" | "dark";
+  profile_theme?: "light" | "dark" | "app";
   featured_achievements?: ProfileAchievement[];
   social_links?: ProfileSocialLink[];
   show_reputation?: boolean; /* reputation is not hidable */

@@ -27,6 +27,7 @@ import { useProfileFollow } from "@/hooks/social/followers/useProfileFollow";
 import { useUser } from "@/providers/UserProvider";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api/api-client";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import Image from "next/image";
 import FursonaAvatar from "@/components/avatar-icons/FursonaAvatar";
@@ -61,6 +62,7 @@ export default function MessageHeader({
   const { back, navigate } = usePageTransition();
   const { override } = useReturnHeader();
   const { currentFursona } = useUser();
+  const { resolvedTheme } = useTheme();
   const peerId = peer?.id ?? "";
   const { profile } = useProfile(peerId);
   const { mutualSince } = useProfileFollow(peerId);
@@ -214,7 +216,7 @@ export default function MessageHeader({
 
       <DrawerContent
         showHandle={false}
-        className={`profile-theme-${displayProfile.profile_theme ?? "dark"} h-screen bg-background overflow-y-auto scrollbar-hide`}
+        className={`profile-theme-${displayProfile.profile_theme === "app" ? (resolvedTheme ?? "dark") : (displayProfile.profile_theme ?? "dark")} h-screen bg-background overflow-y-auto scrollbar-hide`}
       >
         <DrawerHeader className="relative min-h-56 justify-end px-2 overflow-hidden">
           {bannerUrl && (

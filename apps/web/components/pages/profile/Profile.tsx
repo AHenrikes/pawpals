@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogTitle } from "@repo/ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "@repo/ui/drawer";
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { useAppPreferences } from "@/providers/AppPreferencesProvider";
+import { useTheme } from "next-themes";
 import ProfileBanner from "@/components/pages/profile/ProfileBanner";
 import ProfileInfo from "@/components/pages/profile/ProfileInfo";
 import ProfileAside from "@/components/pages/profile/ProfileAside";
@@ -40,6 +41,7 @@ export default function ProfilePage({
   initialActorId,
 }: Readonly<AuthenticatedProfilePageProp>) {
   const { currentFursona, fursonas } = useUser();
+  const { resolvedTheme } = useTheme();
   const { motion: motionPreference } = useAppPreferences();
   const prefersReducedMotion = useReducedMotion();
   const reduceMotion = motionPreference === "reduced" || prefersReducedMotion;
@@ -108,8 +110,9 @@ export default function ProfilePage({
     await refetchCounts();
   };
 
-  const profileTheme =
-    (profile ?? initialProfile)?.profile_theme === "light"
+  const storedProfileTheme = (profile ?? initialProfile)?.profile_theme;
+  const resolvedProfileTheme = storedProfileTheme === "app" ? resolvedTheme : storedProfileTheme;
+  const profileTheme = resolvedProfileTheme === "light"
       ? "profile-theme-light"
       : "profile-theme-dark";
 
@@ -241,7 +244,7 @@ export default function ProfilePage({
         >
           <DialogContent
             showCloseButton={false}
-            className="p-0 flex w-full flex-1 flex-col mx-auto bg-background rounded-xl overflow-hidden sm:p-0 md:flex-row md:max-w-[calc(100dvw-12rem)] md:max-h-[calc(100dvh-12rem)] xl:max-w-7xl"
+            className="p-0 flex w-full min-h-10/12 flex-1 flex-col mx-auto bg-background rounded-xl overflow-hidden sm:p-0 md:flex-row md:max-w-[calc(100dvw-12rem)] md:max-h-[calc(100dvh-12rem)] xl:max-w-7xl"
           >
             <DialogTitle className="sr-only">Profile settings</DialogTitle>
             <SettingsPage

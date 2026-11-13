@@ -220,7 +220,11 @@ export default function SettingsAccount({
 
   return (
     <div className="w-full space-y-8">
-      <section className="space-y-4">
+      <section
+        id="account-information"
+        tabIndex={-1}
+        className="space-y-4 scroll-mt-6 focus:outline-none"
+      >
         <div>
           <TypographyH3>Account information</TypographyH3>
 
@@ -499,7 +503,11 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section
+        id="password-security"
+        tabIndex={-1}
+        className="space-y-4 scroll-mt-6 focus:outline-none"
+      >
         <div>
           <TypographyH3>Password & security</TypographyH3>
           <p className="mt-1 text-sm text-text-muted">
@@ -548,7 +556,11 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section
+        id="account-status"
+        tabIndex={-1}
+        className="space-y-4 scroll-mt-6 focus:outline-none"
+      >
         <div>
           <TypographyH3>Account status</TypographyH3>
           <p className="mt-1 text-sm text-text-muted">
@@ -594,7 +606,11 @@ export default function SettingsAccount({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-destructive/25 bg-surface p-5 md:bg-destructive/8 md:backdrop-blur-xl">
+      <section
+        id="danger-zone"
+        tabIndex={-1}
+        className="space-y-4 scroll-mt-6 rounded-2xl border border-destructive/25 bg-surface p-5 focus:outline-none md:bg-destructive/8 md:backdrop-blur-xl"
+      >
         <div>
           <TypographyH3>Danger zone</TypographyH3>
           <p className="mt-1 text-sm text-text-muted">

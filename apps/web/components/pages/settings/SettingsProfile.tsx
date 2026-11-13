@@ -50,6 +50,12 @@ import {
 import usePlatformOption from "@/hooks/usePlatformOption";
 import useAchievement from "@/hooks/useAchievement";
 
+const profileThemeLabels = {
+  light: "Light",
+  dark: "Dark",
+  app: "Match app theme",
+} as const;
+
 type SettingsProfileProps = {
   currentFursona: FursonaTypes;
   usernameLoading: boolean;
@@ -134,16 +140,22 @@ function PreferenceToggle({
 }
 
 function SettingsSection({
+  anchor,
   title,
   description,
   children,
 }: Readonly<{
+  anchor: string;
   title: string;
   description: string;
   children: React.ReactNode;
 }>) {
   return (
-    <section className="space-y-5">
+    <section
+      id={anchor}
+      tabIndex={-1}
+      className="space-y-5 scroll-mt-6 focus:outline-none"
+    >
       <div>
         <TypographyH3>{title}</TypographyH3>
         <p className="mt-1 text-sm text-text-muted">{description}</p>
@@ -198,7 +210,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
     currentFursona.visibility ?? "public",
   );
 
-  const [profileTheme, setProfileTheme] = useState<"light" | "dark">(
+  const [profileTheme, setProfileTheme] = useState<"light" | "dark" | "app">(
     currentFursona.profile_theme ?? "dark",
   );
 
@@ -412,6 +424,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
         <div className="space-y-6">
           <SettingsSection
+            anchor="profile-information"
             title="Profile information"
             description="Shape what people see when they visit your active fursona."
           >
@@ -515,6 +528,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
 
           <SettingsSection
+            anchor="profile-socials"
             title="Socials"
             description="Add up to six places where people can find you."
           >
@@ -585,6 +599,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
 
           <SettingsSection
+            anchor="profile-post-visibility"
             title="Post visibility"
             description="Choose who can view your posts. Your profile remains visible to signed-in users."
           >
@@ -652,27 +667,30 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
 
           <SettingsSection
+            anchor="profile-theme"
             title="Profile theme"
-            description="Visitors see this profile in your chosen theme without changing their app theme."
+            description="Choose a fixed look or match each visitor's app theme. This setting is saved with your fursona."
           >
             <div className="flex gap-2">
-              {(["light", "dark"] as const).map((theme) => (
+              {(["light", "dark", "app"] as const).map((theme) => (
                 <Button
                   key={theme}
-                  type="button"
+                  aria-pressed={profileTheme === theme}
                   variant={profileTheme === theme ? "default" : "outline"}
                   onClick={() => {
                     setProfileTheme(theme);
                     setNewChange(true);
                   }}
+                  className="glass-control flex w-full items-center justify-between gap-4 rounded-xl p-4 text-left"
                 >
-                  {theme === "light" ? "Light" : "Dark"}
+                  {profileThemeLabels[theme]}
                 </Button>
               ))}
             </div>
           </SettingsSection>
 
           <SettingsSection
+            anchor="profile-sections"
             title="Profile sections"
             description="Control which activity summaries visitors can see."
           >
@@ -699,6 +717,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           </SettingsSection>
 
           <SettingsSection
+            anchor="featured-achievements"
             title="Featured achievements"
             description="Choose up to three achievements to highlight on your profile."
           >
@@ -881,6 +900,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
             resetProfile();
           }}
           disabled={saving || !newChange}
+          className="rounded-md"
         >
           Reset identity
         </Button>
@@ -888,6 +908,7 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         <Button
           onClick={saveProfile}
           disabled={saving || !newChange || isAvailable === false}
+          className="rounded-md"
         >
           {saving ? <Loader2Icon className="animate-spin" /> : <CheckIcon />}
           Save profile

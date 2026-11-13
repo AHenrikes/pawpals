@@ -7,10 +7,37 @@ import useIsMobile from "@/hooks/useIsMobile";
 import { useUser } from "@/providers/UserProvider";
 import { cn } from "@repo/ui/lib/utils";
 import { useReturnHeader } from "@/components/navigations/ReturnHeaderProvider";
+import type { SettingsSectionId } from "./settingsSearch";
 import EditProfileAside, { type EditProfileSection } from "./SettingsAside";
 import SettingsAccount from "./SettingsAccount";
 import SettingsProfile from "./SettingsProfile";
 import SettingsApp from "./SettingsApp";
+import SettingsPrivacy from "./SettingsPrivacy";
+
+const sectionCopy = {
+  account: {
+    title: "My account",
+    description:
+      "Manage the private details and security of your Pawpals account.",
+  },
+  profile: {
+    title: "Profiles & socials",
+    description:
+      "Make your fursona feel like you and connect your other spaces.",
+  },
+  privacy: {
+    title: "Privacy & safety",
+    description: "Decide who can see what you share.",
+  },
+  notifications: {
+    title: "Notifications",
+    description: "Choose which activity gets your attention.",
+  },
+  appearance: {
+    title: "Appearance",
+    description: "Make Pawpals comfortable on this device.",
+  },
+} as const;
 
 type EditProfilePanelProps = {
   initialSection?: EditProfileSection;
@@ -46,7 +73,15 @@ export default function SettingsPage({
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const usernameCheckId = useRef(0);
   const formIdentity = useRef<string | null>(null);
-
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const previousSection = useRef<EditProfileSection>(activeSection);
+  const [searchTarget, setSearchTarget] = useState<{
+    anchor: string;
+    request: number;
+  } | null>(null);
+  const mobileContentClass = isMobileSectionOpen
+    ? "w-full md:flex-1"
+    : "hidden md:block md:flex-1";
   useCleanupBlobUrl(avatarPreview);
   useCleanupBlobUrl(bannerPreview);
 
@@ -80,6 +115,13 @@ export default function SettingsPage({
         : (initialSection ?? "profile"),
     );
   }, [initialSection, isMobileViewport, isMobileSectionOpen, mobileNavigation]);
+
+  useEffect(() => {
+    if (mobileNavigation && isMobileViewport && searchQuery.trim()) {
+      setIsMobileSectionOpen(false);
+      setActiveSection(null);
+    }
+  }, [searchQuery, mobileNavigation, isMobileViewport]);
 
   useEffect(() => {
     if (!mobileNavigation || !isMobileViewport || !isMobileSectionOpen) {
@@ -125,16 +167,41 @@ export default function SettingsPage({
     resetForms();
   }, [account?.id, currentFursona?.id, resetForms]);
 
+  useEffect(() => {
+    if (
+      previousSection.current !== activeSection &&
+      isMobileViewport &&
+      activeSection
+    ) {
+      headingRef.current?.focus();
+    }
+    previousSection.current = activeSection;
+  }, [activeSection, isMobileViewport]);
+
+  useEffect(() => {
+    if (!searchTarget || !activeSection) return;
+    const frame = requestAnimationFrame(() => {
+      const target = document.getElementById(searchTarget.anchor);
+      target?.scrollIntoView({ block: "start", behavior: "auto" });
+      target?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeSection, searchTarget]);
+
+  const openSearchResult = (section: SettingsSectionId, anchor: string) => {
+    setSearchTarget((previous) => ({
+      anchor,
+      request: (previous?.request ?? 0) + 1,
+    }));
+    setActiveSection(section);
+    setIsMobileSectionOpen(true);
+  };
+
   return (
     <div
       className={cn(
-        "flex min-h-0 flex-1",
-        mobileNavigation
-          ? cn(
-              "w-[200%] transition-transform duration-300 ease-in-out md:w-full md:translate-x-0",
-              isMobileSectionOpen ? "-translate-x-1/2" : "translate-x-0",
-            )
-          : "flex-col md:flex-row",
+        "settings-shell flex min-h-0 flex-1 bg-background",
+        !mobileNavigation && "flex-col md:flex-row",
       )}
     >
       <EditProfileAside
@@ -142,19 +209,24 @@ export default function SettingsPage({
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         mobileNavigation={mobileNavigation}
+        inactive={mobileNavigation && isMobileViewport && isMobileSectionOpen}
+        hiddenOnMobile={mobileNavigation && isMobileSectionOpen}
+        onSearchResult={openSearchResult}
         onSectionChange={(section) => {
+          setSearchTarget(null);
           setActiveSection(section);
           setIsMobileSectionOpen(true);
         }}
       />
 
       <section
+        inert={mobileNavigation && isMobileViewport && !isMobileSectionOpen}
         className={cn(
-          "relative min-w-0 px-2 py-6 overflow-y-auto scrollbar-hide sm:px-10",
-          mobileNavigation ? "w-1/2 shrink-0 md:w-auto md:flex-1" : "flex-1",
+          "relative min-w-0 overflow-y-auto px-5 pb-12 pt-7 scrollbar-hide sm:px-10 md:px-12 md:pt-10",
+          mobileNavigation ? mobileContentClass : "flex-1",
         )}
       >
-        <div className="w-full max-w-5xl mx-auto">
+        <div className="mx-auto w-full max-w-4xl">
           {activeSection === "account" && (
             <SettingsAccount
               firstName={firstName}
@@ -203,11 +275,17 @@ export default function SettingsPage({
             />
           )}
 
-          {activeSection === "app" && <SettingsApp />}
+          {activeSection === "privacy" && <SettingsPrivacy />}
+          {activeSection === "appearance" && (
+            <SettingsApp section="appearance" />
+          )}
+          {activeSection === "notifications" && (
+            <SettingsApp section="notifications" />
+          )}
 
           {activeSection === null && (
-            <div className="grid place-content-center">
-              <p>Choose a section</p>
+            <div className="grid place-content-center text-text-muted">
+              <p>Choose a setting to get started.</p>
             </div>
           )}
         </div>

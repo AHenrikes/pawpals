@@ -26,6 +26,7 @@ including authentication, accounts, profiles, discovery, follows, and media.
 14. `20261031010006_connection_search.sql` searches complete connection lists while preserving private-list ownership checks.
 15. `20261101010001_direct_messages.sql` and `20261101010002_unstarted_conversations.sql` add private mutual-follow messaging.
 16. `20261113010001_direct_message_rate_limit.sql` limits each account to 30 sent messages per minute, including direct RPC calls.
+17. `20261113010002_profile_theme_app.sql` lets a fursona follow each visitor's app theme.
 
 Add future schema changes as new, dated migrations. Do not edit these baseline
 files after a project has applied them. A database that already applied the old

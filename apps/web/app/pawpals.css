@@ -116,7 +116,8 @@
 }
 
 @layer base {
-  :root, .profile-theme-light {
+  :root,
+  .profile-theme-light {
     color-scheme: light;
     --radius: 0.875rem;
     --blur: 1.5rem;
@@ -171,7 +172,8 @@
       hsl(var(--background));
   }
 
-  .dark, .profile-theme-dark {
+  .dark,
+  .profile-theme-dark {
     color-scheme: dark;
     --background: 258, 43%, 6%;
     --foreground: 270, 35%, 96%;
@@ -274,6 +276,22 @@
 
   .glass-control {
     @apply border border-border/60 bg-surface transition-colors hover:border-primary/45 hover:bg-surface/80;
+  }
+
+  .settings-shell .glass-panel {
+    @apply border-border/50 bg-surface shadow-none backdrop-blur-none;
+  }
+
+  .settings-shell .glass-control {
+    @apply bg-surface shadow-none backdrop-blur-none;
+  }
+
+  @media (forced-colors: active) {
+    .settings-shell [aria-current="page"],
+    .settings-shell label:has(input:checked) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
   }
 
   @media (min-width: 768px) {

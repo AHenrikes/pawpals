@@ -50,6 +50,7 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.sub', 'a1111111-1111-4111-8111-111111111111', true);
 select lives_ok($$update core.fursonas set profile_theme = 'light' where username = 'profile_target'$$, 'owner can save profile theme');
+select lives_ok($$update core.fursonas set profile_theme = 'app' where username = 'profile_target'$$, 'owner can match the viewer app theme');
 select lives_ok($$update core.fursonas set display_name = 'Target', species = 'Wolf', pronouns = null, bio = 'Protected biography', visibility = 'private', profile_theme = 'light', social_links = '[]'::jsonb, show_events = true, show_communities = true, featured_achievements = '{}'::text[] where username = 'profile_target'$$, 'owner can save the full profile-settings payload');
 select is((select count(*) from public.pending_follows('c1111111-1111-4111-8111-111111111111')), 1::bigint, 'owner sees pending requests');
 select lives_ok($$select public.respond_follow('c1111111-1111-4111-8111-111111111111', 'c2222222-2222-4222-8222-222222222222', true)$$, 'owner can approve');

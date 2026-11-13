@@ -5,6 +5,7 @@ import { MotionConfig } from "framer-motion";
 
 type MotionPreference = "system" | "reduced";
 type TextSize = "default" | "large";
+type AppThemeSource = "independent" | "profile";
 
 type AppPreferences = {
   motion: MotionPreference;
@@ -13,6 +14,8 @@ type AppPreferences = {
   setTextSize: (value: TextSize) => void;
   followRequestAlerts: boolean;
   setFollowRequestAlerts: (value: boolean) => void;
+  appThemeSource: AppThemeSource;
+  setAppThemeSource: (value: AppThemeSource) => void;
 };
 
 const STORAGE_KEY = "pawpals-app-preferences";
@@ -24,6 +27,8 @@ export function AppPreferencesProvider({
   const [motion, setMotion] = useState<MotionPreference>("system");
   const [textSize, setTextSize] = useState<TextSize>("default");
   const [followRequestAlerts, setFollowRequestAlerts] = useState(true);
+  const [appThemeSource, setAppThemeSource] =
+    useState<AppThemeSource>("independent");
   const [systemReduced, setSystemReduced] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -36,6 +41,7 @@ export function AppPreferencesProvider({
         setTextSize(stored.textSize);
       if (typeof stored?.followRequestAlerts === "boolean")
         setFollowRequestAlerts(stored.followRequestAlerts);
+      if (stored?.appThemeSource === "profile") setAppThemeSource("profile");
     } catch {
       // Private browsing or malformed stored data should not block the app.
     }
@@ -55,12 +61,17 @@ export function AppPreferencesProvider({
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ motion, textSize, followRequestAlerts }),
+        JSON.stringify({
+          motion,
+          textSize,
+          followRequestAlerts,
+          appThemeSource,
+        }),
       );
     } catch {
       // Preferences still apply for this visit if storage is unavailable.
     }
-  }, [loaded, motion, textSize, followRequestAlerts]);
+  }, [loaded, motion, textSize, followRequestAlerts, appThemeSource]);
 
   const value = useMemo(
     () => ({
@@ -70,8 +81,10 @@ export function AppPreferencesProvider({
       setTextSize,
       followRequestAlerts,
       setFollowRequestAlerts,
+      appThemeSource,
+      setAppThemeSource,
     }),
-    [motion, textSize, followRequestAlerts],
+    [motion, textSize, followRequestAlerts, appThemeSource],
   );
 
   return (
