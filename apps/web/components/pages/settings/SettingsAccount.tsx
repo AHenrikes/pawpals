@@ -104,11 +104,13 @@ export default function SettingsAccount({
     dateOfBirth !== (account?.dob?.toISOString().slice(0, 10) ?? "");
 
   const accountStatus =
-    ({
-      at_risk: "At risk of suspension",
-      suspended: "Suspended",
-      closed: "Closed",
-    } as Record<string, string>)[account?.status ?? ""] ?? "Active";
+    (
+      {
+        at_risk: "At risk of suspension",
+        suspended: "Suspended",
+        closed: "Closed",
+      } as Record<string, string>
+    )[account?.status ?? ""] ?? "Active";
 
   const cancelEditing = () => {
     setFirstName(account?.firstname ?? "");

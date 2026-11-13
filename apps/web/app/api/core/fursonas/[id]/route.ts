@@ -40,7 +40,8 @@ function parseProfilePreferences(
   }
 
   if (body.profile_theme !== undefined) {
-    if (!profileThemeValues.has(body.profile_theme)) return "Invalid profile theme.";
+    if (!profileThemeValues.has(body.profile_theme))
+      return "Invalid profile theme.";
     updates.profile_theme = body.profile_theme;
   }
 
@@ -145,31 +146,32 @@ async function applyFursonaPatch(
 }
 
 export async function GET(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> },
-  ) {
-    const { supabase, account, response } = await requireUser();
-    if (response) return response;
-    const { id } = await params;
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { supabase, account, response } = await requireUser();
+  if (response) return response;
+  const { id } = await params;
 
-    if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
+  if (!id) return badRequest(ERROR_MESSAGES.FURSONA_NOT_IDENTIFIED);
 
-    const { data: profile, error } = await supabase
-      .schema("social")
-      .rpc("get_fursona_profile_by_identifier", {
-        p_identifier: id,
-        p_actor_fursona_id: account
-          ? request.headers.get("x-acting-fursona-id") || account.default_fursona_id
-          : null,
-      })
-      .maybeSingle();
+  const { data: profile, error } = await supabase
+    .schema("social")
+    .rpc("get_fursona_profile_by_identifier", {
+      p_identifier: id,
+      p_actor_fursona_id: account
+        ? request.headers.get("x-acting-fursona-id") ||
+          account.default_fursona_id
+        : null,
+    })
+    .maybeSingle();
 
-    if (error?.code === "PGRST116")
-      return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-    if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
-    if (!profile) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
-    return okPrivateRead<FursonaProfile>(profile as unknown as FursonaProfile);
-  }
+  if (error?.code === "PGRST116")
+    return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  if (error) return serverError(ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+  if (!profile) return notFound(ERROR_MESSAGES.FURSONA_NOT_FOUND);
+  return okPrivateRead<FursonaProfile>(profile as unknown as FursonaProfile);
+}
 
 export const PATCH = withUser(
   async (
@@ -186,9 +188,13 @@ export const PATCH = withUser(
 
     if (error) return badRequest(error);
 
-    const newUsername = body.username === undefined ? null :
-      typeof body.username === "string" && /^[a-zA-Z0-9_-]{3,50}$/.test(body.username.trim())
-        ? body.username.trim().toLowerCase() : "";
+    const newUsername =
+      body.username === undefined
+        ? null
+        : typeof body.username === "string" &&
+            /^[a-zA-Z0-9_-]{3,50}$/.test(body.username.trim())
+          ? body.username.trim().toLowerCase()
+          : "";
     if (newUsername === "") return badRequest("Invalid username.");
     const hasUpdates = Object.keys(updates).length > 0 || Boolean(newUsername);
     const isSettingDefault =

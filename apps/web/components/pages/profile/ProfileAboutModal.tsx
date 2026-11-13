@@ -11,7 +11,9 @@ import type { FursonaProfile } from "@/types/fursona";
 import { CalendarDaysIcon, ExternalLinkIcon, UsersIcon } from "lucide-react";
 import { safeSocialLinks } from "@/lib/validation/socialLinks";
 
-export function EmptyState({ children }: Readonly<{ children: React.ReactNode }>) {
+export function EmptyState({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <p className="rounded-lg border border-dashed border-border/30 p-4 text-center text-sm text-text-muted">
       {children}
@@ -23,7 +25,7 @@ export default function ProfileAboutModal({
   fursona,
   isOpen,
   onClose,
-  theme
+  theme,
 }: Readonly<{
   fursona: FursonaProfile;
   isOpen: boolean;
@@ -34,7 +36,9 @@ export default function ProfileAboutModal({
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className={`${theme} bg-background h-[min(78dvh,48rem)] w-full px-4 sm:px-6`}>
+      <DrawerContent
+        className={`${theme} bg-background h-[min(78dvh,48rem)] w-full px-4 sm:px-6`}
+      >
         <div className="mx-auto w-full max-w-3xl space-y-5 overflow-y-auto pb-8 scrollbar-hide">
           {/* Bio */}
           <section className="space-y-3">
@@ -71,7 +75,6 @@ export default function ProfileAboutModal({
               <EmptyState>No social links shared.</EmptyState>
             )}
           </section>
-
 
           {fursona.show_events !== false && (
             <>

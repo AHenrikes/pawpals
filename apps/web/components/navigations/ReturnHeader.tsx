@@ -17,7 +17,7 @@ type ReturnHeaderProp = {
   theme?: string;
   backHref?: string;
   title?: string;
-}
+};
 
 function getUsername(pathname: string): boolean {
   if (pathname.startsWith("/@")) {
@@ -98,7 +98,7 @@ export default function ReturnHeader({
               />
             </>
           ) : (
-            <Searchbar onOpenChange={setSearchOpen} theme={theme}/>
+            <Searchbar onOpenChange={setSearchOpen} theme={theme} />
           )}
 
           <NotificationBell />

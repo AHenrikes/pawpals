@@ -40,14 +40,26 @@ export default function ProfileContent() {
     setContent(key);
   };
 
-  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const handleTabKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
     let nextIndex: number;
     switch (event.key) {
-      case "ArrowRight": nextIndex = (index + 1) % profileNav.length; break;
-      case "ArrowLeft": nextIndex = (index - 1 + profileNav.length) % profileNav.length; break;
-      case "Home": nextIndex = 0; break;
-      case "End": nextIndex = profileNav.length - 1; break;
-      default: return;
+      case "ArrowRight":
+        nextIndex = (index + 1) % profileNav.length;
+        break;
+      case "ArrowLeft":
+        nextIndex = (index - 1 + profileNav.length) % profileNav.length;
+        break;
+      case "Home":
+        nextIndex = 0;
+        break;
+      case "End":
+        nextIndex = profileNav.length - 1;
+        break;
+      default:
+        return;
     }
     event.preventDefault();
     const nextTab = profileNav[nextIndex];
@@ -65,14 +77,20 @@ export default function ProfileContent() {
     <SidebarProvider className="flex min-w-0 flex-col pt-2">
       {/* Nav */}
       <div className="overflow-x-auto border-b border-muted pb-3 scrollbar-hide">
-        <div role="tablist" aria-label="Profile content" className="flex min-w-max gap-2 sm:gap-4">
+        <div
+          role="tablist"
+          aria-label="Profile content"
+          className="flex min-w-max gap-2 sm:gap-4"
+        >
           {profileNav.map(({ key, label, icon }, index) => {
             const Icon = icon;
 
             return (
               <Button
                 key={label}
-                ref={(node) => { tabs.current[index] = node; }}
+                ref={(node) => {
+                  tabs.current[index] = node;
+                }}
                 id={`${tabId}-${key}`}
                 role="tab"
                 variant="ghost"
@@ -88,9 +106,7 @@ export default function ProfileContent() {
                 )}
               >
                 {Icon && <Icon className="size-5" aria-hidden="true" />}
-                <span className="text-sm">
-                  {label}
-                </span>
+                <span className="text-sm">{label}</span>
               </Button>
             );
           })}

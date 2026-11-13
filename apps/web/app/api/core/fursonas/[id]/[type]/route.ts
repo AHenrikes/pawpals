@@ -10,14 +10,17 @@ import {
 const PAGE_SIZE = 20;
 const FOLLOW_TYPES = new Set(["followers", "following"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/;
+const TIMESTAMP =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 type FollowCursor = { createdAt: string; fursonaId: string };
 
 function decodeCursor(value: string): FollowCursor | null {
   if (!/^[A-Za-z0-9_-]{1,256}$/.test(value)) return null;
   try {
-    const parsed: unknown = JSON.parse(Buffer.from(value, "base64url").toString());
+    const parsed: unknown = JSON.parse(
+      Buffer.from(value, "base64url").toString(),
+    );
     if (!parsed || typeof parsed !== "object") return null;
     const { createdAt, fursonaId } = parsed as Partial<FollowCursor>;
     if (
@@ -26,7 +29,8 @@ function decodeCursor(value: string): FollowCursor | null {
       Number.isNaN(Date.parse(createdAt)) ||
       typeof fursonaId !== "string" ||
       !UUID.test(fursonaId)
-    ) return null;
+    )
+      return null;
     return { createdAt, fursonaId };
   } catch {
     return null;
@@ -125,10 +129,12 @@ export const GET = withUser(
     );
     const follows = ids.map((id) => fursonaById.get(id)).filter(Boolean);
     const last = page.at(-1);
-    const lastId = last?.[resultColumn as "follower_fursona_id" | "followed_fursona_id"];
-    const nextCursor = hasMore && last && lastId
-      ? encodeCursor({ createdAt: last.created_at, fursonaId: lastId })
-      : null;
+    const lastId =
+      last?.[resultColumn as "follower_fursona_id" | "followed_fursona_id"];
+    const nextCursor =
+      hasMore && last && lastId
+        ? encodeCursor({ createdAt: last.created_at, fursonaId: lastId })
+        : null;
 
     return okPrivateRead({ follows, nextCursor });
   },

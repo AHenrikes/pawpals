@@ -5,9 +5,14 @@ import { type FursonaProfile } from "@/types/fursona";
 import { api } from "@/lib/api/api-client";
 import { useUser } from "@/providers/UserProvider";
 
-export function useProfile(id: string, initialProfile?: FursonaProfile, initialActorId?: string | null) {
+export function useProfile(
+  id: string,
+  initialProfile?: FursonaProfile,
+  initialActorId?: string | null,
+) {
   const { currentFursona, loading: userLoading } = useUser();
-  const matchingInitialProfile = currentFursona?.id === initialActorId ? initialProfile : undefined;
+  const matchingInitialProfile =
+    currentFursona?.id === initialActorId ? initialProfile : undefined;
   const {
     data: profile = matchingInitialProfile ?? null,
     isLoading,

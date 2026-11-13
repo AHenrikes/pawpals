@@ -39,7 +39,11 @@ export default function ProfileBanner({
       {fursona.banner_url && (
         <Image
           src={fursona.banner_url}
-          loader={fursona.banner_url.startsWith("/api/media/") ? mediaImageLoader : undefined}
+          loader={
+            fursona.banner_url.startsWith("/api/media/")
+              ? mediaImageLoader
+              : undefined
+          }
           alt={`${fursona.display_name}'s banner`}
           fill
           sizes="100vw"

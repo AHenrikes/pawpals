@@ -127,7 +127,7 @@ export default function MessageHeader({
     }
 
     if (!mutualFriends.length) {
-      return null
+      return null;
     }
 
     return (

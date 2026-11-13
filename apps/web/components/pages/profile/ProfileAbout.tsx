@@ -12,13 +12,13 @@ type ProfileAboutProps = {
   readonly fursona: FursonaProfile;
   readonly isOwnProfile: boolean;
   readonly theme?: string;
-}
+};
 
 export default function ProfileAbout({
   fursona,
   isOwnProfile,
-  theme
-}: ProfileAboutProps ) {
+  theme,
+}: ProfileAboutProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -36,7 +36,8 @@ export default function ProfileAbout({
       >
         {isOwnProfile && (
           <TypographyXSmall className="line-clamp-3 text-text-muted wrap-break-word lg:line-clamp-none">
-            {fursona.bio || "Your story starts here. Tell a little about yourself."}
+            {fursona.bio ||
+              "Your story starts here. Tell a little about yourself."}
           </TypographyXSmall>
         )}
 

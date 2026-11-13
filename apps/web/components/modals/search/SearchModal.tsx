@@ -77,7 +77,7 @@ export default function SearchModal({
   onBlurCapture,
   searchQuery,
   onSearchQueryChange,
-  theme
+  theme,
 }: SearchDialogProps) {
   const { history, addSearch, clearHistory } = useSearchHistory();
   const prefersReducedMotion = useReducedMotion();
@@ -131,9 +131,14 @@ export default function SearchModal({
         >
           <motion.div
             key="search-popover"
-            initial={reduceMotion ? false : { opacity: 0, y: -50, scaleY: 0.98 }}
+            initial={
+              reduceMotion ? false : { opacity: 0, y: -50, scaleY: 0.98 }
+            }
             animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            transition={{ duration: reduceMotion ? 0 : 0.35, ease: "easeInOut" }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.35,
+              ease: "easeInOut",
+            }}
           >
             {/* Results Container */}
             <div className="flex-1 min-h-0 px-2 py-4 overflow-y-auto scrollbar-none z-50 md:min-h-74 md:px-6 md:pb-0">

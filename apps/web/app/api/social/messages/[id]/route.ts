@@ -53,7 +53,10 @@ export const POST = withUser(
     if (error?.code === "PT429")
       return NextResponse.json(
         { error: "Too many messages. Try again in a minute." },
-        { status: 429, headers: { "Retry-After": "60", "Cache-Control": "no-store" } },
+        {
+          status: 429,
+          headers: { "Retry-After": "60", "Cache-Control": "no-store" },
+        },
       );
     if (error) return serverError(error.message);
     return okNoStore({ message: data });

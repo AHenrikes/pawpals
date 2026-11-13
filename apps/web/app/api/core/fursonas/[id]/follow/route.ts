@@ -21,7 +21,12 @@ export const GET = withUser(
     const actingFursonaId =
       request.headers.get("x-acting-fursona-id") ?? account.default_fursona_id;
     if (!actingFursonaId) {
-      return ok({ isFollowing: false, isPending: false, isMutual: false, mutualSince: null });
+      return ok({
+        isFollowing: false,
+        isPending: false,
+        isMutual: false,
+        mutualSince: null,
+      });
     }
 
     const [{ data: following }, { data: followedBy }] = await Promise.all([

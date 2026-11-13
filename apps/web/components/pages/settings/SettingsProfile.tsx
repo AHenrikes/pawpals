@@ -11,7 +11,10 @@ import {
 import { usePageTransition } from "@/components/transitions/PageTransitionProvider";
 import { api } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/helpers/error-utils";
-import { removeFursonaImage, uploadFursonaImage } from "@/lib/uploads/fursonaMedia";
+import {
+  removeFursonaImage,
+  uploadFursonaImage,
+} from "@/lib/uploads/fursonaMedia";
 import { MAX_IMAGE_SIZE_BYTES } from "@/lib/uploads/imageLimits";
 import { mediaImageLoader } from "@/lib/uploads/mediaImageLoader";
 import { cn } from "@repo/ui/lib/utils";
@@ -195,7 +198,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
     currentFursona.visibility ?? "public",
   );
 
-  const [profileTheme, setProfileTheme] = useState<"light" | "dark">(currentFursona.profile_theme ?? "dark");
+  const [profileTheme, setProfileTheme] = useState<"light" | "dark">(
+    currentFursona.profile_theme ?? "dark",
+  );
 
   const [socialLinks, setSocialLinks] = useState<ProfileSocialLink[]>(
     currentFursona.social_links ?? [],
@@ -297,7 +302,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       return;
     }
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
-      toast.error(`${type === "banner" ? "Banner" : "Avatar"} is too large. Maximum size is ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024} MiB.`);
+      toast.error(
+        `${type === "banner" ? "Banner" : "Avatar"} is too large. Maximum size is ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024} MiB.`,
+      );
       event.target.value = "";
       return;
     }
@@ -343,15 +350,22 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
           : Promise.resolve(null),
       ]);
       for (const result of uploads) {
-        if (result.status === "fulfilled" && result.value) uploadedUrls.push(result.value);
+        if (result.status === "fulfilled" && result.value)
+          uploadedUrls.push(result.value);
       }
-      const failedUpload = uploads.find((result) => result.status === "rejected");
+      const failedUpload = uploads.find(
+        (result) => result.status === "rejected",
+      );
       if (failedUpload?.status === "rejected") throw failedUpload.reason;
-      const avatarUrl = uploads[0].status === "fulfilled" ? uploads[0].value : null;
-      const bannerUrl = uploads[1].status === "fulfilled" ? uploads[1].value : null;
+      const avatarUrl =
+        uploads[0].status === "fulfilled" ? uploads[0].value : null;
+      const bannerUrl =
+        uploads[1].status === "fulfilled" ? uploads[1].value : null;
       const nextUsername = username.trim();
       await api.patch(`/api/core/fursonas/${currentFursona.id}`, {
-        ...(nextUsername !== currentFursona.username && { username: nextUsername }),
+        ...(nextUsername !== currentFursona.username && {
+          username: nextUsername,
+        }),
         display_name: displayName.trim(),
         species,
         pronouns,
@@ -370,8 +384,12 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       });
       committed = true;
       await Promise.allSettled([
-        avatarUrl && currentFursona.avatar_url ? removeFursonaImage(currentFursona.avatar_url) : Promise.resolve(),
-        bannerUrl && currentFursona.banner_url ? removeFursonaImage(currentFursona.banner_url) : Promise.resolve(),
+        avatarUrl && currentFursona.avatar_url
+          ? removeFursonaImage(currentFursona.avatar_url)
+          : Promise.resolve(),
+        bannerUrl && currentFursona.banner_url
+          ? removeFursonaImage(currentFursona.banner_url)
+          : Promise.resolve(),
       ]);
       await refresh();
       await queryClient.invalidateQueries({ queryKey: ["fursona"] });
@@ -381,7 +399,8 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
         navigate(`/@${nextUsername}`, { replace: true });
       onClose?.();
     } catch (error) {
-      if (!committed) await Promise.allSettled(uploadedUrls.map(removeFursonaImage));
+      if (!committed)
+        await Promise.allSettled(uploadedUrls.map(removeFursonaImage));
       toast.error(`Update failed: ${getErrorMessage(error)}`);
     } finally {
       setSaving(false);
@@ -626,14 +645,30 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
             )}
             {visibility === "subscribers_only" && (
               <p className="rounded-lg bg-primary/10 p-3 text-xs text-text-muted">
-                Subscriptions are not available yet. Your profile will still be visible to signed-in users.
+                Subscriptions are not available yet. Your profile will still be
+                visible to signed-in users.
               </p>
             )}
           </SettingsSection>
 
-          <SettingsSection title="Profile theme" description="Visitors see this profile in your chosen theme without changing their app theme.">
+          <SettingsSection
+            title="Profile theme"
+            description="Visitors see this profile in your chosen theme without changing their app theme."
+          >
             <div className="flex gap-2">
-              {(["light", "dark"] as const).map((theme) => <Button key={theme} type="button" variant={profileTheme === theme ? "default" : "outline"} onClick={() => { setProfileTheme(theme); setNewChange(true); }}>{theme === "light" ? "Light" : "Dark"}</Button>)}
+              {(["light", "dark"] as const).map((theme) => (
+                <Button
+                  key={theme}
+                  type="button"
+                  variant={profileTheme === theme ? "default" : "outline"}
+                  onClick={() => {
+                    setProfileTheme(theme);
+                    setNewChange(true);
+                  }}
+                >
+                  {theme === "light" ? "Light" : "Dark"}
+                </Button>
+              ))}
             </div>
           </SettingsSection>
 
@@ -721,7 +756,11 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
               {bannerPreview && (
                 <Image
                   src={bannerPreview}
-                  loader={bannerPreview.startsWith("/api/media/") ? mediaImageLoader : undefined}
+                  loader={
+                    bannerPreview.startsWith("/api/media/")
+                      ? mediaImageLoader
+                      : undefined
+                  }
                   alt="Profile banner preview"
                   fill
                   sizes="288px"
@@ -749,7 +788,11 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
                 {avatarPreview && (
                   <Image
                     src={avatarPreview}
-                    loader={avatarPreview.startsWith("/api/media/") ? mediaImageLoader : undefined}
+                    loader={
+                      avatarPreview.startsWith("/api/media/")
+                        ? mediaImageLoader
+                        : undefined
+                    }
                     alt="Avatar preview"
                     fill
                     sizes="80px"
@@ -827,7 +870,9 @@ export default function SettingsProfile(props: Readonly<SettingsProfileProps>) {
       <div
         className={cn(
           "z-20 -mx-4 flex flex-col-reverse gap-2 border-t border-white/10 p-4 sm:mx-0 sm:flex-row sm:justify-end sm:rounded-2xl sm:border md:bg-background/75 md:shadow-2xl md:shadow-black/10 md:backdrop-blur-2xl",
-          newChange || isAvailable === false ? "sticky bottom-0 bg-background sm:bottom-6" : false,
+          newChange || isAvailable === false
+            ? "sticky bottom-0 bg-background sm:bottom-6"
+            : false,
         )}
       >
         <Button

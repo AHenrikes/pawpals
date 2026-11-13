@@ -116,7 +116,8 @@ export default function MessagesPage({
     const syncVisibility = () => setPageVisible(!document.hidden);
     syncVisibility();
     document.addEventListener("visibilitychange", syncVisibility);
-    return () => document.removeEventListener("visibilitychange", syncVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", syncVisibility);
   }, []);
 
   const loadConversations = useCallback(async (quiet = false) => {
@@ -338,17 +339,20 @@ export default function MessagesPage({
   useEffect(() => {
     if (messages.length)
       bottomRef.current?.scrollIntoView({
-        behavior: document.documentElement.dataset.motion === "reduced" ||
+        behavior:
+          document.documentElement.dataset.motion === "reduced" ||
           window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto" : "smooth",
+            ? "auto"
+            : "smooth",
         block: "end",
       });
   }, [messages.length, selectedId]);
   const allConversations = useMemo(
-    () => openedConversation &&
+    () =>
+      openedConversation &&
       !conversations.some((item) => item.id === openedConversation.id)
-      ? [openedConversation, ...conversations]
-      : conversations,
+        ? [openedConversation, ...conversations]
+        : conversations,
     [openedConversation, conversations],
   );
   const selected = allConversations.find((item) => item.id === selectedId);

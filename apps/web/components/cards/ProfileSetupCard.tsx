@@ -4,7 +4,11 @@ import { useEffect, useId, useState } from "react";
 import { CircleCheckIcon, CircleIcon } from "lucide-react";
 import { Button } from "@repo/ui/button";
 import { safeSocialLinks } from "@/lib/validation/socialLinks";
-import { TypographyH4, TypographySmall, TypographyXSmall } from "@repo/ui/typography";
+import {
+  TypographyH4,
+  TypographySmall,
+  TypographyXSmall,
+} from "@repo/ui/typography";
 import type { FursonaProfile } from "@/types/fursona";
 
 export default function ProfileSetupCard({
@@ -78,17 +82,15 @@ export default function ProfileSetupCard({
           </TypographyXSmall>
         </span>
 
-        <TypographyXSmall className="text-text-muted">A few steps to help others get to know you.</TypographyXSmall>
+        <TypographyXSmall className="text-text-muted">
+          A few steps to help others get to know you.
+        </TypographyXSmall>
       </div>
 
       <ul className="mt-3 space-y-2">
         {steps.map(({ label, complete }) => {
-
           return (
-            <li
-              key={label}
-              className="flex items-center gap-3 p-1"
-            >
+            <li key={label} className="flex items-center gap-3 p-1">
               <span aria-hidden="true">
                 {complete ? (
                   <CircleCheckIcon className="fill-primary text-background" />
@@ -97,16 +99,17 @@ export default function ProfileSetupCard({
                 )}
               </span>
 
-              <TypographySmall className={complete ? "text-text-muted text-xs" : "text-text"}>{label}</TypographySmall>
+              <TypographySmall
+                className={complete ? "text-text-muted text-xs" : "text-text"}
+              >
+                {label}
+              </TypographySmall>
             </li>
           );
         })}
       </ul>
 
-      <Button
-        variant="ghost"
-        onClick={skipForNow}
-      >
+      <Button variant="ghost" onClick={skipForNow}>
         Skip for now
       </Button>
     </section>

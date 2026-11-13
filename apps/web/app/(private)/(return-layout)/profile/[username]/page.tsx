@@ -4,7 +4,7 @@ import Profile from "@/components/pages/profile/Profile";
 import type { FursonaProfile } from "@/types/fursona";
 
 export default async function ProfilePage({
-  params
+  params,
 }: Readonly<{ params: Promise<{ username: string }> }>) {
   const { username } = await params;
   const { supabase, account } = await requireUser();

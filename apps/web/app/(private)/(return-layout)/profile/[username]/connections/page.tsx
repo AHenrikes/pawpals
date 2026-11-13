@@ -69,5 +69,7 @@ export default async function ConnectionsPage({
         </div>
       </div>
     </div>
-  ) : ( <h1>Page does not exist</h1> );
+  ) : (
+    <h1>Page does not exist</h1>
+  );
 }

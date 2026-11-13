@@ -257,7 +257,9 @@ export default function ProfileInfo({
           )}
 
           <Button
-            variant={isFollowing && isMutual || isPending ? "outline" : "default"}
+            variant={
+              (isFollowing && isMutual) || isPending ? "outline" : "default"
+            }
             onClick={() => toggle()}
             disabled={followLoading}
             aria-label={followLabel}
